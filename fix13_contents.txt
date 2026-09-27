@@ -1,0 +1,29 @@
+Archive:  FreedomV3_V1_DirectUpdate_FIX13_FINAL-debug.apk
+  Length      Date    Time    Name
+---------  ---------- -----   ----
+       56  1981-01-01 01:01   META-INF/com/android/build/gradle/app-metadata.properties
+       46  1981-01-01 01:01   META-INF/version-control-info.textproto
+   110896  1981-01-01 01:01   classes.dex
+  8726227  1981-01-01 01:01   assets/engine_v2.html
+      704  1981-01-01 01:01   assets/freedom_approval_router.js
+   168610  1981-01-01 01:01   assets/index.html.before_last
+   171687  1981-01-01 01:01   assets/index.html
+    10507  1981-01-01 01:01   assets/music_fix9.js.before_last
+    21446  1981-01-01 01:01   assets/music_fix9.js
+  1398491  1981-01-01 01:01   assets/raw_bank.js
+  2152080  1981-01-01 01:01   assets/v3_final_home.png
+  4753726  1981-01-01 01:01   assets/v3_guide.mp4
+  3291053  1981-01-01 01:01   assets/v3_intro.mp4
+  1022418  1981-01-01 01:01   assets/v3_ship_hero.png
+  2097883  1981-01-01 01:01   assets/v3_ship_home.png
+     6292  1981-01-01 01:01   AndroidManifest.xml
+  1079789  1981-01-01 01:01   res/J_.ogg
+   201130  1981-01-01 01:01   res/cg.wav
+    72115  1981-01-01 01:01   res/lm.ogg
+   269456  1981-01-01 01:01   res/v4.png
+     1248  1981-01-01 01:01   resources.arsc
+     2126  1981-01-01 01:01   META-INF/CERT.SF
+     1167  1981-01-01 01:01   META-INF/CERT.RSA
+     2052  1981-01-01 01:01   META-INF/MANIFEST.MF
+---------                     -------
+ 25561205                     24 files
