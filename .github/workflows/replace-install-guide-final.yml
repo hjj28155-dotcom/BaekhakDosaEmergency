@@ -1,0 +1,59 @@
+name: Replace installation guide with fully new video
+on:
+  push:
+    paths:
+      - '.github/workflows/replace-install-guide-final.yml'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install ffmpeg and Korean font
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y ffmpeg fonts-noto-cjk
+      - name: Build completely new installation guide
+        run: |
+          set -e
+          FONT="/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc"
+          rm -rf /tmp/guide && mkdir -p /tmp/guide
+          cat > /tmp/guide/make.sh <<'SH'
+          #!/usr/bin/env bash
+          set -e
+          FONT="/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc"
+          make_slide(){
+            n="$1"; title="$2"; body="$3"
+            printf '%s' "$title" > "/tmp/guide/title_${n}.txt"
+            printf '%s' "$body" > "/tmp/guide/body_${n}.txt"
+            ffmpeg -hide_banner -loglevel error -y \
+              -f lavfi -i "color=c=0x031b31:s=1080x1920:d=7:r=30" \
+              -f lavfi -i "anullsrc=r=48000:cl=stereo" \
+              -vf "drawbox=x=70:y=280:w=940:h=1180:color=0x082b49@0.92:t=fill,drawbox=x=95:y=305:w=890:h=1130:color=0xD7B85B@0.95:t=3,drawtext=fontfile=${FONT}:textfile=/tmp/guide/title_${n}.txt:fontcolor=0xF7D873:fontsize=62:x=(w-text_w)/2:y=430,drawtext=fontfile=${FONT}:textfile=/tmp/guide/body_${n}.txt:fontcolor=white:fontsize=42:line_spacing=24:x=(w-text_w)/2:y=690,drawtext=fontfile=${FONT}:text='항행의자유 V3':fontcolor=0xAFC8D8:fontsize=30:x=(w-text_w)/2:y=1370" \
+              -c:v libx264 -preset veryfast -crf 22 -pix_fmt yuv420p -r 30 \
+              -c:a aac -b:a 96k -shortest "/tmp/guide/slide_${n}.mp4"
+          }
+          make_slide 1 "설치 및 업데이트 설명서" $'항행의자유 V3\n최신 설치·업데이트 안내'
+          make_slide 2 "① 공지사항 열기" $'홈 화면에서\n공지사항 버튼을 눌러 주세요.'
+          make_slide 3 "② 설명서 전체화면" $'설치 및 업데이트 설명서의\n재생 버튼을 누르면\n전체 화면으로 확인할 수 있습니다.'
+          make_slide 4 "③ 새 업데이트 확인" $'새 업데이트 알림이 나오면\n업데이트를 눌러\n최신 버전을 받아 주세요.'
+          make_slide 5 "④ APK 설치" $'다운로드가 끝나면 설치를 진행합니다.\n기존 앱은 삭제하지 마세요.'
+          make_slide 6 "⑤ 설치 완료" $'설치가 끝나면 앱을 다시 실행합니다.\n최신 버전이 그대로 적용됩니다.'
+          make_slide 7 "⑥ 안내 동영상" $'신규 설치자와 이번 회차 업데이트 대상은\n안내 동영상을 한 번 끝까지 봅니다.\n종료 후 홈 우측에 두루마리가 나타납니다.'
+          make_slide 8 "설치 및 업데이트 완료" $'안전하고 안정적인 이용을 위해\n최신 버전을 사용해 주세요.\n감사합니다.'
+          : > /tmp/guide/concat.txt
+          for i in {1..8}; do echo "file '/tmp/guide/slide_${i}.mp4'" >> /tmp/guide/concat.txt; done
+          ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i /tmp/guide/concat.txt -c copy freedom_guide_latest.mp4
+          SH
+          chmod +x /tmp/guide/make.sh
+          /tmp/guide/make.sh
+          ffprobe -v error -show_entries format=duration,size -of default=nw=1 freedom_guide_latest.mp4
+          test "$(stat -c%s freedom_guide_latest.mp4)" -gt 1000000
+      - name: Commit new guide video
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add freedom_guide_latest.mp4
+          git commit -m "Replace installation guide with fully new video 20260928"
+          git push
