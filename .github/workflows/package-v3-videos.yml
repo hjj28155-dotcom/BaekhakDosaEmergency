@@ -1,0 +1,17 @@
+name: Package V3 videos
+on:
+  push:
+    paths:
+      - '.github/workflows/package-v3-videos.yml'
+jobs:
+  pack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v3-videos
+          path: |
+            항행의자유_인사소개.mp4
+            항행의자유_V3_설명서_최종버전_20260925.mp4
+          retention-days: 1
