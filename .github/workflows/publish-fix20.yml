@@ -1,0 +1,38 @@
+name: Verify and publish FIX20
+on:
+  push:
+    paths:
+      - '.github/workflows/publish-fix20.yml'
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download APK
+        run: |
+          set -euo pipefail
+          curl -fL 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-5098-8206-ae2a-994bc60996b5/raw?se=2026-09-27T08%3A42%3A53Z&sp=r&sv=2026-02-06&sr=b&scid=4be7d7c6-ca79-56aa-a357-5c9a74692a91&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-27T07%3A31%3A54Z&ske=2026-09-28T07%3A31%3A54Z&sks=b&skv=2026-02-06&sig=Y3CgGV8WLq/ttX84ia83CMoqDRDxbxLBi0ycoXe8r%2BQ%3D' -o FreedomV3_V1_DirectUpdate_FIX20-debug.apk
+          test "$(stat -c%s FreedomV3_V1_DirectUpdate_FIX20-debug.apk)" -gt 12000000
+      - name: Verify APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          AAPT=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
+          "$AAPT" dump badging FreedomV3_V1_DirectUpdate_FIX20-debug.apk | head -25 | tee fix20_badging.txt
+          "$APKSIGNER" verify --print-certs FreedomV3_V1_DirectUpdate_FIX20-debug.apk | tee fix20_signature.txt
+          "$APKSIGNER" verify --print-certs V1_R2760_LOCAL_MUSIC_FINAL.apk | tee v1_signature.txt
+          grep -q "package: name='com.baekhak.dosalivedist'" fix20_badging.txt
+          grep -q "versionCode='30104'" fix20_badging.txt
+          FIX_SHA=$(grep 'certificate SHA-256 digest:' fix20_signature.txt | head -1 | awk '{print $NF}')
+          V1_SHA=$(grep 'certificate SHA-256 digest:' v1_signature.txt | head -1 | awk '{print $NF}')
+          test "$FIX_SHA" = "$V1_SHA"
+      - name: Publish
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add FreedomV3_V1_DirectUpdate_FIX20-debug.apk fix20_badging.txt fix20_signature.txt v1_signature.txt
+          git commit -m 'Publish verified Freedom V3 FIX20 30104' || exit 0
+          git push
