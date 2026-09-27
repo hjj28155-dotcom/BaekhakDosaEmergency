@@ -30,14 +30,14 @@ jobs:
           GRADLE="$ROOT/app/build.gradle"
           test -f "$GRADLE"
           sed -E -i '0,/versionCode[[:space:]]+[0-9]+/s//versionCode 30107/' "$GRADLE"
-          sed -E -i '0,/versionName[[:space:]]+"[^"]+"/s//versionName "V3.1.07-FIX23"/' "$GRADLE"
+          sed -E -i "0,/versionName[[:space:]]+'[^']+'/s//versionName 'V3.1.07-FIX23'/" "$GRADLE"
           grep -nE 'versionCode|versionName' "$GRADLE"
       - name: Build FIX23
         run: |
           set -euo pipefail
           cd buildsrc/FREEDOM_V3_FIX22_BUILD_THIS
           chmod +x gradlew
-          ./gradlew --no-daemon clean assembleFreedomDebug
+          ./gradlew --no-daemon clean assembleDebug
           APK=$(find app/build/outputs/apk -type f -name '*.apk' | head -n1)
           test -n "$APK"
           cp "$APK" "$GITHUB_WORKSPACE/FreedomV3_V1_DirectUpdate_FIX23-debug.apk"
