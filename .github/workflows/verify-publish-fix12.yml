@@ -1,0 +1,41 @@
+name: Verify and publish FIX12
+on:
+  push:
+    paths:
+      - '.github/workflows/verify-publish-fix12.yml'
+permissions:
+  contents: write
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download FIX12
+        run: |
+          set -euo pipefail
+          curl -fL 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-c434-8206-b8a2-0aad13c2d651/raw?se=2026-09-27T05%3A48%3A42Z&sp=r&sv=2026-02-06&sr=b&scid=5490ea69-bab5-5f4e-90e8-ea05e81f6660&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-26T20%3A57%3A00Z&ske=2026-09-27T20%3A57%3A00Z&sks=b&skv=2026-02-06&sig=KXQlgZEZRCbRWJ9OR4C1sL1Ax3kN/nZMKvUBeCTU97s%3D' -o FIX12.apk
+          test "$(stat -c%s FIX12.apk)" -gt 10000000
+      - name: Verify package/version/signature
+        shell: bash
+        run: |
+          set -euo pipefail
+          AAPT=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
+          "$AAPT" dump badging FIX12.apk | head -20 | tee fix12_badging.txt
+          "$APKSIGNER" verify --print-certs FIX12.apk | tee fix12_signature.txt
+          "$APKSIGNER" verify --print-certs V1_R2760_LOCAL_MUSIC_FINAL.apk | tee v1_signature.txt
+          grep -q "package: name='com.baekhak.dosalivedist'" fix12_badging.txt
+          FIX12_SHA=$(grep 'certificate SHA-256 digest:' fix12_signature.txt | head -1 | awk '{print $NF}')
+          V1_SHA=$(grep 'certificate SHA-256 digest:' v1_signature.txt | head -1 | awk '{print $NF}')
+          echo "FIX12=$FIX12_SHA"
+          echo "V1=$V1_SHA"
+          test "$FIX12_SHA" = "$V1_SHA"
+      - name: Publish verified APK
+        run: |
+          set -euo pipefail
+          mv FIX12.apk FreedomV3_V1_DirectUpdate_FIX12-debug.apk
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add FreedomV3_V1_DirectUpdate_FIX12-debug.apk fix12_badging.txt fix12_signature.txt v1_signature.txt
+          git commit -m 'Publish verified Freedom V3 FIX12 APK' || exit 0
+          git push
