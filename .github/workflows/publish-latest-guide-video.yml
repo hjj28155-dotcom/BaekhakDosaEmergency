@@ -1,0 +1,24 @@
+name: Publish latest guide video
+on:
+  push:
+    paths:
+      - '.github/workflows/publish-latest-guide-video.yml'
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download guide
+        run: |
+          set -euo pipefail
+          curl -fL 'https://media.descriptusercontent.com/proxy/remux?url=https%3A%2F%2Fapi.descript.com%2Fv2%2Fpublished_projects%2Fdf91026b-5ab2-42aa-99d3-5d57ac23bc0e%2Fhls%3Fexpiration%3D1790590618936%26signature%3Df4fff6d03b84f1cd412802e4bdd5558e8728ee2445470f65285be87ea8e95f35&filename=original.mp4&mediaCacheBucketName=production-273614-media-cache&expiration=1790587019&signature=2b3092295a1ae66d533dbc1493878aa766da51ed1d9325bc73485ace9b621e55' -o freedom_guide_latest.mp4
+          test "$(stat -c%s freedom_guide_latest.mp4)" -gt 10000
+      - name: Publish
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add freedom_guide_latest.mp4
+          git commit -m 'Publish latest guide video' || exit 0
+          git push
