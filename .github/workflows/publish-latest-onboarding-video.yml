@@ -10,15 +10,42 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Download video
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-noto-cjk
+      - name: Download selected BGM
         run: |
           set -euo pipefail
-          curl -fL 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-0780-8206-93ab-00d2b3ea0c83/raw?se=2026-09-27T09%3A12%3A46Z&sp=r&sv=2026-02-06&sr=b&scid=4d733bb0-58f7-59a2-b5be-be0ed584fe48&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-27T07%3A41%3A17Z&ske=2026-09-28T07%3A41%3A17Z&sks=b&skv=2026-02-06&sig=3eIRXaAGjc8avqnZy0465I3jzd5r2abepJDMvMsuZ4U%3D' -o freedom_onboarding_latest.mp4
-          test "$(stat -c%s freedom_onboarding_latest.mp4)" -gt 14000000
+          curl -fL 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-7904-8206-b74e-7db1ecb9408a/raw?se=2026-09-27T10%3A31%3A17Z&sp=r&sv=2026-02-06&sr=b&scid=874506e8-22e0-53da-8f41-326e6d7a010d&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-27T07%3A45%3A52Z&ske=2026-09-28T07%3A45%3A52Z&sks=b&skv=2026-02-06&sig=tR4TxIKE/VM/UCvCeKRlPJ9cV89JOr%2B9rd6/oa5AXas%3D' -o bgm.mp3
+          test -s bgm.mp3
+      - name: Finalize onboarding video
+        run: |
+          set -euo pipefail
+          VIDEO='freedom_onboarding_latest.mp4'
+          FONT='/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc'
+          test -f "$VIDEO"
+          test -f "$FONT"
+          W=$(ffprobe -v error -select_streams v:0 -show_entries stream=width -of csv=p=0 "$VIDEO")
+          H=$(ffprobe -v error -select_streams v:0 -show_entries stream=height -of csv=p=0 "$VIDEO")
+          DUR=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$VIDEO")
+          HAS_AUDIO=$(ffprobe -v error -select_streams a:0 -show_entries stream=index -of csv=p=0 "$VIDEO" | head -n1 || true)
+          if [ -n "$HAS_AUDIO" ]; then
+            ffmpeg -y -i "$VIDEO" -vf 'fps=30,format=yuv420p' -af 'aresample=44100,aformat=sample_fmts=fltp:channel_layouts=stereo' -c:v libx264 -preset fast -crf 20 -c:a aac -b:a 192k normalized.mp4
+          else
+            ffmpeg -y -i "$VIDEO" -f lavfi -t "$DUR" -i anullsrc=r=44100:cl=stereo -vf 'fps=30,format=yuv420p' -map 0:v -map 1:a -c:v libx264 -preset fast -crf 20 -c:a aac -b:a 192k -shortest normalized.mp4
+          fi
+          ffmpeg -y -f lavfi -i "color=c=0x061c2c:s=${W}x${H}:r=30:d=5" -f lavfi -i 'anullsrc=r=44100:cl=stereo' -vf "drawtext=fontfile=${FONT}:text='설치 및 업데이트는 지금 마지막 화면 다음에':fontcolor=white:fontsize=h/24:x=(w-text_w)/2:y=h*0.40,drawtext=fontfile=${FONT}:text='공지사항에 있는 설치 동영상을 보시면서 진행하세요.':fontcolor=white:fontsize=h/24:x=(w-text_w)/2:y=h*0.52" -t 5 -c:v libx264 -preset fast -crf 20 -pix_fmt yuv420p -c:a aac -b:a 192k card.mp4
+          ffmpeg -y -i normalized.mp4 -i card.mp4 -filter_complex '[0:v][0:a][1:v][1:a]concat=n=2:v=1:a=1[v][a]' -map '[v]' -map '[a]' -c:v libx264 -preset fast -crf 20 -c:a aac -b:a 192k combined.mp4
+          TOTAL=$(ffprobe -v error -show_entries format=duration -of csv=p=0 combined.mp4)
+          FADE_START=$(python3 -c "t=float('$TOTAL'); print(max(0,t-2.0))")
+          ffmpeg -y -i combined.mp4 -stream_loop -1 -i bgm.mp3 -filter_complex "[0:a]volume=1.0[main];[1:a]volume=0.08,afade=t=in:st=0:d=1,atrim=0:${TOTAL},afade=t=out:st=${FADE_START}:d=2[bgm];[main][bgm]amix=inputs=2:duration=first:dropout_transition=2[aout]" -map 0:v -map '[aout]' -c:v copy -c:a aac -b:a 192k -shortest final.mp4
+          mv final.mp4 freedom_onboarding_latest.mp4
+          ffprobe -v error -show_entries format=duration,size -of default=nw=1 freedom_onboarding_latest.mp4
       - name: Publish
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add freedom_onboarding_latest.mp4
-          git commit -m 'Publish latest onboarding video' || exit 0
+          git commit -m 'Finalize onboarding video with selected BGM and end card' || exit 0
           git push
