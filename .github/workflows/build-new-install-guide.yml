@@ -1,0 +1,37 @@
+name: Build new installation guide video
+on:
+  push:
+    paths:
+      - '.github/workflows/build-new-install-guide.yml'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install ffmpeg and Korean font
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y ffmpeg fonts-noto-cjk
+      - name: Build new title
+        run: |
+          FONT="/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc"
+          ffmpeg -y             -f lavfi -i "color=c=0x031b31:s=720x1280:d=5:r=30"             -f lavfi -i "anullsrc=r=48000:cl=stereo"             -vf "drawtext=fontfile=${FONT}:text='설치 및 업데이트 설명서':fontcolor=0xF6D66F:fontsize=58:x=(w-text_w)/2:y=335,drawtext=fontfile=${FONT}:text='항행의자유 V3':fontcolor=white:fontsize=38:x=(w-text_w)/2:y=455,drawtext=fontfile=${FONT}:text='2026.09.28 최신 설치 안내':fontcolor=0xD7E8F2:fontsize=30:x=(w-text_w)/2:y=540,drawbox=x=80:y=645:w=560:h=180:color=0x0A3150@0.80:t=fill,drawtext=fontfile=${FONT}:text='처음 설치하거나 업데이트하시는 분은\n아래 설명을 순서대로 확인해 주세요.':fontcolor=white:fontsize=30:line_spacing=16:x=(w-text_w)/2:y=690"             -t 5 -c:v libx264 -preset medium -crf 21 -pix_fmt yuv420p             -c:a aac -b:a 128k -shortest title_new.mp4
+      - name: Normalize old guide
+        run: |
+          ffmpeg -y -i freedom_guide_latest.mp4             -vf "scale=720:1280:force_original_aspect_ratio=decrease,pad=720:1280:(ow-iw)/2:(oh-ih)/2:black,fps=30,format=yuv420p"             -af "aresample=48000"             -c:v libx264 -preset medium -crf 21 -c:a aac -b:a 128k normalized_old.mp4
+      - name: Concatenate new title and guide
+        run: |
+          printf "file 'title_new.mp4'\nfile 'normalized_old.mp4'\n" > concat.txt
+          ffmpeg -y -f concat -safe 0 -i concat.txt -c copy freedom_guide_latest_new.mp4
+          mv freedom_guide_latest_new.mp4 freedom_guide_latest.mp4
+          ffprobe -v error -show_entries format=duration,size -of default=nw=1 freedom_guide_latest.mp4
+          test "$(stat -c%s freedom_guide_latest.mp4)" -gt 1000000
+      - name: Commit new installation guide
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add freedom_guide_latest.mp4
+          git commit -m "Build new installation guide video 20260928"
+          git push
