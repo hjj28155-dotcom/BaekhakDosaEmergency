@@ -1,0 +1,24 @@
+name: Publish latest onboarding video
+on:
+  push:
+    paths:
+      - '.github/workflows/publish-latest-onboarding-video.yml'
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download video
+        run: |
+          set -euo pipefail
+          curl -fL 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-0780-8206-93ab-00d2b3ea0c83/raw?se=2026-09-27T09%3A12%3A46Z&sp=r&sv=2026-02-06&sr=b&scid=4d733bb0-58f7-59a2-b5be-be0ed584fe48&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-27T07%3A41%3A17Z&ske=2026-09-28T07%3A41%3A17Z&sks=b&skv=2026-02-06&sig=3eIRXaAGjc8avqnZy0465I3jzd5r2abepJDMvMsuZ4U%3D' -o freedom_onboarding_latest.mp4
+          test "$(stat -c%s freedom_onboarding_latest.mp4)" -gt 14000000
+      - name: Publish
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add freedom_onboarding_latest.mp4
+          git commit -m 'Publish latest onboarding video' || exit 0
+          git push
