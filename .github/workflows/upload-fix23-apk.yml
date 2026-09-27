@@ -1,0 +1,24 @@
+name: Upload verified FIX23 APK
+on:
+  push:
+    paths:
+      - '.github/workflows/upload-fix23-apk.yml'
+permissions:
+  contents: write
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download verified FIX23 APK
+        run: |
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-d2ac-8206-a7cd-55f46c1b28ad/raw?se=2026-09-27T10%3A59%3A48Z&sp=r&sv=2026-02-06&sr=b&scid=f335551c-4ed7-5f25-acfb-33f0a9bc2ed9&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-27T07%3A33%3A02Z&ske=2026-09-28T07%3A33%3A02Z&sks=b&skv=2026-02-06&sig=WcK/JnbJXvH7GomNmUEWFQL3j9lEtqjiCoRPVy4BJrE%3D' -o FreedomV3_V1_DirectUpdate_FIX23-debug.apk
+          test "$(stat -c%s FreedomV3_V1_DirectUpdate_FIX23-debug.apk)" = "13186566"
+          echo "4d7c0293e996daeab4e60719a64205c413c3103f74fb7dfcf55037bd2cbee0a4  FreedomV3_V1_DirectUpdate_FIX23-debug.apk" | sha256sum -c -
+      - name: Commit APK
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add FreedomV3_V1_DirectUpdate_FIX23-debug.apk
+          git commit -m 'Upload verified FIX23 APK 30107'
+          git push
