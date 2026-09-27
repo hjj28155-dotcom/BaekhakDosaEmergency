@@ -1,0 +1,27 @@
+name: Publish FIX19 stable
+on:
+  push:
+    paths:
+      - '.github/workflows/publish-fix19-stable.yml'
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download APK
+        env:
+          SRC_B64: aHR0cHM6Ly9zZG1udHBya29yZWFjZW50cmFsLm9haXVzZXJjb250ZW50LmNvbS9maWxlcy8wMDAwMDAwMC01YTZjLTgyMDYtYjZmNi0yNjllMDdjOGFkZWEvcmF3P3NlPTIwMjYtMDktMjdUMDglM0ExNiUzQTA1WiZzcD1yJnN2PTIwMjYtMDItMDYmc3I9YiZzY2lkPTA5MzFlZGZjLTdlNzctNWZmNi1hMTc5LTMxMjA3MzEyNzU2YiZza29pZD0wNzY1YjU1NC00YjkwLTRmYTItOWQ2ZC0wMDU1YTI0Mjc5MTAmc2t0aWQ9YTQ4Y2NhNTYtZTZkYS00ODRlLWE4MTQtOWM4NDk2NTJiY2IzJnNrdD0yMDI2LTA5LTI2VDA5JTNBNTAlM0E0Mlomc2tlPTIwMjYtMDktMjdUMDklM0E1MCUzQTQyWiZza3M9YiZza3Y9MjAyNi0wMi0wNiZzaWc9UWtsSDJuZDFRUnQycTBXTnN3WEpld28xYWRVRmFIdXE3ak1PcTBCL2E2VSUzRA==
+        run: |
+          set -euo pipefail
+          SRC=$(printf '%s' "$SRC_B64" | base64 -d)
+          curl -fL "$SRC" -o FreedomV3_V1_DirectUpdate_FIX19-debug.apk
+          test "$(stat -c%s FreedomV3_V1_DirectUpdate_FIX19-debug.apk)" -gt 12000000
+      - name: Publish
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add FreedomV3_V1_DirectUpdate_FIX19-debug.apk
+          git commit -m 'Publish stable FIX19 APK' || exit 0
+          git push
