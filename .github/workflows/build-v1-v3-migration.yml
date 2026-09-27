@@ -1,0 +1,55 @@
+name: Build V1-to-V3 direct migration APK
+
+on:
+  push:
+    paths:
+      - '.github/workflows/build-v1-v3-migration.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Download source package
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fL 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-ce44-8206-a20c-7e33226d4557/raw?se=2026-09-27T04%3A47%3A03Z&sp=r&sv=2026-02-06&sr=b&scid=a559ec92-cfb0-5e6e-b2ba-ffa3bab95327&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-26T23%3A36%3A49Z&ske=2026-09-27T23%3A36%3A49Z&sks=b&skv=2026-02-06&sig=gXGimlj6jZO8sirQtew9hYkgSV6h2N7jyYUArjlNhYM%3D' -o source.zip
+          rm -rf buildsrc
+          mkdir buildsrc
+          unzip -q source.zip -d buildsrc
+          find buildsrc -maxdepth 2 -type f | head -40
+
+      - name: Build masterDebug
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd buildsrc/V3_V1_DIRECT_UPDATE_BUILD
+          chmod +x gradlew
+          ./gradlew --no-daemon clean assembleMasterDebug
+          find app/build/outputs/apk -type f -name '*.apk' -print
+
+      - name: Publish migration APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK=$(find buildsrc/V3_V1_DIRECT_UPDATE_BUILD/app/build/outputs/apk -type f -name '*.apk' | head -n 1)
+          cp "$APK" ./항행의자유_V3_V1직접업데이트.apk
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add 항행의자유_V3_V1직접업데이트.apk
+          git commit -m 'Publish V1 to V3 direct migration APK' || exit 0
+          git push
