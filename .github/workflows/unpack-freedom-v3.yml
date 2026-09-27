@@ -1,0 +1,58 @@
+name: Unpack Freedom V3 Release
+
+on:
+  push:
+    paths:
+      - '.github/workflows/unpack-freedom-v3.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  unpack:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Unpack release archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          ZIP='항행의자유_V3_Netlify_ALL_PERFECT_FINAL.zip'
+          test -f "$ZIP"
+          rm -rf _release_unpack
+          mkdir _release_unpack
+          unzip -o "$ZIP" -d _release_unpack
+          echo '--- archive contents ---'
+          find _release_unpack -type f -maxdepth 5 -print
+
+      - name: Copy deploy files to repository root
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK_COUNT=$(find _release_unpack -type f -iname '*.apk' | wc -l)
+          MP4_COUNT=$(find _release_unpack -type f -iname '*.mp4' | wc -l)
+          INDEX_COUNT=$(find _release_unpack -type f -name 'index.html' | wc -l)
+          echo "APK=$APK_COUNT MP4=$MP4_COUNT INDEX=$INDEX_COUNT"
+          test "$APK_COUNT" -ge 1
+          test "$MP4_COUNT" -ge 2
+          test "$INDEX_COUNT" -ge 1
+          while IFS= read -r f; do cp -f "$f" "./$(basename "$f")"; done < <(find _release_unpack -type f -iname '*.apk')
+          while IFS= read -r f; do cp -f "$f" "./$(basename "$f")"; done < <(find _release_unpack -type f -iname '*.mp4')
+          INDEX_FILE=$(find _release_unpack -type f -name 'index.html' | head -n 1)
+          cp -f "$INDEX_FILE" ./index.html
+
+      - name: Commit extracted deploy files
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'ChatGPT Codex Connector'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- '*.apk' '*.mp4' index.html
+          if git diff --cached --quiet; then
+            echo 'No deploy file changes to commit.'
+            exit 0
+          fi
+          git commit -m 'Deploy Freedom V3 APK and videos'
+          git push
