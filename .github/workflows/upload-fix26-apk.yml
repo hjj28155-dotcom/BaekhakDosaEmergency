@@ -1,0 +1,24 @@
+name: Upload verified FIX26 APK
+on:
+  push:
+    paths:
+      - '.github/workflows/upload-fix26-apk.yml'
+permissions:
+  contents: write
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download verified FIX26 APK
+        run: |
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-2518-8206-8c63-1d1731e44dcb/raw?se=2026-09-27T12%3A51%3A00Z&sp=r&sv=2026-02-06&sr=b&scid=4af02109-9b2a-50f2-9697-3052f5487d12&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-26T23%3A02%3A42Z&ske=2026-09-27T23%3A02%3A42Z&sks=b&skv=2026-02-06&sig=jOcTYCr%2Blu41rOoziTF6%2BbA9zft2irC4ad6kjweqhFg%3D' -o FreedomV3_V1_DirectUpdate_FIX26-debug.apk
+          test "$(stat -c%s FreedomV3_V1_DirectUpdate_FIX26-debug.apk)" = "17237711"
+          echo "4899e255ecf34fe728b5d451a02767f9d6e2d087bb587ee0878d8d47422f0d2a  FreedomV3_V1_DirectUpdate_FIX26-debug.apk" | sha256sum -c -
+      - name: Commit APK
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add FreedomV3_V1_DirectUpdate_FIX26-debug.apk
+          git commit -m 'Upload verified FIX26 APK 30110'
+          git push
