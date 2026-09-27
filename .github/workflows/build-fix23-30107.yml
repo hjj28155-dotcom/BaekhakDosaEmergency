@@ -1,0 +1,74 @@
+name: Build and publish FIX23 30107
+on:
+  push:
+    paths:
+      - '.github/workflows/build-fix23-30107.yml'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Download source package
+        run: |
+          set -euo pipefail
+          curl -fL 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-ce44-8206-a20c-7e33226d4557/raw?se=2026-09-27T04%3A47%3A03Z&sp=r&sv=2026-02-06&sr=b&scid=a559ec92-cfb0-5e6e-b2ba-ffa3bab95327&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-26T23%3A36%3A49Z&ske=2026-09-27T23%3A36%3A49Z&sks=b&skv=2026-02-06&sig=gXGimlj6jZO8sirQtew9hYkgSV6h2N7jyYUArjlNhYM%3D' -o source.zip
+          rm -rf buildsrc fix22_assets
+          mkdir buildsrc fix22_assets
+          unzip -q source.zip -d buildsrc
+          unzip -q FreedomV3_V1_DirectUpdate_FIX22-debug.apk 'assets/*' -d fix22_assets
+      - name: Patch version and preserve FIX22 assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT='buildsrc/V3_V1_DIRECT_UPDATE_BUILD'
+          test -d "$ROOT"
+          GRADLE=$(find "$ROOT/app" -maxdepth 2 -type f \( -name 'build.gradle' -o -name 'build.gradle.kts' \) | head -n1)
+          echo "Using $GRADLE"
+          python3 - "$GRADLE" <<'PY'
+import re,sys,pathlib
+p=pathlib.Path(sys.argv[1])
+s=p.read_text()
+s2=re.sub(r'versionCode\s*(?:=\s*)?\d+', 'versionCode 30107' if 'versionCode =' not in s else 'versionCode = 30107', s, count=1)
+s2=re.sub(r'versionName\s*(?:=\s*)?["\'][^"\']+["\']', 'versionName "V3.1.07-FIX23"' if 'versionName =' not in s else 'versionName = "V3.1.07-FIX23"', s2, count=1)
+if s2==s:
+    raise SystemExit('version patch did not change gradle file')
+p.write_text(s2)
+print(p.read_text())
+PY
+          ASSET_DIR=$(find "$ROOT/app/src" -type d -path '*/main/assets' | head -n1)
+          test -n "$ASSET_DIR"
+          cp -f fix22_assets/assets/* "$ASSET_DIR"/
+      - name: Build FIX23
+        run: |
+          set -euo pipefail
+          cd buildsrc/V3_V1_DIRECT_UPDATE_BUILD
+          chmod +x gradlew
+          ./gradlew --no-daemon clean assembleMasterDebug
+          APK=$(find app/build/outputs/apk -type f -name '*.apk' | head -n1)
+          cp "$APK" "$GITHUB_WORKSPACE/FreedomV3_V1_DirectUpdate_FIX23-debug.apk"
+      - name: Verify FIX23
+        run: |
+          set -euo pipefail
+          AAPT=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
+          "$AAPT" dump badging FreedomV3_V1_DirectUpdate_FIX23-debug.apk | tee fix23_badging.txt
+          grep -q "package: name='com.baekhak.dosalivedist'" fix23_badging.txt
+          grep -q "versionCode='30107'" fix23_badging.txt
+          "$APKSIGNER" verify --print-certs FreedomV3_V1_DirectUpdate_FIX23-debug.apk | tee fix23_signature.txt
+          "$APKSIGNER" verify --print-certs FreedomV3_V1_DirectUpdate_FIX22-debug.apk | tee fix22_signature_check.txt
+          NEW=$(grep 'certificate SHA-256 digest:' fix23_signature.txt | head -1 | awk '{print $NF}')
+          OLD=$(grep 'certificate SHA-256 digest:' fix22_signature_check.txt | head -1 | awk '{print $NF}')
+          test "$NEW" = "$OLD"
+      - name: Publish FIX23
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add FreedomV3_V1_DirectUpdate_FIX23-debug.apk fix23_badging.txt fix23_signature.txt
+          git commit -m 'Publish verified Freedom V3 FIX23 30107'
+          git push
