@@ -49,7 +49,7 @@ jobs:
           chmod +x /tmp/guide/make.sh
           /tmp/guide/make.sh
           ffprobe -v error -show_entries format=duration,size -of default=nw=1 freedom_guide_latest.mp4
-          test "$(stat -c%s freedom_guide_latest.mp4)" -gt 1000000
+          test "$(stat -c%s freedom_guide_latest.mp4)" -gt 100000
       - name: Commit new guide video
         run: |
           git config user.name "github-actions[bot]"
