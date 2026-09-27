@@ -30,17 +30,9 @@ jobs:
           test -d "$ROOT"
           GRADLE=$(find "$ROOT/app" -maxdepth 2 -type f \( -name 'build.gradle' -o -name 'build.gradle.kts' \) | head -n1)
           echo "Using $GRADLE"
-          python3 - "$GRADLE" <<'PY'
-import re,sys,pathlib
-p=pathlib.Path(sys.argv[1])
-s=p.read_text()
-s2=re.sub(r'versionCode\s*(?:=\s*)?\d+', 'versionCode 30107' if 'versionCode =' not in s else 'versionCode = 30107', s, count=1)
-s2=re.sub(r'versionName\s*(?:=\s*)?["\'][^"\']+["\']', 'versionName "V3.1.07-FIX23"' if 'versionName =' not in s else 'versionName = "V3.1.07-FIX23"', s2, count=1)
-if s2==s:
-    raise SystemExit('version patch did not change gradle file')
-p.write_text(s2)
-print(p.read_text())
-PY
+          sed -E -i '0,/versionCode[[:space:]]*(=)?[[:space:]]*[0-9]+/s//versionCode 30107/' "$GRADLE"
+          sed -E -i '0,/versionName[[:space:]]*(=)?[[:space:]]*"[^"]+"/s//versionName "V3.1.07-FIX23"/' "$GRADLE"
+          grep -nE 'versionCode|versionName' "$GRADLE"
           ASSET_DIR=$(find "$ROOT/app/src" -type d -path '*/main/assets' | head -n1)
           test -n "$ASSET_DIR"
           cp -f fix22_assets/assets/* "$ASSET_DIR"/
