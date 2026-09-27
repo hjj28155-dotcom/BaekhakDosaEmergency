@@ -1,5 +1,8 @@
 name: Publish FIX19 from Drive
 on:
+  push:
+    paths:
+      - '.github/workflows/publish-fix19-drive.yml'
   workflow_dispatch:
 permissions:
   contents: write
