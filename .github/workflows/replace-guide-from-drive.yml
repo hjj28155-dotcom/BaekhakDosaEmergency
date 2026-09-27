@@ -1,0 +1,23 @@
+name: Replace guide with exact Drive source
+on:
+  push:
+    paths:
+      - '.github/workflows/replace-guide-from-drive.yml'
+permissions:
+  contents: write
+jobs:
+  replace:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download exact Drive guide
+        run: |
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-f560-8206-8d55-569a1c5e3b78/raw?se=2026-09-28T00%3A03%3A26Z&sp=r&sv=2026-02-06&sr=b&scid=2c8ab8a8-dab4-577f-8480-cf967e55d569&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-27T17%3A37%3A02Z&ske=2026-09-28T17%3A37%3A02Z&sks=b&skv=2026-02-06&sig=FFu7PTdLn%2BawUk1pXfuY5JqSZo4cY7EDmi/X09Zoy0w%3D' -o freedom_guide_latest.mp4
+          test "$(stat -c%s freedom_guide_latest.mp4)" = "3502801"
+      - name: Commit exact guide
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add freedom_guide_latest.mp4
+          git commit -m 'Use exact Drive installation guide video'
+          git push
