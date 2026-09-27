@@ -1,0 +1,32 @@
+name: Compare APK signatures
+
+on:
+  push:
+    paths:
+      - '.github/workflows/compare-signatures.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compare signatures
+        shell: bash
+        run: |
+          set -euo pipefail
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
+          echo "APKSIGNER=$APKSIGNER"
+          "$APKSIGNER" verify --print-certs V1_R2760_LOCAL_MUSIC_FINAL.apk > sig_v1.txt
+          "$APKSIGNER" verify --print-certs '항행의자유_V3_V1직접업데이트.apk' > sig_v3.txt
+          cat sig_v1.txt
+          cat sig_v3.txt
+      - name: Commit results
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add sig_v1.txt sig_v3.txt
+          git commit -m 'Compare V1 and V3 signatures' || exit 0
+          git push
