@@ -10,39 +10,36 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
-      - name: Download source package
+      - name: Download FIX22 source package
         run: |
           set -euo pipefail
-          curl -fL 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-ce44-8206-a20c-7e33226d4557/raw?se=2026-09-27T04%3A47%3A03Z&sp=r&sv=2026-02-06&sr=b&scid=a559ec92-cfb0-5e6e-b2ba-ffa3bab95327&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-26T23%3A36%3A49Z&ske=2026-09-27T23%3A36%3A49Z&sks=b&skv=2026-02-06&sig=gXGimlj6jZO8sirQtew9hYkgSV6h2N7jyYUArjlNhYM%3D' -o source.zip
-          rm -rf buildsrc fix22_assets
-          mkdir buildsrc fix22_assets
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-0c54-8206-b2ab-cb98595499af/raw?se=2026-09-27T10%3A45%3A23Z&sp=r&sv=2026-02-06&sr=b&scid=c0aa3818-969c-53c0-97f6-01dfbc4e6575&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-27T01%3A21%3A11Z&ske=2026-09-28T01%3A21%3A11Z&sks=b&skv=2026-02-06&sig=yk/nw6qxY95XcDYrHcgHWHb0XinN3g9b3ejapHDhi9Q%3D' -o source.zip
+          rm -rf buildsrc
+          mkdir buildsrc
           unzip -q source.zip -d buildsrc
-          unzip -q FreedomV3_V1_DirectUpdate_FIX22-debug.apk 'assets/*' -d fix22_assets
-      - name: Patch version and preserve FIX22 assets
+          test -d buildsrc/FREEDOM_V3_FIX22_BUILD_THIS
+      - name: Patch version to 30107
         shell: bash
         run: |
           set -euo pipefail
-          ROOT='buildsrc/V3_V1_DIRECT_UPDATE_BUILD'
-          test -d "$ROOT"
-          GRADLE=$(find "$ROOT/app" -maxdepth 2 -type f \( -name 'build.gradle' -o -name 'build.gradle.kts' \) | head -n1)
-          echo "Using $GRADLE"
-          sed -E -i '0,/versionCode[[:space:]]*(=)?[[:space:]]*[0-9]+/s//versionCode 30107/' "$GRADLE"
-          sed -E -i '0,/versionName[[:space:]]*(=)?[[:space:]]*"[^"]+"/s//versionName "V3.1.07-FIX23"/' "$GRADLE"
+          ROOT='buildsrc/FREEDOM_V3_FIX22_BUILD_THIS'
+          GRADLE="$ROOT/app/build.gradle"
+          test -f "$GRADLE"
+          sed -E -i '0,/versionCode[[:space:]]+[0-9]+/s//versionCode 30107/' "$GRADLE"
+          sed -E -i '0,/versionName[[:space:]]+"[^"]+"/s//versionName "V3.1.07-FIX23"/' "$GRADLE"
           grep -nE 'versionCode|versionName' "$GRADLE"
-          ASSET_DIR=$(find "$ROOT/app/src" -type d -path '*/main/assets' | head -n1)
-          test -n "$ASSET_DIR"
-          cp -f fix22_assets/assets/* "$ASSET_DIR"/
       - name: Build FIX23
         run: |
           set -euo pipefail
-          cd buildsrc/V3_V1_DIRECT_UPDATE_BUILD
+          cd buildsrc/FREEDOM_V3_FIX22_BUILD_THIS
           chmod +x gradlew
-          ./gradlew --no-daemon clean assembleMasterDebug
+          ./gradlew --no-daemon clean assembleFreedomDebug
           APK=$(find app/build/outputs/apk -type f -name '*.apk' | head -n1)
+          test -n "$APK"
           cp "$APK" "$GITHUB_WORKSPACE/FreedomV3_V1_DirectUpdate_FIX23-debug.apk"
       - name: Verify FIX23
         run: |
