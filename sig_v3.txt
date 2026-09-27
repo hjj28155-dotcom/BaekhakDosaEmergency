@@ -1,0 +1,6 @@
+V2 Signer: certificate DN: C=US, O=Android, CN=Android Debug
+V2 Signer: certificate SHA-256 digest: b062a08b872c1ecbce9be878645d03e9742bbdee67cd3cc8a486b3a06e08e787
+V2 Signer: certificate SHA-1 digest: ada3235d2d96bedc25d999a905ac4ee7681bf913
+V2 Signer: certificate MD5 digest: b0f925ac5523e2de9508d2a55747a002
+WARNING: META-INF/com/android/build/gradle/app-metadata.properties not protected by signature. Unauthorized modifications to this JAR entry will not be detected. Delete or move the entry outside of META-INF/.
+WARNING: META-INF/version-control-info.textproto not protected by signature. Unauthorized modifications to this JAR entry will not be detected. Delete or move the entry outside of META-INF/.
