@@ -1,0 +1,40 @@
+name: Verify and publish FIX14
+on:
+  push:
+    paths:
+      - '.github/workflows/publish-fix14.yml'
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download
+        run: |
+          set -euo pipefail
+          curl -fL 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-76a0-8206-92fb-1be41c290649/raw?se=2026-09-27T06%3A41%3A33Z&sp=r&sv=2026-02-06&sr=b&scid=cebc1faa-5524-5042-b353-676d54bb1964&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-26T18%3A40%3A22Z&ske=2026-09-27T18%3A40%3A22Z&sks=b&skv=2026-02-06&sig=xR3IjBqNXiOtSNdPY5SIZKQnSKQxIA3TitGCe2B9s0Q%3D' -o FreedomV3_V1_DirectUpdate_FIX14-debug.apk
+          test "$(stat -c%s FreedomV3_V1_DirectUpdate_FIX14-debug.apk)" -gt 20000000
+      - name: Verify
+        shell: bash
+        run: |
+          set -euo pipefail
+          AAPT=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
+          "$AAPT" dump badging FreedomV3_V1_DirectUpdate_FIX14-debug.apk | head -25 | tee fix14_badging.txt
+          "$APKSIGNER" verify --print-certs FreedomV3_V1_DirectUpdate_FIX14-debug.apk | tee fix14_signature.txt
+          "$APKSIGNER" verify --print-certs V1_R2760_LOCAL_MUSIC_FINAL.apk | tee v1_signature.txt
+          unzip -l FreedomV3_V1_DirectUpdate_FIX14-debug.apk | tee fix14_contents.txt
+          grep -q "package: name='com.baekhak.dosalivedist'" fix14_badging.txt
+          grep -q "assets/v3_intro.mp4" fix14_contents.txt
+          grep -q "assets/v3_guide.mp4" fix14_contents.txt
+          FIX14_SHA=$(grep 'certificate SHA-256 digest:' fix14_signature.txt | head -1 | awk '{print $NF}')
+          V1_SHA=$(grep 'certificate SHA-256 digest:' v1_signature.txt | head -1 | awk '{print $NF}')
+          test "$FIX14_SHA" = "$V1_SHA"
+      - name: Publish
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add FreedomV3_V1_DirectUpdate_FIX14-debug.apk fix14_badging.txt fix14_signature.txt fix14_contents.txt v1_signature.txt
+          git commit -m 'Publish verified Freedom V3 FIX14' || exit 0
+          git push
