@@ -1,0 +1,41 @@
+name: Publish FIX13 Final
+on:
+  push:
+    paths:
+      - '.github/workflows/publish-fix13-final.yml'
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download APK
+        run: |
+          set -euo pipefail
+          curl -fL 'https://sdmntprjapaneast.oaiusercontent.com/files/00000000-f03c-8209-b7aa-fc8c2b3d8cdf/raw?se=2026-09-27T06%3A30%3A35Z&sp=r&sv=2026-02-06&sr=b&scid=9c399bdc-8357-5610-b8e8-8011003c6197&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-27T02%3A45%3A50Z&ske=2026-09-28T02%3A45%3A50Z&sks=b&skv=2026-02-06&sig=CTnnJi3AOiNxBbCBiRkpfht9goBOxvEJeTZ3aBtIm6c%3D' -o FreedomV3_V1_DirectUpdate_FIX13_FINAL-debug.apk
+          test "$(stat -c%s FreedomV3_V1_DirectUpdate_FIX13_FINAL-debug.apk)" -gt 20000000
+      - name: Verify
+        shell: bash
+        run: |
+          set -euo pipefail
+          AAPT=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
+          "$AAPT" dump badging FreedomV3_V1_DirectUpdate_FIX13_FINAL-debug.apk | head -25 | tee fix13_badging.txt
+          "$APKSIGNER" verify --print-certs FreedomV3_V1_DirectUpdate_FIX13_FINAL-debug.apk | tee fix13_signature.txt
+          "$APKSIGNER" verify --print-certs V1_R2760_LOCAL_MUSIC_FINAL.apk | tee v1_signature.txt
+          unzip -l FreedomV3_V1_DirectUpdate_FIX13_FINAL-debug.apk | tee fix13_contents.txt
+          grep -q "package: name='com.baekhak.dosalivedist'" fix13_badging.txt
+          grep -q "assets/v3_intro.mp4" fix13_contents.txt
+          grep -q "assets/v3_guide.mp4" fix13_contents.txt
+          unzip -p FreedomV3_V1_DirectUpdate_FIX13_FINAL-debug.apk assets/music_fix9.js | grep -q "FM 라디오"
+          FIX13_SHA=$(grep 'certificate SHA-256 digest:' fix13_signature.txt | head -1 | awk '{print $NF}')
+          V1_SHA=$(grep 'certificate SHA-256 digest:' v1_signature.txt | head -1 | awk '{print $NF}')
+          test "$FIX13_SHA" = "$V1_SHA"
+      - name: Publish
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add FreedomV3_V1_DirectUpdate_FIX13_FINAL-debug.apk fix13_badging.txt fix13_signature.txt fix13_contents.txt v1_signature.txt
+          git commit -m 'Publish verified Freedom V3 FIX13 FINAL' || exit 0
+          git push
