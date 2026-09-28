@@ -1,0 +1,34 @@
+name: Mix exact installation guide with selected BGM
+on:
+  push:
+    paths:
+      - '.github/workflows/mix-exact-guide-bgm.yml'
+permissions:
+  contents: write
+jobs:
+  mix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install ffmpeg
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y ffmpeg
+      - name: Download exact user video and music
+        run: |
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-74cc-8206-9cbb-b4c2e5016c19/raw?se=2026-09-28T00%3A38%3A32Z&sp=r&sv=2026-02-06&sr=b&scid=8f7e04c0-1c39-5770-b32a-6eddbcbe31fd&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-28T00%3A31%3A07Z&ske=2026-09-29T00%3A31%3A07Z&sks=b&skv=2026-02-06&sig=LPW1sU7CpQlbTPmnkJCEud%2B/pJ/BCgP3ZQBdYrrM%2BKs%3D' -o guide_source.mp4
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-7fd0-8206-9b2c-e8aee4f86140/raw?se=2026-09-28T00%3A38%3A32Z&sp=r&sv=2026-02-06&sr=b&scid=9787b4df-f630-52a8-b7dd-6d9e4fba084e&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-27T17%3A24%3A00Z&ske=2026-09-28T17%3A24%3A00Z&sks=b&skv=2026-02-06&sig=lRP3eCjxkScx5iSgorDYn%2Bdl3RctDgCnZFs47%2B0zBsg%3D' -o guide_bgm.mp3
+          test "$(stat -c%s guide_source.mp4)" = "4753726"
+          test "$(stat -c%s guide_bgm.mp3)" = "6605124"
+      - name: Mix selected BGM
+        run: |
+          ffmpeg -hide_banner -loglevel error -y             -i guide_source.mp4             -stream_loop -1 -i guide_bgm.mp3             -filter_complex "[0:a]volume=1.0[orig];[1:a]volume=0.50[bgm];[orig][bgm]amix=inputs=2:duration=first:dropout_transition=2:normalize=0,alimiter=limit=0.95[a]"             -map 0:v:0 -map "[a]"             -c:v copy -c:a aac -b:a 192k -ar 44100 -shortest             freedom_guide_latest.mp4
+          ffprobe -v error -show_entries format=duration,size -of default=nw=1 freedom_guide_latest.mp4
+          test "$(stat -c%s freedom_guide_latest.mp4)" -gt 1000000
+      - name: Commit guide video
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add freedom_guide_latest.mp4
+          git commit -m "Use exact guide video with selected BGM"
+          git push
