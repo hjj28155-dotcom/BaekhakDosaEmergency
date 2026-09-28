@@ -1,0 +1,55 @@
+name: Build verify publish FIX45 30129
+on:
+  push:
+    paths:
+      - '.github/workflows/build-publish-fix45-30129.yml'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Download FIX45 source
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 'https://sdmntprwestus.oaiusercontent.com/files/00000000-4080-8230-b0a9-bd716680cfef/raw?se=2026-09-28T08%3A09%3A01Z&sp=r&sv=2026-02-06&sr=b&scid=4487c707-902d-5db4-84f2-38b1b9ea6376&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-28T00%3A20%3A57Z&ske=2026-09-29T00%3A20%3A57Z&sks=b&skv=2026-02-06&sig=x5ORWyBooCoxDKpJEz1Lhlp3ciO5M1uMBHZK8EylSA0%3D' -o source.zip
+          rm -rf buildsrc && mkdir buildsrc
+          unzip -q source.zip -d buildsrc
+          test -d buildsrc/FREEDOM_V3_FIX45_BUILD_THIS
+      - name: Build FIX45
+        run: |
+          set -euo pipefail
+          cd buildsrc/FREEDOM_V3_FIX45_BUILD_THIS
+          chmod +x gradlew
+          ./gradlew --no-daemon clean assembleDebug
+          APK=$(find app/build/outputs/apk -type f -name '*.apk' | head -n1)
+          test -n "$APK"
+          cp "$APK" "$GITHUB_WORKSPACE/FreedomV3_V1_DirectUpdate_FIX45-debug.apk"
+      - name: Verify package version signature
+        run: |
+          set -euo pipefail
+          AAPT=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
+          "$AAPT" dump badging FreedomV3_V1_DirectUpdate_FIX45-debug.apk | tee fix45_badging.txt
+          grep -q "package: name='com.baekhak.dosalivedist'" fix45_badging.txt
+          grep -q "versionCode='30129'" fix45_badging.txt
+          "$APKSIGNER" verify --print-certs FreedomV3_V1_DirectUpdate_FIX45-debug.apk | tee fix45_signature.txt
+          "$APKSIGNER" verify --print-certs FreedomV3_V1_DirectUpdate_FIX44-debug.apk | tee fix44_signature_check.txt
+          NEW=$(grep 'certificate SHA-256 digest:' fix45_signature.txt | head -1 | awk '{print $NF}')
+          OLD=$(grep 'certificate SHA-256 digest:' fix44_signature_check.txt | head -1 | awk '{print $NF}')
+          echo "FIX45=$NEW"
+          echo "FIX44=$OLD"
+          test "$NEW" = "$OLD"
+      - name: Publish verified FIX45
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add FreedomV3_V1_DirectUpdate_FIX45-debug.apk fix45_badging.txt fix45_signature.txt
+          git commit -m 'Publish verified Freedom V3 FIX45 30129'
+          git push
