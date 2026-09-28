@@ -1,0 +1,21 @@
+name: Publish trimmed onboarding unique file
+on:
+  push:
+    paths:
+      - '.github/workflows/publish-trimmed-onboarding-unique.yml'
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Copy trimmed onboarding to unique filename
+        run: |
+          cp freedom_onboarding_latest.mp4 freedom_onboarding_postscroll_20260928.mp4
+          test "$(stat -c%s freedom_onboarding_postscroll_20260928.mp4)" = "19889258"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add freedom_onboarding_postscroll_20260928.mp4
+          git commit -m "Publish trimmed onboarding under unique filename"
+          git push
