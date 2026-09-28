@@ -1,0 +1,33 @@
+name: Replace guide audio with selected song only
+on:
+  push:
+    paths:
+      - '.github/workflows/guide-selected-song-only.yml'
+permissions:
+  contents: write
+jobs:
+  mix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install ffmpeg
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y ffmpeg
+      - name: Download exact video and selected song
+        run: |
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-2618-8206-819f-036cfa8ad212/raw?se=2026-09-28T01%3A24%3A36Z&sp=r&sv=2026-02-06&sr=b&scid=7939a878-c97b-548f-961e-6d00a6ef1bce&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-28T00%3A33%3A25Z&ske=2026-09-29T00%3A33%3A25Z&sks=b&skv=2026-02-06&sig=sCSpzUwxl8qDksG5WLkHrsDSOGKEXP%2B5B1Gn414mTSU%3D' -o guide_source.mp4
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-4fec-8206-b24b-9660c339cf8a/raw?se=2026-09-28T01%3A24%3A37Z&sp=r&sv=2026-02-06&sr=b&scid=aa084484-76a6-52b2-b69f-0fbe08b2d384&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-28T00%3A33%3A04Z&ske=2026-09-29T00%3A33%3A04Z&sks=b&skv=2026-02-06&sig=g0Zj/72xVpd/F7zQe8tnYJLw9iLstkGqPMR%2BsnDNsb0%3D' -o selected_bgm.mp3
+          test "$(stat -c%s guide_source.mp4)" = "4753726"
+          test "$(stat -c%s selected_bgm.mp3)" = "6605124"
+      - name: Remove original audio and use selected song only
+        run: |
+          ffmpeg -hide_banner -loglevel error -y             -i guide_source.mp4             -stream_loop -1 -i selected_bgm.mp3             -filter:a "volume=0.95,alimiter=limit=0.95"             -map 0:v:0 -map 1:a:0             -c:v copy -c:a aac -b:a 192k -ar 44100             -t 112.833333             freedom_guide_latest.mp4
+          ffprobe -v error -show_entries format=duration,size -of default=nw=1 freedom_guide_latest.mp4
+      - name: Commit final guide audio
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add freedom_guide_latest.mp4
+          git commit -m "Use selected song only for installation guide"
+          git push
