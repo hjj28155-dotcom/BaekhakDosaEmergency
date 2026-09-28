@@ -1,0 +1,23 @@
+name: Publish FIX44 APK
+on:
+  push:
+    paths:
+      - '.github/workflows/publish-fix44-apk.yml'
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download exact AndroidIDE APK
+        run: |
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-344c-8206-a1f3-0602d9a3d79e/raw?se=2026-09-28T06%3A48%3A03Z&sp=r&sv=2026-02-06&sr=b&scid=4f3bb1fa-76fe-5657-be5c-4df6ddc643a5&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-28T00%3A49%3A09Z&ske=2026-09-29T00%3A49%3A09Z&sks=b&skv=2026-02-06&sig=s5vh6r5gOK%2BmgCSM4Q7pV4q1qakun2sMs1%2BAOr6Git4%3D' -o FreedomV3_V1_DirectUpdate_FIX44-debug.apk
+          test "$(stat -c%s FreedomV3_V1_DirectUpdate_FIX44-debug.apk)" = "23381775"
+      - name: Commit APK
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add FreedomV3_V1_DirectUpdate_FIX44-debug.apk
+          git commit -m "Publish FIX44 AndroidIDE APK"
+          git push
