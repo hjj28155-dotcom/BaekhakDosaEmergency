@@ -1,0 +1,32 @@
+name: Remove onboarding end card
+on:
+  push:
+    paths:
+      - '.github/workflows/remove-onboarding-endcard.yml'
+permissions:
+  contents: write
+jobs:
+  trim:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install ffmpeg
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y ffmpeg
+      - name: Trim appended final 5 seconds
+        run: |
+          set -e
+          V="freedom_onboarding_latest.mp4"
+          D=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$V")
+          CUT=$(python3 -c "d=float('$D'); print(max(0,d-5.0))")
+          ffmpeg -hide_banner -loglevel error -y -i "$V" -t "$CUT" -c copy trimmed.mp4
+          mv trimmed.mp4 "$V"
+          ffprobe -v error -show_entries format=duration,size -of default=nw=1 "$V"
+      - name: Commit trimmed video
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add freedom_onboarding_latest.mp4
+          git commit -m "Remove onboarding final instruction card"
+          git push
