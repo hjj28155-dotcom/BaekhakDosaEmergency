@@ -1,0 +1,36 @@
+name: Publish FIX57 30141 AndroidIDE APK
+on:
+  push:
+    paths:
+      - '.github/workflows/publish-fix57-30141.yml'
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download AndroidIDE APK
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-4e94-8206-b101-0496deba509d/raw?se=2026-09-29T01%3A33%3A51Z&sp=r&sv=2026-02-06&sr=b&scid=d7a4d4d6-1717-5806-8626-1e2f2e175f34&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-29T00%3A43%3A22Z&ske=2026-09-30T00%3A43%3A22Z&sks=b&skv=2026-02-06&sig=IkjjYM8q%2BrwFoKagiwmm%2B/8XEgGf7/tL6jQjcxeYUaY%3D' -o FreedomV3_V1_DirectUpdate_FIX57-debug.apk
+          test "$(stat -c%s FreedomV3_V1_DirectUpdate_FIX57-debug.apk)" -gt 30000000
+      - name: Verify package version signature
+        run: |
+          set -euo pipefail
+          AAPT=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
+          "$AAPT" dump badging FreedomV3_V1_DirectUpdate_FIX57-debug.apk | tee fix57_badging.txt
+          grep -q "package: name='com.baekhak.dosalivedist'" fix57_badging.txt
+          grep -q "versionCode='30141'" fix57_badging.txt
+          "$APKSIGNER" verify --print-certs FreedomV3_V1_DirectUpdate_FIX57-debug.apk | tee fix57_signature.txt
+          SIG=$(grep 'certificate SHA-256 digest:' fix57_signature.txt | head -1 | awk '{print $NF}')
+          test "$SIG" = "3fe57967c15f81ee39ea2b9b88dd96a7506c1b5b9032606ecbea04bbdb15ee3c"
+      - name: Publish APK
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add FreedomV3_V1_DirectUpdate_FIX57-debug.apk fix57_badging.txt fix57_signature.txt
+          git commit -m 'Publish verified Freedom V3 FIX57 30141'
+          git push
