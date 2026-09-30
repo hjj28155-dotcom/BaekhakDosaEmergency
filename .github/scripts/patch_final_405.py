@@ -1,0 +1,165 @@
+from pathlib import Path
+import re
+
+p=Path('build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/index.html')
+s=p.read_text(encoding='utf-8')
+
+s=s.replace("""    // V4.0.4 순서: 두루마리 -> 설치 설명서 -> 승인요청 -> 안내동영상 -> 승인완료 후 홈
+    window.__playApprovalAfterGuide=true;
+    setTimeout(()=>{
+      try{ openInstallGuideVideo(); }
+      catch(e){ console.error(e); }
+      setTimeout(()=>{postIntroOpening=false},500);
+    },0);""","""    // FINAL: 승인완료 -> 환영 두루마리 -> 설치동영상 -> 안내동영상 -> 홈
+    window.__playIntroAfterInstall=true;
+    setTimeout(()=>{
+      try{ openInstallGuideVideo(); }
+      catch(e){ console.error(e); }
+      setTimeout(()=>{postIntroOpening=false},500);
+    },0);""")
+
+pat=re.compile(r"  function showRolledScrollInVideoPlace\(\)\{.*?\n  \}\n\n  function startFreedomIntroVideo\(\)\{",re.S)
+rep="""  function showRolledScrollInVideoPlace(){
+    const o=document.getElementById('startupVideoGate');
+    if(!o)return;
+    o.innerHTML=`
+      <div style="position:absolute;inset:0;background:#00152a;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px">
+        <img src="welcome_scroll_final.png" alt="항행의자유 환영 두루마리" style="display:block;max-width:100%;max-height:88vh;width:auto;height:auto;object-fit:contain;border-radius:14px;box-shadow:0 12px 42px rgba(0,0,0,.55)">
+        <button id="postIntroScrollButton" type="button" style="margin-top:10px;min-width:240px;border:1px solid #e2c66d;background:linear-gradient(#8d6b1c,#493407);color:#fff3b0;border-radius:15px;padding:13px 22px;font-size:17px;font-weight:900;box-shadow:0 6px 18px rgba(0,0,0,.4);touch-action:manipulation">다음 · 설치동영상</button>
+      </div>`;
+    const btn=document.getElementById('postIntroScrollButton');
+    if(btn){
+      let fired=false;
+      const go=(ev)=>{if(ev){ev.preventDefault();ev.stopPropagation();}if(fired)return;fired=true;openPostIntroScroll();};
+      btn.addEventListener('click',go,{once:true});
+      btn.addEventListener('pointerup',go,{once:true});
+      btn.addEventListener('touchend',go,{once:true,passive:false});
+    }
+  }
+
+  function beginApprovedOnboardingSequence(){
+    window.__onboardingSequenceActive=true;
+    let gate=document.getElementById('startupVideoGate');
+    if(!gate){
+      gate=document.createElement('div');
+      gate.id='startupVideoGate';
+      gate.style.cssText='position:fixed;inset:0;z-index:2147483000;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;font-family:system-ui,-apple-system,Noto Sans KR,sans-serif';
+      document.body.appendChild(gate);
+    }
+    document.body.style.overflow='hidden';
+    showRolledScrollInVideoPlace();
+  }
+  window.beginApprovedOnboardingSequence=beginApprovedOnboardingSequence;
+  window.__hasSeenFreedomIntro=hasSeenIntro;
+
+  function startFreedomIntroVideo(){"""
+s,n=pat.subn(rep,s,count=1)
+assert n==1
+
+s=s.replace("""  v.addEventListener('ended', function(){
+    closeInstallGuideVideo(false);
+    if(window.__playApprovalAfterGuide){
+      window.__playApprovalAfterGuide=false;
+      setTimeout(()=>{
+        try{
+          window.__approvalThenIntro=true;
+          if(window.showApprovalHardLock) window.showApprovalHardLock();
+        }catch(e){ console.error(e); }
+      },180);
+    }
+  }, {once:true});""","""  v.addEventListener('ended', function(){
+    closeInstallGuideVideo(false);
+    if(window.__playIntroAfterInstall){
+      window.__playIntroAfterInstall=false;
+      setTimeout(()=>{try{if(window.startFreedomIntroVideo) window.startFreedomIntroVideo();}catch(e){console.error(e);}},180);
+    }
+  }, {once:true});""")
+
+s=s.replace("""    // 이미 이번 회차 안내를 끝까지 본 기기는 재생을 반복하지 않고 홈으로 바로 진입합니다.
+    if(hasSeenIntro()){
+      window.__onboardingSequenceActive=false;
+      const gate=document.getElementById('startupVideoGate');
+      if(gate)gate.remove();
+      document.body.style.overflow='';
+      if(window.showApprovalHardLock) window.showApprovalHardLock();
+      return;
+    }""","""    if(hasSeenIntro()){
+      window.__onboardingSequenceActive=false;
+      const gate=document.getElementById('startupVideoGate');
+      if(gate)gate.remove();
+      document.body.style.overflow='';
+      if(window.unlockApprovedApp) window.unlockApprovedApp();
+      return;
+    }""")
+
+pat2=re.compile(r"  function startFirstRunSequence\(\)\{.*?\n  \}\n\n  if\(document\.readyState==='loading'\)\{",re.S)
+rep2="""  function startFirstRunSequence(){
+    hideHomeScroll();
+    window.__onboardingSequenceActive=false;
+    const gate=document.getElementById('startupVideoGate');
+    if(gate)gate.remove();
+    document.body.style.overflow='';
+    try{
+      let q={};
+      if(window.AndroidHost&&AndroidHost.getSpecialApprovalSummary){
+        const raw=AndroidHost.getSpecialApprovalSummary();
+        q=typeof raw==='string'?JSON.parse(raw||'{}'):(raw||{});
+      }
+      if(q.approved===true){
+        if(hasSeenIntro()){if(window.unlockApprovedApp) window.unlockApprovedApp();}
+        else beginApprovedOnboardingSequence();
+      }else{
+        if(window.showApprovalHardLock) window.showApprovalHardLock();
+      }
+    }catch(e){if(window.showApprovalHardLock) window.showApprovalHardLock();}
+  }
+
+  if(document.readyState==='loading'){"""
+s,n=pat2.subn(rep2,s,count=1)
+assert n==1
+
+s=s.replace("""   // 첫 설치 안내 순서 중에는 승인화면을 먼저 띄우지 않는다.
+   if(window.__onboardingSequenceActive===true) return;
+
+   mount();""","""   mount();""")
+
+s=s.replace("""   if(q.status==='approved'||q.approved===true){
+     window.__onboardingSequenceActive=false;
+     statusText('승인완료.');
+     if(window.__approvalThenIntro){
+       launchIntroAfterRequest();
+     }else if(!document.getElementById('startupVideoGate')){
+       unlockApp();
+     }
+     return;
+   }""","""   if(q.status==='approved'||q.approved===true){
+     statusText('항해사 승인완료.');
+     window.__approvalThenIntro=false;
+     hideLockOnly();
+     try{
+       if(window.__hasSeenFreedomIntro && window.__hasSeenFreedomIntro()){window.__onboardingSequenceActive=false;unlockApp();}
+       else if(window.beginApprovedOnboardingSequence){window.beginApprovedOnboardingSequence();}
+       else unlockApp();
+     }catch(e){unlockApp();}
+     return;
+   }""")
+
+s=s.replace("""   if(q.status==='pending'||q.has_request===true){
+     statusText('승인요청 접수됨 · 안내동영상을 시작합니다.');
+     if(window.__approvalThenIntro) launchIntroAfterRequest();
+     return;
+   }""","""   if(q.status==='pending'||q.has_request===true){
+     statusText('승인요청 접수됨 · 항해사 승인을 기다려 주세요.');
+     return;
+   }""")
+
+s=s.replace("승인요청 후 안내동영상이 재생됩니다. 승인완료 전에는 앱 기능을 사용할 수 없습니다.","승인요청 후 항해사 승인이 완료되어야 다음 단계로 진행됩니다. 승인완료 전에는 앱 기능을 사용할 수 없습니다.")
+s=s.replace('<div class="simpleVersion">V3.3.5</div>','<div class="simpleVersion">V4.0.5 FINAL</div>')
+p.write_text(s,encoding='utf-8')
+
+g=Path('build405/FREEDOM_V402_BUILD_THIS/app/build.gradle')
+t=g.read_text(encoding='utf-8')
+t=re.sub(r'versionCode\s+\d+','versionCode 30405',t)
+t=re.sub(r'versionName\s+"[^"]+"','versionName "4.0.5-FINAL-ORDER"',t)
+t=re.sub(r'outputFileName\s*=\s*"[^"]+"','outputFileName = "FREEDOM_V3_FINAL_405-debug.apk"',t)
+g.write_text(t,encoding='utf-8')
