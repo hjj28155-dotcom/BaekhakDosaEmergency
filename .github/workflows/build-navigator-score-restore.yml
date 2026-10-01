@@ -66,6 +66,7 @@ jobs:
         run: |
           set -euo pipefail
           chmod +x gradlew
+          sed -i '/org.gradle.java.home/d' gradle.properties
           ./gradlew assembleDebug --no-daemon
           APK=$(find app/build/outputs/apk/debug -type f -name '*.apk' | head -1)
           test -s "$APK"
