@@ -19,3 +19,5 @@ jobs:
           git add freedom_guide_latest.mp4
           git commit -m "Restore full V3 guide video"
           git push
+
+# restore 12-screen full guide
