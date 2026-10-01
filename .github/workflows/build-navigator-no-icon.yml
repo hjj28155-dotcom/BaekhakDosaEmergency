@@ -1,4 +1,4 @@
-name: Build Navigator No Floating Icon
+name: Build Navigator Link Update No Icon
 on:
   push:
     paths:
@@ -17,30 +17,61 @@ jobs:
       - name: Download navigator source
         run: |
           set -euo pipefail
-          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-a0f8-8206-bb03-6ecd7bb0f323/raw?se=2026-10-01T02%3A12%3A07Z&sp=r&sv=2026-02-06&sr=b&scid=e618c575-a046-5f31-a5bb-59a1b6a56a01&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-30T23%3A57%3A12Z&ske=2026-10-01T23%3A57%3A12Z&sks=b&skv=2026-02-06&sig=IUGKEVE1NJIwhADO9yGvbNQ6WNeAw2lzh1vVFdglRpo%3D' -o navigator.zip
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-85b8-8206-a363-6dc397669cee/raw?se=2026-10-01T02%3A45%3A31Z&sp=r&sv=2026-02-06&sr=b&scid=4facc53d-fed6-50fb-b15c-9de2c675887e&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-30T20%3A14%3A55Z&ske=2026-10-01T20%3A14%3A55Z&sks=b&skv=2026-02-06&sig=1vls1C9mEPCMi6wacjG039TyrWOJOnOuUsWu%2BAvzUos%3D' -o navigator.zip
           rm -rf navigator
           mkdir navigator
           unzip -q navigator.zip -d navigator
-          test -f navigator/V3_PERPECT_SUCCESS_MUSIC_FIX9/app/build.gradle
-      - name: Verify no floating icon components
+          test -f navigator/V3_PERPECT_SUCCESS_MUSIC_FIX9/app/src/master/assets/index.html
+      - name: Patch visible link update button
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          root=Path('navigator/V3_PERPECT_SUCCESS_MUSIC_FIX9')
+          h=root/'app/src/master/assets/index.html'
+          s=h.read_text(encoding='utf-8')
+          old='<button class="auxAction" onclick="openM(\'update\')">↻ 앱 업데이트</button>'
+          new='<button class="auxAction gold" onclick="try{AndroidHost.openNavigatorUpdateLink()}catch(e){alert(\'업데이트 링크를 열 수 없습니다.\')}">↻ 항해사앱 업데이트</button>'
+          if old not in s:
+              raise SystemExit('home update button not found')
+          s=s.replace(old,new,1)
+          s=s.replace('V3.0.80 · MASTER FIX8 승인 유지 · 음악 FIX9','V3.0.83 · 서버승인 유지 · 이동아이콘 없음 · 링크 업데이트')
+          h.write_text(s,encoding='utf-8')
+
+          j=root/'app/src/main/java/com/baekhak/centralcontrol/MainActivity.java'
+          t=j.read_text(encoding='utf-8')
+          needle='        @JavascriptInterface public void chooseApkUpdate() { chooseApkUpdateFile(); }'
+          insert='''        @JavascriptInterface public void chooseApkUpdate() { chooseApkUpdateFile(); }
+        @JavascriptInterface public void openNavigatorUpdateLink() {
+            runOnUiThread(() -> {
+                try {
+                    Intent i = new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/navigator-update.html"));
+                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(i);
+                } catch (Exception e) {
+                    Toast.makeText(this, "업데이트 링크를 열지 못했습니다.", Toast.LENGTH_LONG).show();
+                }
+            });
+        }'''
+          if needle not in t:
+              raise SystemExit('bridge insertion point not found')
+          t=t.replace(needle,insert,1)
+          j.write_text(t,encoding='utf-8')
+
+          g=root/'app/build.gradle'
+          b=g.read_text(encoding='utf-8')
+          b=b.replace("versionCode 30080","versionCode 30083")
+          b=b.replace("versionName 'V3.0.80-MASTER-MUSIC-FIX9-20260925'","versionName 'V3.0.83-MASTER-LINK-UPDATE-NO-ICON-20261001'")
+          b=b.replace('"MASTER_OWNER_ONLY-${variant.buildType.name}.apk"','"NAVIGATOR_LINK_UPDATE_NO_ICON-${variant.buildType.name}.apk"')
+          g.write_text(b,encoding='utf-8')
+          PY
+      - name: Verify no floating icon
         run: |
           set -euo pipefail
           cd navigator/V3_PERPECT_SUCCESS_MUSIC_FIX9
           ! grep -R "SYSTEM_ALERT_WINDOW" app/src/master app/src/main/AndroidManifest.xml
           ! grep -R "OverlayControlService" app/src/master app/src/main
           ! grep -R "OverlayBootReceiver" app/src/master app/src/main
-      - name: Rename navigator no-icon build
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          import re
-          p=Path('navigator/V3_PERPECT_SUCCESS_MUSIC_FIX9/app/build.gradle')
-          s=p.read_text(encoding='utf-8')
-          s=s.replace("versionCode 30080","versionCode 30082")
-          s=s.replace("versionName 'V3.0.80-MASTER-MUSIC-FIX9-20260925'","versionName 'V3.0.82-MASTER-NO-FLOATING-ICON-20261001'")
-          s=s.replace('"MASTER_OWNER_ONLY-${variant.buildType.name}.apk"','"NAVIGATOR_NO_FLOATING_ICON-${variant.buildType.name}.apk"')
-          p.write_text(s,encoding='utf-8')
-          PY
       - name: Build navigator APK
         working-directory: navigator/V3_PERPECT_SUCCESS_MUSIC_FIX9
         run: |
@@ -49,10 +80,10 @@ jobs:
           ./gradlew :app:assembleMasterDebug --no-daemon
           APK=$(find app/build/outputs/apk/master/debug -type f -name '*.apk' | head -1)
           test -s "$APK"
-          cp "$APK" "$GITHUB_WORKSPACE/항해사앱_이동아이콘삭제_최종_20261001.apk"
+          cp "$APK" "$GITHUB_WORKSPACE/항해사앱_링크업데이트_이동아이콘없음_최종.apk"
       - uses: actions/upload-artifact@v4
         with:
-          name: navigator-no-floating-icon
-          path: 항해사앱_이동아이콘삭제_최종_20261001.apk
+          name: navigator-link-update-no-icon
+          path: 항해사앱_링크업데이트_이동아이콘없음_최종.apk
           if-no-files-found: error
           retention-days: 1
