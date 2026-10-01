@@ -26,6 +26,7 @@ public class OverlayService extends Service {
     public static final String ACTION_HIDE="com.navigator.freedom.miniicon.HIDE";
     private static final String CHANNEL="hanghae_mini_overlay";
     private static final int NOTICE=7411;
+    // v1.0.10 adaptive UI release trigger
 
     private WindowManager wm;
     private LinearLayout root, menu, stationPanel;
