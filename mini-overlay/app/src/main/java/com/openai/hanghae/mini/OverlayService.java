@@ -77,7 +77,7 @@ public class OverlayService extends Service {
         Notification.Builder b=Build.VERSION.SDK_INT>=26?new Notification.Builder(this,CHANNEL):new Notification.Builder(this);
         b.setSmallIcon(android.R.drawable.ic_media_play)
          .setContentTitle("항행의자유 이동아이콘")
-         .setContentText("MP3 · FM · AM · YouTube")
+         .setContentText("MP3 · FM · AM · YouTube · AVI · MP4")
          .setOngoing(true).setOnlyAlertOnce(true);
         Intent open=new Intent(this,MainActivity.class);
         b.setContentIntent(PendingIntent.getActivity(this,NOTICE,open,PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE));
@@ -111,10 +111,18 @@ public class OverlayService extends Service {
         anchor=new TextView(this);anchor.setText("⚓");anchor.setTextSize(19f);anchor.setTextColor(0xFFFFD96A);anchor.setGravity(Gravity.CENTER);
         anchor.setBackground(bg(0xEE08233E,0xCCF3C954,14));anchor.setLayoutParams(new LinearLayout.LayoutParams(dp(39),dp(39)));bar.addView(anchor);
 
-        menu=new LinearLayout(this);menu.setOrientation(LinearLayout.HORIZONTAL);menu.setGravity(Gravity.CENTER_VERTICAL);menu.setVisibility(View.GONE);
+        menu=new LinearLayout(this);menu.setOrientation(LinearLayout.HORIZONTAL);menu.setGravity(Gravity.CENTER_VERTICAL);menu.setVisibility(View.VISIBLE);
         Button mp3=btn("🎵 MP3",0xEE1068C8), fm=btn("📻 FM",0xEE5B34D6), am=btn("📡 AM",0xEE6D2DB7),
-               yt=btn("유튜브",0xEEDB1F28), stop=btn("■ 종료",0xEED52D46), update=btn("업데이트",0xEE087F5B);
-        menu.addView(mp3);menu.addView(fm);menu.addView(am);menu.addView(yt);menu.addView(stop);menu.addView(update);bar.addView(menu);
+               yt=btn("유튜브",0xEEDB1F28), avi=btn("AVI",0xEE8A4D1E), mp4=btn("MP4",0xEE1F7A5B),
+               stop=btn("■ 종료",0xEED52D46), update=btn("업데이트",0xEE087F5B);
+        menu.addView(mp3);menu.addView(fm);menu.addView(am);menu.addView(yt);menu.addView(avi);menu.addView(mp4);menu.addView(stop);menu.addView(update);
+
+        HorizontalScrollView menuScroll=new HorizontalScrollView(this);
+        menuScroll.setHorizontalScrollBarEnabled(true);
+        menuScroll.setFillViewport(false);
+        menuScroll.setVisibility(View.GONE);
+        menuScroll.addView(menu,new HorizontalScrollView.LayoutParams(-2,-1));
+        bar.addView(menuScroll,new LinearLayout.LayoutParams(dp(285),dp(46)));
         root.addView(bar,new LinearLayout.LayoutParams(-2,dp(46)));
 
         now=new TextView(this);now.setTextColor(0xFFFFE58A);now.setTextSize(10.5f);now.setPadding(dp(8),dp(2),dp(8),dp(3));now.setVisibility(View.GONE);
@@ -127,6 +135,8 @@ public class OverlayService extends Service {
         fm.setOnClickListener(v->showStations(true));
         am.setOnClickListener(v->showStations(false));
         yt.setOnClickListener(v->openYoutube());
+        avi.setOnClickListener(v->showDownloadVideos("avi"));
+        mp4.setOnClickListener(v->showDownloadVideos("mp4"));
         stop.setOnClickListener(v->{stopMedia();collapseStations();collapseMenu();toast("음악 · 라디오를 종료했습니다.");});
         update.setOnClickListener(v->{collapseStations();collapseMenu();openUpdater();});
 
@@ -154,7 +164,7 @@ public class OverlayService extends Service {
 
     private void toggleMenu(){
         expanded=!expanded;
-        if(menu!=null)menu.setVisibility(expanded?View.VISIBLE:View.GONE);
+        if(menu!=null && menu.getParent() instanceof View) ((View)menu.getParent()).setVisibility(expanded?View.VISIBLE:View.GONE);
         if(expanded){
             try{
                 String ver=getPackageManager().getPackageInfo(getPackageName(),0).versionName;
@@ -164,7 +174,7 @@ public class OverlayService extends Service {
             collapseStations();
         }
     }
-    private void collapseMenu(){expanded=false;if(menu!=null)menu.setVisibility(View.GONE);}
+    private void collapseMenu(){expanded=false;if(menu!=null && menu.getParent() instanceof View)((View)menu.getParent()).setVisibility(View.GONE);}
     private void collapseStations(){if(stationPanel!=null){stationPanel.removeAllViews();stationPanel.setVisibility(View.GONE);}}
 
     private void toggleLocalMp3(){
@@ -325,6 +335,92 @@ public class OverlayService extends Service {
         int n=localTrackIndex-1;
         if(n<0)n=localTrackIds.size()-1;
         playLocalTrack(n);
+    }
+
+    private void showDownloadVideos(String ext){
+        if(stationPanel==null)return;
+
+        if(Build.VERSION.SDK_INT>=33 && checkSelfPermission(android.Manifest.permission.READ_MEDIA_VIDEO)!=android.content.pm.PackageManager.PERMISSION_GRANTED){
+            toast("AVI · MP4 사용을 위해 동영상 권한을 허용해 주세요.");
+            openApp();
+            return;
+        }
+        if(Build.VERSION.SDK_INT>=23 && Build.VERSION.SDK_INT<33 &&
+           checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE)!=android.content.pm.PackageManager.PERMISSION_GRANTED){
+            toast("AVI · MP4 사용을 위해 파일 권한을 허용해 주세요.");
+            openApp();
+            return;
+        }
+
+        stationPanel.removeAllViews();
+        stationPanel.setVisibility(View.VISIBLE);
+
+        TextView title=station("▼ 다운로드 폴더 · "+ext.toUpperCase(java.util.Locale.KOREA)+" 선택");
+        title.setTextColor(0xFFFFD96A);
+        title.setOnClickListener(v->collapseStations());
+        stationPanel.addView(title);
+
+        Uri base=MediaStore.Files.getContentUri("external");
+        String[] projection;
+        String selection;
+        String[] args;
+        if(Build.VERSION.SDK_INT>=29){
+            projection=new String[]{MediaStore.Files.FileColumns._ID,MediaStore.Files.FileColumns.DISPLAY_NAME,MediaStore.Files.FileColumns.MIME_TYPE};
+            selection=MediaStore.Files.FileColumns.RELATIVE_PATH+" LIKE ? AND "+MediaStore.Files.FileColumns.DISPLAY_NAME+" LIKE ?";
+            args=new String[]{Environment.DIRECTORY_DOWNLOADS+"/%","%."+ext};
+        }else{
+            projection=new String[]{MediaStore.Files.FileColumns._ID,MediaStore.Files.FileColumns.DISPLAY_NAME,MediaStore.Files.FileColumns.MIME_TYPE};
+            selection=MediaStore.Files.FileColumns.DISPLAY_NAME+" LIKE ?";
+            args=new String[]{"%."+ext};
+        }
+
+        boolean found=false;
+        try(Cursor cur=getContentResolver().query(base,projection,selection,args,MediaStore.Files.FileColumns.DISPLAY_NAME+" COLLATE NOCASE ASC")){
+            if(cur!=null){
+                int idCol=cur.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID);
+                int nameCol=cur.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME);
+                int mimeCol=cur.getColumnIndex(MediaStore.Files.FileColumns.MIME_TYPE);
+                while(cur.moveToNext()){
+                    found=true;
+                    long id=cur.getLong(idCol);
+                    String name=cur.getString(nameCol);
+                    String mime=mimeCol>=0?cur.getString(mimeCol):null;
+                    Uri uri=Uri.withAppendedPath(base,String.valueOf(id));
+                    TextView item=station("▶ "+(name==null?ext.toUpperCase(java.util.Locale.KOREA):name));
+                    final String fmime=(mime==null||mime.length()==0)?("mp4".equals(ext)?"video/mp4":"video/*"):mime;
+                    item.setOnClickListener(v->openVideoFile(uri,fmime));
+                    stationPanel.addView(item);
+                }
+            }
+        }catch(Exception e){
+            toast("다운로드 폴더의 "+ext.toUpperCase(java.util.Locale.KOREA)+" 목록을 불러오지 못했습니다.");
+            return;
+        }
+
+        if(!found){
+            TextView empty=station("다운로드 폴더에 ."+ext+" 파일이 없습니다.");
+            empty.setTextColor(0xFFFFB8B8);
+            stationPanel.addView(empty);
+        }
+    }
+
+    private void openVideoFile(Uri uri,String mime){
+        try{
+            Intent i=new Intent(Intent.ACTION_VIEW);
+            i.setDataAndType(uri,mime);
+            i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION|Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
+            setNow("🎬 동영상 재생 앱을 열었습니다.");
+        }catch(Exception e){
+            try{
+                Intent i=new Intent(Intent.ACTION_VIEW);
+                i.setDataAndType(uri,"video/*");
+                i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION|Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(i);
+            }catch(Exception x){
+                toast("이 동영상을 재생할 앱이 없습니다.");
+            }
+        }
     }
 
     private void showStations(boolean fm){
