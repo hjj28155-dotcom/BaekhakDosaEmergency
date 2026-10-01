@@ -466,9 +466,10 @@ public class OverlayService extends Service {
             }else if(status==DownloadManager.STATUS_SUCCESSFUL){
                 setNow("✅ 업데이트 다운로드 100%");
             }else if(status==DownloadManager.STATUS_FAILED){
+                int reason=c.getInt(c.getColumnIndexOrThrow(DownloadManager.COLUMN_REASON));
                 updateHandler.removeCallbacks(updatePoller);
                 updateDownloadId=-1L;
-                setNow("❌ 업데이트 다운로드 실패 · 다시 눌러주세요.");
+                setNow("❌ 업데이트 다운로드 실패("+reason+") · 다시 눌러주세요.");
             }
         }catch(Exception ignored){}
     }
