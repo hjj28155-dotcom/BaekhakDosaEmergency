@@ -8,7 +8,7 @@ import android.os.Build;
 public class BootReceiver extends BroadcastReceiver {
     @Override public void onReceive(Context context, Intent intent){
         try{
-            boolean enabled=context.getSharedPreferences("overlay_control",Context.MODE_PRIVATE).getBoolean("enabled",true);
+            boolean enabled=context.getSharedPreferences("overlay_control",Context.MODE_PRIVATE).getBoolean("enabled",false);
             if(!enabled) return;
             Intent s=new Intent(context,OverlayService.class).setAction(OverlayService.ACTION_SHOW);
             if(Build.VERSION.SDK_INT>=26) context.startForegroundService(s); else context.startService(s);
