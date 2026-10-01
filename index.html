@@ -32,12 +32,13 @@ h1{margin:0 0 8px;color:#ffe39a;font-size:30px}
 <h1>항행의자유</h1>
 <div class="sub">최종 배포판 V4.0.16 CLEAN AUDIO<br>처음 설치하시는 분은 아래 설치 동영상을 먼저 보세요.</div>
 <div class="guideWrap">
-  <div class="guideTitle">▶ 설치 동영상 · 바로 재생</div>
-  <video id="installGuideVideo" class="guideVideo" controls playsinline autoplay muted preload="auto">
-    <source src="freedom_guide_latest.mp4?v=20261001-2048" type="video/mp4">
+  <div class="guideTitle">▶ 설치 동영상</div>
+  <button id="guideStartBtn" class="btn" type="button" style="margin-top:0" onclick="startGuideWithSound()">🔊 소리 켜고 설치영상 재생</button>
+  <video id="installGuideVideo" class="guideVideo" controls playsinline preload="auto" style="margin-top:12px">
+    <source src="freedom_guide_latest.mp4?v=20261001-2100" type="video/mp4">
     설치 동영상을 재생할 수 없습니다.
   </video>
-  <div class="autoNote">설치 동영상을 먼저 보신 뒤 아래 <b>APK 다운로드 시작</b> 버튼을 누르세요.<br>다운로드 화면이 열리면 <b>무시하고 다운로드</b>를 누르면 됩니다.</div>
+  <div id="guideStatus" class="autoNote">먼저 위 버튼을 눌러 설치 동영상을 소리와 함께 끝까지 보세요.</div>
 </div>
 <div class="card">
 <div class="step"><b>1</b>링크 클릭</div>
@@ -49,17 +50,48 @@ h1{margin:0 0 8px;color:#ffe39a;font-size:30px}
 <div class="step"><b>7</b>안내동영상 재생</div>
 <div class="step"><b>8</b>홈화면 실행</div>
 </div>
-<a id="downloadBtn" class="btn" href="https://drive.google.com/uc?export=download&id=1ZCzOFzQuwnZYqX9iCoJALKews8lk-0oH" download="항행의자유_V4.0.16_CLEAN_AUDIO.apk">APK 다운로드 시작</a>
+<button id="downloadBtn" class="btn" type="button" disabled style="opacity:.45" onclick="downloadLatestApk()">설치영상 시청 후 APK 다운로드</button>
 <div class="ok">배포 파일: FREEDOM_V4_0_16_CLEAN_AUDIO-debug.apk</div>
-<div class="note">본체 이동아이콘은 삭제되었습니다. 이동아이콘은 별도 전용 앱으로 사용합니다.</div>
+<div class="note">설치영상이 끝나면 APK 다운로드 버튼이 자동으로 열립니다.</div>
 </div>
 <script>
+let GUIDE_DONE=false;
+
+function startGuideWithSound(){
+  const v=document.getElementById('installGuideVideo');
+  const b=document.getElementById('guideStartBtn');
+  const st=document.getElementById('guideStatus');
+  if(!v)return;
+  v.muted=false;
+  v.volume=1;
+  v.currentTime=0;
+  const p=v.play();
+  if(p&&typeof p.then==='function'){
+    p.then(()=>{
+      if(b){b.disabled=true;b.style.opacity='.65';b.textContent='▶ 설치영상 재생 중';}
+      if(st)st.textContent='설치 동영상을 끝까지 시청해 주세요.';
+    }).catch(()=>{
+      if(st)st.textContent='영상 재생이 차단되었습니다. 버튼을 다시 눌러 주세요.';
+    });
+  }
+}
+
+function unlockDownload(){
+  GUIDE_DONE=true;
+  const b=document.getElementById('downloadBtn');
+  const st=document.getElementById('guideStatus');
+  if(b){b.disabled=false;b.style.opacity='1';b.textContent='APK 다운로드 시작';}
+  if(st)st.textContent='✅ 설치영상 시청 완료 · 이제 APK를 받을 수 있습니다.';
+}
+
+function downloadLatestApk(){
+  if(!GUIDE_DONE)return;
+  location.href='https://drive.usercontent.google.com/download?id=1ZCzOFzQuwnZYqX9iCoJALKews8lk-0oH&export=download&confirm=t';
+}
+
 window.addEventListener('load',()=>{
   const v=document.getElementById('installGuideVideo');
-  if(v){
-    const p=v.play();
-    if(p&&typeof p.catch==='function')p.catch(()=>{});
-  }
+  if(v)v.addEventListener('ended',unlockDownload);
 });
 </script>
 </body>
