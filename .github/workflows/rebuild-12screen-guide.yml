@@ -1,0 +1,51 @@
+name: Rebuild 12-screen installation guide
+on:
+  push:
+    paths:
+      - '.github/workflows/rebuild-12screen-guide.yml'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install ffmpeg and Korean font
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y ffmpeg fonts-noto-cjk
+      - name: Build exact 12-screen guide
+        run: |
+          set -e
+          FONT="/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc"
+          rm -rf /tmp/guide12 && mkdir -p /tmp/guide12
+          make_slide(){
+            n="$1"; title="$2"; body="$3"
+            printf '%s' "$title" > "/tmp/guide12/title_${n}.txt"
+            printf '%s' "$body" > "/tmp/guide12/body_${n}.txt"
+            ffmpeg -hide_banner -loglevel error -y               -f lavfi -i "color=c=0x031b31:s=1080x1920:d=7:r=30"               -f lavfi -i "anullsrc=r=48000:cl=stereo"               -vf "drawbox=x=70:y=250:w=940:h=1260:color=0x082b49@0.94:t=fill,drawbox=x=95:y=275:w=890:h=1210:color=0xD7B85B@0.95:t=3,drawtext=fontfile=${FONT}:text='${n}':fontcolor=0xF7D873:fontsize=110:x=(w-text_w)/2:y=360,drawtext=fontfile=${FONT}:textfile=/tmp/guide12/title_${n}.txt:fontcolor=white:fontsize=58:x=(w-text_w)/2:y=555,drawtext=fontfile=${FONT}:textfile=/tmp/guide12/body_${n}.txt:fontcolor=0xD7E8F2:fontsize=40:line_spacing=24:x=(w-text_w)/2:y=760,drawtext=fontfile=${FONT}:text='항행의자유 · 설치 및 실행 안내':fontcolor=0xAFC8D8:fontsize=28:x=(w-text_w)/2:y=1390"               -c:v libx264 -preset veryfast -crf 22 -pix_fmt yuv420p -r 30               -c:a aac -b:a 96k -shortest "/tmp/guide12/slide_${n}.mp4"
+          }
+          make_slide 1 "설치 파일 다운로드" $'배포 링크에서 최신 설치 파일을\n다운로드합니다.'
+          make_slide 2 "설치 진행" $'다운로드한 APK를 열어\n설치를 진행합니다.'
+          make_slide 3 "앱 실행" $'설치가 끝나면\n항행의자유 앱을 실행합니다.'
+          make_slide 4 "첫 실행 안내" $'처음 실행 시 나타나는 안내를\n순서대로 확인합니다.'
+          make_slide 5 "필수 업데이트" $'필수 업데이트가 있으면\n최신 버전으로 먼저 갱신합니다.'
+          make_slide 6 "홈 화면 구성" $'홈 화면의 기본 구성을\n확인합니다.'
+          make_slide 7 "주요 메뉴 안내" $'원문분석·공지·음악 등\n주요 메뉴 위치를 확인합니다.'
+          make_slide 8 "두루마리 이용" $'최신 두루마리를 확인한 뒤\n두루마리를 눌러 다음 단계로 이동합니다.'
+          make_slide 9 "특별승인 안내" $'승인요청을 보내고\n항해사 승인 절차를 기다립니다.'
+          make_slide 10 "MP3 + FM 기능" $'승인 후 사용할 수 있는\nMP3·FM 기능을 확인합니다.'
+          make_slide 11 "이제, 함께 하세요" $'설치와 승인이 완료되면\n항행의자유를 이용할 수 있습니다.'
+          make_slide 12 "감사합니다" $'항행의자유와 함께해 주셔서\n감사합니다.'
+          : > /tmp/guide12/concat.txt
+          for i in $(seq 1 12); do echo "file '/tmp/guide12/slide_${i}.mp4'" >> /tmp/guide12/concat.txt; done
+          ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i /tmp/guide12/concat.txt -c copy freedom_guide_latest.mp4
+          ffprobe -v error -show_entries format=duration,size -of default=nw=1 freedom_guide_latest.mp4
+          test "$(stat -c%s freedom_guide_latest.mp4)" -gt 100000
+      - name: Publish 12-screen guide
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add freedom_guide_latest.mp4
+          git commit -m "Publish corrected 12-screen guide with screens 7 8 9" || exit 0
+          git push
