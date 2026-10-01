@@ -80,8 +80,8 @@ public class OverlayService extends Service {
          .setContentTitle("항행의자유 이동아이콘")
          .setContentText("MP3 · FM · AM · YouTube · AVI · MP4")
          .setOngoing(true).setOnlyAlertOnce(true);
-        Intent open=new Intent(this,MainActivity.class);
-        b.setContentIntent(PendingIntent.getActivity(this,NOTICE,open,PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE));
+        Intent show=new Intent(this,OverlayService.class).setAction(ACTION_SHOW);
+        b.setContentIntent(PendingIntent.getService(this,NOTICE,show,PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE));
         return b.build();
     }
 
@@ -115,7 +115,9 @@ public class OverlayService extends Service {
         b.setBackground(bg(color,0x66FFD35A,13));
 
         int minW;
-        if("업데이트".equals(text)) minW=82;
+        if("🚢 항행의자유".equals(text)) minW=118;
+        else if("아이콘 숨김".equals(text)) minW=96;
+        else if("업데이트".equals(text)) minW=82;
         else if("유튜브".equals(text)) minW=72;
         else if("■ 종료".equals(text)) minW=72;
         else if("🎵 MP3".equals(text)) minW=72;
@@ -146,10 +148,11 @@ public class OverlayService extends Service {
         anchor.setBackground(bg(0xEE08233E,0xCCF3C954,14));anchor.setLayoutParams(new LinearLayout.LayoutParams(dp(44),dp(44)));bar.addView(anchor);
 
         menu=new LinearLayout(this);menu.setOrientation(LinearLayout.HORIZONTAL);menu.setGravity(Gravity.CENTER_VERTICAL);menu.setVisibility(View.VISIBLE);
-        Button mp3=btn("🎵 MP3",0xEE1068C8), fm=btn("📻 FM",0xEE5B34D6), am=btn("📡 AM",0xEE6D2DB7),
+        Button freedom=btn("🚢 항행의자유",0xEE0C7AA8),
+               mp3=btn("🎵 MP3",0xEE1068C8), fm=btn("📻 FM",0xEE5B34D6), am=btn("📡 AM",0xEE6D2DB7),
                yt=btn("유튜브",0xEEDB1F28), avi=btn("AVI",0xEE8A4D1E), mp4=btn("MP4",0xEE1F7A5B),
-               stop=btn("■ 종료",0xEED52D46), update=btn("업데이트",0xEE087F5B);
-        menu.addView(mp3);menu.addView(fm);menu.addView(am);menu.addView(yt);menu.addView(avi);menu.addView(mp4);menu.addView(stop);menu.addView(update);
+               hide=btn("아이콘 숨김",0xEE455A64), stop=btn("■ 종료",0xEED52D46), update=btn("업데이트",0xEE087F5B);
+        menu.addView(freedom);menu.addView(mp3);menu.addView(fm);menu.addView(am);menu.addView(yt);menu.addView(avi);menu.addView(mp4);menu.addView(hide);menu.addView(stop);menu.addView(update);
 
         HorizontalScrollView menuScroll=new HorizontalScrollView(this);
         menuScroll.setHorizontalScrollBarEnabled(true);
@@ -167,12 +170,14 @@ public class OverlayService extends Service {
         stationPanel=new LinearLayout(this);stationPanel.setOrientation(LinearLayout.VERTICAL);stationPanel.setVisibility(View.GONE);
         root.addView(stationPanel,new LinearLayout.LayoutParams(-1,-2));
 
+        freedom.setOnClickListener(v->openFreedomApp());
         mp3.setOnClickListener(v->{showMp3Controls();toggleLocalMp3();});
         fm.setOnClickListener(v->showStations(true));
         am.setOnClickListener(v->showStations(false));
         yt.setOnClickListener(v->openYoutube());
         avi.setOnClickListener(v->showDownloadVideos("avi"));
         mp4.setOnClickListener(v->showDownloadVideos("mp4"));
+        hide.setOnClickListener(v->hideOverlayOnly());
         stop.setOnClickListener(v->{stopMedia();collapseStations();collapseMenu();toast("음악 · 라디오를 종료했습니다.");});
         update.setOnClickListener(v->{collapseStations();collapseMenu();openUpdater();});
 
@@ -508,6 +513,39 @@ public class OverlayService extends Service {
         if(now!=null)now.setVisibility(View.GONE);
     }
     private void setNow(String s){if(now!=null){now.setText(s);now.setVisibility(View.VISIBLE);}}
+
+    private void openFreedomApp(){
+        collapseStations();
+        collapseMenu();
+        try{
+            Intent i=getPackageManager().getLaunchIntentForPackage("com.baekhak.centralcontrol");
+            if(i!=null){
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(i);
+                setNow("🚢 항행의자유 앱 실행");
+                return;
+            }
+        }catch(Exception ignored){}
+        try{
+            Intent web=new Intent(Intent.ACTION_VIEW,Uri.parse("https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/"));
+            web.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(web);
+            setNow("🚢 항행의자유 설치/실행 페이지를 엽니다.");
+        }catch(Exception e){
+            toast("항행의자유 앱을 열 수 없습니다.");
+        }
+    }
+
+    private void hideOverlayOnly(){
+        collapseStations();
+        collapseMenu();
+        removeOverlay();
+        try{
+            NotificationManager nm=(NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+            if(nm!=null)nm.notify(NOTICE,notification());
+        }catch(Exception ignored){}
+        toast("이동아이콘을 숨겼습니다. 알림을 누르면 다시 나타납니다.");
+    }
 
     private void openYoutube(){
         collapseStations();
