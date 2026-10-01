@@ -1,0 +1,27 @@
+name: Import latest install guide from Drive
+on:
+  push:
+    paths:
+      - '.github/workflows/import-latest-install-guide-from-drive.yml'
+permissions:
+  contents: write
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download exact latest install guide
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-a608-8206-b320-b3aba96eb07f/raw?se=2026-10-01T17%3A53%3A19Z&sp=r&sv=2026-02-06&sr=b&scid=cd720944-4621-5170-aa3f-0f26affc1843&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-01T15%3A34%3A24Z&ske=2026-10-02T15%3A34%3A24Z&sks=b&skv=2026-02-06&sig=1/SrRCz1vhSeaBv6JLk3LR1abAcMCP%2BkOfkRz3J2EFw%3D' -o freedom_guide_latest.mp4
+          test -s freedom_guide_latest.mp4
+          test "$(stat -c%s freedom_guide_latest.mp4)" -gt 8000000
+      - name: Publish exact latest install guide
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add freedom_guide_latest.mp4
+          git commit -m 'Publish exact latest install guide from Drive' || true
+          git pull --rebase origin main
+          git push
