@@ -44,7 +44,7 @@ jobs:
           ./gradlew assembleDebug --no-daemon
           APK=$(find app/build/outputs/apk/debug -type f -name '*.apk' | head -1)
           test -s "$APK"
-          cp "$APK" ../../FREEDOM_V3_FINAL_405-debug.apk
+          cp "$APK" ../FREEDOM_V3_FINAL_405-debug.apk
 
       - name: Publish only final V3 APK
         run: |
