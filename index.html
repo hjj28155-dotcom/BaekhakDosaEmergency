@@ -35,7 +35,7 @@ h1{margin:0 0 8px;color:#ffe39a;font-size:30px}
   <div class="guideTitle">🎬 설치 설명서 + 김광석 〈일어나〉</div>
   <button id="guideStartBtn" class="btn" type="button" style="margin-top:0" onclick="startGuideSong()">▶ 설치 설명서 + 노래 재생 시작</button>
   <video id="installGuideVideo" class="guideVideo" playsinline preload="auto" muted style="margin-top:12px">
-    <source src="https://drive.usercontent.google.com/download?id=1-OfL4zZzD6u3Mv4WJKkLMJm7bEDXtk1i&export=download&confirm=t" type="video/mp4">
+    <source src="freedom_guide_latest.mp4?v=20261002-004" type="video/mp4">
     설치 동영상을 재생할 수 없습니다.
   </video>
   <audio id="guideSongAudio" preload="auto" controls style="display:block;width:100%;margin-top:10px"
@@ -133,7 +133,8 @@ async function startGuideSong(){
 
     // Only after audio succeeds, start the silent guide video.
     try{await v.play();}catch(e){
-      if(st)st.textContent='🎵 소리는 재생 중입니다. 영상 재생 버튼을 한 번 눌러주세요.';
+      if(st)st.textContent='⚠️ 영상 재생을 시작하지 못했습니다. 화면을 한 번 눌러 다시 시도합니다.';
+      try{v.load();await v.play();}catch(_e){}
     }
 
     if(start){start.disabled=true;start.style.display='none';}
