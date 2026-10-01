@@ -17,7 +17,7 @@ jobs:
       - name: Download navigator source
         run: |
           set -euo pipefail
-          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-85b8-8206-a363-6dc397669cee/raw?se=2026-10-01T02%3A45%3A31Z&sp=r&sv=2026-02-06&sr=b&scid=4facc53d-fed6-50fb-b15c-9de2c675887e&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-30T20%3A14%3A55Z&ske=2026-10-01T20%3A14%3A55Z&sks=b&skv=2026-02-06&sig=1vls1C9mEPCMi6wacjG039TyrWOJOnOuUsWu%2BAvzUos%3D' -o navigator.zip
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-2594-8206-bd96-e6ebe95233ae/raw?se=2026-10-01T02%3A50%3A47Z&sp=r&sv=2026-02-06&sr=b&scid=9b0fdbf3-e06c-5feb-a918-1f47154f95bd&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-01T02%3A26%3A33Z&ske=2026-10-02T02%3A26%3A33Z&sks=b&skv=2026-02-06&sig=OFDWEO6KKmH29tNOCqEkUIoi4CKd9gcqi%2BxiPtbsX08%3D' -o navigator.zip
           rm -rf navigator
           mkdir navigator
           unzip -q navigator.zip -d navigator
