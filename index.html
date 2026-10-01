@@ -65,9 +65,9 @@ h1{margin:0 0 8px;color:#ffe39a;font-size:30px}
 <div class="step"><b>7</b>승인요청 접수 후 안내동영상</div>
 <div class="step"><b>8</b>승인완료 후 홈화면 실행</div>
 </div>
-<button id="downloadBtn" class="btn" type="button" disabled style="opacity:.45" onclick="downloadLatestApk()">설치 설명서 + 노래 완료 후 APK 다운로드</button>
+<button id="downloadBtn" class="btn" type="button" disabled style="opacity:.45" onclick="downloadLatestApk()">설치동영상 완료 후 자동으로 APK 다운로드</button>
 <div class="ok">배포 파일: FREEDOM_V4_0_19_ENGINE_FUSION-debug.apk</div>
-<div class="note">설치영상이 끝나면 APK 다운로드 버튼이 자동으로 열립니다.</div>
+<div class="note">설치영상이 끝나면 자동으로 다음 설치 단계(APK 다운로드)로 이동합니다.</div>
 </div>
 <script>
 let SESSION_ACTIVE=false;
@@ -236,14 +236,17 @@ window.addEventListener('load',()=>{
   if(v){
     v.addEventListener('ended',()=>{
       GUIDE_ENDED=true;
-      // 영상은 마지막 화면에 고정하고 노래가 끝날 때까지 유지
-      try{v.currentTime=Math.max(0,v.duration-0.05);}catch(e){}
+      const a=document.getElementById('guideSongAudio');
+      try{ if(a && !a.paused) a.pause(); }catch(e){}
+      finishGuideSong();
+      const st=document.getElementById('guideStatus');
+      if(st) st.textContent='✅ 설치동영상 완료 · 다음 설치 단계로 이동합니다.';
+      setTimeout(()=>{ try{ downloadLatestApk(); }catch(e){} },700);
     });
-    // 사용자 조작으로 앞으로 건너뛰는 것을 막기 위해 controls 자체를 노출하지 않음
   }
 
   if(a){
-    a.addEventListener('ended',finishGuideSong);
+    a.addEventListener('ended',()=>{ if(!GUIDE_ENDED) finishGuideSong(); });
     a.addEventListener('timeupdate',()=>{
       if(!SESSION_ACTIVE||SESSION_DONE)return;
       const st=document.getElementById('guideStatus');
