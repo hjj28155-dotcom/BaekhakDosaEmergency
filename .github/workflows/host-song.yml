@@ -1,6 +1,9 @@
 name: host-song
 on:
-  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/host-song.yml'
 jobs:
   host-song:
     runs-on: ubuntu-latest
