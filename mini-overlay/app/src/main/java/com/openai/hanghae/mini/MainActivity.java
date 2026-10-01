@@ -8,24 +8,46 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Locale;
 
 public class MainActivity extends Activity {
     private static final int REQ_AUDIO=77;
     private static final String UPDATE_URL="https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/%ED%95%AD%ED%96%89%EC%9D%98%EC%9E%90%EC%9C%A0_%EC%9D%B4%EB%8F%99%EC%95%84%EC%9D%B4%EC%BD%98_MP3_FM_AM_%EC%9C%A0%ED%8A%9C%EB%B8%8C.apk";
+
     private boolean pendingStart=false;
     private long updateDownloadId=-1L;
     private BroadcastReceiver updateReceiver;
+
+    private TextView updateStatus;
+    private ProgressBar updateProgress;
+    private Button updateButton;
+    private final Handler progressHandler=new Handler(Looper.getMainLooper());
+
+    private final Runnable progressPoller=new Runnable(){
+        @Override public void run(){
+            if(updateDownloadId<0L) return;
+            queryDownloadProgress();
+            progressHandler.postDelayed(this,500);
+        }
+    };
 
     @Override public void onCreate(Bundle b){
         super.onCreate(b);
@@ -68,9 +90,26 @@ public class MainActivity extends Activity {
         start.setOnClickListener(v->startRequested());
         root.addView(start);
 
-        Button update=button("⬇ 업데이트");
-        update.setOnClickListener(v->startDirectUpdate());
-        root.addView(update);
+        updateButton=button("⬇ 업데이트");
+        updateButton.setOnClickListener(v->startDirectUpdate());
+        root.addView(updateButton);
+
+        updateStatus=new TextView(this);
+        updateStatus.setText("업데이트 버튼을 누르면 진행률이 바로 표시됩니다.");
+        updateStatus.setTextColor(Color.rgb(180,220,240));
+        updateStatus.setTextSize(15);
+        updateStatus.setGravity(Gravity.CENTER);
+        LinearLayout.LayoutParams statusLp=new LinearLayout.LayoutParams(-1,-2);
+        statusLp.setMargins(0,dp(12),0,0);
+        root.addView(updateStatus,statusLp);
+
+        updateProgress=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
+        updateProgress.setMax(100);
+        updateProgress.setProgress(0);
+        updateProgress.setVisibility(View.GONE);
+        LinearLayout.LayoutParams progressLp=new LinearLayout.LayoutParams(-1,dp(18));
+        progressLp.setMargins(0,dp(8),0,0);
+        root.addView(updateProgress,progressLp);
 
         Button hide=button("⏹ 이동아이콘 끄기");
         hide.setOnClickListener(v->hideOverlay());
@@ -137,43 +176,118 @@ public class MainActivity extends Activity {
     private void startDirectUpdate(){
         try{
             DownloadManager dm=(DownloadManager)getSystemService(DOWNLOAD_SERVICE);
-            if(dm==null){Toast.makeText(this,"업데이트를 시작하지 못했습니다.",Toast.LENGTH_SHORT).show();return;}
+            if(dm==null){
+                setUpdateState("업데이트를 시작하지 못했습니다.",0,false);
+                return;
+            }
+
+            if(updateDownloadId>=0L){
+                setUpdateState("이미 업데이트 파일을 내려받는 중입니다.",updateProgress==null?0:updateProgress.getProgress(),true);
+                return;
+            }
+
+            String fileName="항행의자유_이동아이콘_업데이트_"+System.currentTimeMillis()+".apk";
             DownloadManager.Request req=new DownloadManager.Request(Uri.parse(UPDATE_URL));
             req.setTitle("항행의자유 이동아이콘 업데이트");
             req.setDescription("최신 APK를 내려받는 중입니다.");
             req.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
             req.setMimeType("application/vnd.android.package-archive");
-            updateDownloadId=dm.enqueue(req);
+            req.setAllowedOverMetered(true);
+            req.setAllowedOverRoaming(true);
+            req.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,fileName);
 
             if(updateReceiver!=null){
                 try{unregisterReceiver(updateReceiver);}catch(Exception ignored){}
             }
+
             updateReceiver=new BroadcastReceiver(){
                 @Override public void onReceive(Context context, Intent intent){
                     long id=intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID,-1L);
                     if(id!=updateDownloadId)return;
+                    progressHandler.removeCallbacks(progressPoller);
+                    queryDownloadProgress();
                     try{
                         Uri uri=dm.getUriForDownloadedFile(id);
-                        if(uri==null){Toast.makeText(MainActivity.this,"업데이트 파일을 열지 못했습니다.",Toast.LENGTH_SHORT).show();return;}
+                        if(uri==null){
+                            setUpdateState("다운로드는 끝났지만 설치 파일을 열지 못했습니다. 다운로드 폴더를 확인해 주세요.",100,false);
+                            updateDownloadId=-1L;
+                            return;
+                        }
+                        setUpdateState("✅ 다운로드 완료 · 다운로드 폴더에 저장됨 · 설치 화면을 여는 중",100,true);
                         Intent install=new Intent(Intent.ACTION_VIEW);
                         install.setDataAndType(uri,"application/vnd.android.package-archive");
                         install.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION|Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(install);
                     }catch(Exception e){
-                        Toast.makeText(MainActivity.this,"설치 화면을 열지 못했습니다.",Toast.LENGTH_SHORT).show();
+                        setUpdateState("✅ 다운로드 완료 · 다운로드 폴더에서 APK를 눌러 설치해 주세요.",100,true);
+                    }finally{
+                        updateDownloadId=-1L;
                     }
                 }
             };
+
             IntentFilter filter=new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
             if(Build.VERSION.SDK_INT>=33) registerReceiver(updateReceiver,filter,Context.RECEIVER_NOT_EXPORTED);
             else registerReceiver(updateReceiver,filter);
-            Toast.makeText(this,"업데이트 파일을 내려받습니다.",Toast.LENGTH_SHORT).show();
+
+            updateDownloadId=dm.enqueue(req);
+            if(updateButton!=null) updateButton.setEnabled(false);
+            setUpdateState("⬇ 다운로드 시작 · 0%",0,true);
+            progressHandler.removeCallbacks(progressPoller);
+            progressHandler.post(progressPoller);
+
         }catch(Exception e){
-            Toast.makeText(this,"업데이트를 시작하지 못했습니다.",Toast.LENGTH_SHORT).show();
+            updateDownloadId=-1L;
+            if(updateButton!=null) updateButton.setEnabled(true);
+            setUpdateState("업데이트를 시작하지 못했습니다.",0,false);
         }
     }
 
+    private void queryDownloadProgress(){
+        if(updateDownloadId<0L)return;
+        DownloadManager dm=(DownloadManager)getSystemService(DOWNLOAD_SERVICE);
+        if(dm==null)return;
+
+        DownloadManager.Query q=new DownloadManager.Query().setFilterById(updateDownloadId);
+        try(Cursor c=dm.query(q)){
+            if(c==null || !c.moveToFirst())return;
+            int status=c.getInt(c.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS));
+            long done=c.getLong(c.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+            long total=c.getLong(c.getColumnIndexOrThrow(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+
+            int percent=(total>0L)?(int)Math.min(100L,(done*100L)/total):0;
+            if(status==DownloadManager.STATUS_RUNNING){
+                setUpdateState("⬇ 다운로드 "+percent+"% · "+mb(done)+" / "+(total>0?mb(total):"--"),percent,true);
+            }else if(status==DownloadManager.STATUS_PENDING){
+                setUpdateState("업데이트 다운로드 준비 중…",percent,true);
+            }else if(status==DownloadManager.STATUS_PAUSED){
+                setUpdateState("다운로드 일시 대기 · "+percent+"%",percent,true);
+            }else if(status==DownloadManager.STATUS_SUCCESSFUL){
+                setUpdateState("✅ 다운로드 100% · 설치 준비 중",100,true);
+            }else if(status==DownloadManager.STATUS_FAILED){
+                progressHandler.removeCallbacks(progressPoller);
+                updateDownloadId=-1L;
+                if(updateButton!=null) updateButton.setEnabled(true);
+                setUpdateState("❌ 다운로드 실패 · 다시 업데이트를 눌러 주세요.",percent,false);
+            }
+        }catch(Exception ignored){}
+    }
+
+    private String mb(long bytes){
+        return String.format(Locale.KOREA,"%.1fMB",bytes/1048576.0);
+    }
+
+    private void setUpdateState(String text,int percent,boolean showBar){
+        if(updateStatus!=null)updateStatus.setText(text);
+        if(updateProgress!=null){
+            updateProgress.setVisibility(showBar?View.VISIBLE:View.GONE);
+            updateProgress.setProgress(Math.max(0,Math.min(100,percent)));
+        }
+        if(updateButton!=null && updateDownloadId<0L)updateButton.setEnabled(true);
+    }
+
     @Override protected void onDestroy(){
+        progressHandler.removeCallbacks(progressPoller);
         if(updateReceiver!=null){
             try{unregisterReceiver(updateReceiver);}catch(Exception ignored){}
             updateReceiver=null;
