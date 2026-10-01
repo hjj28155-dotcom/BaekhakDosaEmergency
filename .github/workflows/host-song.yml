@@ -10,15 +10,14 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-      - run: pip install gdown
-      - run: gdown 1XdVx8DwQSWAUSMGsu6scOedKIgbrSZdL -O kimkwangseok_ileona.mp3
-      - run: |
-          test -s kimkwangseok_ileona.mp3
+      - name: Download exact user MP3
+        run: |
+          curl -L --fail --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-d888-8206-b4a5-8624caf77bf4/raw?se=2026-10-01T14%3A23%3A25Z&sp=r&sv=2026-02-06&sr=b&scid=330d8a03-70b1-5d12-be7d-76cb19c73911&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-01T14%3A10%3A14Z&ske=2026-10-02T14%3A10%3A14Z&sks=b&skv=2026-02-06&sig=Sx0ScAmF8XbzMcBTpokFi4%2BfAsuTxMuXVaaIX3y65is%3D' -o kimkwangseok_ileona.mp3
+          test "$(stat -c%s kimkwangseok_ileona.mp3)" -eq 6601224
+      - name: Commit song to site
+        run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add kimkwangseok_ileona.mp3
-          git commit -m "Host Kim Kwang-seok Ileona audio" || exit 0
+          git commit -m "Host exact Kim Kwang-seok Ileona MP3" || exit 0
           git push
