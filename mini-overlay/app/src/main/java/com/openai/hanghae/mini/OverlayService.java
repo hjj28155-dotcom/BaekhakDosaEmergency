@@ -541,10 +541,10 @@ public class OverlayService extends Service {
         if(launchByLabel("항해사","🧭 항해사앱 실행")) return;
 
         try{
-            Intent web=new Intent(Intent.ACTION_VIEW,Uri.parse("https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/navigator-update.html"));
+            Intent web=new Intent(Intent.ACTION_VIEW,Uri.parse("https://drive.google.com/file/d/12tYTGlkKPraVz1PEeqOszrGmvTp9Juue/view?usp=drivesdk"));
             web.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(web);
-            setNow("🧭 항해사앱 설치/업데이트 페이지를 엽니다.");
+            setNow("🧭 구글드라이브의 항해사앱 최신본을 엽니다.");
         }catch(Exception e){
             toast("항해사앱을 열 수 없습니다.");
         }
