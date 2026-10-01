@@ -26,7 +26,7 @@ jobs:
           SERVER_PID=$!
           trap 'kill $SERVER_PID || true' EXIT
           sleep 2
-          cat > /tmp/capture.mjs <<'EOF'
+          cat > capture.mjs <<'EOF'
           import { chromium } from 'playwright';
           const browser = await chromium.launch({headless:true});
           const page = await browser.newPage({viewport:{width:864,height:1536}, deviceScaleFactor:1});
@@ -43,7 +43,7 @@ jobs:
           await page.screenshot({path:'/tmp/approval_real.png'});
           await browser.close();
           EOF
-          node /tmp/capture.mjs
+          node capture.mjs
           test -s /tmp/approval_real.png
 
       - name: Build guide using only real app visuals for steps 7 8 9
