@@ -89,12 +89,42 @@ public class OverlayService extends Service {
         GradientDrawable d=new GradientDrawable();d.setColor(fill);d.setCornerRadius(dp(radius));d.setStroke(dp(1),stroke);return d;
     }
 
+    private float cappedSp(float sp){
+        float fs=getResources().getConfiguration().fontScale;
+        if(fs<=0f)fs=1f;
+        float capped=Math.min(fs,1.20f);
+        return sp/capped;
+    }
+
     private Button btn(String text,int color){
-        Button b=new Button(this);b.setText(text);b.setTextColor(Color.WHITE);b.setTextSize(9.5f);b.setAllCaps(false);
-        b.setGravity(Gravity.CENTER);b.setPadding(dp(3),0,dp(3),0);b.setMinHeight(0);b.setMinimumHeight(0);b.setMinWidth(0);b.setMinimumWidth(0);
+        Button b=new Button(this);
+        b.setText(text);
+        b.setTextColor(Color.WHITE);
+        b.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP,cappedSp(12f));
+        b.setAllCaps(false);
+        b.setSingleLine(true);
+        b.setEllipsize(null);
+        b.setIncludeFontPadding(false);
+        b.setGravity(Gravity.CENTER);
+        b.setPadding(dp(10),0,dp(10),0);
+        b.setMinHeight(dp(42));
+        b.setMinimumHeight(dp(42));
+        b.setMinWidth(dp(54));
+        b.setMinimumWidth(dp(54));
         b.setBackground(bg(color,0x66FFD35A,13));
-        int w="🎵 MP3".equals(text)?52:("📻 FM".equals(text)||"📡 AM".equals(text)?47:("업데이트".equals(text)?62:55));
-        LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(dp(w),dp(36));p.setMargins(dp(1),dp(2),dp(1),dp(2));b.setLayoutParams(p);return b;
+
+        int minW;
+        if("업데이트".equals(text)) minW=82;
+        else if("유튜브".equals(text)) minW=72;
+        else if("■ 종료".equals(text)) minW=72;
+        else if("🎵 MP3".equals(text)) minW=72;
+        else if("📻 FM".equals(text)||"📡 AM".equals(text)) minW=64;
+        else minW=64;
+
+        LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(dp(minW),dp(42));
+        p.setMargins(dp(2),dp(2),dp(2),dp(2));
+        b.setLayoutParams(p);
+        return b;
     }
 
     private TextView station(String text){
@@ -109,7 +139,7 @@ public class OverlayService extends Service {
 
         LinearLayout bar=new LinearLayout(this);bar.setOrientation(LinearLayout.HORIZONTAL);bar.setGravity(Gravity.CENTER_VERTICAL);
         anchor=new TextView(this);anchor.setText("⚓");anchor.setTextSize(19f);anchor.setTextColor(0xFFFFD96A);anchor.setGravity(Gravity.CENTER);
-        anchor.setBackground(bg(0xEE08233E,0xCCF3C954,14));anchor.setLayoutParams(new LinearLayout.LayoutParams(dp(39),dp(39)));bar.addView(anchor);
+        anchor.setBackground(bg(0xEE08233E,0xCCF3C954,14));anchor.setLayoutParams(new LinearLayout.LayoutParams(dp(44),dp(44)));bar.addView(anchor);
 
         menu=new LinearLayout(this);menu.setOrientation(LinearLayout.HORIZONTAL);menu.setGravity(Gravity.CENTER_VERTICAL);menu.setVisibility(View.VISIBLE);
         Button mp3=btn("🎵 MP3",0xEE1068C8), fm=btn("📻 FM",0xEE5B34D6), am=btn("📡 AM",0xEE6D2DB7),
@@ -122,10 +152,10 @@ public class OverlayService extends Service {
         menuScroll.setFillViewport(false);
         menuScroll.setVisibility(View.GONE);
         menuScroll.addView(menu,new HorizontalScrollView.LayoutParams(-2,-1));
-        bar.addView(menuScroll,new LinearLayout.LayoutParams(dp(285),dp(46)));
-        root.addView(bar,new LinearLayout.LayoutParams(-2,dp(46)));
+        bar.addView(menuScroll,new LinearLayout.LayoutParams(dp(300),dp(50)));
+        root.addView(bar,new LinearLayout.LayoutParams(-2,dp(50)));
 
-        now=new TextView(this);now.setTextColor(0xFFFFE58A);now.setTextSize(10.5f);now.setPadding(dp(8),dp(2),dp(8),dp(3));now.setVisibility(View.GONE);
+        now=new TextView(this);now.setTextColor(0xFFFFE58A);now.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP,12f);now.setPadding(dp(8),dp(4),dp(8),dp(5));now.setMaxLines(2);now.setVisibility(View.GONE);
         root.addView(now,new LinearLayout.LayoutParams(-2,-2));
 
         stationPanel=new LinearLayout(this);stationPanel.setOrientation(LinearLayout.VERTICAL);stationPanel.setVisibility(View.GONE);
