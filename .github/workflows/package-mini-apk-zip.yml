@@ -1,0 +1,33 @@
+name: Package Mini APK ZIP
+
+on:
+  push:
+    paths:
+      - '.github/workflows/package-mini-apk-zip.yml'
+      - 'HANGHAE_MINI_MP3_FM_AM_YOUTUBE-debug.apk'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Make ZIP
+        run: |
+          set -euo pipefail
+          test -s HANGHAE_MINI_MP3_FM_AM_YOUTUBE-debug.apk
+          rm -f HANGHAE_MINI_LATEST.zip
+          zip -j HANGHAE_MINI_LATEST.zip HANGHAE_MINI_MP3_FM_AM_YOUTUBE-debug.apk
+          test -s HANGHAE_MINI_LATEST.zip
+      - name: Publish ZIP
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add HANGHAE_MINI_LATEST.zip
+          git commit -m 'Publish mini overlay ZIP fallback' || true
+          git pull --rebase origin main
+          git push
