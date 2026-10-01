@@ -540,6 +540,7 @@ public class OverlayService extends Service {
         collapseStations();
         collapseMenu();
 
+        if(launchPackage("com.baekhak.dosa.v3","🧭 항해사앱 실행")) return;
         if(launchByLabel("항해사","🧭 항해사앱 실행")) return;
 
         try{
