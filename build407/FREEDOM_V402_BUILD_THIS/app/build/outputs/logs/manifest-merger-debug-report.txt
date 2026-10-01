@@ -1,0 +1,173 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:1:1-44:12
+MERGED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:1:1-44:12
+INJECTED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/AndroidManifest.xml:1:1-7:12
+INJECTED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/AndroidManifest.xml:1:1-7:12
+INJECTED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/AndroidManifest.xml:1:1-7:12
+	package
+		INJECTED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/AndroidManifest.xml
+	android:versionName
+		INJECTED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/AndroidManifest.xml
+	android:versionCode
+		INJECTED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/AndroidManifest.xml
+	xmlns:android
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:1:11-69
+uses-permission#android.permission.INTERNET
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:2:2-63
+	android:name
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:2:19-61
+uses-permission#android.permission.WAKE_LOCK
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:3:2-64
+	android:name
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:3:19-62
+uses-permission#android.permission.FOREGROUND_SERVICE
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:4:2-73
+	android:name
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:4:19-71
+uses-permission#android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:5:2-88
+	android:name
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:5:19-86
+uses-permission#android.permission.POST_NOTIFICATIONS
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:6:2-73
+	android:name
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:6:19-71
+uses-permission#android.permission.REQUEST_INSTALL_PACKAGES
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:7:2-79
+	android:name
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:7:19-77
+uses-permission#android.permission.READ_MEDIA_AUDIO
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:8:2-71
+	android:name
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:8:19-69
+uses-permission#android.permission.READ_EXTERNAL_STORAGE
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:9:2-103
+	android:maxSdkVersion
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:9:75-101
+	android:name
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:9:19-74
+uses-permission#android.permission.RECEIVE_BOOT_COMPLETED
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:10:2-77
+	android:name
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:10:19-75
+queries
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:11:2-31:12
+intent#action:name:android.intent.action.TTS_SERVICE
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:12:3-78
+action#android.intent.action.TTS_SERVICE
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:12:11-69
+	android:name
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:12:19-67
+intent#action:name:com.sec.android.app.myfiles.PICK_DATA
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:13:3-82
+action#com.sec.android.app.myfiles.PICK_DATA
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:13:11-73
+	android:name
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:13:19-71
+intent#action:name:com.sec.android.app.myfiles.PICK_DATA_MULTIPLE
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:14:3-91
+action#com.sec.android.app.myfiles.PICK_DATA_MULTIPLE
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:14:11-82
+	android:name
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:14:19-80
+package#com.sec.android.app.myfiles
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:15:3-56
+	android:name
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:15:12-54
+package#com.google.android.documentsui
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:16:3-59
+	android:name
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:16:12-57
+package#com.android.documentsui
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:17:3-52
+	android:name
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:17:12-50
+intent#action:name:android.intent.action.OPEN_DOCUMENT+category:name:android.intent.category.OPENABLE+data:mimeType:audio/*
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:18:3-22:12
+action#android.intent.action.OPEN_DOCUMENT
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:19:4-64
+	android:name
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:19:12-62
+category#android.intent.category.OPENABLE
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:20:4-63
+	android:name
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:20:14-61
+data
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:21:4-38
+	android:mimeType
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:21:10-36
+intent#action:name:android.intent.action.OPEN_DOCUMENT_TREE
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:23:3-25:12
+action#android.intent.action.OPEN_DOCUMENT_TREE
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:24:4-69
+	android:name
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:24:12-67
+intent#action:name:android.intent.action.OPEN_DOCUMENT+category:name:android.intent.category.OPENABLE+data:mimeType:application/vnd.android.package-archive
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:26:3-30:12
+application
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:32:2-43:16
+MERGED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:32:2-43:16
+MERGED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:32:2-43:16
+INJECTED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/AndroidManifest.xml:2:2-6:16
+	android:extractNativeLibs
+		INJECTED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/AndroidManifest.xml
+	android:label
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:32:47-79
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:32:47-79
+	android:icon
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:32:80-117
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:32:80-117
+	android:allowBackup
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:32:154-181
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:32:154-181
+	android:theme
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:32:15-46
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:32:15-46
+	android:usesCleartextTraffic
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:32:118-153
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:32:118-153
+service#com.baekhak.centralcontrol.MusicPlaybackService
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:33:3-37:52
+	android:exported
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:35:5-29
+	android:stopWithTask
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:36:5-33
+	android:foregroundServiceType
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:37:5-50
+	android:name
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:34:5-41
+service#com.baekhak.centralcontrol.RadioPlaybackService
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:38:3-42:52
+	android:exported
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:40:5-29
+	android:stopWithTask
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:41:5-33
+	android:foregroundServiceType
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:42:5-50
+	android:name
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/AndroidManifest.xml:39:5-41
+activity#com.baekhak.centralcontrol.MainActivity
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/AndroidManifest.xml:3:3-5:14
+	android:exported
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/AndroidManifest.xml:3:68-91
+	android:name
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/AndroidManifest.xml:3:13-67
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/AndroidManifest.xml:4:4-145
+action#android.intent.action.MAIN
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/AndroidManifest.xml:4:19-70
+	android:name
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/AndroidManifest.xml:4:27-68
+category#android.intent.category.LAUNCHER
+ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/AndroidManifest.xml:4:70-129
+	android:name
+		ADDED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/AndroidManifest.xml:4:80-127
+uses-sdk
+INJECTED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/AndroidManifest.xml
+INJECTED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/AndroidManifest.xml

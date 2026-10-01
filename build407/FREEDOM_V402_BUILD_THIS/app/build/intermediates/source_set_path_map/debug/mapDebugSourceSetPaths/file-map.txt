@@ -1,0 +1,8 @@
+com.baekhak.centralcontrol.app-pngs-0 /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/build/generated/res/pngs/debug
+com.baekhak.centralcontrol.app-resValues-1 /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/build/generated/res/resValues/debug
+com.baekhak.centralcontrol.app-mergeDebugResources-2 /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir
+com.baekhak.centralcontrol.app-mergeDebugResources-3 /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/build/intermediates/incremental/debug/mergeDebugResources/stripped.dir
+com.baekhak.centralcontrol.app-debug-4 /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/build/intermediates/merged_res/debug/mergeDebugResources
+com.baekhak.centralcontrol.app-debug-5 /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/debug/res
+com.baekhak.centralcontrol.app-freedom-6 /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/res
+com.baekhak.centralcontrol.app-main-7 /home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/main/res

@@ -1,0 +1,6 @@
+int drawable v3_ship_icon 0x7f010000
+int raw home_joyful_loop 0x7f020000
+int raw sea_intro 0x7f020001
+int raw v3_congrats_fanfare 0x7f020002
+int string app_name 0x7f030000
+int style AppTheme 0x7f040000

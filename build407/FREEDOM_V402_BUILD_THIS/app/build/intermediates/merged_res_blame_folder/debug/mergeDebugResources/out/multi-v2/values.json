@@ -1,0 +1,43 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.baekhak.centralcontrol.app-mergeDebugResources-2:/values/values.xml",
+            "map": [
+                {
+                    "source": "/home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/res/values/strings.xml",
+                    "from": {
+                        "startLines": "0",
+                        "startColumns": "11",
+                        "startOffsets": "11",
+                        "endColumns": "49",
+                        "endOffsets": "49"
+                    },
+                    "to": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "42",
+                        "endOffsets": "93"
+                    }
+                },
+                {
+                    "source": "/home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/res/values/styles.xml",
+                    "from": {
+                        "startLines": "0",
+                        "startColumns": "11",
+                        "startOffsets": "11",
+                        "endColumns": "191",
+                        "endOffsets": "191"
+                    },
+                    "to": {
+                        "startLines": "3",
+                        "startColumns": "4",
+                        "startOffsets": "98",
+                        "endColumns": "184",
+                        "endOffsets": "278"
+                    }
+                }
+            ]
+        }
+    ]
+}

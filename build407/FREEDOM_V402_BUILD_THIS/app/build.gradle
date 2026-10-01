@@ -1,0 +1,60 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.baekhak.centralcontrol'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'com.navigator.freedom.v3final'
+        minSdk 23
+        targetSdk 35
+        versionCode 30407
+        versionName "4.0.7-NO-FLOATING-ICON"
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    buildTypes {
+        debug {
+            debuggable false
+            minifyEnabled false
+        }
+        release {
+            minifyEnabled false
+            shrinkResources false
+        }
+    }
+
+    sourceSets {
+        main {
+            manifest.srcFile 'src/main/AndroidManifest.xml'
+            res.srcDirs = ['src/main/res', 'src/freedom/res']
+            assets.srcDirs = ['src/main/assets', 'src/freedom/assets']
+        }
+        debug {
+            manifest.srcFile 'src/freedom/AndroidManifest.xml'
+        }
+        release {
+            manifest.srcFile 'src/freedom/AndroidManifest.xml'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "FREEDOM_V3_FINAL_407-debug.apk"
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}

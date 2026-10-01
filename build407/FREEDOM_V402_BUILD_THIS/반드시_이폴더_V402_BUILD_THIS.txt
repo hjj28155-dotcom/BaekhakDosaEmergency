@@ -1,0 +1,7 @@
+반드시 FREEDOM_V402_BUILD_THIS 폴더를 AndroidIDE에서 새 프로젝트로 여세요.
+
+버전: 3.4.2
+정상 빌드 APK:
+FREEDOM_V3_402_REBUILD_HARDLOCK-debug.apk
+
+이 파일이 프로젝트 최상단에 보여야 V402가 맞습니다.

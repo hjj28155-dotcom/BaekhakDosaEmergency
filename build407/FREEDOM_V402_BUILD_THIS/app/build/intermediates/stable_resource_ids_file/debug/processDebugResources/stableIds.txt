@@ -1,0 +1,6 @@
+com.navigator.freedom.v3final:style/AppTheme = 0x7f040000
+com.navigator.freedom.v3final:string/app_name = 0x7f030000
+com.navigator.freedom.v3final:raw/sea_intro = 0x7f020001
+com.navigator.freedom.v3final:raw/v3_congrats_fanfare = 0x7f020002
+com.navigator.freedom.v3final:raw/home_joyful_loop = 0x7f020000
+com.navigator.freedom.v3final:drawable/v3_ship_icon = 0x7f010000

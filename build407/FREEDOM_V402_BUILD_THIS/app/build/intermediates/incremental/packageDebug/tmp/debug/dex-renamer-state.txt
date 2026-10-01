@@ -1,0 +1,4 @@
+#Thu Oct 01 01:30:53 UTC 2026
+base.0=/home/runner/work/BaekhakDosaEmergency/BaekhakDosaEmergency/build407/FREEDOM_V402_BUILD_THIS/app/build/intermediates/dex/debug/mergeDexDebug/classes.dex
+renamed.0=classes.dex
+path.0=classes.dex
