@@ -18,7 +18,7 @@ jobs:
       - name: Download V404 source
         run: |
           set -euo pipefail
-          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-7d10-8206-ac79-f30d5b9f7c4b/raw?se=2026-10-01T01%3A09%3A56Z&sp=r&sv=2026-02-06&sr=b&scid=ca29b5e0-1d0c-5b46-af9d-e3a45c0805fa&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-01T01%3A00%3A03Z&ske=2026-10-02T01%3A00%3A03Z&sks=b&skv=2026-02-06&sig=lla2imEisjHIMC3Kk2SBN8L8unpl7g3gtJ%2B2g5VyUkg%3D' -o source.zip
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-afe0-8206-ad0c-376df9eb8ef7/raw?se=2026-10-01T01%3A34%3A25Z&sp=r&sv=2026-02-06&sr=b&scid=21fb5e4c-3f0c-5cf0-9b57-1bea427006f1&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-01T01%3A16%3A08Z&ske=2026-10-02T01%3A16%3A08Z&sks=b&skv=2026-02-06&sig=Fp4AqyfwApfZ9J03bagUvvNSxnZcQ/6xkZwFU6AesIk%3D' -o source.zip
           rm -rf build407
           mkdir build407
           unzip -q source.zip -d build407
@@ -26,7 +26,7 @@ jobs:
       - name: Download final welcome scroll
         run: |
           set -euo pipefail
-          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-45c0-8206-92e0-3109ed1021fe/raw?se=2026-10-01T01%3A10%3A02Z&sp=r&sv=2026-02-06&sr=b&scid=41926168-ae36-523c-8beb-28877180f49a&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-30T22%3A03%3A05Z&ske=2026-10-01T22%3A03%3A05Z&sks=b&skv=2026-02-06&sig=DcoIVNdWoqBqgYyf3u7BzoOOygHz/L9p139or3saZqo%3D' -o build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/welcome_scroll_final.png
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-6a68-8206-9249-aec8575884fe/raw?se=2026-10-01T01%3A34%3A27Z&sp=r&sv=2026-02-06&sr=b&scid=24949fab-4fe8-53e9-ab3d-6bc64d5bd6f9&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-01T01%3A23%3A56Z&ske=2026-10-02T01%3A23%3A56Z&sks=b&skv=2026-02-06&sig=0SxoJ7eyv5hoAHfmoq%2BwYh8qqDJ6PKq4BngEcJWW1Oo%3D' -o build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/welcome_scroll_final.png
           test -s build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/welcome_scroll_final.png
       - name: Apply V405 ordered flow
         run: |
