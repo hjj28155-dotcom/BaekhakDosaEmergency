@@ -1,0 +1,59 @@
+name: Build Freedom V3 Final 407 No Floating Icon
+on:
+  push:
+    paths:
+      - '.github/workflows/build-final-407.yml'
+      - '.github/scripts/patch_remove_main_overlay_407.py'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Download V404 source
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-7d10-8206-ac79-f30d5b9f7c4b/raw?se=2026-10-01T01%3A09%3A56Z&sp=r&sv=2026-02-06&sr=b&scid=ca29b5e0-1d0c-5b46-af9d-e3a45c0805fa&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-01T01%3A00%3A03Z&ske=2026-10-02T01%3A00%3A03Z&sks=b&skv=2026-02-06&sig=lla2imEisjHIMC3Kk2SBN8L8unpl7g3gtJ%2B2g5VyUkg%3D' -o source.zip
+          rm -rf build407
+          mkdir build407
+          unzip -q source.zip -d build407
+          test -f build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/index.html
+      - name: Download final welcome scroll
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-45c0-8206-92e0-3109ed1021fe/raw?se=2026-10-01T01%3A10%3A02Z&sp=r&sv=2026-02-06&sr=b&scid=41926168-ae36-523c-8beb-28877180f49a&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-30T22%3A03%3A05Z&ske=2026-10-01T22%3A03%3A05Z&sks=b&skv=2026-02-06&sig=DcoIVNdWoqBqgYyf3u7BzoOOygHz/L9p139or3saZqo%3D' -o build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/welcome_scroll_final.png
+          test -s build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/welcome_scroll_final.png
+      - name: Apply V405 ordered flow
+        run: |
+          sed 's|build405/FREEDOM_V402_BUILD_THIS|build407/FREEDOM_V402_BUILD_THIS|g' .github/scripts/patch_final_405.py > /tmp/p405.py
+          python3 /tmp/p405.py
+      - name: Apply V406 scroll plus approval
+        run: |
+          sed 's|build405/FREEDOM_V402_BUILD_THIS|build407/FREEDOM_V402_BUILD_THIS|g' .github/scripts/patch_scroll_approval_406.py > /tmp/p406.py
+          python3 /tmp/p406.py
+      - name: Remove floating icon from main app
+        run: python3 .github/scripts/patch_remove_main_overlay_407.py
+      - name: Build APK
+        working-directory: build407/FREEDOM_V402_BUILD_THIS
+        run: |
+          set -euo pipefail
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+          APK=$(find app/build/outputs/apk/debug -type f -name '*.apk' | head -1)
+          test -s "$APK"
+          cp "$APK" ../FREEDOM_V3_FINAL_407-debug.apk
+      - name: Publish final APK
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          rm -f FREEDOM_V3_FINAL_40*-debug.apk
+          cp build407/FREEDOM_V3_FINAL_407-debug.apk ./FREEDOM_V3_FINAL_407-debug.apk
+          git add -A
+          git commit -m 'Publish Freedom V4.0.7 without floating icon'
+          git push
