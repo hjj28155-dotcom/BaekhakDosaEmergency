@@ -14,6 +14,7 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.view.*;
 import android.widget.*;
+import java.util.ArrayList;
 
 public class OverlayService extends Service {
     public static final String ACTION_SHOW="com.navigator.freedom.miniicon.SHOW";
@@ -29,6 +30,9 @@ public class OverlayService extends Service {
     private MediaPlayer player;
     private String currentName="";
     private boolean localMode=false;
+    private final ArrayList<Long> localTrackIds=new ArrayList<>();
+    private final ArrayList<String> localTrackNames=new ArrayList<>();
+    private int localTrackIndex=-1;
 
     @Override public void onCreate(){
         super.onCreate();
@@ -111,7 +115,7 @@ public class OverlayService extends Service {
         stationPanel=new LinearLayout(this);stationPanel.setOrientation(LinearLayout.VERTICAL);stationPanel.setVisibility(View.GONE);
         root.addView(stationPanel,new LinearLayout.LayoutParams(-1,-2));
 
-        mp3.setOnClickListener(v->{collapseStations();toggleLocalMp3();});
+        mp3.setOnClickListener(v->{showMp3Controls();toggleLocalMp3();});
         fm.setOnClickListener(v->showStations(true));
         am.setOnClickListener(v->showStations(false));
         yt.setOnClickListener(v->openYoutube());
@@ -147,26 +151,161 @@ public class OverlayService extends Service {
     private void toggleLocalMp3(){
         if(player!=null&&localMode){
             try{
-                if(player.isPlaying()){player.pause();setNow("🎵 MP3 일시정지");}
-                else{player.start();setNow("🎵 "+currentName);}
-            }catch(Exception e){startLatestMp3();}
+                if(player.isPlaying()){
+                    player.pause();
+                    setNow("🎵 일시정지 · "+currentName);
+                }else{
+                    player.start();
+                    setNow("🎵 "+currentName);
+                }
+            }catch(Exception e){
+                startAllMp3();
+            }
             return;
         }
-        startLatestMp3();
+        startAllMp3();
     }
 
-    private void startLatestMp3(){
+    private void showMp3Controls(){
+        if(stationPanel==null)return;
+        stationPanel.removeAllViews();
+        stationPanel.setVisibility(View.VISIBLE);
+
+        TextView title=station("🎵 MP3 전체곡 연속재생");
+        title.setTextColor(0xFFFFD96A);
+        stationPanel.addView(title);
+
+        LinearLayout row=new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER);
+
+        Button prev=new Button(this);
+        prev.setText("◀ 이전곡");
+        prev.setTextSize(11f);
+        prev.setAllCaps(false);
+        prev.setOnClickListener(v->previousLocalTrack());
+
+        Button pause=new Button(this);
+        pause.setText("▶ / ❚❚");
+        pause.setTextSize(11f);
+        pause.setAllCaps(false);
+        pause.setOnClickListener(v->toggleLocalMp3());
+
+        Button next=new Button(this);
+        next.setText("다음곡 ▶");
+        next.setTextSize(11f);
+        next.setAllCaps(false);
+        next.setOnClickListener(v->nextLocalTrack());
+
+        row.addView(prev,new LinearLayout.LayoutParams(dp(82),dp(42)));
+        row.addView(pause,new LinearLayout.LayoutParams(dp(82),dp(42)));
+        row.addView(next,new LinearLayout.LayoutParams(dp(82),dp(42)));
+        stationPanel.addView(row);
+    }
+
+    private boolean loadLocalTracks(){
+        localTrackIds.clear();
+        localTrackNames.clear();
+
         Uri base=MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         String[] proj={MediaStore.Audio.Media._ID,MediaStore.Audio.Media.DISPLAY_NAME};
-        try(Cursor c=getContentResolver().query(base,proj,MediaStore.Audio.Media.DURATION+">?",new String[]{"10000"},MediaStore.Audio.Media.DATE_MODIFIED+" DESC")){
-            if(c!=null&&c.moveToFirst()){
-                long id=c.getLong(c.getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
-                String name=c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME));
-                Uri uri=Uri.withAppendedPath(base,String.valueOf(id));
-                playUri(name,uri,true);
-            }else toast("휴대폰에서 MP3 파일을 찾지 못했습니다.");
-        }catch(SecurityException e){toast("음악 및 오디오 권한을 허용해 주세요.");openApp();}
-        catch(Exception e){toast("MP3를 재생하지 못했습니다.");}
+        String selection=MediaStore.Audio.Media.DURATION+">?";
+        String[] args={"10000"};
+        String sort=MediaStore.Audio.Media.DISPLAY_NAME+" COLLATE NOCASE ASC";
+
+        try(Cursor c=getContentResolver().query(base,proj,selection,args,sort)){
+            if(c!=null){
+                int idCol=c.getColumnIndexOrThrow(MediaStore.Audio.Media._ID);
+                int nameCol=c.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME);
+                while(c.moveToNext()){
+                    localTrackIds.add(c.getLong(idCol));
+                    String n=c.getString(nameCol);
+                    localTrackNames.add(n==null?"MP3":n);
+                }
+            }
+        }catch(SecurityException e){
+            toast("음악 및 오디오 권한을 허용해 주세요.");
+            openApp();
+            return false;
+        }catch(Exception e){
+            toast("MP3 목록을 불러오지 못했습니다.");
+            return false;
+        }
+        return !localTrackIds.isEmpty();
+    }
+
+    private void startAllMp3(){
+        if(localTrackIds.isEmpty() && !loadLocalTracks()){
+            toast("휴대폰에서 MP3 파일을 찾지 못했습니다.");
+            return;
+        }
+        if(localTrackIndex<0 || localTrackIndex>=localTrackIds.size()) localTrackIndex=0;
+        playLocalTrack(localTrackIndex);
+    }
+
+    private void playLocalTrack(int index){
+        if(localTrackIds.isEmpty()){
+            if(!loadLocalTracks()){
+                toast("휴대폰에서 MP3 파일을 찾지 못했습니다.");
+                return;
+            }
+        }
+        if(index<0) index=localTrackIds.size()-1;
+        if(index>=localTrackIds.size()) index=0;
+        localTrackIndex=index;
+
+        Uri uri=Uri.withAppendedPath(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                String.valueOf(localTrackIds.get(localTrackIndex)));
+        String name=localTrackNames.get(localTrackIndex);
+
+        releasePlayerOnly();
+        currentName=name;
+        localMode=true;
+
+        MediaPlayer mp=new MediaPlayer();
+        player=mp;
+        try{
+            mp.setAudioAttributes(new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .build());
+            mp.setDataSource(this,uri);
+            mp.setOnPreparedListener(p->{
+                try{
+                    p.start();
+                    setNow("🎵 "+(localTrackIndex+1)+"/"+localTrackIds.size()+" · "+currentName);
+                }catch(Exception ignored){}
+            });
+            mp.setOnCompletionListener(p->nextLocalTrack());
+            mp.setOnErrorListener((p,w,e)->{
+                toast("이 곡을 재생하지 못해 다음 곡으로 넘어갑니다.");
+                nextLocalTrack();
+                return true;
+            });
+            mp.prepareAsync();
+            setNow("MP3 준비 중 · "+name);
+        }catch(Exception e){
+            nextLocalTrack();
+        }
+    }
+
+    private void nextLocalTrack(){
+        if(localTrackIds.isEmpty()){
+            startAllMp3();
+            return;
+        }
+        playLocalTrack((localTrackIndex+1)%localTrackIds.size());
+    }
+
+    private void previousLocalTrack(){
+        if(localTrackIds.isEmpty()){
+            startAllMp3();
+            return;
+        }
+        int n=localTrackIndex-1;
+        if(n<0)n=localTrackIds.size()-1;
+        playLocalTrack(n);
     }
 
     private void showStations(boolean fm){
@@ -199,7 +338,24 @@ public class OverlayService extends Service {
         }catch(Exception e){stopMedia();toast("재생을 시작하지 못했습니다.");}
     }
 
-    private void stopMedia(){MediaPlayer p=player;player=null;currentName="";localMode=false;if(p!=null){try{p.stop();}catch(Exception ignored){}try{p.release();}catch(Exception ignored){}}if(now!=null)now.setVisibility(View.GONE);}
+    private void releasePlayerOnly(){
+        MediaPlayer p=player;
+        player=null;
+        if(p!=null){
+            try{p.setOnCompletionListener(null);}catch(Exception ignored){}
+            try{p.setOnErrorListener(null);}catch(Exception ignored){}
+            try{p.stop();}catch(Exception ignored){}
+            try{p.release();}catch(Exception ignored){}
+        }
+    }
+
+    private void stopMedia(){
+        releasePlayerOnly();
+        currentName="";
+        localMode=false;
+        localTrackIndex=-1;
+        if(now!=null)now.setVisibility(View.GONE);
+    }
     private void setNow(String s){if(now!=null){now.setText(s);now.setVisibility(View.VISIBLE);}}
 
     private void openYoutube(){
