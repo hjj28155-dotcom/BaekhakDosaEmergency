@@ -1,0 +1,22 @@
+name: host-song
+on:
+  workflow_dispatch:
+jobs:
+  host-song:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - run: pip install gdown
+      - run: gdown 1XdVx8DwQSWAUSMGsu6scOedKIgbrSZdL -O kimkwangseok_ileona.mp3
+      - run: |
+          test -s kimkwangseok_ileona.mp3
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add kimkwangseok_ileona.mp3
+          git commit -m "Host Kim Kwang-seok Ileona audio" || exit 0
+          git push
