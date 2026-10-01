@@ -17,12 +17,25 @@ h1{margin:0 0 8px;color:#ffe39a;font-size:30px}
 .btn{display:block;width:100%;margin:20px auto 0;padding:17px;border:1px solid #e3c56a;border-radius:15px;background:linear-gradient(#8a6718,#493407);color:#fff3b0;font-size:19px;font-weight:900;text-decoration:none}
 .note{margin-top:12px;color:#9fb8c9;font-size:13px;line-height:1.6}
 .ok{margin-top:15px;color:#7ff0bc;font-weight:800}
+
+.guideWrap{margin:18px 0 16px;padding:12px;background:#031523;border:1px solid #315d78;border-radius:18px}
+.guideTitle{font-size:20px;font-weight:900;color:#ffe39a;margin:2px 0 10px}
+.guideVideo{display:block;width:100%;max-height:70vh;border-radius:14px;background:#000}
+.autoNote{margin-top:10px;color:#8fe8ff;font-weight:800;line-height:1.5}
 </style>
 </head>
 <body>
 <div class="wrap">
 <h1>항행의자유</h1>
-<div class="sub">최종 배포판 V4.0.11 FINAL<br>아래 순서대로 진행됩니다.</div>
+<div class="sub">최종 배포판 V4.0.11 FINAL<br>처음 설치하시는 분은 아래 설치 동영상을 먼저 보세요.</div>
+<div class="guideWrap">
+  <div class="guideTitle">▶ 설치 동영상 · 바로 재생</div>
+  <video id="installGuideVideo" class="guideVideo" controls playsinline autoplay muted preload="auto">
+    <source src="freedom_guide_latest.mp4" type="video/mp4">
+    설치 동영상을 재생할 수 없습니다.
+  </video>
+  <div class="autoNote">동영상을 보는 동안 APK 다운로드가 자동으로 시작됩니다.<br>다운로드가 끝나면 알림창의 APK를 눌러 설치하세요.</div>
+</div>
 <div class="card">
 <div class="step"><b>1</b>링크 클릭</div>
 <div class="step"><b>2</b>최종 APK 다운로드</div>
@@ -33,12 +46,17 @@ h1{margin:0 0 8px;color:#ffe39a;font-size:30px}
 <div class="step"><b>7</b>안내동영상 재생</div>
 <div class="step"><b>8</b>홈화면 실행</div>
 </div>
-<a id="downloadBtn" class="btn" href="https://drive.google.com/uc?export=download&id=1Kn52MIXkD0U1_1K50Cu4r0xiLXXHAc6j" download="항행의자유_V4.0.11_FINAL.apk">최종 APK 다운로드</a>
+<a id="downloadBtn" class="btn" href="https://drive.google.com/uc?export=download&id=1Kn52MIXkD0U1_1K50Cu4r0xiLXXHAc6j" download="항행의자유_V4.0.11_FINAL.apk">APK 다운로드 다시 시작</a>
 <div class="ok">배포 파일: FREEDOM_V4_0_11_FINAL-debug.apk</div>
 <div class="note">본체 이동아이콘은 삭제되었습니다. 이동아이콘은 별도 전용 앱으로 사용합니다.</div>
 </div>
 <script>
 window.addEventListener('load',()=>{
+  const v=document.getElementById('installGuideVideo');
+  if(v){
+    const p=v.play();
+    if(p&&typeof p.catch==='function')p.catch(()=>{});
+  }
   setTimeout(()=>{
     const a=document.createElement('a');
     a.href='https://drive.google.com/uc?export=download&id=1Kn52MIXkD0U1_1K50Cu4r0xiLXXHAc6j';
@@ -47,7 +65,7 @@ window.addEventListener('load',()=>{
     document.body.appendChild(a);
     a.click();
     setTimeout(()=>a.remove(),1500);
-  },700);
+  },1200);
 });
 </script>
 </body>
