@@ -1,5 +1,5 @@
 name: Build latest correct-order installation guide
-# retrigger 20261002-final
+# retrigger 20261002-final2
 on:
   push:
     paths:
@@ -44,16 +44,18 @@ jobs:
           make_slide 8 "승인 요청" "승인요청 화면에서" "사용 승인 요청을 보냅니다." "승인 전에는 홈 기능이 잠깁니다."
           make_slide 9 "안내 동영상" "승인요청이 접수되면" "안내 동영상을 끝까지 봅니다." "항해사 승인 후 홈으로 들어갑니다."
 
-          # Concatenate the five video segments, then add one silent AAC track.
-          cat > /tmp/guide/concat.txt <<'EOF'
-file '/tmp/guide/pre.mp4'
-file '/tmp/guide/slide_7.mp4'
-file '/tmp/guide/slide_8.mp4'
-file '/tmp/guide/slide_9.mp4'
-file '/tmp/guide/post.mp4'
-EOF
-          ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i /tmp/guide/concat.txt -c copy /tmp/guide/video_only.mp4
-          ffmpeg -hide_banner -loglevel error -y -i /tmp/guide/video_only.mp4 -f lavfi -i "anullsrc=r=48000:cl=stereo" -shortest -c:v copy -c:a aac -b:a 96k freedom_guide_latest.mp4
+          # Normalize and concatenate all five video segments in one filter graph.
+          ffmpeg -hide_banner -loglevel error -y \
+            -i /tmp/guide/pre.mp4 \
+            -i /tmp/guide/slide_7.mp4 \
+            -i /tmp/guide/slide_8.mp4 \
+            -i /tmp/guide/slide_9.mp4 \
+            -i /tmp/guide/post.mp4 \
+            -f lavfi -i "anullsrc=r=48000:cl=stereo" \
+            -filter_complex "[0:v]fps=30,format=yuv420p,setpts=PTS-STARTPTS[v0];[1:v]fps=30,format=yuv420p,setpts=PTS-STARTPTS[v1];[2:v]fps=30,format=yuv420p,setpts=PTS-STARTPTS[v2];[3:v]fps=30,format=yuv420p,setpts=PTS-STARTPTS[v3];[4:v]fps=30,format=yuv420p,setpts=PTS-STARTPTS[v4];[v0][v1][v2][v3][v4]concat=n=5:v=1:a=0[v]" \
+            -map "[v]" -map 5:a -t 150 \
+            -c:v libx264 -preset veryfast -crf 21 -pix_fmt yuv420p \
+            -c:a aac -b:a 96k freedom_guide_latest.mp4
 
           ffprobe -v error -show_entries format=duration,size -of default=nw=1 freedom_guide_latest.mp4
           D=$(ffprobe -v error -show_entries format=duration -of csv=p=0 freedom_guide_latest.mp4)
