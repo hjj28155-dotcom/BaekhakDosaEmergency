@@ -152,7 +152,18 @@ public class OverlayService extends Service {
         try{wm.addView(root,lp);}catch(Exception e){root=null;}
     }
 
-    private void toggleMenu(){expanded=!expanded;if(menu!=null)menu.setVisibility(expanded?View.VISIBLE:View.GONE);if(!expanded)collapseStations();}
+    private void toggleMenu(){
+        expanded=!expanded;
+        if(menu!=null)menu.setVisibility(expanded?View.VISIBLE:View.GONE);
+        if(expanded){
+            try{
+                String ver=getPackageManager().getPackageInfo(getPackageName(),0).versionName;
+                setNow("항행의자유 이동아이콘 v"+ver+" · 업데이트 버튼 준비");
+            }catch(Exception ignored){}
+        }else{
+            collapseStations();
+        }
+    }
     private void collapseMenu(){expanded=false;if(menu!=null)menu.setVisibility(View.GONE);}
     private void collapseStations(){if(stationPanel!=null){stationPanel.removeAllViews();stationPanel.setVisibility(View.GONE);}}
 
@@ -461,7 +472,14 @@ public class OverlayService extends Service {
                 if(outUri!=null){
                     try{getContentResolver().delete(outUri,null,null);}catch(Exception ignored){}
                 }
-                updateHandler.post(() -> setNow("❌ 업데이트 실패 · "+msg));
+                updateHandler.post(() -> {
+                    setNow("❌ 업데이트 실패 · "+msg+" · 브라우저 다운로드로 전환");
+                    try{
+                        Intent browser=new Intent(Intent.ACTION_VIEW,Uri.parse(apkUrl));
+                        browser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(browser);
+                    }catch(Exception ignored){}
+                });
             }finally{
                 if(conn!=null)conn.disconnect();
                 updateBusy=false;
