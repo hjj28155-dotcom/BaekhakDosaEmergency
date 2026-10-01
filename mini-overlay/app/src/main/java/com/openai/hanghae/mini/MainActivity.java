@@ -14,19 +14,23 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
     private static final int REQ_AUDIO=77;
+    private boolean pendingStart=false;
 
     @Override public void onCreate(Bundle b){
         super.onCreate(b);
         setContentView(buildUi());
-        ensurePermissionsAndStart();
     }
 
     @Override protected void onResume(){
         super.onResume();
-        if(canOverlay()) startOverlay();
+        if(pendingStart && canOverlay()){
+            pendingStart=false;
+            ensureAudioPermissionAndStart();
+        }
     }
 
     private LinearLayout buildUi(){
@@ -44,21 +48,18 @@ public class MainActivity extends Activity {
         root.addView(title,new LinearLayout.LayoutParams(-1,-2));
 
         TextView info=new TextView(this);
-        info.setText("\n⚓ 이동아이콘 전용\nMP3 · FM · AM · YouTube\n\n처음 한 번 '다른 앱 위에 표시'와\n'음악 및 오디오' 권한을 허용해 주세요.");
+        info.setText("\n⚓ 이동아이콘 전용\nMP3 · FM · AM · YouTube\n\n원할 때만 켜고 끌 수 있습니다.\n꺼둔 상태는 앱 재실행·재부팅 후에도 유지됩니다.");
         info.setTextColor(Color.WHITE);
         info.setTextSize(16);
         info.setGravity(Gravity.CENTER);
         root.addView(info,new LinearLayout.LayoutParams(-1,-2));
 
-        Button start=button("⚓ 이동아이콘 시작");
-        start.setOnClickListener(v->ensurePermissionsAndStart());
+        Button start=button("⚓ 이동아이콘 켜기");
+        start.setOnClickListener(v->startRequested());
         root.addView(start);
 
-        Button hide=button("이동아이콘 숨기기");
-        hide.setOnClickListener(v->{
-            Intent i=new Intent(this,OverlayService.class).setAction(OverlayService.ACTION_HIDE);
-            try{ startService(i); }catch(Exception ignored){}
-        });
+        Button hide=button("⏹ 이동아이콘 끄기");
+        hide.setOnClickListener(v->hideOverlay());
         root.addView(hide);
         return root;
     }
@@ -76,11 +77,16 @@ public class MainActivity extends Activity {
     private int dp(int v){ return Math.round(v*getResources().getDisplayMetrics().density); }
     private boolean canOverlay(){ return Build.VERSION.SDK_INT<23 || Settings.canDrawOverlays(this); }
 
-    private void ensurePermissionsAndStart(){
+    private void startRequested(){
         if(!canOverlay()){
+            pendingStart=true;
             startActivity(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,Uri.parse("package:"+getPackageName())));
             return;
         }
+        ensureAudioPermissionAndStart();
+    }
+
+    private void ensureAudioPermissionAndStart(){
         if(Build.VERSION.SDK_INT>=33 && checkSelfPermission(Manifest.permission.READ_MEDIA_AUDIO)!=PackageManager.PERMISSION_GRANTED){
             requestPermissions(new String[]{Manifest.permission.READ_MEDIA_AUDIO},REQ_AUDIO);
             return;
@@ -93,12 +99,33 @@ public class MainActivity extends Activity {
     }
 
     private void startOverlay(){
+        getSharedPreferences("overlay_control",MODE_PRIVATE).edit().putBoolean("enabled",true).apply();
         Intent i=new Intent(this,OverlayService.class).setAction(OverlayService.ACTION_SHOW);
-        try{ if(Build.VERSION.SDK_INT>=26) startForegroundService(i); else startService(i); }catch(Exception ignored){}
+        try{
+            if(Build.VERSION.SDK_INT>=26) startForegroundService(i); else startService(i);
+            Toast.makeText(this,"이동아이콘을 켰습니다.",Toast.LENGTH_SHORT).show();
+        }catch(Exception e){
+            Toast.makeText(this,"이동아이콘을 시작하지 못했습니다.",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void hideOverlay(){
+        pendingStart=false;
+        getSharedPreferences("overlay_control",MODE_PRIVATE).edit().putBoolean("enabled",false).apply();
+        Intent i=new Intent(this,OverlayService.class).setAction(OverlayService.ACTION_HIDE);
+        try{
+            if(Build.VERSION.SDK_INT>=26) startForegroundService(i); else startService(i);
+        }catch(Exception ignored){}
+        try{ stopService(new Intent(this,OverlayService.class)); }catch(Exception ignored){}
+        Toast.makeText(this,"이동아이콘을 껐습니다.",Toast.LENGTH_SHORT).show();
     }
 
     @Override public void onRequestPermissionsResult(int requestCode,String[] permissions,int[] grantResults){
         super.onRequestPermissionsResult(requestCode,permissions,grantResults);
-        if(requestCode==REQ_AUDIO) startOverlay();
+        if(requestCode==REQ_AUDIO){
+            boolean granted=grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED;
+            if(granted) startOverlay();
+            else Toast.makeText(this,"MP3 사용을 위해 음악 권한이 필요합니다.",Toast.LENGTH_SHORT).show();
+        }
     }
 }
