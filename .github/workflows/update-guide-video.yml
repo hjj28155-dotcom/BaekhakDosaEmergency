@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Download latest guide video
         run: |
-          curl -L --fail --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-f57c-8206-aab1-9a9db63a274d/raw?se=2026-10-01T15%3A26%3A10Z&sp=r&sv=2026-02-06&sr=b&scid=aeb4cefe-4d30-53c9-8c62-6f57ac877986&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-01T12%3A48%3A14Z&ske=2026-10-02T12%3A48%3A14Z&sks=b&skv=2026-02-06&sig=icvAPbVInFbyBBcnYTvMlddVygJ3V14ODTSFnLftCDA%3D' -o latest_guide.mp4
+          curl -L --fail --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-b7a8-8206-9f6a-0fd9cae38e83/raw?se=2026-10-01T15%3A49%3A03Z&sp=r&sv=2026-02-06&sr=b&scid=9d8cd0b4-6e6f-5ed7-842b-7453336cdaa1&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-01T14%3A25%3A41Z&ske=2026-10-02T14%3A25%3A41Z&sks=b&skv=2026-02-06&sig=kv3u3%2B9TMyvzuPFcLj8NPpTfERTLUxockZcvPt6Aqrw%3D' -o latest_guide.mp4
           test "$(stat -c%s latest_guide.mp4)" -eq 8114289
       - name: Replace public guide video
         run: |
