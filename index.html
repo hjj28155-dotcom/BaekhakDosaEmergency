@@ -23,8 +23,8 @@ h1{margin:0 0 8px;color:#ffe39a;font-size:30px}
 
 .guideWrap{margin:18px 0 16px;padding:12px;background:#031523;border:1px solid #315d78;border-radius:18px}
 .guideTitle{font-size:20px;font-weight:900;color:#ffe39a;margin:2px 0 10px}
-.guideVideo{display:block;width:100%;height:1px;opacity:0;pointer-events:none}
-.guideStage{min-height:520px;border-radius:14px;background:linear-gradient(180deg,#071d31,#0a3557);border:2px solid #d6b75a;display:flex;align-items:center;justify-content:center;padding:24px;margin-top:12px}
+.guideVideo{display:block;width:100%;max-height:70vh;border-radius:14px;background:#000;margin-top:12px}
+.guideStage{display:none!important}
 .guidePanel{width:100%;max-width:620px;text-align:left;background:rgba(4,30,51,.96);border:2px solid #d6b75a;border-radius:22px;padding:26px;box-shadow:0 10px 30px #0008}
 .guideNo{font-size:62px;font-weight:1000;color:#ffe39a;text-align:center;margin-bottom:10px}
 .guideHead{font-size:34px;font-weight:1000;text-align:center;margin-bottom:24px}
@@ -47,8 +47,8 @@ h1{margin:0 0 8px;color:#ffe39a;font-size:30px}
     <div id="guideBody"></div>
   </div>
 </div>
-<video id="installGuideVideo" class="guideVideo" playsinline preload="auto" muted>
-  <source src="freedom_guide_latest.mp4?v=20261002-stable" type="video/mp4">
+<video id="installGuideVideo" class="guideVideo" playsinline preload="auto" muted controlslist="nodownload noplaybackrate">
+  <source src="build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/install_guide_final.mp4?v=20261002-exact" type="video/mp4">
 </video>
   <audio id="guideSongAudio" preload="auto" controls style="display:block;width:100%;margin-top:10px"
     src="kimkwangseok_ileona.mp3?v=20261001-2319"></audio>
@@ -242,10 +242,8 @@ window.addEventListener('load',()=>{
     // 사용자 조작으로 앞으로 건너뛰는 것을 막기 위해 controls 자체를 노출하지 않음
   }
 
-  renderGuideSlide(0);
   if(a){
     a.addEventListener('ended',finishGuideSong);
-    a.addEventListener('timeupdate',syncGuideSlideFromAudio);
     a.addEventListener('timeupdate',()=>{
       if(!SESSION_ACTIVE||SESSION_DONE)return;
       const st=document.getElementById('guideStatus');
