@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>항행의자유 V4.0.18 MAX VOLUME FIX</title>
+<title>항행의자유 V4.0.18 MAX VOLUME 4X</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:linear-gradient(180deg,#03182c,#00101f);color:#fff;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif}
@@ -30,7 +30,7 @@ h1{margin:0 0 8px;color:#ffe39a;font-size:30px}
 <body>
 <div class="wrap">
 <h1>항행의자유</h1>
-<div class="sub">최종 배포판 V4.0.18 MAX VOLUME FIX<br>처음 설치하시는 분은 아래 설치 동영상을 먼저 보세요.</div>
+<div class="sub">최종 배포판 V4.0.18 MAX VOLUME 4X<br>처음 설치하시는 분은 아래 설치 동영상을 먼저 보세요.</div>
 <div class="guideWrap">
   <div class="guideTitle">🎬 설치 설명서 + 김광석 〈일어나〉</div>
   <button id="guideStartBtn" class="btn" type="button" style="margin-top:0" onclick="startGuideSong()">▶ 설치 설명서 + 노래 재생 시작</button>
@@ -63,7 +63,7 @@ let SESSION_DONE=false;
 let GUIDE_ENDED=false;
 
 // 소리를 브라우저 기본 100%보다 더 크게 들리게 하는 증폭 회로.
-// Gain 2.5배(+약 8dB) + Compressor로 큰 피크의 찢어짐을 줄인다.
+// Gain 4.0배(+약 12dB) + Compressor로 큰 피크의 찢어짐을 최대한 줄인다.
 let LOUD_CTX=null;
 let LOUD_SOURCE=null;
 let LOUD_GAIN=null;
@@ -81,12 +81,12 @@ async function ensureLoudAudio(a){
       LOUD_GAIN=LOUD_CTX.createGain();
       LOUD_COMP=LOUD_CTX.createDynamicsCompressor();
 
-      LOUD_GAIN.gain.value=2.5;
-      LOUD_COMP.threshold.value=-18;
-      LOUD_COMP.knee.value=18;
-      LOUD_COMP.ratio.value=6;
-      LOUD_COMP.attack.value=0.003;
-      LOUD_COMP.release.value=0.22;
+      LOUD_GAIN.gain.value=4.0;
+      LOUD_COMP.threshold.value=-24;
+      LOUD_COMP.knee.value=24;
+      LOUD_COMP.ratio.value=12;
+      LOUD_COMP.attack.value=0.001;
+      LOUD_COMP.release.value=0.18;
 
       LOUD_SOURCE.connect(LOUD_GAIN);
       LOUD_GAIN.connect(LOUD_COMP);
@@ -138,7 +138,7 @@ async function startGuideSong(){
 
     if(start){start.disabled=true;start.style.display='none';}
     if(rewind)rewind.style.display='block';
-    if(st)st.textContent='🔊 최대 음량 증폭 재생 중 · 설치 설명서와 김광석 〈일어나〉가 함께 진행됩니다.';
+    if(st)st.textContent='🔊 초대형 음량 4배 증폭 재생 중 · 설치 설명서와 김광석 〈일어나〉가 함께 진행됩니다.';
   }catch(err){
     SESSION_ACTIVE=false;
     SESSION_DONE=false;
@@ -212,7 +212,7 @@ window.addEventListener('load',()=>{
       const sec=Math.floor(a.currentTime||0);
       const dur=Math.floor(a.duration||0);
       const fmt=x=>Math.floor(x/60)+':'+String(x%60).padStart(2,'0');
-      if(st)st.textContent='🔊 최대 음량 · 김광석 〈일어나〉 '+fmt(sec)+' / '+(dur?fmt(dur):'--:--')+' · 설치 설명서 진행 중';
+      if(st)st.textContent='🔊 4배 증폭 · 김광석 〈일어나〉 '+fmt(sec)+' / '+(dur?fmt(dur):'--:--')+' · 설치 설명서 진행 중';
     });
   }
 });
