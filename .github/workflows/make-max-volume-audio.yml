@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - '.github/workflows/make-max-volume-audio.yml'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -14,18 +15,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Amplify and limit MP3
+      - name: Amplify source MP3
         run: |
           set -euo pipefail
-          ffmpeg -y -i kimkwangseok_ileona.mp3             -af "volume=9dB,alimiter=limit=0.97:attack=5:release=50"             -codec:a libmp3lame -b:a 320k             kimkwangseok_ileona_max.mp3
-          test -s kimkwangseok_ileona_max.mp3
+          ffmpeg -y -i kimkwangseok_ileona.mp3             -af "volume=9dB,alimiter=limit=0.97:attack=5:release=50"             -codec:a libmp3lame -b:a 320k             kimkwangseok_ileona_boosted.mp3
+          test -s kimkwangseok_ileona_boosted.mp3
+          mv kimkwangseok_ileona_boosted.mp3 kimkwangseok_ileona.mp3
 
-      - name: Publish amplified audio
+      - name: Publish amplified source
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add kimkwangseok_ileona_max.mp3
-          git commit -m 'Publish MAX volume guide audio' || true
+          git add kimkwangseok_ileona.mp3
+          git commit -m 'Amplify guide audio source to MAX volume' || true
           git pull --rebase origin main
           git push
