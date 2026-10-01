@@ -31,38 +31,21 @@ jobs:
           s=h.read_text(encoding='utf-8')
           old='<button class="auxAction" onclick="openM(\'update\')">↻ 앱 업데이트</button>'
           new='<button class="auxAction gold" onclick="try{AndroidHost.openNavigatorUpdateLink()}catch(e){alert(\'업데이트 링크를 열 수 없습니다.\')}">↻ 항해사앱 업데이트</button>'
-          if old not in s:
-              raise SystemExit('home update button not found')
+          if old not in s: raise SystemExit('home update button not found')
           s=s.replace(old,new,1)
           s=s.replace('V3.0.80 · MASTER FIX8 승인 유지 · 음악 FIX9','V3.0.83 · 서버승인 유지 · 이동아이콘 없음 · 링크 업데이트')
           h.write_text(s,encoding='utf-8')
-
           j=root/'app/src/main/java/com/baekhak/centralcontrol/MainActivity.java'
           t=j.read_text(encoding='utf-8')
           needle='        @JavascriptInterface public void chooseApkUpdate() { chooseApkUpdateFile(); }'
-          insert='''        @JavascriptInterface public void chooseApkUpdate() { chooseApkUpdateFile(); }
-        @JavascriptInterface public void openNavigatorUpdateLink() {
-            runOnUiThread(() -> {
-                try {
-                    Intent i = new Intent(Intent.ACTION_VIEW,
-                        Uri.parse("https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/navigator-update.html"));
-                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(i);
-                } catch (Exception e) {
-                    Toast.makeText(this, "업데이트 링크를 열지 못했습니다.", Toast.LENGTH_LONG).show();
-                }
-            });
-        }'''
-          if needle not in t:
-              raise SystemExit('bridge insertion point not found')
+          insert='        @JavascriptInterface public void chooseApkUpdate() { chooseApkUpdateFile(); }\n        @JavascriptInterface public void openNavigatorUpdateLink() {\n            runOnUiThread(() -> {\n                try {\n                    Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/navigator-update.html"));\n                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);\n                    startActivity(i);\n                } catch (Exception e) {\n                    Toast.makeText(this, "업데이트 링크를 열지 못했습니다.", Toast.LENGTH_LONG).show();\n                }\n            });\n        }'
+          if needle not in t: raise SystemExit('bridge insertion point not found')
           t=t.replace(needle,insert,1)
           j.write_text(t,encoding='utf-8')
-
           g=root/'app/build.gradle'
           b=g.read_text(encoding='utf-8')
           b=b.replace("versionCode 30080","versionCode 30083")
           b=b.replace("versionName 'V3.0.80-MASTER-MUSIC-FIX9-20260925'","versionName 'V3.0.83-MASTER-LINK-UPDATE-NO-ICON-20261001'")
-          b=b.replace('"MASTER_OWNER_ONLY-${variant.buildType.name}.apk"','"NAVIGATOR_LINK_UPDATE_NO_ICON-${variant.buildType.name}.apk"')
           g.write_text(b,encoding='utf-8')
           PY
       - name: Verify no floating icon
