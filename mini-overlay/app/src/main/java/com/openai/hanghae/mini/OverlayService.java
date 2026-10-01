@@ -85,7 +85,7 @@ public class OverlayService extends Service {
         Button b=new Button(this);b.setText(text);b.setTextColor(Color.WHITE);b.setTextSize(9.5f);b.setAllCaps(false);
         b.setGravity(Gravity.CENTER);b.setPadding(dp(3),0,dp(3),0);b.setMinHeight(0);b.setMinimumHeight(0);b.setMinWidth(0);b.setMinimumWidth(0);
         b.setBackground(bg(color,0x66FFD35A,13));
-        int w="🎵 MP3".equals(text)?52:("📻 FM".equals(text)||"📡 AM".equals(text)?47:("✕".equals(text)?40:55));
+        int w="🎵 MP3".equals(text)?52:("📻 FM".equals(text)||"📡 AM".equals(text)?47:("업데이트".equals(text)?62:55));
         LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(dp(w),dp(36));p.setMargins(dp(1),dp(2),dp(1),dp(2));b.setLayoutParams(p);return b;
     }
 
@@ -105,8 +105,8 @@ public class OverlayService extends Service {
 
         menu=new LinearLayout(this);menu.setOrientation(LinearLayout.HORIZONTAL);menu.setGravity(Gravity.CENTER_VERTICAL);menu.setVisibility(View.GONE);
         Button mp3=btn("🎵 MP3",0xEE1068C8), fm=btn("📻 FM",0xEE5B34D6), am=btn("📡 AM",0xEE6D2DB7),
-               yt=btn("유튜브",0xEEDB1F28), stop=btn("■ 종료",0xEED52D46), close=btn("✕",0xEE4A5568);
-        menu.addView(mp3);menu.addView(fm);menu.addView(am);menu.addView(yt);menu.addView(stop);menu.addView(close);bar.addView(menu);
+               yt=btn("유튜브",0xEEDB1F28), stop=btn("■ 종료",0xEED52D46), update=btn("업데이트",0xEE087F5B);
+        menu.addView(mp3);menu.addView(fm);menu.addView(am);menu.addView(yt);menu.addView(stop);menu.addView(update);bar.addView(menu);
         root.addView(bar,new LinearLayout.LayoutParams(-2,dp(46)));
 
         now=new TextView(this);now.setTextColor(0xFFFFE58A);now.setTextSize(10.5f);now.setPadding(dp(8),dp(2),dp(8),dp(3));now.setVisibility(View.GONE);
@@ -120,7 +120,7 @@ public class OverlayService extends Service {
         am.setOnClickListener(v->showStations(false));
         yt.setOnClickListener(v->openYoutube());
         stop.setOnClickListener(v->{stopMedia();collapseStations();collapseMenu();toast("음악 · 라디오를 종료했습니다.");});
-        close.setOnClickListener(v->{collapseStations();collapseMenu();});
+        update.setOnClickListener(v->{collapseStations();collapseMenu();openUpdater();});
 
         if(Build.VERSION.SDK_INT>=26)lp=new WindowManager.LayoutParams(-2,-2,WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,PixelFormat.TRANSLUCENT);
@@ -362,6 +362,14 @@ public class OverlayService extends Service {
         collapseStations();
         try{Intent y=new Intent(Intent.ACTION_VIEW,Uri.parse("https://www.youtube.com"));y.setPackage("com.google.android.youtube");y.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);startActivity(y);}
         catch(Exception e){try{Intent y=new Intent(Intent.ACTION_VIEW,Uri.parse("https://www.youtube.com"));y.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);startActivity(y);}catch(Exception x){toast("YouTube를 열 수 없습니다.");}}
+    }
+    private void openUpdater(){
+        try{
+            Intent i=new Intent(this,MainActivity.class);
+            i.putExtra("direct_update",true);
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
+        }catch(Exception e){toast("업데이트를 시작하지 못했습니다.");}
     }
     private void openApp(){try{Intent i=new Intent(this,MainActivity.class);i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);startActivity(i);}catch(Exception ignored){}}
     private void toast(String s){Toast.makeText(this,s,Toast.LENGTH_SHORT).show();}
