@@ -154,7 +154,9 @@ public class OverlayService extends Service {
                mp3=btn("🎵 MP3",0xEE1068C8), fm=btn("📻 FM",0xEE5B34D6), am=btn("📡 AM",0xEE6D2DB7),
                yt=btn("유튜브",0xEEDB1F28), avi=btn("AVI",0xEE8A4D1E), mp4=btn("MP4",0xEE1F7A5B),
                hide=btn("아이콘 숨김",0xEE455A64), stop=btn("■ 종료",0xEED52D46), update=btn("업데이트",0xEE087F5B);
-        menu.addView(freedom);menu.addView(navigator);menu.addView(mp3);menu.addView(fm);menu.addView(am);menu.addView(yt);menu.addView(avi);menu.addView(mp4);menu.addView(hide);menu.addView(stop);menu.addView(update);
+        menu.addView(freedom);
+        if(BuildConfig.NAVIGATOR_EDITION) menu.addView(navigator);
+        menu.addView(mp3);menu.addView(fm);menu.addView(am);menu.addView(yt);menu.addView(avi);menu.addView(mp4);menu.addView(hide);menu.addView(stop);menu.addView(update);
 
         HorizontalScrollView menuScroll=new HorizontalScrollView(this);
         menuScroll.setHorizontalScrollBarEnabled(true);
@@ -173,7 +175,7 @@ public class OverlayService extends Service {
         root.addView(stationPanel,new LinearLayout.LayoutParams(-1,-2));
 
         freedom.setOnClickListener(v->openFreedomApp());
-        navigator.setOnClickListener(v->openNavigatorApp());
+        if(BuildConfig.NAVIGATOR_EDITION) navigator.setOnClickListener(v->openNavigatorApp());
         mp3.setOnClickListener(v->{showMp3Controls();toggleLocalMp3();});
         fm.setOnClickListener(v->showStations(true));
         am.setOnClickListener(v->showStations(false));
@@ -622,7 +624,9 @@ public class OverlayService extends Service {
         updateBusy=true;
         setNow("⬇ 업데이트 다운로드 시작 · 0%");
 
-        final String apkUrl="https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/HANGHAE_MINI_MP3_FM_AM_YOUTUBE-debug.apk?v=20261002-0105";
+        final String apkUrl=BuildConfig.NAVIGATOR_EDITION
+                ?"https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/HANGHAE_NAVIGATOR_MINI-debug.apk?v=1.0.15"
+                :"https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/HANGHAE_MINI_MP3_FM_AM_YOUTUBE-debug.apk?v=1.0.15";
 
         new Thread(() -> {
             HttpURLConnection conn=null;
