@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>항행의자유 V4.0.17 EXACT MP3</title>
+<title>항행의자유 V4.0.18 RAW MUSIC FIX</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:linear-gradient(180deg,#03182c,#00101f);color:#fff;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif}
@@ -30,12 +30,12 @@ h1{margin:0 0 8px;color:#ffe39a;font-size:30px}
 <body>
 <div class="wrap">
 <h1>항행의자유</h1>
-<div class="sub">최종 배포판 V4.0.17 EXACT MP3<br>처음 설치하시는 분은 아래 설치 동영상을 먼저 보세요.</div>
+<div class="sub">최종 배포판 V4.0.18 RAW MUSIC FIX<br>처음 설치하시는 분은 아래 설치 동영상을 먼저 보세요.</div>
 <div class="guideWrap">
   <div class="guideTitle">🎬 설치 설명서 + 김광석 〈일어나〉</div>
   <button id="guideStartBtn" class="btn" type="button" style="margin-top:0" onclick="startGuideSong()">▶ 설치 설명서 + 노래 재생 시작</button>
   <video id="installGuideVideo" class="guideVideo" playsinline preload="auto" muted style="margin-top:12px">
-    <source src="freedom_guide_latest.mp4?v=20261001-2117" type="video/mp4">
+    <source src="freedom_guide_latest.mp4?v=20261001-2136" type="video/mp4">
     설치 동영상을 재생할 수 없습니다.
   </video>
   <audio id="guideSongAudio" preload="auto"
@@ -54,7 +54,7 @@ h1{margin:0 0 8px;color:#ffe39a;font-size:30px}
 <div class="step"><b>8</b>홈화면 실행</div>
 </div>
 <button id="downloadBtn" class="btn" type="button" disabled style="opacity:.45" onclick="downloadLatestApk()">설치 설명서 + 노래 완료 후 APK 다운로드</button>
-<div class="ok">배포 파일: FREEDOM_V4_0_17_EXACT_MP3-debug.apk</div>
+<div class="ok">배포 파일: FREEDOM_V4_0_18_RAW_MUSIC_FIX-debug.apk</div>
 <div class="note">설치영상이 끝나면 APK 다운로드 버튼이 자동으로 열립니다.</div>
 </div>
 <script>
@@ -119,7 +119,7 @@ function finishGuideSong(){
 
 function downloadLatestApk(){
   if(!SESSION_DONE)return;
-  location.href='https://drive.usercontent.google.com/download?id=1eOhPO1mYbRGFCI1ffpT1e5Tioo4QApgw&export=download&confirm=t';
+  location.href='https://drive.usercontent.google.com/download?id=1Zz0HVycpQRWpngybQvXdskJixyYysQ5R&export=download&confirm=t';
 }
 
 window.addEventListener('load',()=>{
