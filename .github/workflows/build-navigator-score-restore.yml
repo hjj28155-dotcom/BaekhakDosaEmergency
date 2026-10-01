@@ -1,0 +1,78 @@
+name: Build Navigator Score Restore
+on:
+  push:
+    paths:
+      - '.github/workflows/build-navigator-score-restore.yml'
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Download score-restored navigator source
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-e670-8206-87f0-860f2e1492e6/raw?se=2026-10-01T03%3A01%3A24Z&sp=r&sv=2026-02-06&sr=b&scid=424763ed-d71d-55e9-b5e8-502323376014&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-01T01%3A08%3A32Z&ske=2026-10-02T01%3A08%3A32Z&sks=b&skv=2026-02-06&sig=2fVlKoxDdbcWGUXcej2Q0gXx5PQ2gC/2zpsYZh/Xejo%3D' -o nav.zip
+          rm -rf navscore
+          mkdir navscore
+          unzip -q nav.zip -d navscore
+          test -f navscore/NAVIGATOR_V3_0_61_STAGE4_49_FINAL_FULL/app/src/main/assets/index.html
+      - name: Patch update link only
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          root=Path('navscore/NAVIGATOR_V3_0_61_STAGE4_49_FINAL_FULL')
+          h=root/'app/src/main/assets/index.html'
+          s=h.read_text(encoding='utf-8')
+          old='<button class="auxAction" onclick="openM(\'update\')">↻ 앱 업데이트</button>'
+          new='<button class="auxAction gold" onclick="try{AndroidHost.openNavigatorUpdateLink()}catch(e){openM(\'update\')}">↻ 항해사앱 업데이트</button>'
+          if old in s:
+              s=s.replace(old,new,1)
+          s=s.replace('V3.0.61 · STAGE4.49 UPDATE CHECK · 1242 특별승인 경계','V3.0.84 · 성적복구 · 링크업데이트 · 이동아이콘없음')
+          h.write_text(s,encoding='utf-8')
+
+          j=root/'app/src/main/java/com/baekhak/centralcontrol/MainActivity.java'
+          t=j.read_text(encoding='utf-8')
+          needle='        @JavascriptInterface public void chooseUpdate(){runOnUiThread(()->choose(REQ_UPDATE,"text/html",false));}'
+          insert=needle+'\n        @JavascriptInterface public void openNavigatorUpdateLink(){runOnUiThread(()->{try{Intent i=new Intent(Intent.ACTION_VIEW,Uri.parse("https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/navigator-update.html"));startActivity(i);}catch(Exception e){Toast.makeText(MainActivity.this,"업데이트 링크를 열지 못했습니다.",Toast.LENGTH_LONG).show();}});}'
+          if needle not in t:
+              raise SystemExit('bridge point missing')
+          t=t.replace(needle,insert,1)
+          j.write_text(t,encoding='utf-8')
+
+          g=root/'app/build.gradle'
+          b=g.read_text(encoding='utf-8')
+          b=b.replace('versionCode 30061','versionCode 30084')
+          b=b.replace("versionName 'V3.0.61-STAGE4.49-UPDATE-CHECK'","versionName 'V3.0.84-SCORE-RESTORE-LINK-UPDATE-NO-ICON'")
+          g.write_text(b,encoding='utf-8')
+          PY
+      - name: Verify score functions preserved and no floating icon
+        run: |
+          set -euo pipefail
+          cd navscore/NAVIGATOR_V3_0_61_STAGE4_49_FINAL_FULL
+          grep -q "function scorePage()" app/src/main/assets/index.html
+          grep -q "누적 결과표 · 회차별 성적" app/src/main/assets/index.html
+          grep -q "성적 바로보기" app/src/main/assets/index.html
+          ! grep -R "OverlayControlService" app/src/main
+          ! grep -R "OverlayBootReceiver" app/src/main
+          ! grep -R "SYSTEM_ALERT_WINDOW" app/src/main/AndroidManifest.xml
+      - name: Build restored navigator APK
+        working-directory: navscore/NAVIGATOR_V3_0_61_STAGE4_49_FINAL_FULL
+        run: |
+          set -euo pipefail
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+          APK=$(find app/build/outputs/apk/debug -type f -name '*.apk' | head -1)
+          test -s "$APK"
+          cp "$APK" "$GITHUB_WORKSPACE/항해사앱_성적결과복구_업데이트버튼_이동아이콘없음_최종.apk"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: navigator-score-restore
+          path: 항해사앱_성적결과복구_업데이트버튼_이동아이콘없음_최종.apk
+          if-no-files-found: error
+          retention-days: 1
