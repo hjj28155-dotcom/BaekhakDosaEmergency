@@ -1,0 +1,120 @@
+/* FIX9 shared music controls. Native storage is authoritative; WebView reload cannot clear it. */
+(function () {
+  'use strict';
+  let timer = null, view = '', lastItems = [], visibleCount = 200;
+  const h = () => window.AndroidHost || window.BaekhakNative;
+  const e = value => String(value == null ? '' : value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  function read(method) {
+    const host = h();
+    if (!host || typeof host[method] !== 'function') throw new Error('음악 FIX9 APK로 업데이트한 뒤 사용해 주세요.');
+    return JSON.parse(String(host[method]()));
+  }
+  function time(ms) { let n=Math.max(0,Math.floor(Number(ms||0)/1000));return Math.floor(n/60)+':'+String(n%60).padStart(2,'0'); }
+  function status(message) { const node=document.getElementById('musicActionState');if(node)node.textContent=message; }
+  function common(s) {
+    const volume = Number.isFinite(Number(s.volume)) ? Math.max(0, Math.min(100,Number(s.volume))) : 42;
+    return `<div class="panel goldline music9-now"><h3>🎵 우리 음악 · FIX9</h3>
+      <div id="music9Name" class="music9-name">${e(s.name||'저장된 음악을 선택해 주세요')}</div>
+      <div id="music9Time">${time(s.position)} / ${time(s.duration)}</div>
+      <div id="musicActionState" role="status" aria-live="polite"></div>
+      <div class="music9-controls">
+        <button class="b green" id="music9Play" onclick="musicDo('play')">▶ 재생 / 이어듣기</button>
+        <button class="b" onclick="musicDo('pause')">⏸ 일시정지</button>
+        <button class="b" onclick="musicDo('prev')">⏮ 이전곡</button>
+        <button class="b" onclick="musicDo('next')">⏭ 다음곡</button>
+        <button class="b danger" onclick="musicDo('stop')">⏹ 음악 종료</button>
+      </div>
+      <div class="label">음량 <span id="musicVolText">${volume}%</span></div>
+      <input aria-label="음량" class="musicRange" type="range" min="0" max="100" value="${volume}" oninput="musicVolText.textContent=this.value+'%';setMusicVolume(this.value)">
+      </div>`;
+  }
+  function style() {return `<style>
+    #mc .music9-controls{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+    #mc .music9-controls .b{flex:1 1 120px;min-height:44px;font-size:14px;padding:7px 8px}
+    #mc #music9Play{flex-basis:220px;font-weight:bold;font-size:17px}
+    #mc .music9-name{font-size:18px;font-weight:700;overflow-wrap:anywhere;margin:5px 0;line-height:1.25}
+    #mc .music9-wide{width:100%;min-height:48px;font-size:15px;margin:5px 0;padding:7px 8px}
+    #mc .music9-track{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #356079}
+    #mc .music9-track>span{min-width:0;overflow-wrap:anywhere}
+    #mc .music9-track .b{flex:0 0 auto;min-height:48px}
+    #mc #musicActionState{min-height:26px;color:#ffe5a1;overflow-wrap:anywhere}
+    #mc .music9-small{color:#bdd5e2;line-height:1.35;font-size:12px}
+    #mc #music9Time{margin:4px 0;font-variant-numeric:tabular-nums}
+    .modal.musicOneScreen{padding:4px!important;overflow:hidden!important}.modal.musicOneScreen>.card{width:min(940px,calc(100vw - 8px))!important;max-width:940px!important;height:calc(100dvh - 8px)!important;margin:0 auto!important;padding:8px 12px!important;overflow:hidden!important}.modal.musicOneScreen>.card>h2{font-size:22px!important;margin:0 0 4px!important}.modal.musicOneScreen #mc{height:calc(100% - 34px)!important;overflow:auto!important}.modal.musicOneScreen .panel{margin:6px 0!important;padding:9px!important}.modal.musicOneScreen .label{margin:4px 0 2px!important}.modal.musicOneScreen .musicRange{margin:3px 0!important}@media(max-width:760px){.modal.musicOneScreen>.card{padding:6px 8px!important}.modal.musicOneScreen>.card>h2{font-size:19px!important}.modal.musicOneScreen #mc .music9-controls .b{min-height:40px!important;font-size:12px!important}.modal.musicOneScreen #mc .music9-wide{min-height:42px!important;font-size:13px!important}}
+    </style>`;}
+  function tick() {
+    if(!document.getElementById('music9Name') || document.getElementById('modal')?.style.display==='none') {
+      clearInterval(timer);timer=null;return;
+    }
+    try {
+      const s=read('getMusicState');
+      document.getElementById('music9Name').textContent=s.name||'저장된 음악을 선택해 주세요';
+      document.getElementById('music9Time').textContent=time(s.position)+' / '+time(s.duration);
+      status(s.importing?s.progress:s.error||(s.status==='preparing'?'재생 준비 중…':s.playing?'재생 중 · 듣던 위치 자동 저장':s.status==='paused'?'일시정지 · ▶ 재생으로 이어듣기':'대기 · 저장된 음악과 재생 위치 보존'));
+      const b=document.getElementById('music9Play');b.textContent=s.playing?'▶ 재생 중':'▶ 재생 / 이어듣기';
+    }catch(err){status(err.message);}
+  }
+  function startTick(){if(timer)clearInterval(timer);tick();timer=setInterval(tick,1000);}
+  function state(){try{return read('getMusicState');}catch(err){return {error:err.message};}}
+  function open(){
+    view='player';let s=state(),count='—';try{let l=read('getSavedMusicLibrary');if(l.ok)count=l.items.length;}catch(err){}
+    modal('배경음악',style()+common(s)+`<div class="panel">
+      <button class="b gold music9-wide" id="music9Library" onclick="ourMusicFolderPage()">📂 우리 음악폴더 · 저장된 음악 (${e(count)}곡)</button>
+      <button class="b music9-wide" onclick="musicDo('multi')">＋ 내 파일 MP3 여러 곡 추가</button>
+      <div class="music9-controls"><button class="b" onclick="musicDo('reset')">기본 음악으로</button><button class="b" onclick="musicDo('library')">저장한 음악으로</button></div>
+      <div class="music9-small">선택한 곡은 앱 안에 보관합니다. 다른 곡을 추가하거나 기본 음악으로 바꿔도 목록을 지우지 않습니다.<br>재생 중 앱 화면을 종료해도 음악은 계속 나옵니다. 앱을 다시 열면 듣던 곡과 위치가 그대로 표시됩니다. 일시정지·음악 종료는 버튼을 눌렀을 때만 적용됩니다.</div>
+      </div>`);
+    document.getElementById('modal')?.classList.add('musicOneScreen');
+    startTick();
+  }
+  function library(){
+    view='library';visibleCount=200;let l;
+    try{l=read('getSavedMusicLibrary');if(!l.ok)throw new Error(l.error||'음악목록 읽기 실패');}
+    catch(err){modal('우리 음악폴더',style()+`<div class="panel">${e(err.message)}<p>기존 목록은 삭제하지 않았습니다.</p><button class="b" onclick="musicPage()">음악 화면으로</button></div>`);return;}
+    lastItems=Array.isArray(l.items)?l.items:[];
+    modal('우리 음악폴더 · 저장된 음악',style()+common(state())+`<div class="panel">
+      <h3>저장된 음악 <span id="music9Count">${lastItems.length}</span>곡</h3>
+      <div class="music9-controls">
+        <button class="b gold" onclick="musicDo('multi')">＋ MP3 여러 곡 추가</button>
+        <button class="b green" onclick="musicDo('folder')">📂 휴대폰 Music 폴더 연결</button>
+        <button class="b" onclick="musicDo('refreshfolder')">↻ 폴더 전곡 불러오기</button>
+      </div>
+      <div class="music9-small">${l.folderConnected?'연결한 폴더를 기억하고 있습니다. 전곡 불러오기는 새 곡만 추가합니다.':'폴더를 한 번 연결하면 다음부터 다시 찾지 않아도 됩니다. 기존 MP3 파일은 이동하거나 삭제하지 않습니다.'}<br>음악 보관에는 저장공간이 필요합니다. 앱 삭제·데이터 초기화 시 앱 안의 보관본은 지워집니다.</div>
+      <input id="music9Search" placeholder="저장한 곡 이름 찾기" aria-label="저장한 곡 이름 찾기" style="margin-top:12px">
+      <div id="music9List"></div><button class="b music9-wide" id="music9More" style="display:none">더 보기</button>
+      <button class="b music9-wide" onclick="musicPage()">음악 화면으로 돌아가기</button>
+      </div>`);
+    document.getElementById('modal')?.classList.add('musicOneScreen');
+    const search=document.getElementById('music9Search');search.addEventListener('input',()=>{visibleCount=200;renderRows();});
+    document.getElementById('music9More').onclick=()=>{visibleCount+=200;renderRows();};
+    renderRows();startTick();
+  }
+  function renderRows(){
+    const q=String(document.getElementById('music9Search').value||'').toLocaleLowerCase();
+    const items=lastItems.filter(t=>String(t.name).toLocaleLowerCase().includes(q));
+    const list=document.getElementById('music9List');list.textContent='';
+    items.slice(0,visibleCount).forEach(t=>{
+      const row=document.createElement('div');row.className='music9-track';
+      const label=document.createElement('span');label.textContent=t.name+(t.available===false?' · 파일 확인 필요':'');row.appendChild(label);
+      const button=document.createElement('button');button.className='b green';button.textContent='▶ 재생';button.disabled=t.available===false;
+      button.onclick=()=>{try{h().playSavedMusic(String(t.id));status('선택한 곡 준비 중…');setTimeout(tick,500);}catch(err){status(err.message);}};
+      row.appendChild(button);list.appendChild(row);
+    });
+    if(!items.length)list.textContent=lastItems.length?'해당 이름의 곡이 없습니다.':'아직 보관된 곡이 없습니다. 위에서 MP3를 추가하거나 음악폴더를 연결하세요.';
+    document.getElementById('music9More').style.display=items.length>visibleCount?'block':'none';
+  }
+  window.MusicV9={open,library};window.musicPage=open;window.ourMusicFolderPage=library;
+  window.musicDo=function(action){
+    try{
+      if(action==='multi'){h().chooseMultipleMusic();status('내 파일에서 음악을 선택하세요. 취소해도 기존 목록은 유지됩니다.');return;}
+      const message=h().musicAction(String(action));status(String(message||'처리 중…'));setTimeout(tick,700);
+    }catch(err){status(err.message);}
+  };
+  window.onMusicLibraryChanged=function(result){
+    if(!result?.ok){status((result?.error||'저장 실패')+' · 기존 목록 유지');return;}
+    if(document.getElementById('music9Name')){if(view==='library')library();else open();}
+  };
+  window.onMusicSelected=()=>window.onMusicLibraryChanged({ok:true});
+  window.onMusicFolderSelected=()=>window.onMusicLibraryChanged({ok:true});
+  window.onDeviceMusicPlaylistSaved=window.onMusicLibraryChanged;
+})();

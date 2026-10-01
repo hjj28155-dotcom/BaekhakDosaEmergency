@@ -1,0 +1,21 @@
+항행의자유 V3.4.0 완전 재구축본
+
+기존 프로젝트를 수정한 것이 아닙니다.
+새 Gradle 프로젝트를 처음부터 만들고 최신 src만 이식했습니다.
+
+AndroidIDE에서 반드시 이 폴더만 여세요:
+FREEDOM_V340_REBUILD_BUILD_THIS
+
+Build -> assembleDebug
+
+예상 APK:
+app/build/outputs/apk/debug/FREEDOM_V3_400_REBUILD_HARDLOCK-debug.apk
+
+유지:
+- 최근 5회차 1240~1244
+- 5조합×4묶음
+- 인쇄
+- MP3 사용자 선택형 / 현재곡 표시
+- 이동아이콘 버튼축소 / 종료-X A안
+- 승인요청 없음/승인대기 = 완전잠금
+- 승인완료 후에만 전체 사용

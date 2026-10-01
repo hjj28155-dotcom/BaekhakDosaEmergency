@@ -1,0 +1,18 @@
+[
+    {
+        "merged": "com.baekhak.centralcontrol.app-debug-4:/raw_home_joyful_loop.ogg.flat",
+        "source": "com.baekhak.centralcontrol.app-freedom-6:/raw/home_joyful_loop.ogg"
+    },
+    {
+        "merged": "com.baekhak.centralcontrol.app-debug-4:/raw_v3_congrats_fanfare.wav.flat",
+        "source": "com.baekhak.centralcontrol.app-freedom-6:/raw/v3_congrats_fanfare.wav"
+    },
+    {
+        "merged": "com.baekhak.centralcontrol.app-debug-4:/drawable_v3_ship_icon.png.flat",
+        "source": "com.baekhak.centralcontrol.app-main-7:/drawable/v3_ship_icon.png"
+    },
+    {
+        "merged": "com.baekhak.centralcontrol.app-debug-4:/raw_sea_intro.ogg.flat",
+        "source": "com.baekhak.centralcontrol.app-freedom-6:/raw/sea_intro.ogg"
+    }
+]
