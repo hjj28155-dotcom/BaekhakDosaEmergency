@@ -1,0 +1,26 @@
+name: Restore original guide visuals
+on:
+  push:
+    paths:
+      - '.github/workflows/restore-original-guide-visuals.yml'
+permissions:
+  contents: write
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Restore last original visual guide
+        run: |
+          set -e
+          git show 34a172c731b65e476c634cfc2b406ade73100877:freedom_guide_latest.mp4 > freedom_guide_latest.mp4
+          test "$(stat -c%s freedom_guide_latest.mp4)" -eq 5190248
+      - name: Commit restored original guide
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add freedom_guide_latest.mp4
+          git commit -m "Restore original installation guide visuals" || exit 0
+          git push
