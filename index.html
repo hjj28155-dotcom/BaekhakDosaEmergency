@@ -34,7 +34,7 @@ h1{margin:0 0 8px;color:#ffe39a;font-size:30px}
     <source src="freedom_guide_latest.mp4" type="video/mp4">
     설치 동영상을 재생할 수 없습니다.
   </video>
-  <div class="autoNote">동영상을 보는 동안 APK 다운로드가 자동으로 시작됩니다.<br>다운로드가 끝나면 알림창의 APK를 눌러 설치하세요.</div>
+  <div class="autoNote">설치 동영상을 먼저 보신 뒤 아래 <b>APK 다운로드 시작</b> 버튼을 누르세요.<br>다운로드 화면이 열리면 <b>무시하고 다운로드</b>를 누르면 됩니다.</div>
 </div>
 <div class="card">
 <div class="step"><b>1</b>링크 클릭</div>
@@ -46,7 +46,7 @@ h1{margin:0 0 8px;color:#ffe39a;font-size:30px}
 <div class="step"><b>7</b>안내동영상 재생</div>
 <div class="step"><b>8</b>홈화면 실행</div>
 </div>
-<a id="downloadBtn" class="btn" href="https://drive.google.com/uc?export=download&id=1Kn52MIXkD0U1_1K50Cu4r0xiLXXHAc6j" download="항행의자유_V4.0.11_FINAL.apk">APK 다운로드 다시 시작</a>
+<a id="downloadBtn" class="btn" href="https://drive.google.com/uc?export=download&id=1Kn52MIXkD0U1_1K50Cu4r0xiLXXHAc6j" download="항행의자유_V4.0.11_FINAL.apk">APK 다운로드 시작</a>
 <div class="ok">배포 파일: FREEDOM_V4_0_11_FINAL-debug.apk</div>
 <div class="note">본체 이동아이콘은 삭제되었습니다. 이동아이콘은 별도 전용 앱으로 사용합니다.</div>
 </div>
@@ -57,15 +57,6 @@ window.addEventListener('load',()=>{
     const p=v.play();
     if(p&&typeof p.catch==='function')p.catch(()=>{});
   }
-  setTimeout(()=>{
-    const a=document.createElement('a');
-    a.href='https://drive.google.com/uc?export=download&id=1Kn52MIXkD0U1_1K50Cu4r0xiLXXHAc6j';
-    a.download='항행의자유_V4.0.11_FINAL.apk';
-    a.style.display='none';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(()=>a.remove(),1500);
-  },1200);
 });
 </script>
 </body>
