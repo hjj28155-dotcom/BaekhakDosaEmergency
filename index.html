@@ -23,7 +23,13 @@ h1{margin:0 0 8px;color:#ffe39a;font-size:30px}
 
 .guideWrap{margin:18px 0 16px;padding:12px;background:#031523;border:1px solid #315d78;border-radius:18px}
 .guideTitle{font-size:20px;font-weight:900;color:#ffe39a;margin:2px 0 10px}
-.guideVideo{display:block;width:100%;max-height:70vh;border-radius:14px;background:#000}
+.guideVideo{display:block;width:100%;height:1px;opacity:0;pointer-events:none}
+.guideStage{min-height:520px;border-radius:14px;background:linear-gradient(180deg,#071d31,#0a3557);border:2px solid #d6b75a;display:flex;align-items:center;justify-content:center;padding:24px;margin-top:12px}
+.guidePanel{width:100%;max-width:620px;text-align:left;background:rgba(4,30,51,.96);border:2px solid #d6b75a;border-radius:22px;padding:26px;box-shadow:0 10px 30px #0008}
+.guideNo{font-size:62px;font-weight:1000;color:#ffe39a;text-align:center;margin-bottom:10px}
+.guideHead{font-size:34px;font-weight:1000;text-align:center;margin-bottom:24px}
+.guideLine{font-size:22px;line-height:1.65;margin:10px 0;color:#eef7ff}
+.guideLine b{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#12689e;color:#ffe39a;margin-right:10px}
 .autoNote{margin-top:10px;color:#8fe8ff;font-weight:800;line-height:1.5}
 </style>
 </head>
@@ -34,10 +40,16 @@ h1{margin:0 0 8px;color:#ffe39a;font-size:30px}
 <div class="guideWrap">
   <div class="guideTitle">🎬 설치 설명서 + 김광석 〈일어나〉</div>
   <button id="guideStartBtn" class="btn" type="button" style="margin-top:0" onclick="startGuideSong()">▶ 설치 설명서 + 노래 재생 시작</button>
-  <video id="installGuideVideo" class="guideVideo" playsinline preload="auto" muted style="margin-top:12px">
-    <source src="freedom_guide_latest.mp4?v=20261002-latest" type="video/mp4">
-    설치 동영상을 재생할 수 없습니다.
-  </video>
+  <div id="guideStage" class="guideStage">
+  <div class="guidePanel">
+    <div id="guideNo" class="guideNo">1</div>
+    <div id="guideHead" class="guideHead">설치 파일 다운로드</div>
+    <div id="guideBody"></div>
+  </div>
+</div>
+<video id="installGuideVideo" class="guideVideo" playsinline preload="auto" muted>
+  <source src="freedom_guide_latest.mp4?v=20261002-stable" type="video/mp4">
+</video>
   <audio id="guideSongAudio" preload="auto" controls style="display:block;width:100%;margin-top:10px"
     src="kimkwangseok_ileona.mp3?v=20261001-2319"></audio>
   <button id="rewindBtn" class="btn" type="button" style="display:none;margin-top:12px" onclick="rewindTen()">↩ 10초 되돌리기</button>
@@ -104,6 +116,31 @@ async function ensureLoudAudio(a){
   }
 }
 
+const GUIDE_SLIDES=[
+ {n:1,h:'설치 파일 다운로드',l:['배포 링크에서 최신 설치 파일을 받습니다.','다운로드가 끝날 때까지 기다립니다.','완료되면 설치 파일을 엽니다.']},
+ {n:2,h:'설치 진행',l:['APK 설치 화면에서 설치를 누릅니다.','보안 안내가 나오면 세부정보를 확인합니다.','설치 완료까지 기다립니다.']},
+ {n:3,h:'앱 실행',l:['설치가 끝나면 항행의자유 앱을 실행합니다.','첫 실행 화면을 확인합니다.','다음 안내가 나올 때까지 기다립니다.']},
+ {n:4,h:'첫 실행 안내',l:['첫 실행 안내 내용을 확인합니다.','필요한 안내를 순서대로 진행합니다.','임의로 중간 단계를 건너뛰지 않습니다.']},
+ {n:5,h:'필수 업데이트',l:['업데이트 안내가 있으면 최신 버전으로 갱신합니다.','업데이트 완료 후 앱을 다시 실행합니다.','항상 최신 버전을 사용합니다.']},
+ {n:6,h:'홈 화면 구성',l:['홈 화면의 기본 메뉴를 확인합니다.','원문분석·공지·업데이트 위치를 확인합니다.','승인 전 기능은 잠금 상태를 유지합니다.']},
+ {n:7,h:'최신 두루마리',l:['최신 두루마리 화면을 확인합니다.','두루마리 내용을 읽습니다.','두루마리를 눌러 다음 단계로 이동합니다.']},
+ {n:8,h:'승인 요청',l:['승인요청 화면에서 요청을 보냅니다.','요청 접수 상태를 확인합니다.','승인 전에는 홈 기능을 사용할 수 없습니다.']},
+ {n:9,h:'안내 동영상',l:['승인요청 접수 후 안내동영상을 봅니다.','안내는 끝까지 확인합니다.','항해사 승인 완료를 기다립니다.']},
+ {n:10,h:'승인완료 후 홈',l:['승인이 완료되면 홈으로 들어갑니다.','MP3·FM 등 허용 기능을 사용할 수 있습니다.','항행의자유 이용을 시작합니다.']}
+];
+function renderGuideSlide(i){
+ const s=GUIDE_SLIDES[Math.max(0,Math.min(GUIDE_SLIDES.length-1,i))];
+ const no=document.getElementById('guideNo'),h=document.getElementById('guideHead'),b=document.getElementById('guideBody');
+ if(no)no.textContent=s.n;
+ if(h)h.textContent=s.h;
+ if(b)b.innerHTML=s.l.map((x,j)=>'<div class="guideLine"><b>'+(j+1)+'</b>'+x+'</div>').join('');
+}
+function syncGuideSlideFromAudio(){
+ const a=document.getElementById('guideSongAudio');
+ if(!a)return;
+ const idx=Math.min(9,Math.floor((a.currentTime||0)/15));
+ renderGuideSlide(idx);
+}
 async function startGuideSong(){
   const v=document.getElementById('installGuideVideo');
   const a=document.getElementById('guideSongAudio');
@@ -205,8 +242,10 @@ window.addEventListener('load',()=>{
     // 사용자 조작으로 앞으로 건너뛰는 것을 막기 위해 controls 자체를 노출하지 않음
   }
 
+  renderGuideSlide(0);
   if(a){
     a.addEventListener('ended',finishGuideSong);
+    a.addEventListener('timeupdate',syncGuideSlideFromAudio);
     a.addEventListener('timeupdate',()=>{
       if(!SESSION_ACTIVE||SESSION_DONE)return;
       const st=document.getElementById('guideStatus');
