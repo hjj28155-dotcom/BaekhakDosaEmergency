@@ -1,0 +1,30 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'com.openai.hanghae.mini'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'com.navigator.freedom.miniicon'
+        minSdk 23
+        targetSdk 35
+        versionCode 10001
+        versionName '1.0.1'
+    }
+
+    buildTypes {
+        debug { debuggable false; minifyEnabled false }
+        release { minifyEnabled false; shrinkResources false }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = 'HANGHAE_MINI_MP3_FM_AM_YOUTUBE-debug.apk'
+        }
+    }
+}
