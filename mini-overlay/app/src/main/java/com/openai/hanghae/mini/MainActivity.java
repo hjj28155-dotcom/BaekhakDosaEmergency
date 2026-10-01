@@ -140,8 +140,10 @@ public class MainActivity extends Activity {
     }
 
     private void ensureAudioPermissionAndStart(){
-        if(Build.VERSION.SDK_INT>=33 && checkSelfPermission(Manifest.permission.READ_MEDIA_AUDIO)!=PackageManager.PERMISSION_GRANTED){
-            requestPermissions(new String[]{Manifest.permission.READ_MEDIA_AUDIO},REQ_AUDIO);
+        if(Build.VERSION.SDK_INT>=33 &&
+           (checkSelfPermission(Manifest.permission.READ_MEDIA_AUDIO)!=PackageManager.PERMISSION_GRANTED ||
+            checkSelfPermission(Manifest.permission.READ_MEDIA_VIDEO)!=PackageManager.PERMISSION_GRANTED)){
+            requestPermissions(new String[]{Manifest.permission.READ_MEDIA_AUDIO,Manifest.permission.READ_MEDIA_VIDEO},REQ_AUDIO);
             return;
         }
         if(Build.VERSION.SDK_INT>=23 && Build.VERSION.SDK_INT<33 && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)!=PackageManager.PERMISSION_GRANTED){
@@ -301,7 +303,7 @@ public class MainActivity extends Activity {
         if(requestCode==REQ_AUDIO){
             boolean granted=grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED;
             if(granted) startOverlay();
-            else Toast.makeText(this,"MP3 사용을 위해 음악 권한이 필요합니다.",Toast.LENGTH_SHORT).show();
+            else Toast.makeText(this,"MP3 · AVI · MP4 사용을 위해 음악/동영상 권한이 필요합니다.",Toast.LENGTH_SHORT).show();
         }
     }
 }
