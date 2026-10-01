@@ -1,0 +1,58 @@
+name: Build Navigator No Floating Icon
+on:
+  push:
+    paths:
+      - '.github/workflows/build-navigator-no-icon.yml'
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Download navigator source
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-a0f8-8206-bb03-6ecd7bb0f323/raw?se=2026-10-01T02%3A12%3A07Z&sp=r&sv=2026-02-06&sr=b&scid=e618c575-a046-5f31-a5bb-59a1b6a56a01&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-30T23%3A57%3A12Z&ske=2026-10-01T23%3A57%3A12Z&sks=b&skv=2026-02-06&sig=IUGKEVE1NJIwhADO9yGvbNQ6WNeAw2lzh1vVFdglRpo%3D' -o navigator.zip
+          rm -rf navigator
+          mkdir navigator
+          unzip -q navigator.zip -d navigator
+          test -f navigator/V3_PERPECT_SUCCESS_MUSIC_FIX9/app/build.gradle
+      - name: Verify no floating icon components
+        run: |
+          set -euo pipefail
+          cd navigator/V3_PERPECT_SUCCESS_MUSIC_FIX9
+          ! grep -R "SYSTEM_ALERT_WINDOW" app/src/master app/src/main/AndroidManifest.xml
+          ! grep -R "OverlayControlService" app/src/master app/src/main
+          ! grep -R "OverlayBootReceiver" app/src/master app/src/main
+      - name: Rename navigator no-icon build
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('navigator/V3_PERPECT_SUCCESS_MUSIC_FIX9/app/build.gradle')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace("versionCode 30080","versionCode 30082")
+          s=s.replace("versionName 'V3.0.80-MASTER-MUSIC-FIX9-20260925'","versionName 'V3.0.82-MASTER-NO-FLOATING-ICON-20261001'")
+          s=s.replace('"MASTER_OWNER_ONLY-${variant.buildType.name}.apk"','"NAVIGATOR_NO_FLOATING_ICON-${variant.buildType.name}.apk"')
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Build navigator APK
+        working-directory: navigator/V3_PERPECT_SUCCESS_MUSIC_FIX9
+        run: |
+          set -euo pipefail
+          chmod +x gradlew
+          ./gradlew :app:assembleMasterDebug --no-daemon
+          APK=$(find app/build/outputs/apk/master/debug -type f -name '*.apk' | head -1)
+          test -s "$APK"
+          cp "$APK" ../../../항해사앱_이동아이콘삭제_최종_20261001.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: navigator-no-floating-icon
+          path: 항해사앱_이동아이콘삭제_최종_20261001.apk
+          if-no-files-found: error
+          retention-days: 1
