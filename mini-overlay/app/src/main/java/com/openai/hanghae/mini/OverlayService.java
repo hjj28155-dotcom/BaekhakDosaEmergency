@@ -121,9 +121,12 @@ public class OverlayService extends Service {
         else if("📻 FM".equals(text)||"📡 AM".equals(text)) minW=64;
         else minW=64;
 
-        LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(dp(minW),dp(42));
-        p.setMargins(dp(2),dp(2),dp(2),dp(2));
+        b.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,dp(44));
+        p.setMargins(dp(3),dp(2),dp(3),dp(2));
         b.setLayoutParams(p);
+        b.setMinWidth(dp(minW));
+        b.setMinimumWidth(dp(minW));
         return b;
     }
 
@@ -152,8 +155,10 @@ public class OverlayService extends Service {
         menuScroll.setFillViewport(false);
         menuScroll.setVisibility(View.GONE);
         menuScroll.addView(menu,new HorizontalScrollView.LayoutParams(-2,-1));
-        bar.addView(menuScroll,new LinearLayout.LayoutParams(dp(300),dp(50)));
-        root.addView(bar,new LinearLayout.LayoutParams(-2,dp(50)));
+        int screenW=getResources().getDisplayMetrics().widthPixels;
+        int menuW=Math.max(dp(220),Math.min(dp(360),screenW-dp(70)));
+        bar.addView(menuScroll,new LinearLayout.LayoutParams(menuW,dp(52)));
+        root.addView(bar,new LinearLayout.LayoutParams(-2,dp(52)));
 
         now=new TextView(this);now.setTextColor(0xFFFFE58A);now.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP,12f);now.setPadding(dp(8),dp(4),dp(8),dp(5));now.setMaxLines(2);now.setVisibility(View.GONE);
         root.addView(now,new LinearLayout.LayoutParams(-2,-2));
