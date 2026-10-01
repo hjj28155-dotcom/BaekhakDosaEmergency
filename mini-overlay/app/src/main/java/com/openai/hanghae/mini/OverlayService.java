@@ -116,6 +116,7 @@ public class OverlayService extends Service {
 
         int minW;
         if("🚢 항행의자유".equals(text)) minW=118;
+        else if("🧭 항해사앱".equals(text)) minW=104;
         else if("아이콘 숨김".equals(text)) minW=96;
         else if("업데이트".equals(text)) minW=82;
         else if("유튜브".equals(text)) minW=72;
@@ -149,10 +150,11 @@ public class OverlayService extends Service {
 
         menu=new LinearLayout(this);menu.setOrientation(LinearLayout.HORIZONTAL);menu.setGravity(Gravity.CENTER_VERTICAL);menu.setVisibility(View.VISIBLE);
         Button freedom=btn("🚢 항행의자유",0xEE0C7AA8),
+               navigator=btn("🧭 항해사앱",0xEE8A5B18),
                mp3=btn("🎵 MP3",0xEE1068C8), fm=btn("📻 FM",0xEE5B34D6), am=btn("📡 AM",0xEE6D2DB7),
                yt=btn("유튜브",0xEEDB1F28), avi=btn("AVI",0xEE8A4D1E), mp4=btn("MP4",0xEE1F7A5B),
                hide=btn("아이콘 숨김",0xEE455A64), stop=btn("■ 종료",0xEED52D46), update=btn("업데이트",0xEE087F5B);
-        menu.addView(freedom);menu.addView(mp3);menu.addView(fm);menu.addView(am);menu.addView(yt);menu.addView(avi);menu.addView(mp4);menu.addView(hide);menu.addView(stop);menu.addView(update);
+        menu.addView(freedom);menu.addView(navigator);menu.addView(mp3);menu.addView(fm);menu.addView(am);menu.addView(yt);menu.addView(avi);menu.addView(mp4);menu.addView(hide);menu.addView(stop);menu.addView(update);
 
         HorizontalScrollView menuScroll=new HorizontalScrollView(this);
         menuScroll.setHorizontalScrollBarEnabled(true);
@@ -171,6 +173,7 @@ public class OverlayService extends Service {
         root.addView(stationPanel,new LinearLayout.LayoutParams(-1,-2));
 
         freedom.setOnClickListener(v->openFreedomApp());
+        navigator.setOnClickListener(v->openNavigatorApp());
         mp3.setOnClickListener(v->{showMp3Controls();toggleLocalMp3();});
         fm.setOnClickListener(v->showStations(true));
         am.setOnClickListener(v->showStations(false));
@@ -517,15 +520,10 @@ public class OverlayService extends Service {
     private void openFreedomApp(){
         collapseStations();
         collapseMenu();
-        try{
-            Intent i=getPackageManager().getLaunchIntentForPackage("com.baekhak.centralcontrol");
-            if(i!=null){
-                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(i);
-                setNow("🚢 항행의자유 앱 실행");
-                return;
-            }
-        }catch(Exception ignored){}
+
+        if(launchPackage("com.navigator.freedom.v3final","🚢 항행의자유 앱 실행")) return;
+        if(launchByLabel("항행의자유","🚢 항행의자유 앱 실행")) return;
+
         try{
             Intent web=new Intent(Intent.ACTION_VIEW,Uri.parse("https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/"));
             web.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -534,6 +532,70 @@ public class OverlayService extends Service {
         }catch(Exception e){
             toast("항행의자유 앱을 열 수 없습니다.");
         }
+    }
+
+    private void openNavigatorApp(){
+        collapseStations();
+        collapseMenu();
+
+        if(launchByLabel("항해사","🧭 항해사앱 실행")) return;
+
+        try{
+            Intent web=new Intent(Intent.ACTION_VIEW,Uri.parse("https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/navigator-update.html"));
+            web.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(web);
+            setNow("🧭 항해사앱 설치/업데이트 페이지를 엽니다.");
+        }catch(Exception e){
+            toast("항해사앱을 열 수 없습니다.");
+        }
+    }
+
+    private boolean launchPackage(String pkg,String status){
+        try{
+            Intent i=getPackageManager().getLaunchIntentForPackage(pkg);
+            if(i==null)return false;
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
+            setNow(status);
+            return true;
+        }catch(Exception e){
+            return false;
+        }
+    }
+
+    private boolean launchByLabel(String keyword,String status){
+        try{
+            android.content.pm.PackageManager pm=getPackageManager();
+            Intent q=new Intent(Intent.ACTION_MAIN);
+            q.addCategory(Intent.CATEGORY_LAUNCHER);
+            java.util.List<android.content.pm.ResolveInfo> list=pm.queryIntentActivities(q,0);
+            if(list==null)return false;
+
+            for(android.content.pm.ResolveInfo ri:list){
+                if(ri==null || ri.activityInfo==null || ri.activityInfo.applicationInfo==null)continue;
+                String pkg=ri.activityInfo.packageName;
+                if(getPackageName().equals(pkg))continue;
+
+                CharSequence appLabel=ri.activityInfo.applicationInfo.loadLabel(pm);
+                CharSequence activityLabel=ri.loadLabel(pm);
+                String a=appLabel==null?"":appLabel.toString();
+                String b=activityLabel==null?"":activityLabel.toString();
+
+                if(a.contains(keyword)||b.contains(keyword)){
+                    Intent i=pm.getLaunchIntentForPackage(pkg);
+                    if(i==null){
+                        i=new Intent(Intent.ACTION_MAIN);
+                        i.addCategory(Intent.CATEGORY_LAUNCHER);
+                        i.setClassName(pkg,ri.activityInfo.name);
+                    }
+                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(i);
+                    setNow(status);
+                    return true;
+                }
+            }
+        }catch(Exception ignored){}
+        return false;
     }
 
     private void hideOverlayOnly(){
