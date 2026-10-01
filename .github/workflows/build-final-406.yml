@@ -1,0 +1,54 @@
+name: Build Freedom V3 Final 406
+on:
+  push:
+    paths:
+      - '.github/workflows/build-final-406.yml'
+      - '.github/scripts/patch_scroll_approval_406.py'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Download V404 source
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-c308-8206-b611-95b9bb9770b2/raw?se=2026-10-01T00%3A25%3A00Z&sp=r&sv=2026-02-06&sr=b&scid=b46943be-52b0-5078-ad7e-48eb3eb18f09&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-01T00%3A12%3A08Z&ske=2026-10-02T00%3A12%3A08Z&sks=b&skv=2026-02-06&sig=OVfzHK7Qmy/VWFvXUkDZuNQaYLJ0ysHfmbFJO3yeQkc%3D' -o source.zip
+          rm -rf build405
+          mkdir build405
+          unzip -q source.zip -d build405
+          test -f build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/index.html
+      - name: Download final welcome scroll
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-9860-8206-a141-12a2fa846dab/raw?se=2026-10-01T00%3A25%3A02Z&sp=r&sv=2026-02-06&sr=b&scid=39ac5320-ef24-50f6-b11a-7ae3d9e1d644&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-30T20%3A39%3A19Z&ske=2026-10-01T20%3A39%3A19Z&sks=b&skv=2026-02-06&sig=BzwdY59cBOiZaJdIIZVkSW/ubKghzQF9FC3Bakf6dEA%3D' -o build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/welcome_scroll_final.png
+          test -s build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/welcome_scroll_final.png
+      - name: Apply V405 ordered flow patch
+        run: python3 .github/scripts/patch_final_405.py
+      - name: Apply V406 simultaneous scroll approval patch
+        run: python3 .github/scripts/patch_scroll_approval_406.py
+      - name: Build final APK
+        working-directory: build405/FREEDOM_V402_BUILD_THIS
+        run: |
+          set -euo pipefail
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+          APK=$(find app/build/outputs/apk/debug -type f -name '*.apk' | head -1)
+          test -s "$APK"
+          cp "$APK" ../FREEDOM_V3_FINAL_406-debug.apk
+      - name: Publish final V406 APK only
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          find . -maxdepth 1 -type f -name 'FREEDOM_V3_FINAL_*.apk' -delete
+          cp build405/FREEDOM_V3_FINAL_406-debug.apk ./FREEDOM_V3_FINAL_406-debug.apk
+          git add -A
+          git commit -m 'Publish Freedom V3 final 406 scroll approval flow'
+          git push
