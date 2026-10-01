@@ -38,10 +38,10 @@ h1{margin:0 0 8px;color:#ffe39a;font-size:30px}
     <source src="freedom_guide_latest.mp4?v=20261001-2136" type="video/mp4">
     설치 동영상을 재생할 수 없습니다.
   </video>
-  <audio id="guideSongAudio" preload="auto"
+  <audio id="guideSongAudio" preload="auto" controls style="display:block;width:100%;margin-top:10px"
     src="kimkwangseok_ileona.mp3?v=20261001-2319"></audio>
   <button id="rewindBtn" class="btn" type="button" style="display:none;margin-top:12px" onclick="rewindTen()">↩ 10초 되돌리기</button>
-  <div id="guideStatus" class="autoNote">재생 시작 후에는 앞으로 건너뛰기나 종료 없이 끝까지 진행됩니다.</div>
+  <div id="guideStatus" class="autoNote">🔊 위 버튼을 누르면 소리가 먼저 시작됩니다. 소리가 안 나면 바로 아래 오디오 ▶ 버튼을 한 번 눌러주세요.</div>
 </div>
 <div class="card">
 <div class="step"><b>1</b>링크 클릭</div>
@@ -62,7 +62,7 @@ let SESSION_ACTIVE=false;
 let SESSION_DONE=false;
 let GUIDE_ENDED=false;
 
-function startGuideSong(){
+async function startGuideSong(){
   const v=document.getElementById('installGuideVideo');
   const a=document.getElementById('guideSongAudio');
   const start=document.getElementById('guideStartBtn');
@@ -74,16 +74,40 @@ function startGuideSong(){
   SESSION_DONE=false;
   GUIDE_ENDED=false;
 
-  v.muted=true;
-  v.currentTime=0;
-  a.currentTime=0;
-  a.volume=1;
+  try{
+    v.muted=true;
+    v.currentTime=0;
+    a.pause();
+    try{a.currentTime=0;}catch(e){}
+    a.volume=1;
+    a.muted=false;
 
-  Promise.allSettled([v.play(),a.play()]).then(()=>{
+    // Important for KakaoTalk/Android WebView:
+    // start audio directly from the user's click gesture and verify it actually started.
+    await a.play();
+
+    // Only after audio succeeds, start the silent guide video.
+    try{await v.play();}catch(e){
+      if(st)st.textContent='🎵 소리는 재생 중입니다. 영상 재생 버튼을 한 번 눌러주세요.';
+    }
+
     if(start){start.disabled=true;start.style.display='none';}
     if(rewind)rewind.style.display='block';
-    if(st)st.textContent='🎬 설치 설명서와 김광석 〈일어나〉가 함께 재생 중입니다.';
-  });
+    if(st)st.textContent='🔊 소리 정상 재생 중 · 설치 설명서와 김광석 〈일어나〉가 함께 진행됩니다.';
+  }catch(err){
+    SESSION_ACTIVE=false;
+    SESSION_DONE=false;
+    if(start){
+      start.disabled=false;
+      start.style.display='block';
+      start.textContent='🔊 소리와 함께 다시 시작';
+    }
+    if(st){
+      st.textContent='⚠️ 카카오톡 브라우저가 소리를 막았습니다. 아래 오디오 ▶ 버튼을 먼저 한 번 누른 뒤 위 버튼을 다시 눌러주세요.';
+    }
+    // Keep native audio controls visible for guaranteed user-gesture playback.
+    a.controls=true;
+  }
 }
 
 function rewindTen(){
