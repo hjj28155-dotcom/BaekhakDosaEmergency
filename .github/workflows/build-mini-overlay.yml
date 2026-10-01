@@ -6,6 +6,9 @@ on:
       - '.github/workflows/build-mini-overlay.yml'
 permissions:
   contents: write
+concurrency:
+  group: mini-overlay-publish
+  cancel-in-progress: true
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -31,5 +34,6 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           cp HANGHAE_MINI_MP3_FM_AM_YOUTUBE-debug.apk '항행의자유_이동아이콘_MP3_FM_AM_유튜브.apk'
           git add HANGHAE_MINI_MP3_FM_AM_YOUTUBE-debug.apk '항행의자유_이동아이콘_MP3_FM_AM_유튜브.apk'
-          git commit -m 'Publish mini overlay APK'
+          git commit -m 'Publish mini overlay APK' || true
+          git pull --rebase origin main
           git push
