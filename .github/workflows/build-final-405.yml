@@ -21,7 +21,7 @@ jobs:
       - name: Download V404 source
         run: |
           set -euo pipefail
-          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-0278-8206-ab0e-5e189efec998/raw?se=2026-09-30T23%3A58%3A38Z&sp=r&sv=2026-02-06&sr=b&scid=2fc10d91-152e-5355-a02c-ff9032277f67&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-30T16%3A37%3A21Z&ske=2026-10-01T16%3A37%3A21Z&sks=b&skv=2026-02-06&sig=wgcC8/J%2BhTQyhZognlPuH00aTHm9Vt6FFyf5xsDdpEI%3D' -o source.zip
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-fbdc-8206-af43-c2da4676bd10/raw?se=2026-10-01T00%3A05%3A27Z&sp=r&sv=2026-02-06&sr=b&scid=3ade7a2f-8157-55fc-8d3d-1031837709d0&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-30T23%3A57%3A12Z&ske=2026-10-01T23%3A57%3A12Z&sks=b&skv=2026-02-06&sig=K3%2Bct89bi9xXCTXIsGYnSjsaI7cMLMeccMT/15o0s2M%3D' -o source.zip
           rm -rf build405
           mkdir build405
           unzip -q source.zip -d build405
@@ -30,7 +30,7 @@ jobs:
       - name: Download final welcome scroll
         run: |
           set -euo pipefail
-          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-1264-8206-9f17-30e5ee2d66d7/raw?se=2026-10-01T00%3A02%3A00Z&sp=r&sv=2026-02-06&sr=b&scid=b01dace9-c64b-5aeb-8381-8c214af3f48c&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-30T23%3A25%3A10Z&ske=2026-10-01T23%3A25%3A10Z&sks=b&skv=2026-02-06&sig=6WzGTKE%2BttsOzhrWU0W3HD49BP0WI%2BwZN/xnJoFaFA4%3D' -o build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/welcome_scroll_final.png
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-ef10-8206-8691-11d7a00ffe1b/raw?se=2026-10-01T00%3A05%3A30Z&sp=r&sv=2026-02-06&sr=b&scid=1dce076e-2f8c-534c-a3d4-46aacfd6dee6&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-30T23%3A47%3A50Z&ske=2026-10-01T23%3A47%3A50Z&sks=b&skv=2026-02-06&sig=vQhVdlgkoIy7orwlroAdq9CIHKdWkT8LpKVThnJLkrQ%3D' -o build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/welcome_scroll_final.png
           test -s build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/welcome_scroll_final.png
 
       - name: Patch final order
