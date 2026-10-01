@@ -30,7 +30,7 @@ import java.util.Locale;
 
 public class MainActivity extends Activity {
     private static final int REQ_AUDIO=77;
-    private static final String UPDATE_URL="https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/%ED%95%AD%ED%96%89%EC%9D%98%EC%9E%90%EC%9C%A0_%EC%9D%B4%EB%8F%99%EC%95%84%EC%9D%B4%EC%BD%98_MP3_FM_AM_%EC%9C%A0%ED%8A%9C%EB%B8%8C.apk";
+    private static final String UPDATE_URL="https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/HANGHAE_MINI_MP3_FM_AM_YOUTUBE-debug.apk?v=20261002-0045";
 
     private boolean pendingStart=false;
     private long updateDownloadId=-1L;
@@ -265,10 +265,11 @@ public class MainActivity extends Activity {
             }else if(status==DownloadManager.STATUS_SUCCESSFUL){
                 setUpdateState("✅ 다운로드 100% · 설치 준비 중",100,true);
             }else if(status==DownloadManager.STATUS_FAILED){
+                int reason=c.getInt(c.getColumnIndexOrThrow(DownloadManager.COLUMN_REASON));
                 progressHandler.removeCallbacks(progressPoller);
                 updateDownloadId=-1L;
                 if(updateButton!=null) updateButton.setEnabled(true);
-                setUpdateState("❌ 다운로드 실패 · 다시 업데이트를 눌러 주세요.",percent,false);
+                setUpdateState("❌ 다운로드 실패("+reason+") · 다시 업데이트를 눌러 주세요.",percent,false);
             }
         }catch(Exception ignored){}
     }
