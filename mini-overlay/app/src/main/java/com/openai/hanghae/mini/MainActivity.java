@@ -2,6 +2,10 @@ package com.openai.hanghae.mini;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.IntentFilter;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -18,11 +22,17 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity {
     private static final int REQ_AUDIO=77;
+    private static final String UPDATE_URL="https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/%ED%95%AD%ED%96%89%EC%9D%98%EC%9E%90%EC%9C%A0_%EC%9D%B4%EB%8F%99%EC%95%84%EC%9D%B4%EC%BD%98_MP3_FM_AM_%EC%9C%A0%ED%8A%9C%EB%B8%8C.apk";
     private boolean pendingStart=false;
+    private long updateDownloadId=-1L;
+    private BroadcastReceiver updateReceiver;
 
     @Override public void onCreate(Bundle b){
         super.onCreate(b);
         setContentView(buildUi());
+        if(getIntent()!=null && getIntent().getBooleanExtra("direct_update",false)){
+            startDirectUpdate();
+        }
     }
 
     @Override protected void onResume(){
@@ -57,6 +67,10 @@ public class MainActivity extends Activity {
         Button start=button("⚓ 이동아이콘 켜기");
         start.setOnClickListener(v->startRequested());
         root.addView(start);
+
+        Button update=button("⬇ 업데이트");
+        update.setOnClickListener(v->startDirectUpdate());
+        root.addView(update);
 
         Button hide=button("⏹ 이동아이콘 끄기");
         hide.setOnClickListener(v->hideOverlay());
@@ -118,6 +132,53 @@ public class MainActivity extends Activity {
         }catch(Exception ignored){}
         try{ stopService(new Intent(this,OverlayService.class)); }catch(Exception ignored){}
         Toast.makeText(this,"이동아이콘을 껐습니다.",Toast.LENGTH_SHORT).show();
+    }
+
+    private void startDirectUpdate(){
+        try{
+            DownloadManager dm=(DownloadManager)getSystemService(DOWNLOAD_SERVICE);
+            if(dm==null){Toast.makeText(this,"업데이트를 시작하지 못했습니다.",Toast.LENGTH_SHORT).show();return;}
+            DownloadManager.Request req=new DownloadManager.Request(Uri.parse(UPDATE_URL));
+            req.setTitle("항행의자유 이동아이콘 업데이트");
+            req.setDescription("최신 APK를 내려받는 중입니다.");
+            req.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+            req.setMimeType("application/vnd.android.package-archive");
+            updateDownloadId=dm.enqueue(req);
+
+            if(updateReceiver!=null){
+                try{unregisterReceiver(updateReceiver);}catch(Exception ignored){}
+            }
+            updateReceiver=new BroadcastReceiver(){
+                @Override public void onReceive(Context context, Intent intent){
+                    long id=intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID,-1L);
+                    if(id!=updateDownloadId)return;
+                    try{
+                        Uri uri=dm.getUriForDownloadedFile(id);
+                        if(uri==null){Toast.makeText(MainActivity.this,"업데이트 파일을 열지 못했습니다.",Toast.LENGTH_SHORT).show();return;}
+                        Intent install=new Intent(Intent.ACTION_VIEW);
+                        install.setDataAndType(uri,"application/vnd.android.package-archive");
+                        install.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION|Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(install);
+                    }catch(Exception e){
+                        Toast.makeText(MainActivity.this,"설치 화면을 열지 못했습니다.",Toast.LENGTH_SHORT).show();
+                    }
+                }
+            };
+            IntentFilter filter=new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
+            if(Build.VERSION.SDK_INT>=33) registerReceiver(updateReceiver,filter,Context.RECEIVER_NOT_EXPORTED);
+            else registerReceiver(updateReceiver,filter);
+            Toast.makeText(this,"업데이트 파일을 내려받습니다.",Toast.LENGTH_SHORT).show();
+        }catch(Exception e){
+            Toast.makeText(this,"업데이트를 시작하지 못했습니다.",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override protected void onDestroy(){
+        if(updateReceiver!=null){
+            try{unregisterReceiver(updateReceiver);}catch(Exception ignored){}
+            updateReceiver=null;
+        }
+        super.onDestroy();
     }
 
     @Override public void onRequestPermissionsResult(int requestCode,String[] permissions,int[] grantResults){
