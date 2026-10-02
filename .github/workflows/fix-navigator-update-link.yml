@@ -1,0 +1,26 @@
+name: Fix Navigator update link
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-navigator-update-link.yml'
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore current Navigator APK link
+        run: |
+          set -euo pipefail
+          sed -i 's/1Q5QeN0m7H1BB7Y7OGbgwLSqLpjV3dpOH/12tYTGlkKPraVz1PEeqOszrGmvTp9Juue/g' navigator-update.html
+          sed -i 's/이동아이콘 없는 항해사앱 최신판입니다./성적결과 복구 · 업데이트 버튼 유지 · 이동아이콘 없는 항해사앱 최신판입니다./g' navigator-update.html
+          grep -q '12tYTGlkKPraVz1PEeqOszrGmvTp9Juue' navigator-update.html
+      - name: Publish
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add navigator-update.html
+          git commit -m "Restore Navigator update link to current build" || exit 0
+          git pull --rebase origin main
+          git push
