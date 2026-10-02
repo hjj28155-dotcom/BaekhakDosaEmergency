@@ -1327,7 +1327,7 @@ function receiveLegacyBackup(name,text){let obj;try{obj=JSON.parse(String(text||
 function nativeMusicName(){try{return String(AndroidHost.getMusicName()||'')}catch(e){return ''}}function nativeMusicEnabled(){try{return !!AndroidHost.isMusicEnabled()}catch(e){return false}}function nativeMusicVolume(){try{return Number(AndroidHost.getMusicVolume()||40)}catch(e){return 40}}function nativeMusicPlaylistCount(){try{return Number(AndroidHost.getMusicPlaylistCount())||0}catch(e){return 0}}
 function nativeVersion(){try{return String(AndroidHost.getNativeVersion?AndroidHost.getNativeVersion():'확인불가')}catch(e){return '확인불가'}}
 function chooseApkUpdate(){try{AndroidHost.chooseApkUpdate()}catch(e){alert('업데이트를 시작할 수 없습니다.')}}
-function updatePage(){let an='',ar='';try{an=String(AndroidHost.getApprovalApplicantName?AndroidHost.getApprovalApplicantName():'');ar=String(AndroidHost.getApprovalReferrerName?AndroidHost.getApprovalReferrerName():'')}catch(e){};modal('앱 업데이트',`<div class="panel goldline"><h3>V3 LIVE 업데이트</h3><div>현재 네이티브 버전: <b>${esc(nativeVersion())}</b></div><div class="small">업데이트 승인 요청 후 반드시 승인 확인 버튼으로 상태를 확인해 주세요.</div></div><div class="panel"><div class="label">실명 기입 (필수)</div><input id="updateApplicantName" value="${esc(an)}" placeholder="본인 실명"><div class="label">누구의 지인인지 기입 (필수)</div><input id="updateReferrerName" value="${esc(ar)}" placeholder="예: 홍길동의 지인"><div class="row" style="margin-top:8px"><button class="b gold" style="flex:1" onclick="requestV3UpdateApproval()">V3 업데이트 승인요청</button><button class="b" style="flex:1" onclick="checkV3UpdateApproval()">승인 확인</button></div><div class="small status" id="updateApprovalMsg" style="margin-top:9px">승인요청 후 항해사 승인이 끝나면 승인 확인을 눌러 주세요.</div></div><div class="panel"><div class="row"><button class="b gold" onclick="chooseApkUpdate()">⬇ 최신 V3 업데이트 설치</button></div></div>`) ;setTimeout(refreshV3UpdateApprovalState,120)}
+function updatePage(){let an='',ar='';try{an=String(AndroidHost.getApprovalApplicantName?AndroidHost.getApprovalApplicantName():'');ar=String(AndroidHost.getApprovalReferrerName?AndroidHost.getApprovalReferrerName():'')}catch(e){};modal('앱 업데이트',`<div class="panel goldline"><h3>V3 LIVE 업데이트</h3><div>현재 네이티브 버전: <b>${esc(nativeVersion())}</b></div><div class="small">업데이트 승인 요청 후 반드시 승인 확인 버튼으로 상태를 확인해 주세요.</div></div><div class="panel"><div class="label">실명 기입 (필수)</div><input id="updateApplicantName" value="${esc(an)}" placeholder="본인 실명"><div class="label">누구의 지인인지 기입 (필수)</div><input id="updateReferrerName" value="${esc(ar)}" placeholder="예: 홍길동의 지인"><div class="row" style="margin-top:8px"><button class="b gold" style="flex:1" onclick="requestV3UpdateApproval()">V3 업데이트 승인요청</button><button class="b" style="flex:1" onclick="checkV3UpdateApproval()">승인 확인</button></div><div class="small status" id="updateApprovalMsg" style="margin-top:9px">승인요청 후 항해사 승인이 끝나면 승인 확인을 눌러 주세요.</div></div><div class="panel"><div class="row"><button id="v422UpdateInstallBtn" class="b gold" type="button">⬇ 최신 V3 업데이트 설치</button></div></div>`) ;setTimeout(refreshV3UpdateApprovalState,120)}
 function requestV3UpdateApproval(){let name=String(document.getElementById('updateApplicantName')?.value||'').trim(),ref=String(document.getElementById('updateReferrerName')?.value||'').trim(),msg=document.getElementById('updateApprovalMsg');if(!name){msg.textContent='실명을 입력해 주세요.';return}if(!ref){msg.textContent='누구의 지인인지 입력해 주세요.';return}try{D.pendingSpecialRound=1243;AndroidHost.requestSpecialApproval(1243,name,ref);msg.textContent='승인요청을 보냈습니다. 승인 완료 후 이후 업데이트에서는 다시 요청하지 않습니다.';startSpecialApprovalAutoPoll()}catch(e){msg.textContent='승인요청을 보내지 못했습니다.'}}
 function refreshV3UpdateApprovalState(){
  const msg=document.getElementById('updateApprovalMsg');if(!msg)return;
@@ -1548,7 +1548,57 @@ function v330GroupsPurchase(games){
 function v330Print(){
  const t=document.querySelector('#mc .v330print');if(!t){alert('인쇄할 내용이 없습니다.');return}
  const w=window.open('','_blank');if(!w){alert('인쇄창을 열 수 없습니다.');return}
- w.document.write(`<!doctype html><html><head><meta charset="utf-8"><style>body{font-family:Arial,"Noto Sans KR",sans-serif;padding:8mm;color:#111}.r5grid{display:grid;grid-template-columns:1fr 1fr;gap:4mm}.r5group{border:1px solid #777;border-radius:5px;padding:3mm}.r5group h4{text-align:center;margin:0 0 2mm}.r5row{display:grid;grid-template-columns:7mm 1fr 10mm;align-items:center;padding:1.6mm 0;border-bottom:1px solid #ddd}.r5row.purchase{grid-template-columns:7mm 1fr}.r5balls{display:flex;gap:1.5mm}.r5ball{display:inline-flex;width:7mm;height:7mm;border-radius:50%;border:1px solid #555;align-items:center;justify-content:center;font-size:8pt;font-weight:bold}.r5winning{display:flex;justify-content:center;gap:3mm}.r5winning .r5ball{width:9mm;height:9mm}.r5actions,button{display:none!important}@media print{@page{size:A4 portrait;margin:8mm}}</style></head><body>${t.innerHTML}</body></html>`);
+ w.document.write(`<!doctype html><html><head><meta charset="utf-8"><style>body{font-family:Arial,"Noto Sans KR",sans-serif;padding:8mm;color:#111}.r5grid{display:grid;grid-template-columns:1fr 1fr;gap:4mm}.r5group{border:1px solid #777;border-radius:5px;padding:3mm}.r5group h4{text-align:center;margin:0 0 2mm}.r5row{display:grid;grid-template-columns:7mm 1fr 10mm;align-items:center;padding:1.6mm 0;border-bottom:1px solid #ddd}.r5row.purchase{grid-template-columns:7mm 1fr}.r5balls{display:flex;gap:1.5mm}.r5ball{display:inline-flex;width:7mm;height:7mm;border-radius:50%;border:1px solid #555;align-items:center;justify-content:center;font-size:8pt;font-weight:bold}.r5winning{display:flex;justify-content:center;gap:3mm}.r5winning .r5ball{width:9mm;height:9mm}.r5actions,button{display:none!important}@media print{@page{size:A4 portrait;margin:8mm}}</style></head><body>${t.innerHTML}
+<script id="v422DirectButtonFix">
+(function(){
+  function forceClose(){
+    try{
+      var m=document.getElementById('modal');
+      if(m){
+        m.style.display='none';
+        m.style.pointerEvents='none';
+        m.classList.remove('scoreOneScreen','musicOneScreen');
+      }
+      document.querySelectorAll('.simpleHot').forEach(function(b){b.style.pointerEvents='auto';});
+      document.body.style.overflow='';
+      document.body.style.overflowY='auto';
+    }catch(e){}
+  }
+
+  function forceUpdate(){
+    try{
+      if(window.AndroidHost && typeof AndroidHost.chooseApkUpdate==='function'){
+        AndroidHost.chooseApkUpdate();
+        return;
+      }
+      if(window.BaekhakNative && typeof BaekhakNative.chooseApkUpdate==='function'){
+        BaekhakNative.chooseApkUpdate();
+        return;
+      }
+      alert('업데이트 설치 연결을 불러오지 못했습니다. 앱을 완전히 종료한 뒤 다시 실행해 주세요.');
+    }catch(e){
+      alert('업데이트 설치를 시작하지 못했습니다.');
+    }
+  }
+
+  function intercept(ev){
+    var t=ev.target && ev.target.closest ? ev.target.closest('button') : null;
+    if(!t)return;
+    var isClose=t.classList && t.classList.contains('close');
+    var isUpdate=t.id==='v422UpdateInstallBtn';
+    if(!isClose && !isUpdate)return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    if(ev.stopImmediatePropagation)ev.stopImmediatePropagation();
+    if(isClose)forceClose();
+    else forceUpdate();
+  }
+
+  document.addEventListener('pointerup',intercept,true);
+  document.addEventListener('click',intercept,true);
+})();
+</script>
+</body></html>`);
  w.document.close();setTimeout(()=>{try{w.print()}catch(e){}},250);
 }
 function v330ResultPage(round){
