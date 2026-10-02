@@ -1,5 +1,4 @@
-name: Build final installation guide 1-10
-# trigger-final-789-v2
+name: Build final installation guide 1-10 approved
 on:
   push:
     paths:
@@ -15,16 +14,16 @@ jobs:
         run: |
           sudo apt-get update -y
           sudo apt-get install -y ffmpeg
-      - name: Download approved screens 7 8 9
+      - name: Download final approved 7 8 9 screens
         run: |
           set -euo pipefail
-          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-bae8-8206-a902-ade95c615309/raw?se=2026-10-02T02%3A00%3A44Z&sp=r&sv=2026-02-06&sr=b&scid=3918848b-3786-52af-9f95-f271fa71a42f&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-01T20%3A43%3A33Z&ske=2026-10-02T20%3A43%3A33Z&sks=b&skv=2026-02-06&sig=23xKgjm31b4a7QVDwwz9zsXdlYOILeSU6XoIp4U/1KQ%3D' -o guide7.png
-          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-fb44-8206-98b9-ac8aa8937796/raw?se=2026-10-02T02%3A00%3A47Z&sp=r&sv=2026-02-06&sr=b&scid=dd5dcab1-9f48-5d62-ab2a-17bf40574377&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-01T23%3A45%3A14Z&ske=2026-10-02T23%3A45%3A14Z&sks=b&skv=2026-02-06&sig=JaR799PXaevdHOmKOGplDJI%2BRbSQjyn8deLP48RybnQ%3D' -o guide8.png
-          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-aaec-8206-8953-6f934f0febd7/raw?se=2026-10-02T02%3A00%3A51Z&sp=r&sv=2026-02-06&sr=b&scid=3e9dccc4-4ddf-507f-b08e-d940fe1da4cf&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-02T01%3A14%3A01Z&ske=2026-10-03T01%3A14%3A01Z&sks=b&skv=2026-02-06&sig=%2B69PuqVHVSmIoujRVQ%2B/q/ENXj/okAhR/lVuADepcfI%3D' -o guide9.png
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-5e0c-8206-8d71-d07cb6bc710c/raw?se=2026-10-02T02%3A21%3A31Z&sp=r&sv=2026-02-06&sr=b&scid=27b8c8b2-8ee5-5e29-990c-6cf70d1519a4&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-02T01%3A14%3A00Z&ske=2026-10-03T01%3A14%3A00Z&sks=b&skv=2026-02-06&sig=MuzV24XKImWko75%2B5zOlyNizAbZfij/h6hy0dBTLg1w%3D' -o guide7.png
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-976c-8206-95f5-10d1a17ce86e/raw?se=2026-10-02T02%3A21%3A33Z&sp=r&sv=2026-02-06&sr=b&scid=63892556-f7a7-5437-8d33-51aab932d5a7&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-02T00%3A18%3A55Z&ske=2026-10-03T00%3A18%3A55Z&sks=b&skv=2026-02-06&sig=r2I4Z138Wa39rHKV/K75aRlSoraeRqiRchhKwkVXhKA%3D' -o guide8.png
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-ba70-8206-a3d4-448bfc27dc68/raw?se=2026-10-02T02%3A21%3A35Z&sp=r&sv=2026-02-06&sr=b&scid=ff2673f7-b83f-58d6-997d-a9b6f0d878e6&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-02T01%3A32%3A49Z&ske=2026-10-03T01%3A32%3A49Z&sks=b&skv=2026-02-06&sig=/7gqrz3qMRJPFsLkUQ2SnMrPKStv2Cfn1yOcYFIDpuM%3D' -o guide9.png
           test -s guide7.png
           test -s guide8.png
           test -s guide9.png
-      - name: Build exact 1 through 10 guide
+      - name: Build exact approved sequence 1 through 10
         run: |
           set -euo pipefail
           SRC="build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/install_guide_final.mp4"
@@ -32,30 +31,41 @@ jobs:
           mkdir -p /tmp/guide
           VF="scale=864:1536:force_original_aspect_ratio=decrease,pad=864:1536:(ow-iw)/2:(oh-ih)/2:black,fps=30,format=yuv420p"
 
-          # Original screens 1~6
           ffmpeg -hide_banner -loglevel error -y -ss 0 -i "$SRC" -t 90 -an -vf "$VF" -c:v libx264 -preset veryfast -crf 20 /tmp/guide/01_06.mp4
-
-          # Approved screens 7, 8, 9 — 15 seconds each
           ffmpeg -hide_banner -loglevel error -y -loop 1 -i guide7.png -t 15 -vf "$VF" -an -c:v libx264 -preset veryfast -crf 20 /tmp/guide/07.mp4
           ffmpeg -hide_banner -loglevel error -y -loop 1 -i guide8.png -t 15 -vf "$VF" -an -c:v libx264 -preset veryfast -crf 20 /tmp/guide/08.mp4
           ffmpeg -hide_banner -loglevel error -y -loop 1 -i guide9.png -t 15 -vf "$VF" -an -c:v libx264 -preset veryfast -crf 20 /tmp/guide/09.mp4
-
-          # Original screen 10
           ffmpeg -hide_banner -loglevel error -y -ss 90 -i "$SRC" -t 15 -an -vf "$VF" -c:v libx264 -preset veryfast -crf 20 /tmp/guide/10.mp4
 
           printf "file '/tmp/guide/01_06.mp4'\nfile '/tmp/guide/07.mp4'\nfile '/tmp/guide/08.mp4'\nfile '/tmp/guide/09.mp4'\nfile '/tmp/guide/10.mp4'\n" > /tmp/guide/list.txt
-
           ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i /tmp/guide/list.txt -c copy /tmp/guide/video.mp4
-
-          # Add silent audio track. Page music is synchronized separately.
-          ffmpeg -hide_banner -loglevel error -y -i /tmp/guide/video.mp4 -f lavfi -i "anullsrc=r=48000:cl=stereo"             -map 0:v:0 -map 1:a:0 -t 150 -c:v copy -c:a aac -b:a 96k freedom_guide_latest.mp4
+          ffmpeg -hide_banner -loglevel error -y -i /tmp/guide/video.mp4 -f lavfi -i "anullsrc=r=48000:cl=stereo" -map 0:v:0 -map 1:a:0 -t 150 -c:v copy -c:a aac -b:a 96k freedom_guide_latest.mp4
 
           D=$(ffprobe -v error -show_entries format=duration -of csv=p=0 freedom_guide_latest.mp4)
           S=$(stat -c%s freedom_guide_latest.mp4)
           echo "duration=$D size=$S"
           awk "BEGIN{exit !($D > 149 && $D < 151)}"
           test "$S" -gt 1000000
-      - name: Publish final 1-10 guide
+
+          # Verification frames for 7, 8, 9, 10 positions.
+          ffmpeg -hide_banner -loglevel error -y -ss 97.5  -i freedom_guide_latest.mp4 -frames:v 1 verify7.png
+          ffmpeg -hide_banner -loglevel error -y -ss 112.5 -i freedom_guide_latest.mp4 -frames:v 1 verify8.png
+          ffmpeg -hide_banner -loglevel error -y -ss 127.5 -i freedom_guide_latest.mp4 -frames:v 1 verify9.png
+          ffmpeg -hide_banner -loglevel error -y -ss 142.5 -i freedom_guide_latest.mp4 -frames:v 1 verify10.png
+          test -s verify7.png
+          test -s verify8.png
+          test -s verify9.png
+          test -s verify10.png
+      - name: Upload verification frames
+        uses: actions/upload-artifact@v4
+        with:
+          name: guide-verification-7-10
+          path: |
+            verify7.png
+            verify8.png
+            verify9.png
+            verify10.png
+      - name: Publish final approved guide
         run: |
           set -euo pipefail
           cp freedom_guide_latest.mp4 /tmp/freedom_guide_latest.mp4
@@ -65,5 +75,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add freedom_guide_latest.mp4
-          git commit -m "Publish approved installation guide screens 1 through 10" || exit 0
+          git commit -m "Publish final approved installation guide 1 through 10" || exit 0
           git push origin main
