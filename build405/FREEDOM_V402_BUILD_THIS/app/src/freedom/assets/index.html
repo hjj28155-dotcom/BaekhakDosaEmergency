@@ -1725,6 +1725,32 @@ function v330Print(){
 })();
 </script>
 
+
+<script id="v3FinalNoApprovalGate">
+(function(){
+  // V3 final owner build: no approval gate / no onboarding lock.
+  function unlockNow(){
+    try{ window.SPECIAL_APPROVED=true; }catch(e){}
+    try{ if(window.D){D.specialApprovalUnlocked=true; if(typeof save==='function')save();} }catch(e){}
+    try{ window.showApprovalHardLock=function(){}; }catch(e){}
+    try{ window.showFinalScroll=function(){}; }catch(e){}
+    try{ const a=document.getElementById('approvalHardLock'); if(a)a.remove(); }catch(e){}
+    try{ const g=document.getElementById('startupVideoGate'); if(g)g.remove(); }catch(e){}
+    try{ document.body.style.overflow=''; }catch(e){}
+    try{ window.__onboardingSequenceActive=false; }catch(e){}
+    try{ if(typeof window.unlockApprovedApp==='function')window.unlockApprovedApp(); }catch(e){}
+  }
+  unlockNow();
+  document.addEventListener('DOMContentLoaded',unlockNow,{once:true});
+  window.addEventListener('load',()=>{unlockNow();setTimeout(unlockNow,250);setTimeout(unlockNow,1000);},{once:true});
+  try{
+    new MutationObserver(()=>{
+      const a=document.getElementById('approvalHardLock'); if(a)a.remove();
+      const g=document.getElementById('startupVideoGate'); if(g)g.remove();
+    }).observe(document.documentElement,{childList:true,subtree:true});
+  }catch(e){}
+})();
+</script>
 </body></html>`);
  w.document.close();setTimeout(()=>{try{w.print()}catch(e){}},250);
 }
