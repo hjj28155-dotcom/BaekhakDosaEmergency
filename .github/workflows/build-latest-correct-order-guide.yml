@@ -1,4 +1,5 @@
 name: Build latest correct-order installation guide
+# retrigger 20261002-real789-final2
 on:
   push:
     paths:
