@@ -36,7 +36,7 @@ h1{margin:0 0 8px;color:#ffe39a;font-size:30px}
 <body>
 <div class="wrap">
 <h1>항행의자유</h1>
-<div class="sub">최종 배포판 V4.0.19 ENGINE FUSION<br>처음 설치하시는 분은 아래 설치 동영상을 먼저 보세요.</div>
+<div class="sub">최종 배포판 V4.0.22 UPDATE CLOSE BUTTON FIX<br>처음 설치하시는 분은 아래 설치 동영상을 먼저 보세요.</div>
 <div class="guideWrap">
   <div class="guideTitle">🎬 설치 설명서 + 김광석 〈일어나〉</div>
   <button id="guideStartBtn" class="btn" type="button" style="margin-top:0" onclick="startGuideSong()">▶ 설치 설명서 + 노래 재생 시작</button>
@@ -66,7 +66,7 @@ h1{margin:0 0 8px;color:#ffe39a;font-size:30px}
 <div class="step"><b>8</b>승인완료 후 홈화면 실행</div>
 </div>
 <button id="downloadBtn" class="btn" type="button" disabled style="opacity:.45" onclick="downloadLatestApk()">설치동영상 완료 후 자동으로 APK 다운로드</button>
-<div class="ok">배포 파일: FREEDOM_V4_0_19_ENGINE_FUSION-debug.apk</div>
+<div class="ok">배포 파일: FREEDOM_V4_0_22_UPDATE_CLOSE_BUTTON_FIX-debug.apk</div>
 <div class="note">설치영상이 끝나면 자동으로 다음 설치 단계(APK 다운로드)로 이동합니다.</div>
 </div>
 <script>
@@ -226,7 +226,7 @@ function finishGuideSong(){
 
 function downloadLatestApk(){
   if(!SESSION_DONE)return;
-  location.href='https://drive.usercontent.google.com/download?id=19S-QZ_Lfsn5X3YXpLnOo705c7jZTV1YB&export=download&confirm=t';
+  location.href='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/latest-apk';
 }
 
 window.addEventListener('load',()=>{
