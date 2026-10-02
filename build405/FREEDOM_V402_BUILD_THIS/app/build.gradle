@@ -10,8 +10,8 @@ android {
         applicationId 'com.navigator.freedom.v3final'
         minSdk 23
         targetSdk 35
-        versionCode 30406
-        versionName "4.0.6-SCROLL-APPROVAL"
+        versionCode 30422
+        versionName "4.0.22-UPDATE-CLOSE-BUTTON-FIX-V2.6-DEV"
     }
 
     buildFeatures {
@@ -50,7 +50,7 @@ android {
 
     applicationVariants.all { variant ->
         variant.outputs.all {
-            outputFileName = "FREEDOM_V3_FINAL_406-debug.apk"
+            outputFileName = "FREEDOM_V4_0_22_UPDATE_CLOSE_BUTTON_FIX-debug.apk"
         }
     }
 }
