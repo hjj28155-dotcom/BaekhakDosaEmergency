@@ -1,0 +1,31 @@
+name: Build Freedom V4.0.22 Direct Button Fix
+on:
+  push:
+    paths:
+      - '.github/workflows/build-v422-direct-fix.yml'
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Build V4.0.22
+        working-directory: build405/FREEDOM_V402_BUILD_THIS
+        run: |
+          set -euo pipefail
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+          APK=$(find app/build/outputs/apk/debug -type f -name 'FREEDOM_V4_0_22_UPDATE_CLOSE_BUTTON_FIX-debug.apk' | head -1)
+          test -s "$APK"
+          cp "$APK" "$GITHUB_WORKSPACE/FREEDOM_V4_0_22_UPDATE_CLOSE_BUTTON_FIX-debug.apk"
+          sha256sum "$GITHUB_WORKSPACE/FREEDOM_V4_0_22_UPDATE_CLOSE_BUTTON_FIX-debug.apk"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FREEDOM_V4_0_22_UPDATE_CLOSE_BUTTON_FIX
+          path: FREEDOM_V4_0_22_UPDATE_CLOSE_BUTTON_FIX-debug.apk
+          if-no-files-found: error
