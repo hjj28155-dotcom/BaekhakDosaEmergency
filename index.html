@@ -48,11 +48,11 @@ h1{margin:0 0 8px;color:#ffe39a;font-size:30px}
   </div>
 </div>
 <video id="installGuideVideo" class="guideVideo" playsinline preload="auto" muted controls controlslist="nodownload noplaybackrate">
-  <source src="freedom_guide_latest.mp4?v=20261002-real789-533a38" type="video/mp4">
+  <source src="freedom_guide_latest.mp4?v=20261002-real789-final2" type="video/mp4">
 </video>
   <audio id="guideSongAudio" preload="auto" controls style="display:block;width:100%;margin-top:10px"
     src="kimkwangseok_ileona.mp3?v=20261001-2319"></audio>
-  <button id="rewindBtn" class="btn" type="button" style="display:none;margin-top:12px" onclick="rewindTen()">↩ 10초 되돌리기</button>
+  <div id="guideControlRow" style="display:none;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px"><button id="rewindBtn" class="btn" type="button" style="margin:0" onclick="rewindTen()">↩ 10초 되돌리기</button><button id="guideExitBtn" class="btn" type="button" style="margin:0;background:linear-gradient(#8f2530,#4a0d16)" onclick="exitGuide()">⏹ 종료</button></div>
   <div id="guideStatus" class="autoNote">🔊 위 버튼을 누르면 소리가 먼저 시작됩니다. 소리가 안 나면 바로 아래 오디오 ▶ 버튼을 한 번 눌러주세요.</div>
 </div>
 <div class="card">
@@ -65,9 +65,9 @@ h1{margin:0 0 8px;color:#ffe39a;font-size:30px}
 <div class="step"><b>7</b>승인요청 접수 후 안내동영상</div>
 <div class="step"><b>8</b>승인완료 후 홈화면 실행</div>
 </div>
-<button id="downloadBtn" class="btn" type="button" disabled style="opacity:.45" onclick="downloadLatestApk()">설치동영상 완료 후 자동으로 APK 다운로드</button>
+<button id="downloadBtn" class="btn" type="button" disabled style="opacity:.45" onclick="downloadLatestApk()">최신 V3 업데이트 설치</button>
 <div class="ok">배포 파일: FREEDOM_V4_0_22_UPDATE_CLOSE_BUTTON_FIX-debug.apk</div>
-<div class="note">설치영상이 끝나면 자동으로 다음 설치 단계(APK 다운로드)로 이동합니다.</div>
+<div class="note">영상은 일시중지·되돌리기·재생바 이동·종료가 가능합니다.</div>
 </div>
 <script>
 let SESSION_ACTIVE=false;
@@ -175,7 +175,7 @@ async function startGuideSong(){
     }
 
     if(start){start.disabled=true;start.style.display='none';}
-    if(rewind)rewind.style.display='block';
+    const row=document.getElementById('guideControlRow'); if(row)row.style.display='grid';
     if(st)st.textContent='🔊 초대형 음량 4배 증폭 재생 중 · 설치 설명서와 김광석 〈일어나〉가 함께 진행됩니다.';
   }catch(err){
     SESSION_ACTIVE=false;
@@ -193,24 +193,33 @@ async function startGuideSong(){
   }
 }
 
+function exitGuide(){
+  const v=document.getElementById('installGuideVideo');
+  const a=document.getElementById('guideSongAudio');
+  const start=document.getElementById('guideStartBtn');
+  const row=document.getElementById('guideControlRow');
+  const st=document.getElementById('guideStatus');
+  try{ if(v) v.pause(); }catch(e){}
+  try{ if(a) a.pause(); }catch(e){}
+  SESSION_ACTIVE=false;
+  GUIDE_ENDED=false;
+  if(start){start.disabled=false;start.style.display='block';start.textContent='▶ 설치 설명서 + 노래 재생 시작';}
+  if(row)row.style.display='none';
+  if(st)st.textContent='⏹ 재생을 종료했습니다. 재생바를 움직여 원하는 구간부터 다시 볼 수 있습니다.';
+}
+
 function rewindTen(){
   if(!SESSION_ACTIVE||SESSION_DONE)return;
   const v=document.getElementById('installGuideVideo');
   const a=document.getElementById('guideSongAudio');
   if(!v||!a)return;
 
-  const target=Math.max(0,a.currentTime-10);
-  a.currentTime=target;
-
-  // 설치영상 구간 안이면 영상도 같은 위치로 되돌림.
-  // 영상이 이미 끝난 뒤라면 최대 마지막 장면까지만 복귀.
-  if(v.duration && target < v.duration){
-    GUIDE_ENDED=false;
-    v.currentTime=target;
-    v.play().catch(()=>{});
-  }else if(v.duration){
-    v.currentTime=Math.max(0,v.duration-0.05);
-  }
+  const target=Math.max(0,(v.currentTime||0)-10);
+  GUIDE_ENDED=false;
+  v.currentTime=target;
+  try{a.currentTime=Math.min(target,a.duration||target);}catch(e){}
+  if(v.paused){v.play().catch(()=>{});}
+  if(a.paused){a.play().catch(()=>{});}
 }
 
 function finishGuideSong(){
@@ -234,14 +243,16 @@ window.addEventListener('load',()=>{
   const a=document.getElementById('guideSongAudio');
 
   if(v){
+    v.addEventListener('play',()=>{ try{ if(a){a.currentTime=Math.min(v.currentTime||0,a.duration||v.currentTime||0);a.play().catch(()=>{});} }catch(e){} });
+    v.addEventListener('pause',()=>{ try{ if(a && !v.ended)a.pause(); }catch(e){} });
+    v.addEventListener('seeking',()=>{ try{ if(a)a.currentTime=Math.min(v.currentTime||0,a.duration||v.currentTime||0); }catch(e){} });
     v.addEventListener('ended',()=>{
       GUIDE_ENDED=true;
       const a=document.getElementById('guideSongAudio');
       try{ if(a && !a.paused) a.pause(); }catch(e){}
       finishGuideSong();
       const st=document.getElementById('guideStatus');
-      if(st) st.textContent='✅ 설치동영상 완료 · 다음 설치 단계로 이동합니다.';
-      setTimeout(()=>{ try{ downloadLatestApk(); }catch(e){} },700);
+      if(st) st.textContent='✅ 설치동영상 완료 · 재생바로 되돌려 다시 볼 수 있습니다. 준비되면 아래 업데이트 설치 버튼을 누르세요.';
     });
   }
 
@@ -258,12 +269,6 @@ window.addEventListener('load',()=>{
   }
 });
 
-window.addEventListener('beforeunload',e=>{
-  if(SESSION_ACTIVE&&!SESSION_DONE){
-    e.preventDefault();
-    e.returnValue='';
-  }
-});
 </script>
 </body>
 </html>
