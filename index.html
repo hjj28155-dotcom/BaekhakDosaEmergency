@@ -52,7 +52,7 @@ h1{margin:0 0 8px;color:#ffe39a;font-size:30px}
 </video>
   <audio id="guideSongAudio" preload="auto" controls style="display:block;width:100%;margin-top:10px"
     src="kimkwangseok_ileona.mp3?v=20261001-2319"></audio>
-  <div id="guideControlRow" style="display:none;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px"><button id="rewindBtn" class="btn" type="button" style="margin:0" onclick="rewindTen()">↩ 10초 되돌리기</button><button id="guideExitBtn" class="btn" type="button" style="margin:0;background:linear-gradient(#8f2530,#4a0d16)" onclick="exitGuide()">⏹ 종료</button></div>
+  <div id="guideControlRow" style="display:none;grid-template-columns:1fr;gap:10px;margin-top:12px"><button id="guideExitBtn" class="btn" type="button" style="margin:0;background:linear-gradient(#8f2530,#4a0d16)" onclick="exitGuide()">⏹ 종료</button></div>
   <div id="guideStatus" class="autoNote">🔊 위 버튼을 누르면 소리가 먼저 시작됩니다. 소리가 안 나면 바로 아래 오디오 ▶ 버튼을 한 번 눌러주세요.</div>
 </div>
 <div class="card">
@@ -145,7 +145,6 @@ async function startGuideSong(){
   const v=document.getElementById('installGuideVideo');
   const a=document.getElementById('guideSongAudio');
   const start=document.getElementById('guideStartBtn');
-  const rewind=document.getElementById('rewindBtn');
   const st=document.getElementById('guideStatus');
   if(!v||!a)return;
 
@@ -208,28 +207,12 @@ function exitGuide(){
   if(st)st.textContent='⏹ 재생을 종료했습니다. 재생바를 움직여 원하는 구간부터 다시 볼 수 있습니다.';
 }
 
-function rewindTen(){
-  if(!SESSION_ACTIVE||SESSION_DONE)return;
-  const v=document.getElementById('installGuideVideo');
-  const a=document.getElementById('guideSongAudio');
-  if(!v||!a)return;
-
-  const target=Math.max(0,(v.currentTime||0)-10);
-  GUIDE_ENDED=false;
-  v.currentTime=target;
-  try{a.currentTime=Math.min(target,a.duration||target);}catch(e){}
-  if(v.paused){v.play().catch(()=>{});}
-  if(a.paused){a.play().catch(()=>{});}
-}
-
 function finishGuideSong(){
   SESSION_ACTIVE=false;
   SESSION_DONE=true;
   const b=document.getElementById('downloadBtn');
-  const rw=document.getElementById('rewindBtn');
-  const st=document.getElementById('guideStatus');
+    const st=document.getElementById('guideStatus');
   if(b){b.disabled=false;b.style.opacity='1';b.textContent='APK 다운로드 시작';}
-  if(rw)rw.style.display='none';
   if(st)st.textContent='✅ 설치 설명서 + 김광석 〈일어나〉 전체 재생 완료 · 다운로드가 열렸습니다.';
 }
 
