@@ -17,12 +17,12 @@ jobs:
       - name: Download approved screens 7 8 9
         run: |
           set -euo pipefail
-          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-a708-8206-ab47-11a3ddf1cb2e/raw?se=2026-10-02T01%3A43%3A42Z&sp=r&sv=2026-02-06&sr=b&scid=5a3385a2-19b7-534d-973f-8e5699ab215f&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-02T01%3A23%3A14Z&ske=2026-10-03T01%3A23%3A14Z&sks=b&skv=2026-02-06&sig=vlBnsTPMXWPjcEqyqoLS/Ck%2B4kXoFoORX0/Yo5Zb%2Bh8%3D' -o guide7.jpg
-          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-3968-8206-8d65-fb2cf7e348d2/raw?se=2026-10-02T01%3A43%3A45Z&sp=r&sv=2026-02-06&sr=b&scid=94bec8fa-986d-594f-8e61-116c0c060d8e&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-02T01%3A23%3A16Z&ske=2026-10-03T01%3A23%3A16Z&sks=b&skv=2026-02-06&sig=48W7ZAKX6z8BhpIelrhW49WURpK8rh9Ge2g2EUk2DPQ%3D' -o guide8.jpg
-          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-ee28-8206-8959-4df634c458d5/raw?se=2026-10-02T01%3A43%3A47Z&sp=r&sv=2026-02-06&sr=b&scid=92c84a7b-4ac1-59d1-a142-e8c3489ab562&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-02T00%3A57%3A03Z&ske=2026-10-03T00%3A57%3A03Z&sks=b&skv=2026-02-06&sig=rD%2BWEnoNDHefuvBLMzkHmGRDj8txu/LynlkAsDih%2BXc%3D' -o guide9.jpg
-          test -s guide7.jpg
-          test -s guide8.jpg
-          test -s guide9.jpg
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-bae8-8206-a902-ade95c615309/raw?se=2026-10-02T02%3A00%3A44Z&sp=r&sv=2026-02-06&sr=b&scid=3918848b-3786-52af-9f95-f271fa71a42f&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-01T20%3A43%3A33Z&ske=2026-10-02T20%3A43%3A33Z&sks=b&skv=2026-02-06&sig=23xKgjm31b4a7QVDwwz9zsXdlYOILeSU6XoIp4U/1KQ%3D' -o guide7.png
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-fb44-8206-98b9-ac8aa8937796/raw?se=2026-10-02T02%3A00%3A47Z&sp=r&sv=2026-02-06&sr=b&scid=dd5dcab1-9f48-5d62-ab2a-17bf40574377&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-01T23%3A45%3A14Z&ske=2026-10-02T23%3A45%3A14Z&sks=b&skv=2026-02-06&sig=JaR799PXaevdHOmKOGplDJI%2BRbSQjyn8deLP48RybnQ%3D' -o guide8.png
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-aaec-8206-8953-6f934f0febd7/raw?se=2026-10-02T02%3A00%3A51Z&sp=r&sv=2026-02-06&sr=b&scid=3e9dccc4-4ddf-507f-b08e-d940fe1da4cf&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-02T01%3A14%3A01Z&ske=2026-10-03T01%3A14%3A01Z&sks=b&skv=2026-02-06&sig=%2B69PuqVHVSmIoujRVQ%2B/q/ENXj/okAhR/lVuADepcfI%3D' -o guide9.png
+          test -s guide7.png
+          test -s guide8.png
+          test -s guide9.png
       - name: Build exact 1 through 10 guide
         run: |
           set -euo pipefail
@@ -35,9 +35,9 @@ jobs:
           ffmpeg -hide_banner -loglevel error -y -ss 0 -i "$SRC" -t 90 -an -vf "$VF" -c:v libx264 -preset veryfast -crf 20 /tmp/guide/01_06.mp4
 
           # Approved screens 7, 8, 9 — 15 seconds each
-          ffmpeg -hide_banner -loglevel error -y -loop 1 -i guide7.jpg -t 15 -vf "$VF" -an -c:v libx264 -preset veryfast -crf 20 /tmp/guide/07.mp4
-          ffmpeg -hide_banner -loglevel error -y -loop 1 -i guide8.jpg -t 15 -vf "$VF" -an -c:v libx264 -preset veryfast -crf 20 /tmp/guide/08.mp4
-          ffmpeg -hide_banner -loglevel error -y -loop 1 -i guide9.jpg -t 15 -vf "$VF" -an -c:v libx264 -preset veryfast -crf 20 /tmp/guide/09.mp4
+          ffmpeg -hide_banner -loglevel error -y -loop 1 -i guide7.png -t 15 -vf "$VF" -an -c:v libx264 -preset veryfast -crf 20 /tmp/guide/07.mp4
+          ffmpeg -hide_banner -loglevel error -y -loop 1 -i guide8.png -t 15 -vf "$VF" -an -c:v libx264 -preset veryfast -crf 20 /tmp/guide/08.mp4
+          ffmpeg -hide_banner -loglevel error -y -loop 1 -i guide9.png -t 15 -vf "$VF" -an -c:v libx264 -preset veryfast -crf 20 /tmp/guide/09.mp4
 
           # Original screen 10
           ffmpeg -hide_banner -loglevel error -y -ss 90 -i "$SRC" -t 15 -an -vf "$VF" -c:v libx264 -preset veryfast -crf 20 /tmp/guide/10.mp4
