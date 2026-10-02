@@ -1598,6 +1598,133 @@ function v330Print(){
   document.addEventListener('click',intercept,true);
 })();
 </script>
+
+<script id="v423FinalOnboardingSequence">
+(function(){
+  // FINAL APPROVED FLOW:
+  // 설치안내 종료/앱 첫 실행 -> 두루마리 -> 승인요청 -> 안내동영상 -> 승인완료 후 홈
+  const FINAL_INTRO_KEY='freedom_intro_campaign_V423_FINAL_FLOW';
+
+  function readApproval(){
+    try{
+      if(window.AndroidHost && typeof AndroidHost.getSpecialApprovalSummary==='function'){
+        const raw=AndroidHost.getSpecialApprovalSummary();
+        return typeof raw==='string'?JSON.parse(raw||'{}'):(raw||{});
+      }
+    }catch(e){}
+    return {};
+  }
+
+  function introSeen(){
+    try{return localStorage.getItem(FINAL_INTRO_KEY)==='1'}catch(e){return false}
+  }
+  function markIntro(){
+    try{localStorage.setItem(FINAL_INTRO_KEY,'1')}catch(e){}
+  }
+
+  function ensureGate(){
+    let g=document.getElementById('startupVideoGate');
+    if(!g){
+      g=document.createElement('div');
+      g.id='startupVideoGate';
+      g.style.cssText='position:fixed;inset:0;z-index:2147483300;background:#00152a;color:#fff;display:flex;align-items:center;justify-content:center;font-family:system-ui,-apple-system,Noto Sans KR,sans-serif';
+      document.body.appendChild(g);
+    }
+    document.body.style.overflow='hidden';
+    return g;
+  }
+
+  function showFinalScroll(){
+    window.__onboardingSequenceActive=true;
+    const g=ensureGate();
+    g.innerHTML=`
+      <div style="position:absolute;inset:0;background:#00152a;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px">
+        <img src="welcome_scroll_final.png" alt="항행의자유 환영 두루마리" style="display:block;max-width:100%;max-height:88vh;width:auto;height:auto;object-fit:contain;border-radius:14px;box-shadow:0 12px 42px rgba(0,0,0,.55)">
+        <button id="finalScrollNext" type="button" style="margin-top:10px;min-width:240px;border:1px solid #e2c66d;background:linear-gradient(#8d6b1c,#493407);color:#fff3b0;border-radius:15px;padding:13px 22px;font-size:17px;font-weight:900;box-shadow:0 6px 18px rgba(0,0,0,.4);touch-action:manipulation">다음 · 승인요청</button>
+      </div>`;
+    const b=document.getElementById('finalScrollNext');
+    if(b){
+      const go=(ev)=>{
+        if(ev){ev.preventDefault();ev.stopPropagation();}
+        try{g.remove();}catch(e){}
+        document.body.style.overflow='';
+        setTimeout(()=>{try{if(window.showApprovalHardLock)window.showApprovalHardLock();}catch(e){}},60);
+      };
+      b.addEventListener('click',go,{once:true});
+      b.addEventListener('pointerup',go,{once:true});
+    }
+  }
+  window.showFinalScroll=showFinalScroll;
+
+  // Wrap approval callback: once request is accepted (pending), show 안내동영상.
+  const prevApprovalState=window.onSpecialApprovalState;
+  window.onSpecialApprovalState=function(p){
+    try{if(typeof prevApprovalState==='function')prevApprovalState(p);}catch(e){}
+    let q={};
+    try{q=typeof p==='string'?JSON.parse(p||'{}'):(p||{});}catch(e){}
+    if((q.status==='pending'||q.has_request===true) && !introSeen()){
+      try{
+        const lock=document.getElementById('approvalHardLock');
+        if(lock)lock.remove();
+        document.body.style.overflow='';
+      }catch(e){}
+      setTimeout(()=>{
+        try{
+          if(typeof window.startFreedomIntroVideo==='function') window.startFreedomIntroVideo();
+        }catch(e){}
+      },120);
+    }
+  };
+
+  // Replace first-run entry point after all legacy scripts load.
+  function finalBoot(){
+    const q=readApproval();
+    if(q.approved===true){
+      try{
+        const g=document.getElementById('startupVideoGate'); if(g)g.remove();
+        const lock=document.getElementById('approvalHardLock'); if(lock)lock.remove();
+        document.body.style.overflow='';
+        window.__onboardingSequenceActive=false;
+        if(window.unlockApprovedApp)window.unlockApprovedApp();
+      }catch(e){}
+      return;
+    }
+
+    if(q.has_request===true){
+      if(!introSeen()){
+        try{
+          const lock=document.getElementById('approvalHardLock'); if(lock)lock.remove();
+          if(typeof window.startFreedomIntroVideo==='function')window.startFreedomIntroVideo();
+        }catch(e){}
+      }else{
+        try{if(window.showApprovalHardLock)window.showApprovalHardLock();}catch(e){}
+      }
+      return;
+    }
+
+    showFinalScroll();
+  }
+
+  // 안내동영상 완료를 감지해 다음 상태로 정리.
+  document.addEventListener('ended',function(ev){
+    if(ev.target && ev.target.id==='startupSequenceVideo'){
+      markIntro();
+      setTimeout(()=>{
+        const q=readApproval();
+        if(q.approved===true){
+          try{if(window.unlockApprovedApp)window.unlockApprovedApp();}catch(e){}
+        }else{
+          try{if(window.showApprovalHardLock)window.showApprovalHardLock();}catch(e){}
+        }
+      },250);
+    }
+  },true);
+
+  // Legacy auto-starts finish first; then enforce the approved final flow.
+  window.addEventListener('load',()=>setTimeout(finalBoot,900),{once:true});
+})();
+</script>
+
 </body></html>`);
  w.document.close();setTimeout(()=>{try{w.print()}catch(e){}},250);
 }
