@@ -67,7 +67,7 @@ h1{margin:0 0 8px;color:#ffe39a;font-size:30px}
 </div>
 <button id="downloadBtn" class="btn" type="button" disabled style="opacity:.45" onclick="downloadLatestApk()">최신 V3 업데이트 설치</button>
 <div class="ok">배포 파일: FREEDOM_V4_0_23_FINAL_ONBOARDING-debug.apk</div>
-<div class="note">영상은 일시중지·되돌리기·재생바 이동·종료가 가능합니다.</div>
+<div class="note">영상은 일시중지·재생바 앞뒤 이동·종료가 가능하며, 화면과 노래가 같은 위치로 함께 이동합니다.</div>
 </div>
 <script>
 let SESSION_ACTIVE=false;
@@ -226,9 +226,48 @@ window.addEventListener('load',()=>{
   const a=document.getElementById('guideSongAudio');
 
   if(v){
-    v.addEventListener('play',()=>{ try{ if(a){a.currentTime=Math.min(v.currentTime||0,a.duration||v.currentTime||0);a.play().catch(()=>{});} }catch(e){} });
-    v.addEventListener('pause',()=>{ try{ if(a && !v.ended)a.pause(); }catch(e){} });
-    v.addEventListener('seeking',()=>{ try{ if(a)a.currentTime=Math.min(v.currentTime||0,a.duration||v.currentTime||0); }catch(e){} });
+    let __wasPlayingBeforeSeek=false;
+    const syncAudioToVideo=()=>{
+      try{
+        if(!a)return;
+        const target=Math.max(0,Number(v.currentTime||0));
+        const max=Number.isFinite(a.duration)&&a.duration>0?a.duration:target;
+        a.currentTime=Math.min(target,max);
+      }catch(e){}
+    };
+    v.addEventListener('play',()=>{
+      try{
+        SESSION_ACTIVE=true;
+        syncAudioToVideo();
+        if(a&&a.paused)a.play().catch(()=>{});
+      }catch(e){}
+    });
+    v.addEventListener('pause',()=>{
+      try{ if(a && !v.ended)a.pause(); }catch(e){}
+    });
+    v.addEventListener('seeking',()=>{
+      try{
+        __wasPlayingBeforeSeek=!v.paused;
+        if(a&&!a.paused)a.pause();
+        syncAudioToVideo();
+      }catch(e){}
+    });
+    v.addEventListener('seeked',()=>{
+      try{
+        syncAudioToVideo();
+        if(__wasPlayingBeforeSeek || !v.paused){
+          if(a)a.play().catch(()=>{});
+          if(v.paused)v.play().catch(()=>{});
+        }
+      }catch(e){}
+    });
+    v.addEventListener('timeupdate',()=>{
+      try{
+        if(!a||v.seeking||a.seeking)return;
+        const drift=Math.abs((a.currentTime||0)-(v.currentTime||0));
+        if(drift>0.35) syncAudioToVideo();
+      }catch(e){}
+    });
     v.addEventListener('ended',()=>{
       GUIDE_ENDED=true;
       const a=document.getElementById('guideSongAudio');
