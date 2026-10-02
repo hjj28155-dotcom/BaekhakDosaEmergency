@@ -4,7 +4,7 @@ on:
     paths:
       - '.github/workflows/build-v422-direct-fix.yml'
 permissions:
-  contents: read
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -29,3 +29,12 @@ jobs:
           name: FREEDOM_V4_0_22_UPDATE_CLOSE_BUTTON_FIX
           path: FREEDOM_V4_0_22_UPDATE_CLOSE_BUTTON_FIX-debug.apk
           if-no-files-found: error
+      - name: Publish direct APK
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f FREEDOM_V4_0_22_UPDATE_CLOSE_BUTTON_FIX-debug.apk
+          git commit -m "Publish Freedom V4.0.22 direct update APK" || exit 0
+          git pull --rebase
+          git push
