@@ -1,5 +1,4 @@
-name: Build install guide 1-6 plus 10
-# retrigger 20261002-1to6-plus10
+name: Build final installation guide 1-10
 on:
   push:
     paths:
@@ -15,29 +14,47 @@ jobs:
         run: |
           sudo apt-get update -y
           sudo apt-get install -y ffmpeg
-      - name: Build installation guide 1 through 6 plus original 10
+      - name: Download approved screens 7 8 9
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-a708-8206-ab47-11a3ddf1cb2e/raw?se=2026-10-02T01%3A43%3A42Z&sp=r&sv=2026-02-06&sr=b&scid=5a3385a2-19b7-534d-973f-8e5699ab215f&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-02T01%3A23%3A14Z&ske=2026-10-03T01%3A23%3A14Z&sks=b&skv=2026-02-06&sig=vlBnsTPMXWPjcEqyqoLS/Ck%2B4kXoFoORX0/Yo5Zb%2Bh8%3D' -o guide7.jpg
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-3968-8206-8d65-fb2cf7e348d2/raw?se=2026-10-02T01%3A43%3A45Z&sp=r&sv=2026-02-06&sr=b&scid=94bec8fa-986d-594f-8e61-116c0c060d8e&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-02T01%3A23%3A16Z&ske=2026-10-03T01%3A23%3A16Z&sks=b&skv=2026-02-06&sig=48W7ZAKX6z8BhpIelrhW49WURpK8rh9Ge2g2EUk2DPQ%3D' -o guide8.jpg
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-ee28-8206-8959-4df634c458d5/raw?se=2026-10-02T01%3A43%3A47Z&sp=r&sv=2026-02-06&sr=b&scid=92c84a7b-4ac1-59d1-a142-e8c3489ab562&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-02T00%3A57%3A03Z&ske=2026-10-03T00%3A57%3A03Z&sks=b&skv=2026-02-06&sig=rD%2BWEnoNDHefuvBLMzkHmGRDj8txu/LynlkAsDih%2BXc%3D' -o guide9.jpg
+          test -s guide7.jpg
+          test -s guide8.jpg
+          test -s guide9.jpg
+      - name: Build exact 1 through 10 guide
         run: |
           set -euo pipefail
           SRC="build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/install_guide_final.mp4"
           test -f "$SRC"
-
           mkdir -p /tmp/guide
+          VF="scale=864:1536:force_original_aspect_ratio=decrease,pad=864:1536:(ow-iw)/2:(oh-ih)/2:black,fps=30,format=yuv420p"
 
-          # Original screens 1~6.
-          ffmpeg -hide_banner -loglevel error -y             -ss 0 -i "$SRC" -t 90 -an             -vf "fps=30,format=yuv420p"             -c:v libx264 -preset veryfast -crf 20 /tmp/guide/pre.mp4
+          # Original screens 1~6
+          ffmpeg -hide_banner -loglevel error -y -ss 0 -i "$SRC" -t 90 -an -vf "$VF" -c:v libx264 -preset veryfast -crf 20 /tmp/guide/01_06.mp4
 
-          # Original screen 10 only. 7/8/9 stay OUT of this installation video.
-          ffmpeg -hide_banner -loglevel error -y             -ss 90 -i "$SRC" -t 15 -an             -vf "fps=30,format=yuv420p"             -c:v libx264 -preset veryfast -crf 20 /tmp/guide/post10.mp4
+          # Approved screens 7, 8, 9 — 15 seconds each
+          ffmpeg -hide_banner -loglevel error -y -loop 1 -i guide7.jpg -t 15 -vf "$VF" -an -c:v libx264 -preset veryfast -crf 20 /tmp/guide/07.mp4
+          ffmpeg -hide_banner -loglevel error -y -loop 1 -i guide8.jpg -t 15 -vf "$VF" -an -c:v libx264 -preset veryfast -crf 20 /tmp/guide/08.mp4
+          ffmpeg -hide_banner -loglevel error -y -loop 1 -i guide9.jpg -t 15 -vf "$VF" -an -c:v libx264 -preset veryfast -crf 20 /tmp/guide/09.mp4
 
-          # Concatenate 1~6 + 10. Add silent audio track; page music remains separate.
-          ffmpeg -hide_banner -loglevel error -y             -i /tmp/guide/pre.mp4             -i /tmp/guide/post10.mp4             -f lavfi -i "anullsrc=r=48000:cl=stereo"             -filter_complex "[0:v]setpts=PTS-STARTPTS[v0];[1:v]setpts=PTS-STARTPTS[v1];[v0][v1]concat=n=2:v=1:a=0[v]"             -map "[v]" -map 2:a -t 105             -c:v libx264 -preset veryfast -crf 20 -pix_fmt yuv420p             -c:a aac -b:a 96k freedom_guide_latest.mp4
+          # Original screen 10
+          ffmpeg -hide_banner -loglevel error -y -ss 90 -i "$SRC" -t 15 -an -vf "$VF" -c:v libx264 -preset veryfast -crf 20 /tmp/guide/10.mp4
 
-          ffprobe -v error -show_entries format=duration,size -of default=nw=1 freedom_guide_latest.mp4
+          printf "file '/tmp/guide/01_06.mp4'\nfile '/tmp/guide/07.mp4'\nfile '/tmp/guide/08.mp4'\nfile '/tmp/guide/09.mp4'\nfile '/tmp/guide/10.mp4'\n" > /tmp/guide/list.txt
+
+          ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i /tmp/guide/list.txt -c copy /tmp/guide/video.mp4
+
+          # Add silent audio track. Page music is synchronized separately.
+          ffmpeg -hide_banner -loglevel error -y -i /tmp/guide/video.mp4 -f lavfi -i "anullsrc=r=48000:cl=stereo"             -map 0:v:0 -map 1:a:0 -t 150 -c:v copy -c:a aac -b:a 96k freedom_guide_latest.mp4
+
           D=$(ffprobe -v error -show_entries format=duration -of csv=p=0 freedom_guide_latest.mp4)
-          awk "BEGIN{exit !($D > 100 && $D < 110)}"
-          test "$(stat -c%s freedom_guide_latest.mp4)" -gt 1000000
-
-      - name: Publish corrected guide
+          S=$(stat -c%s freedom_guide_latest.mp4)
+          echo "duration=$D size=$S"
+          awk "BEGIN{exit !($D > 149 && $D < 151)}"
+          test "$S" -gt 1000000
+      - name: Publish final 1-10 guide
         run: |
           set -euo pipefail
           cp freedom_guide_latest.mp4 /tmp/freedom_guide_latest.mp4
@@ -47,5 +64,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add freedom_guide_latest.mp4
-          git commit -m "Publish installation guide screens 1-6 and 10 only" || exit 0
+          git commit -m "Publish approved installation guide screens 1 through 10" || exit 0
           git push origin main
