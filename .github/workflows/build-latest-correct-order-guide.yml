@@ -1,5 +1,5 @@
-name: Build latest correct-order installation guide
-# retrigger 20261002-real789-final2
+name: Build install guide first 6 only
+# retrigger 20261002-first6-only
 on:
   push:
     paths:
@@ -11,79 +11,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install video and browser tools
+      - name: Install ffmpeg
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y ffmpeg fonts-noto-cjk
-          npm init -y >/dev/null 2>&1
-          npm install playwright >/dev/null 2>&1
-          npx playwright install chromium >/dev/null 2>&1
-
-      - name: Capture the real approval-request screen from the app
-        run: |
-          set -euo pipefail
-          python3 -m http.server 8000 >/tmp/http.log 2>&1 &
-          SERVER_PID=$!
-          trap 'kill $SERVER_PID || true' EXIT
-          sleep 2
-          cat > capture.mjs <<'EOF'
-          import { chromium } from 'playwright';
-          const browser = await chromium.launch({headless:true});
-          const page = await browser.newPage({viewport:{width:864,height:1536}, deviceScaleFactor:1});
-          await page.goto('http://127.0.0.1:8000/build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/index.html',{waitUntil:'domcontentloaded'});
-          await page.waitForTimeout(1500);
-          await page.evaluate(() => {
-            try {
-              window.SPECIAL_APPROVED=false;
-              if (window.D) window.D.pendingSpecialRound=1243;
-              if (typeof window.specialApprovalPage === 'function') window.specialApprovalPage();
-            } catch(e) {}
-          });
-          await page.waitForTimeout(500);
-          await page.screenshot({path:'/tmp/approval_real.png'});
-          await browser.close();
-          EOF
-          node capture.mjs
-          test -s /tmp/approval_real.png
-
-      - name: Build guide using only real app visuals for steps 7 8 9
+          sudo apt-get install -y ffmpeg
+      - name: Build installation guide 1 through 6 only
         run: |
           set -euo pipefail
           SRC="build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/install_guide_final.mp4"
-          SCROLL="build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/welcome_scroll_final.png"
-          INTRO="build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/freedom_onboarding_postscroll_20260928.mp4"
           test -f "$SRC"
-          test -f "$SCROLL"
-          test -f "$INTRO"
-          mkdir -p /tmp/guide
-
-          # Original approved installation-guide visuals: steps 1~6.
-          ffmpeg -hide_banner -loglevel error -y -ss 0 -i "$SRC" -t 90 -an             -vf "fps=30,scale=864:1536:force_original_aspect_ratio=decrease,pad=864:1536:(ow-iw)/2:(oh-ih)/2:black,format=yuv420p"             -c:v libx264 -preset veryfast -crf 20 /tmp/guide/pre.mp4
-
-          # Step 7: the exact welcome-scroll image that the installed app uses.
-          ffmpeg -hide_banner -loglevel error -y -loop 1 -i "$SCROLL" -t 15 -an             -vf "fps=30,scale=864:1536:force_original_aspect_ratio=decrease,pad=864:1536:(ow-iw)/2:(oh-ih)/2:black,format=yuv420p"             -c:v libx264 -preset veryfast -crf 20 /tmp/guide/step7.mp4
-
-          # Step 8: the actual approval-request modal rendered from the app's own HTML/CSS.
-          ffmpeg -hide_banner -loglevel error -y -loop 1 -i /tmp/approval_real.png -t 15 -an             -vf "fps=30,scale=864:1536:force_original_aspect_ratio=decrease,pad=864:1536:(ow-iw)/2:(oh-ih)/2:black,format=yuv420p"             -c:v libx264 -preset veryfast -crf 20 /tmp/guide/step8.mp4
-
-          # Step 9: use the app's real guidance/onboarding video itself, not a fabricated slide.
-          ffmpeg -hide_banner -loglevel error -y -ss 0 -i "$INTRO" -t 15 -an             -vf "fps=30,scale=864:1536:force_original_aspect_ratio=decrease,pad=864:1536:(ow-iw)/2:(oh-ih)/2:black,format=yuv420p"             -c:v libx264 -preset veryfast -crf 20 /tmp/guide/step9.mp4
-
-          # Original final screen 10 from the approved guide.
-          ffmpeg -hide_banner -loglevel error -y -ss 90 -i "$SRC" -t 15 -an             -vf "fps=30,scale=864:1536:force_original_aspect_ratio=decrease,pad=864:1536:(ow-iw)/2:(oh-ih)/2:black,format=yuv420p"             -c:v libx264 -preset veryfast -crf 20 /tmp/guide/post.mp4
-
-          ffmpeg -hide_banner -loglevel error -y             -i /tmp/guide/pre.mp4             -i /tmp/guide/step7.mp4             -i /tmp/guide/step8.mp4             -i /tmp/guide/step9.mp4             -i /tmp/guide/post.mp4             -f lavfi -i "anullsrc=r=48000:cl=stereo"             -filter_complex "[0:v]setpts=PTS-STARTPTS[v0];[1:v]setpts=PTS-STARTPTS[v1];[2:v]setpts=PTS-STARTPTS[v2];[3:v]setpts=PTS-STARTPTS[v3];[4:v]setpts=PTS-STARTPTS[v4];[v0][v1][v2][v3][v4]concat=n=5:v=1:a=0[v]"             -map "[v]" -map 5:a -t 150             -c:v libx264 -preset veryfast -crf 21 -pix_fmt yuv420p             -c:a aac -b:a 96k freedom_guide_latest.mp4
-
+          ffmpeg -hide_banner -loglevel error -y -ss 0 -i "$SRC" -t 90 -an             -vf "fps=30,format=yuv420p"             -c:v libx264 -preset veryfast -crf 20             -f lavfi -i "anullsrc=r=48000:cl=stereo"             -map 0:v:0 -map 1:a:0 -t 90             -c:a aac -b:a 96k freedom_guide_latest.mp4
           ffprobe -v error -show_entries format=duration,size -of default=nw=1 freedom_guide_latest.mp4
-          D=$(ffprobe -v error -show_entries format=duration -of csv=p=0 freedom_guide_latest.mp4)
-          awk "BEGIN{exit !($D > 145 && $D < 155)}"
-          test "$(stat -c%s freedom_guide_latest.mp4)" -gt 1000000
-
-      - name: Publish corrected real-screen guide
+      - name: Publish first 6 only
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add freedom_guide_latest.mp4
-          git commit -m "Use real app screens for guide steps 7 8 9" || exit 0
+          git commit -m "Keep post-install steps 7 8 9 out of installation video" || exit 0
           git push
