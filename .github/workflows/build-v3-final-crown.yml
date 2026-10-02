@@ -1,4 +1,4 @@
-name: Build Freedom V3 Final Crown
+name: Build Freedom V3 Final Crown No Approval
 on:
   push:
     paths:
@@ -14,7 +14,7 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - name: Build V3 final crown APK
+      - name: Build V3 final crown no-approval APK
         working-directory: build405/FREEDOM_V402_BUILD_THIS
         run: |
           set -euo pipefail
