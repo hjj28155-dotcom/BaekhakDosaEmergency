@@ -1,5 +1,5 @@
-name: Build install guide first 6 only
-# retrigger 20261002-first6-only
+name: Build install guide 1-6 plus 10
+# retrigger 20261002-1to6-plus10
 on:
   push:
     paths:
@@ -15,17 +15,32 @@ jobs:
         run: |
           sudo apt-get update -y
           sudo apt-get install -y ffmpeg
-      - name: Build installation guide 1 through 6 only
+      - name: Build installation guide 1 through 6 plus original 10
         run: |
           set -euo pipefail
           SRC="build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/install_guide_final.mp4"
           test -f "$SRC"
-          ffmpeg -hide_banner -loglevel error -y -ss 0 -i "$SRC" -t 90 -an             -vf "fps=30,format=yuv420p"             -c:v libx264 -preset veryfast -crf 20             -f lavfi -i "anullsrc=r=48000:cl=stereo"             -map 0:v:0 -map 1:a:0 -t 90             -c:a aac -b:a 96k freedom_guide_latest.mp4
+
+          mkdir -p /tmp/guide
+
+          # Original screens 1~6.
+          ffmpeg -hide_banner -loglevel error -y             -ss 0 -i "$SRC" -t 90 -an             -vf "fps=30,format=yuv420p"             -c:v libx264 -preset veryfast -crf 20 /tmp/guide/pre.mp4
+
+          # Original screen 10 only. 7/8/9 stay OUT of this installation video.
+          ffmpeg -hide_banner -loglevel error -y             -ss 90 -i "$SRC" -t 15 -an             -vf "fps=30,format=yuv420p"             -c:v libx264 -preset veryfast -crf 20 /tmp/guide/post10.mp4
+
+          # Concatenate 1~6 + 10. Add silent audio track; page music remains separate.
+          ffmpeg -hide_banner -loglevel error -y             -i /tmp/guide/pre.mp4             -i /tmp/guide/post10.mp4             -f lavfi -i "anullsrc=r=48000:cl=stereo"             -filter_complex "[0:v]setpts=PTS-STARTPTS[v0];[1:v]setpts=PTS-STARTPTS[v1];[v0][v1]concat=n=2:v=1:a=0[v]"             -map "[v]" -map 2:a -t 105             -c:v libx264 -preset veryfast -crf 20 -pix_fmt yuv420p             -c:a aac -b:a 96k freedom_guide_latest.mp4
+
           ffprobe -v error -show_entries format=duration,size -of default=nw=1 freedom_guide_latest.mp4
-      - name: Publish first 6 only
+          D=$(ffprobe -v error -show_entries format=duration -of csv=p=0 freedom_guide_latest.mp4)
+          awk "BEGIN{exit !($D > 100 && $D < 110)}"
+          test "$(stat -c%s freedom_guide_latest.mp4)" -gt 1000000
+
+      - name: Publish corrected guide
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add freedom_guide_latest.mp4
-          git commit -m "Keep post-install steps 7 8 9 out of installation video" || exit 0
+          git commit -m "Publish installation guide screens 1-6 and 10 only" || exit 0
           git push
