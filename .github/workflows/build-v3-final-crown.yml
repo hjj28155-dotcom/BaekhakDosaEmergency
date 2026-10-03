@@ -40,5 +40,14 @@ jobs:
           git add -f "항행의자유_왕관앱_V3_1244당첨결과수정_R4_20261004.apk"
           git commit -m "Publish Freedom V3 update stats fix APK" || exit 0
           git reset --hard HEAD
-          git pull --rebase origin main
-          git push origin main
+          pushed=0
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git rebase origin/main
+            if git push origin HEAD:main; then
+              pushed=1
+              break
+            fi
+            sleep 2
+          done
+          test "$pushed" = "1"
