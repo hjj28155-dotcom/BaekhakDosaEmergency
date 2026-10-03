@@ -1666,37 +1666,85 @@ public class MainActivity extends Activity {
         }
     }
 
+    private static final String LATEST_APK_URL =
+            "https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/latest-apk";
+
     private void chooseApkUpdateFile() {
-        runOnUiThread(() -> {
-            // STAGE4.35: 업데이트 경로는 Samsung 내 파일로만 고정합니다.
-            // 시스템 ACTION_OPEN_DOCUMENT/GET_CONTENT는 사용하지 않으므로
-            // AndroidIDE/A-IDE가 파일선택 요청을 가로챌 수 없습니다.
-            try {
-                Intent s = new Intent("com.sec.android.app.myfiles.PICK_DATA");
-                s.setPackage("com.sec.android.app.myfiles");
-                s.putExtra("CONTENT_TYPE", "*/*");
-                s.putExtra("FOLDERPATH", "/storage/emulated/0/Download");
-                s.addCategory(Intent.CATEGORY_DEFAULT);
-                s.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                startActivityForResult(s, APK_UPDATE_PICKER);
-                Toast.makeText(this, "내 파일에서 업데이트 APK를 선택해 주세요.", Toast.LENGTH_SHORT).show();
-                return;
-            } catch (Exception ignored) {}
-
-            // PICK_DATA를 지원하지 않는 Samsung 버전은 내 파일 앱 자체를 엽니다.
-            // 사용자가 Download 폴더의 APK를 누르면 Android 설치 화면으로 이어집니다.
-            try {
-                Intent launch = getPackageManager().getLaunchIntentForPackage("com.sec.android.app.myfiles");
-                if (launch != null) {
-                    launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(launch);
-                    Toast.makeText(this, "내 파일의 Download 폴더에서 업데이트 APK를 눌러 설치해 주세요.", Toast.LENGTH_LONG).show();
-                    return;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            runOnUiThread(() -> {
+                try {
+                    Intent s = new Intent("com.sec.android.app.myfiles.PICK_DATA");
+                    s.setPackage("com.sec.android.app.myfiles");
+                    s.putExtra("CONTENT_TYPE", "*/*");
+                    s.putExtra("FOLDERPATH", "/storage/emulated/0/Download");
+                    s.addCategory(Intent.CATEGORY_DEFAULT);
+                    s.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    startActivityForResult(s, APK_UPDATE_PICKER);
+                    Toast.makeText(this, "내 파일에서 업데이트 APK를 선택해 주세요.", Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                    Toast.makeText(this, "업데이트 파일 선택기를 열지 못했습니다.", Toast.LENGTH_LONG).show();
                 }
-            } catch (Exception ignored) {}
+            });
+            return;
+        }
 
-            Toast.makeText(this, "Samsung 내 파일 앱을 열지 못했습니다.", Toast.LENGTH_LONG).show();
-        });
+        Toast.makeText(this, "최신 업데이트를 다운로드합니다.", Toast.LENGTH_SHORT).show();
+        new Thread(() -> {
+            HttpURLConnection conn = null;
+            Uri apkUri = null;
+            try {
+                URL url = new URL(LATEST_APK_URL);
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.setConnectTimeout(20000);
+                conn.setReadTimeout(120000);
+                conn.setInstanceFollowRedirects(true);
+                conn.setUseCaches(false);
+                conn.setRequestProperty("Accept", "application/vnd.android.package-archive, application/octet-stream, */*");
+                conn.setRequestProperty("User-Agent", "FreedomApp/" + CONTENT_BUILD);
+
+                int code = conn.getResponseCode();
+                if (code < 200 || code >= 300) throw new Exception("HTTP " + code);
+
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Downloads.DISPLAY_NAME, "항행의자유_최신업데이트_" + (CONTENT_BUILD + 1) + ".apk");
+                values.put(MediaStore.Downloads.MIME_TYPE, "application/vnd.android.package-archive");
+                values.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+                values.put(MediaStore.Downloads.IS_PENDING, 1);
+
+                apkUri = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+                if (apkUri == null) throw new Exception("다운로드 파일 생성 실패");
+
+                try (InputStream in = conn.getInputStream();
+                     OutputStream out = getContentResolver().openOutputStream(apkUri, "w")) {
+                    if (out == null) throw new Exception("다운로드 저장 실패");
+                    byte[] buf = new byte[64 * 1024];
+                    int n;
+                    while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+                    out.flush();
+                }
+
+                ContentValues done = new ContentValues();
+                done.put(MediaStore.Downloads.IS_PENDING, 0);
+                getContentResolver().update(apkUri, done, null, null);
+
+                final Uri installUri = apkUri;
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "다운로드 완료 · 설치 화면을 엽니다.", Toast.LENGTH_SHORT).show();
+                    launchApkInstaller(installUri);
+                });
+            } catch (Exception e) {
+                final Uri failedUri = apkUri;
+                try {
+                    if (failedUri != null) getContentResolver().delete(failedUri, null, null);
+                } catch (Exception ignored) {}
+                final String msg = e.getMessage() == null ? "업데이트 다운로드 실패" : e.getMessage();
+                runOnUiThread(() ->
+                        Toast.makeText(this, "업데이트 다운로드 실패: " + msg, Toast.LENGTH_LONG).show());
+            } finally {
+                if (conn != null) conn.disconnect();
+            }
+        }, "Freedom-ApkUpdate").start();
     }
 
     private void launchApkInstaller(Uri uri) {
