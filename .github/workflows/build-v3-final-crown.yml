@@ -23,21 +23,21 @@ jobs:
           set -euo pipefail
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
-          APK=$(find app/build/outputs/apk/debug -type f -name 'HANGHAE_FREEDOM_V4_0_26_RESULT_1244_FIX_R5-debug.apk' | head -1)
+          APK=$(find app/build/outputs/apk/debug -type f -name 'HANGHAE_FREEDOM_V4_0_27_DIRECT_UPDATE_FIX_R6-debug.apk' | head -1)
           test -s "$APK"
-          cp "$APK" "$GITHUB_WORKSPACE/항행의자유_V4.0.26_1244당첨결과수정_R5.apk"
-          sha256sum "$GITHUB_WORKSPACE/항행의자유_V4.0.26_1244당첨결과수정_R5.apk"
+          cp "$APK" "$GITHUB_WORKSPACE/항행의자유_V4.0.27_직접업데이트수정_R6.apk"
+          sha256sum "$GITHUB_WORKSPACE/항행의자유_V4.0.27_직접업데이트수정_R6.apk"
       - uses: actions/upload-artifact@v4
         with:
-          name: HANGHAE_FREEDOM_V4_0_26_RESULT_1244_FIX_R5
-          path: 항행의자유_V4.0.26_1244당첨결과수정_R5.apk
+          name: HANGHAE_FREEDOM_V4_0_27_DIRECT_UPDATE_FIX_R6
+          path: 항행의자유_V4.0.27_직접업데이트수정_R6.apk
           if-no-files-found: error
       - name: Publish direct APK
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f "항행의자유_V4.0.26_1244당첨결과수정_R5.apk"
+          git add -f "항행의자유_V4.0.27_직접업데이트수정_R6.apk"
           git commit -m "Publish Freedom V3 update stats fix APK" || exit 0
           git reset --hard HEAD
           pushed=0
