@@ -1242,7 +1242,26 @@ function updateCheckPage(){let nm=getLocalUpdateName();modal('업데이트 확�
 let __namedUpdatePayload=null;
 function saveUpdateDisplayName(){let n=(document.getElementById('updateDisplayName')?.value||'').trim();let m=document.getElementById('updateNameSaveMsg');if(!n){if(m)m.textContent='실명을 입력해 주세요.';return}if(/[0-9@]/.test(n)){if(m)m.textContent='이름만 입력해 주세요. 전화번호·이메일은 저장하지 않습니다.';return}try{AndroidHost.setUpdateDisplayNameAndReport(n);if(m)m.textContent='저장하고 현재 버전을 등록하는 중입니다...'}catch(e){if(m)m.textContent='등록 기능을 실행할 수 없습니다.'}}
 function onUpdateNameSaved(ok,msg){let m=document.getElementById('updateNameSaveMsg');if(m)m.textContent=ok?('이름 저장 완료: '+msg):String(msg||'저장 실패');if(ok)setTimeout(loadNamedUpdateStats,900)}
-function loadNamedUpdateStats(){let t=document.getElementById('namedUpdateTarget');if(t)t.textContent='서버에서 이름별 업데이트 현황을 불러오는 중입니다...';try{if(window.AndroidHost&&AndroidHost.requestNamedUpdateStats){AndroidHost.requestNamedUpdateStats();return}}catch(e){}if(t)t.textContent='업데이트 확인 서버에 연결할 수 없습니다.'}
+async function loadNamedUpdateStats(){
+  let t=document.getElementById('namedUpdateTarget'),h=document.getElementById('namedUpdateByDate');
+  if(t)t.textContent='서버에서 이름별 업데이트 현황을 불러오는 중입니다...';
+  if(h)h.textContent='불러오는 중입니다...';
+  try{
+    const r=await fetch('https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/app-update-heartbeat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-app-key':'bxuiC99t7w3AG6PtIe-b3ui3xiIqRsRh-OKw0LU26qk'},
+      body:JSON.stringify({action:'named_stats'}),
+      cache:'no-store'
+    });
+    const p=await r.json();
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    onNamedUpdateStats(p);
+    return;
+  }catch(e){
+    if(t)t.textContent='현황 불러오기 실패 · 서버 연결을 다시 확인해 주세요.';
+    if(h)h.textContent='업데이트 이력을 불러오지 못했습니다.';
+  }
+}
 function fmtUpdateDT(v){try{let d=new Date(v);return {date:d.toLocaleDateString('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit'}),time:d.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})}}catch(e){return {date:String(v||''),time:''}}}
 function onNamedUpdateStats(p){try{p=typeof p==='string'?JSON.parse(p):p||{};__namedUpdatePayload=p;let s=document.getElementById('namedUpdateSummary'),t=document.getElementById('namedUpdateTarget');if(!p.ok){if(t)t.textContent='현황 불러오기 실패 · 인터넷 연결을 확인해 주세요.';return}let total=Number(p.total_names||0),up=Number(p.updated_count||0),old=Number(p.not_updated_count||0);if(s)s.innerHTML=`<div class="stat"><strong>${total}</strong><span>등록 이름</span></div><div class="stat"><strong>${up}</strong><span>최신 완료</span></div><div class="stat"><strong>${old}</strong><span>이전 버전</span></div>`;if(t)t.innerHTML=`현재 최신 감지 버전: <b>${esc(p.target_version||'아직 없음')}</b>`;renderNamedUpdateLast();renderNamedUpdateByDate()}catch(e){let t=document.getElementById('namedUpdateTarget');if(t)t.textContent='표시 중 오류가 발생했습니다.'}}
 function renderNamedUpdateLast(){let box=document.getElementById('namedUpdatePeople');if(!box||!__namedUpdatePayload)return;let f=(document.getElementById('updateNameFilter')?.value||'').trim().toLowerCase();let target=Number(__namedUpdatePayload.target_version_code||0);let a=Array.isArray(__namedUpdatePayload.people)?__namedUpdatePayload.people:[];if(f)a=a.filter(x=>String(x.display_name||'').toLowerCase().includes(f));box.innerHTML=a.length?`<table class="table"><thead><tr><th>이름</th><th>상태</th><th>버전</th><th>업데이트</th></tr></thead><tbody>${a.map(x=>{let dt=fmtUpdateDT(x.updated_at),ok=Number(x.version_code||0)===target;return `<tr><td><b>${esc(x.display_name||'')}</b></td><td>${ok?'✅ 최신':'⏳ 이전'}</td><td>${esc(x.version_name||'')}</td><td>${esc(dt.date+' '+dt.time)}</td></tr>`}).join('')}</tbody></table>`:'등록된 이름이 없습니다.'}
