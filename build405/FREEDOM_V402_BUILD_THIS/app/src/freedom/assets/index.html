@@ -1852,6 +1852,58 @@ function v330Print(){
 </script>
 
 
+
+<script id="v430UserUpdatePage">
+(function(){
+  const INFO_URL='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/latest-apk-info';
+
+  window.updatePage=function(){
+    let current='확인 중';
+    try{current=String(AndroidHost.getNativeVersion?AndroidHost.getNativeVersion():'확인불가')}catch(e){}
+    modal('앱 업데이트',
+      '<div class="panel goldline" style="text-align:center">'+
+        '<h3 style="font-size:24px">항행의자유 최신 업데이트</h3>'+
+        '<div style="margin-top:10px">현재 버전: <b>'+esc(current)+'</b></div>'+
+        '<div id="v430LatestInfo" class="small status" style="margin-top:8px">최신 버전을 확인하는 중입니다...</div>'+
+      '</div>'+
+      '<div class="panel">'+
+        '<button id="v430DirectUpdateBtn" class="b gold" type="button" style="width:100%;padding:16px 12px;font-size:18px">⬇ 최신버전 바로 업데이트</button>'+
+        '<div id="v430UpdateStatus" class="small status" style="margin-top:10px;text-align:center">버튼을 누르면 앱 안에서 최신 APK를 내려받고 설치 화면으로 바로 연결합니다.</div>'+
+      '</div>'
+    );
+    const b=document.getElementById('v430DirectUpdateBtn');
+    if(b){
+      const go=function(ev){
+        if(ev){ev.preventDefault();ev.stopPropagation();}
+        const s=document.getElementById('v430UpdateStatus');
+        if(s)s.textContent='최신 APK를 내려받는 중입니다. 잠시만 기다려 주세요.';
+        try{
+          if(window.AndroidHost&&typeof AndroidHost.chooseApkUpdate==='function'){
+            AndroidHost.chooseApkUpdate();
+            return;
+          }
+          if(window.BaekhakNative&&typeof BaekhakNative.chooseApkUpdate==='function'){
+            BaekhakNative.chooseApkUpdate();
+            return;
+          }
+          if(s)s.textContent='업데이트 기능 연결을 찾지 못했습니다.';
+        }catch(e){
+          if(s)s.textContent='업데이트 시작 중 오류가 발생했습니다.';
+        }
+      };
+      b.onclick=go;
+      b.addEventListener('pointerup',go,{passive:false});
+    }
+    fetch(INFO_URL,{cache:'no-store'}).then(r=>r.json()).then(p=>{
+      const q=document.getElementById('v430LatestInfo');
+      if(q)q.innerHTML='서버 최신 버전: <b>'+esc(p.version_name||'확인불가')+'</b>';
+    }).catch(()=>{
+      const q=document.getElementById('v430LatestInfo');
+      if(q)q.textContent='최신 버전 정보는 설치 버튼에서 다시 확인합니다.';
+    });
+  };
+})();
+</script>
 </body></html>`);
  w.document.close();setTimeout(()=>{try{w.print()}catch(e){}},250);
 }
