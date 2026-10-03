@@ -2502,9 +2502,18 @@ window.replayNoticeVideo_unused=function(){
 
  function readApproval(){
    try{
+     if((window.D&&D.specialApprovalUnlocked===true) || window.SPECIAL_APPROVED===true){
+       return {approved:true,status:'approved',restored_from_local:true};
+     }
+   }catch(e){}
+   try{
      if(window.AndroidHost&&typeof AndroidHost.getSpecialApprovalSummary==='function'){
        var raw=AndroidHost.getSpecialApprovalSummary();
-       return typeof raw==='string'?JSON.parse(raw||'{}'):(raw||{});
+       var q=typeof raw==='string'?JSON.parse(raw||'{}'):(raw||{});
+       if(q&&q.approved===true){
+         try{D.specialApprovalUnlocked=true;save();}catch(e){}
+       }
+       return q;
      }
    }catch(e){}
    return {};
@@ -2546,7 +2555,8 @@ window.replayNoticeVideo_unused=function(){
 
  function mount(){
    var q=readApproval();
-   if(q.approved===true){
+   if(q.approved===true || (window.D&&D.specialApprovalUnlocked===true) || window.SPECIAL_APPROVED===true){
+     try{SPECIAL_APPROVED=true;D.specialApprovalUnlocked=true;save();}catch(e){}
      hideLockOnly();
      return;
    }
