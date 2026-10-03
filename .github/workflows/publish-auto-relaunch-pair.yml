@@ -1,0 +1,60 @@
+name: Verify and publish auto relaunch pair
+on:
+  push:
+    paths:
+      - '.github/workflows/publish-auto-relaunch-pair.yml'
+permissions:
+  contents: write
+jobs:
+  verify-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download APKs
+        run: |
+          set -euo pipefail
+          curl -fL 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-ef24-8206-85af-b5a3689597b8/raw?se=2026-10-03T10%3A43%3A06Z&sp=r&sv=2026-02-06&sr=b&scid=33e913f2-1105-5743-a131-76e0e948abfd&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-02T23%3A43%3A17Z&ske=2026-10-03T23%3A43%3A17Z&sks=b&skv=2026-02-06&sig=3ByzOOhmktpFEUSi/YqdTU4NTcd/oCmne/qvk7EzK%2B0%3D' -o NAVIGATOR_V3_0_86_AUTO_RELAUNCH-debug.apk
+          curl -fL 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-4718-8206-af57-3d2acce83e09/raw?se=2026-10-03T10%3A42%3A47Z&sp=r&sv=2026-02-06&sr=b&scid=73c699a7-8be1-5e91-ae1e-cb7172fb5815&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-02T20%3A05%3A56Z&ske=2026-10-03T20%3A05%3A56Z&sks=b&skv=2026-02-06&sig=8yznNQdpvCel77ZM/59yqCylF2B8qsPVnE3pHH6nJ98%3D' -o navigator_old.apk
+          curl -fL 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-ca7c-8206-9933-aafed68bd933/raw?se=2026-10-03T10%3A43%3A06Z&sp=r&sv=2026-02-06&sr=b&scid=dc4b2ec9-7c38-5039-9e11-46e97e5671f9&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-03T01%3A47%3A02Z&ske=2026-10-04T01%3A47%3A02Z&sks=b&skv=2026-02-06&sig=E/sHfw1/V6cj32hF/5NNFbAjMiz2pcM2SeDa%2B8vwR2U%3D' -o FREEDOM_V4_0_26_AUTO_RELAUNCH-debug.apk
+          curl -fL 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-166c-8206-85fe-fd3783523866/raw?se=2026-10-03T10%3A42%3A53Z&sp=r&sv=2026-02-06&sr=b&scid=f88ec410-cc59-58f9-925c-d03da622016c&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-03T02%3A27%3A25Z&ske=2026-10-04T02%3A27%3A25Z&sks=b&skv=2026-02-06&sig=NgqLC3p216FaATML2rsO9HXF9Rt4%2BgB/59YS8Cexw00%3D' -o freedom_old.apk
+      - name: Verify package, version and signer
+        shell: bash
+        run: |
+          set -euo pipefail
+          AAPT=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
+
+          "$AAPT" dump badging NAVIGATOR_V3_0_86_AUTO_RELAUNCH-debug.apk | head -30 | tee navigator_new_badging.txt
+          "$AAPT" dump badging navigator_old.apk | head -30 | tee navigator_old_badging.txt
+          "$APKSIGNER" verify --print-certs NAVIGATOR_V3_0_86_AUTO_RELAUNCH-debug.apk | tee navigator_new_signature.txt
+          "$APKSIGNER" verify --print-certs navigator_old.apk | tee navigator_old_signature.txt
+
+          "$AAPT" dump badging FREEDOM_V4_0_26_AUTO_RELAUNCH-debug.apk | head -30 | tee freedom_new_badging.txt
+          "$AAPT" dump badging freedom_old.apk | head -30 | tee freedom_old_badging.txt
+          "$APKSIGNER" verify --print-certs FREEDOM_V4_0_26_AUTO_RELAUNCH-debug.apk | tee freedom_new_signature.txt
+          "$APKSIGNER" verify --print-certs freedom_old.apk | tee freedom_old_signature.txt
+
+          grep -q "package: name='com.baekhak.dosa.v3'" navigator_new_badging.txt
+          grep -q "versionCode='30086'" navigator_new_badging.txt
+          grep -q "package: name='com.navigator.freedom.v4final'" freedom_new_badging.txt
+          grep -q "versionCode='30426'" freedom_new_badging.txt
+
+          NAV_NEW=$(grep 'certificate SHA-256 digest:' navigator_new_signature.txt | head -1 | awk '{print $NF}')
+          NAV_OLD=$(grep 'certificate SHA-256 digest:' navigator_old_signature.txt | head -1 | awk '{print $NF}')
+          FRE_NEW=$(grep 'certificate SHA-256 digest:' freedom_new_signature.txt | head -1 | awk '{print $NF}')
+          FRE_OLD=$(grep 'certificate SHA-256 digest:' freedom_old_signature.txt | head -1 | awk '{print $NF}')
+          test "$NAV_NEW" = "$NAV_OLD"
+          test "$FRE_NEW" = "$FRE_OLD"
+
+          unzip -l NAVIGATOR_V3_0_86_AUTO_RELAUNCH-debug.apk | tee navigator_contents.txt
+          unzip -l FREEDOM_V4_0_26_AUTO_RELAUNCH-debug.apk | tee freedom_contents.txt
+      - name: Publish verified APKs
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add NAVIGATOR_V3_0_86_AUTO_RELAUNCH-debug.apk FREEDOM_V4_0_26_AUTO_RELAUNCH-debug.apk \
+                  navigator_new_badging.txt navigator_new_signature.txt \
+                  freedom_new_badging.txt freedom_new_signature.txt
+          git commit -m 'Publish verified auto relaunch APKs' || exit 0
+          git push
