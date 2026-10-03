@@ -23,21 +23,21 @@ jobs:
           set -euo pipefail
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
-          APK=$(find app/build/outputs/apk/debug -type f -name 'HANGHAE_FREEDOM_V4_0_28_APPROVAL_FALLBACK_R7-debug.apk' | head -1)
+          APK=$(find app/build/outputs/apk/debug -type f -name 'HANGHAE_FREEDOM_V4_0_29_APPROVAL_PRESERVE_R8-debug.apk' | head -1)
           test -s "$APK"
-          cp "$APK" "$GITHUB_WORKSPACE/항행의자유_V4.0.28_승인요청복구_R7.apk"
-          sha256sum "$GITHUB_WORKSPACE/항행의자유_V4.0.28_승인요청복구_R7.apk"
+          cp "$APK" "$GITHUB_WORKSPACE/항행의자유_V4.0.29_승인유지_R8.apk"
+          sha256sum "$GITHUB_WORKSPACE/항행의자유_V4.0.29_승인유지_R8.apk"
       - uses: actions/upload-artifact@v4
         with:
-          name: HANGHAE_FREEDOM_V4_0_28_APPROVAL_FALLBACK_R7
-          path: 항행의자유_V4.0.28_승인요청복구_R7.apk
+          name: HANGHAE_FREEDOM_V4_0_29_APPROVAL_PRESERVE_R8
+          path: 항행의자유_V4.0.29_승인유지_R8.apk
           if-no-files-found: error
       - name: Publish direct APK
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f "항행의자유_V4.0.28_승인요청복구_R7.apk"
+          git add -f "항행의자유_V4.0.29_승인유지_R8.apk"
           git commit -m "Publish Freedom V3 update stats fix APK" || exit 0
           git reset --hard HEAD
           pushed=0
