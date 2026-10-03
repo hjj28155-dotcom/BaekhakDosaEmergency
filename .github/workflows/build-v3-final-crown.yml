@@ -1,8 +1,10 @@
-name: Build Freedom V3 Final Crown No Approval
+name: Build Freedom V3 Final Crown Approval Restored
 on:
   push:
     paths:
       - '.github/workflows/build-v3-final-crown.yml'
+      - 'build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/index.html'
+      - 'build405/FREEDOM_V402_BUILD_THIS/app/build.gradle'
 permissions:
   contents: write
 jobs:
@@ -14,7 +16,7 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - name: Build V3 final crown no-approval APK
+      - name: Build V3 final crown approval-restored APK
         working-directory: build405/FREEDOM_V402_BUILD_THIS
         run: |
           set -euo pipefail
