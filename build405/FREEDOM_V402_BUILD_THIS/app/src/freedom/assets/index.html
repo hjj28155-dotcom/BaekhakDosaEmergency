@@ -1052,6 +1052,9 @@ function bindSpecialApprovalButtonsV116(){
 }
 function checkSpecialApprovalSafeV116(){
   const info=document.getElementById('specialApprovalInfo');
+  if(!(window.AndroidHost&&typeof AndroidHost.checkSpecialApproval==='function')){
+    v428DirectApprovalCheck();return;
+  }
   if(SPECIAL_APPROVED){unlockPendingSpecialRound();return;}
   try{
     if(!(window.AndroidHost&&typeof AndroidHost.checkSpecialApproval==='function')){
@@ -1080,7 +1083,110 @@ function checkSpecialApprovalSafeV116(){
   }
 }
 
-function requestSpecialApprovalNow(){let n=Number(D.pendingSpecialRound||1243),name=String(document.getElementById('specialApplicantName')?.value||'').trim(),ref=String(document.getElementById('specialReferrerName')?.value||'').trim();let x=document.getElementById('specialApprovalInfo');if(!name){if(x)x.textContent='실명을 입력해 주세요.';document.getElementById('specialApplicantName')?.focus();return}if(!ref){if(x)x.textContent='누구의 지인인지 입력해 주세요.';document.getElementById('specialReferrerName')?.focus();return}if(x)x.textContent='특별승인 요청을 보내는 중입니다...';try{AndroidHost.requestSpecialApproval(n,name,ref);startSpecialApprovalAutoPoll();[500,1200,2500].forEach(ms=>setTimeout(()=>{try{const raw=AndroidHost.getSpecialApprovalSummary();const q=typeof raw==='string'?JSON.parse(raw||'{}'):(raw||{});SPECIAL_APPROVAL_STATE=Object.assign({},SPECIAL_APPROVAL_STATE,q);if(q.has_request&&!SPECIAL_APPROVAL_STATE.status)SPECIAL_APPROVAL_STATE.status='pending';renderSpecialApprovalState()}catch(e){}},ms))}catch(e){if(x)x.textContent='승인 요청 기능을 실행할 수 없습니다.'}}
+function v428ApprovalDeviceId(){
+  try{
+    let k='freedom_approval_device_id_v428',v=localStorage.getItem(k)||'';
+    if(!/^\\d{6,20}$/.test(v)){
+      v=String(Date.now())+String(Math.floor(Math.random()*100000)).padStart(5,'0');
+      if(v.length>20)v=v.slice(-20);
+      localStorage.setItem(k,v);
+    }
+    return v;
+  }catch(e){
+    return String(Date.now()).slice(-13)+String(Math.floor(Math.random()*10000)).padStart(4,'0');
+  }
+}
+async function v428DirectApprovalRequest(n,name,ref){
+  const x=document.getElementById('specialApprovalInfo');
+  try{
+    const deviceId=v428ApprovalDeviceId();
+    const r=await fetch('https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/approval-request',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        device_id:deviceId,
+        device_label:name+'||'+ref,
+        referrer_name:ref,
+        purpose_ack:true,
+        requested_round:Number(n||1244)
+      }),
+      cache:'no-store'
+    });
+    const q=await r.json();
+    if(!r.ok||!q||q.ok!==true)throw new Error((q&&q.error)||('HTTP '+r.status));
+    try{
+      localStorage.setItem('freedom_approval_request_token_v428',String(q.request_token||''));
+      localStorage.setItem('freedom_approval_device_id_v428',deviceId);
+    }catch(e){}
+    SPECIAL_APPROVAL_STATE=Object.assign({},SPECIAL_APPROVAL_STATE,q,{has_request:true});
+    if(String(q.status||'')==='approved'){
+      SPECIAL_APPROVED=true;D.specialApprovalUnlocked=true;save();
+    }
+    renderSpecialApprovalState();
+    if(x)x.textContent=String(q.status||'')==='approved'?'승인완료 · 이용 가능합니다.':'승인요청 완료 · 승인 확인을 눌러 주세요.';
+    return true;
+  }catch(e){
+    if(x)x.textContent='승인요청 실패 · 네트워크 연결을 확인해 주세요.';
+    return false;
+  }
+}
+async function v428DirectApprovalCheck(){
+  const x=document.getElementById('specialApprovalInfo');
+  let token='',deviceId='';
+  try{
+    token=localStorage.getItem('freedom_approval_request_token_v428')||'';
+    deviceId=localStorage.getItem('freedom_approval_device_id_v428')||'';
+  }catch(e){}
+  if(!token)return false;
+  try{
+    const r=await fetch('https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/approval-status',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({request_token:token,device_id:deviceId}),
+      cache:'no-store'
+    });
+    const q=await r.json();
+    if(!r.ok)throw new Error((q&&q.error)||('HTTP '+r.status));
+    SPECIAL_APPROVAL_STATE=Object.assign({},SPECIAL_APPROVAL_STATE,q,{has_request:true});
+    if(String(q.status||'')==='approved'){
+      SPECIAL_APPROVED=true;D.specialApprovalUnlocked=true;save();
+      renderSpecialApprovalState();
+      if(x)x.textContent='승인완료 · 이용 가능합니다.';
+      setTimeout(()=>{try{unlockPendingSpecialRound()}catch(e){}},150);
+    }else{
+      renderSpecialApprovalState();
+      if(x)x.textContent='승인대기 · 승인 후 다시 확인해 주세요.';
+    }
+    return true;
+  }catch(e){
+    if(x)x.textContent='승인 상태 확인 실패 · 다시 시도해 주세요.';
+    return false;
+  }
+}
+function requestSpecialApprovalNow(){
+  let n=Number(D.pendingSpecialRound||1243),
+      name=String(document.getElementById('specialApplicantName')?.value||'').trim(),
+      ref=String(document.getElementById('specialReferrerName')?.value||'').trim(),
+      x=document.getElementById('specialApprovalInfo');
+  if(!name){if(x)x.textContent='실명을 입력해 주세요.';document.getElementById('specialApplicantName')?.focus();return}
+  if(!ref){if(x)x.textContent='누구의 지인인지 입력해 주세요.';document.getElementById('specialReferrerName')?.focus();return}
+  if(x)x.textContent='특별승인 요청을 보내는 중입니다...';
+  try{
+    if(window.AndroidHost&&typeof AndroidHost.requestSpecialApproval==='function'){
+      AndroidHost.requestSpecialApproval(n,name,ref);
+      startSpecialApprovalAutoPoll();
+      [700,1600,2800].forEach(ms=>setTimeout(()=>{try{
+        const raw=AndroidHost.getSpecialApprovalSummary&&AndroidHost.getSpecialApprovalSummary();
+        const q=typeof raw==='string'?JSON.parse(raw||'{}'):(raw||{});
+        SPECIAL_APPROVAL_STATE=Object.assign({},SPECIAL_APPROVAL_STATE,q);
+        if(q.has_request&&!SPECIAL_APPROVAL_STATE.status)SPECIAL_APPROVAL_STATE.status='pending';
+        renderSpecialApprovalState()
+      }catch(e){}},ms));
+      return;
+    }
+  }catch(e){}
+  v428DirectApprovalRequest(n,name,ref);
+}
 function checkSpecialApprovalNow(){let x=document.getElementById('specialApprovalInfo');if(x)x.textContent='승인 상태를 확인하는 중입니다...';try{AndroidHost.checkSpecialApproval()}catch(e){if(x)x.textContent='승인 확인 기능을 실행할 수 없습니다.'}}
 function unlockPendingSpecialRound(){let n=Number(D.pendingSpecialRound||1243);D.pendingSpecialRound=null;SPECIAL_APPROVED=true;D.specialApprovalUnlocked=true;save();closeM();if(setRound(n))setTimeout(()=>v124OpenVisibleRound(n),80)}
 // FIX6: update the existing approval panel without reopening it or causing
