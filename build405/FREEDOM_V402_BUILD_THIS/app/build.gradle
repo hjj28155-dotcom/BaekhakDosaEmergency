@@ -10,8 +10,8 @@ android {
         applicationId 'com.navigator.freedom.v3final'
         minSdk 23
         targetSdk 35
-        versionCode 30425
-        versionName "V3-FINAL-CROWN-UPDATE-STATS-FIX-20261003"
+        versionCode 30426
+        versionName "V3-FINAL-CROWN-UPDATE-STATS-FIX-R2-20261003"
     }
 
     buildFeatures {
@@ -50,7 +50,7 @@ android {
 
     applicationVariants.all { variant ->
         variant.outputs.all {
-            outputFileName = "HANGHAE_FREEDOM_V3_FINAL_CROWN_UPDATE_STATS_FIX_20261003-debug.apk"
+            outputFileName = "HANGHAE_FREEDOM_V3_FINAL_CROWN_UPDATE_STATS_FIX_R2_20261003-debug.apk"
         }
     }
 }
