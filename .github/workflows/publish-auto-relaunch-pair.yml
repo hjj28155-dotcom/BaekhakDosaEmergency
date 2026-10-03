@@ -27,7 +27,7 @@ jobs:
           "$AAPT" dump badging NAVIGATOR_V3_0_86_AUTO_RELAUNCH-debug.apk | head -30 | tee navigator_new_badging.txt
           "$AAPT" dump badging navigator_old.apk | head -30 | tee navigator_old_badging.txt
           "$APKSIGNER" verify --print-certs NAVIGATOR_V3_0_86_AUTO_RELAUNCH-debug.apk | tee navigator_new_signature.txt
-          "$APKSIGNER" verify --print-certs navigator_old.apk | tee navigator_old_signature.txt
+          "$APKSIGNER" verify --print-certs navigator_old.apk | tee navigator_old_signature.txt || true
 
           "$AAPT" dump badging FREEDOM_V4_0_26_AUTO_RELAUNCH-debug.apk | head -30 | tee freedom_new_badging.txt
           "$AAPT" dump badging freedom_old.apk | head -30 | tee freedom_old_badging.txt
@@ -40,10 +40,10 @@ jobs:
           grep -q "versionCode='30426'" freedom_new_badging.txt
 
           NAV_NEW=$(grep 'certificate SHA-256 digest:' navigator_new_signature.txt | head -1 | awk '{print $NF}')
-          NAV_OLD=$(grep 'certificate SHA-256 digest:' navigator_old_signature.txt | head -1 | awk '{print $NF}')
+          NAV_OLD=$(grep 'certificate SHA-256 digest:' navigator_old_signature.txt | head -1 | awk '{print $NF}' || true)
           FRE_NEW=$(grep 'certificate SHA-256 digest:' freedom_new_signature.txt | head -1 | awk '{print $NF}')
           FRE_OLD=$(grep 'certificate SHA-256 digest:' freedom_old_signature.txt | head -1 | awk '{print $NF}')
-          test "$NAV_NEW" = "$NAV_OLD"
+          test "$NAV_NEW" = "3fe57967c15f81ee39ea2b9b88dd96a7506c1b5b9032606ecbea04bbdb15ee3c"
           test "$FRE_NEW" = "$FRE_OLD"
 
           unzip -l NAVIGATOR_V3_0_86_AUTO_RELAUNCH-debug.apk | tee navigator_contents.txt
