@@ -23,21 +23,21 @@ jobs:
           set -euo pipefail
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
-          APK=$(find app/build/outputs/apk/debug -type f -name 'HANGHAE_FREEDOM_V3_FINAL_CROWN_UPDATE_STATS_FIX_R3_20261004-debug.apk' | head -1)
+          APK=$(find app/build/outputs/apk/debug -type f -name 'HANGHAE_FREEDOM_V3_FINAL_CROWN_RESULT_1244_FIX_R4_20261004-debug.apk' | head -1)
           test -s "$APK"
-          cp "$APK" "$GITHUB_WORKSPACE/항행의자유_왕관앱_V3_업데이트현황수정_R3_20261004.apk"
-          sha256sum "$GITHUB_WORKSPACE/항행의자유_왕관앱_V3_업데이트현황수정_R3_20261004.apk"
+          cp "$APK" "$GITHUB_WORKSPACE/항행의자유_왕관앱_V3_1244당첨결과수정_R4_20261004.apk"
+          sha256sum "$GITHUB_WORKSPACE/항행의자유_왕관앱_V3_1244당첨결과수정_R4_20261004.apk"
       - uses: actions/upload-artifact@v4
         with:
-          name: HANGHAE_FREEDOM_V3_FINAL_CROWN_UPDATE_STATS_FIX_R3_20261004
-          path: 항행의자유_왕관앱_V3_업데이트현황수정_R3_20261004.apk
+          name: HANGHAE_FREEDOM_V3_FINAL_CROWN_RESULT_1244_FIX_R4_20261004
+          path: 항행의자유_왕관앱_V3_1244당첨결과수정_R4_20261004.apk
           if-no-files-found: error
       - name: Publish direct APK
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f "항행의자유_왕관앱_V3_업데이트현황수정_R3_20261004.apk"
+          git add -f "항행의자유_왕관앱_V3_1244당첨결과수정_R4_20261004.apk"
           git commit -m "Publish Freedom V3 update stats fix APK" || exit 0
           git reset --hard HEAD
           git pull --rebase origin main
