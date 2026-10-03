@@ -5,6 +5,7 @@ on:
       - '.github/workflows/build-v3-final-crown.yml'
       - 'build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/index.html'
       - 'build405/FREEDOM_V402_BUILD_THIS/app/build.gradle'
+      - 'build405/FREEDOM_V402_BUILD_THIS/app/src/main/java/com/baekhak/centralcontrol/MainActivity.java'
 permissions:
   contents: write
 jobs:
@@ -38,5 +39,6 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -f "항행의자유_왕관앱_V3_업데이트현황수정_R2_20261003.apk"
           git commit -m "Publish Freedom V3 update stats fix APK" || exit 0
+          git reset --hard HEAD
           git pull --rebase origin main
           git push origin main
