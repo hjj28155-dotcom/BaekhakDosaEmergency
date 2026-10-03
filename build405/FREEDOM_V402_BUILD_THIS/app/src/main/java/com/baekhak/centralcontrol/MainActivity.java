@@ -538,9 +538,26 @@ public class MainActivity extends Activity {
     }
 
     private void requestNamedUpdateStatsAsync() {
-        final String result = "{\"ok\":false,\"error\":\"admin_view_disabled_in_distribution\"}";
-        if (webView != null) webView.post(() -> webView.evaluateJavascript(
-            "if(window.onNamedUpdateStats){onNamedUpdateStats(" + JSONObject.quote(result) + ");}", null));
+        new Thread(() -> {
+            String body;
+            try {
+                JSONObject p = new JSONObject();
+                p.put("action", "named_stats");
+                body = postUpdateApi(p);
+            } catch (Exception e) {
+                try {
+                    JSONObject x = new JSONObject();
+                    x.put("ok", false);
+                    x.put("error", "network");
+                    body = x.toString();
+                } catch (Exception ignored) {
+                    body = "{\"ok\":false}";
+                }
+            }
+            final String result = body;
+            if (webView != null) webView.post(() -> webView.evaluateJavascript(
+                "if(window.onNamedUpdateStats){onNamedUpdateStats(" + JSONObject.quote(result) + ");}", null));
+        }, "V3-NamedUpdateStats").start();
     }
 
     private SharedPreferences specialApprovalPrefs() {
