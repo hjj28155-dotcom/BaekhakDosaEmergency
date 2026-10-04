@@ -1,30 +1,32 @@
 <!doctype html>
 <html lang="ko">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
 <title>항행의자유 최신 업데이트</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#03182c,#00101f);color:#fff;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif}
-.wrap{max-width:720px;margin:0 auto;padding:42px 18px;text-align:center}
-h1{color:#ffe39a;font-size:32px;margin:0 0 12px}.sub{color:#c5d8e7;line-height:1.7}
-.card{margin-top:24px;background:#08253c;border:1px solid #315d78;border-radius:18px;padding:22px}
-.btn{display:block;width:100%;padding:20px;border:1px solid #e3c56a;border-radius:15px;background:linear-gradient(#8a6718,#493407);color:#fff3b0;font-size:20px;font-weight:900;text-decoration:none}
-.ok{margin-top:18px;color:#7ff0bc;font-weight:800;line-height:1.7}.note{margin-top:16px;color:#b8cbd8;line-height:1.7}
-</style>
-</head>
-<body>
-<div class="wrap">
-<h1>항행의자유</h1>
-<div class="sub">기존 사용자 업데이트 복구 페이지<br>설치동영상 없이 바로 최신판으로 진행합니다.</div>
+.wrap{max-width:720px;margin:auto;padding:28px 16px 48px;text-align:center}h1{color:#ffe39a;font-size:30px}.sub{color:#c5d8e7;line-height:1.6}
+.card{margin-top:18px;background:#08253c;border:1px solid #315d78;border-radius:18px;padding:18px}
+video{width:100%;border-radius:14px;background:#000;margin-top:14px}.btn{display:block;width:100%;margin-top:14px;padding:17px;border:1px solid #e3c56a;border-radius:15px;background:linear-gradient(#8a6718,#493407);color:#fff3b0;font-size:19px;font-weight:900;text-decoration:none}
+.status{margin-top:12px;color:#8fe8ff;font-weight:800;line-height:1.6}.install{display:none}.emergency{margin-top:12px;font-size:14px;color:#b8cbd8}.emergency a{color:#b8e8ff}
+</style></head>
+<body><div class="wrap"><h1>항행의자유</h1><div class="sub">최신 설치동영상을 확인한 뒤 업데이트를 진행합니다.</div>
 <div class="card">
-<a class="btn" href="https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/latest-apk">최신 항행의자유 V4.0.30 업데이트 설치</a>
-<div class="ok">최신판: V4.0.30 사용자 직접업데이트 R9</div>
-<div class="note">기존 앱을 삭제하지 마십시오.<br>위 버튼을 눌러 다운로드한 뒤 기존 앱 위에 업데이트 설치합니다.</div>
-</div>
-</div>
-</body>
-</html>
+<button id="playBtn" class="btn" type="button">▶ 설치동영상 재생</button>
+<video id="guide" playsinline preload="metadata" controls><source src="freedom_guide_latest.mp4?v=20261004-recovery" type="video/mp4"></video>
+<div id="status" class="status">재생 버튼을 눌러 설치동영상을 시작하세요.</div>
+<a id="installBtn" class="btn install" href="https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/latest-apk">최신 항행의자유 V4.0.30 업데이트 설치</a>
+<div class="emergency">영상 재생에 문제가 있을 경우 <a href="https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/latest-apk">최신판 설치로 바로 진행</a></div>
+</div></div>
+<script>
+const v=document.getElementById('guide'), p=document.getElementById('playBtn'), b=document.getElementById('installBtn'), s=document.getElementById('status');
+async function startGuide(){
+ try{v.muted=false; await v.play(); p.textContent='⏸ 설치동영상 일시정지'; s.textContent='설치동영상 재생 중입니다.';}
+ catch(e){try{v.muted=true;await v.play();p.textContent='⏸ 설치동영상 일시정지';s.textContent='영상 재생 중입니다. 소리는 영상의 음량 버튼을 확인하세요.';}catch(_){s.textContent='재생이 차단되었습니다. 영상의 ▶ 버튼을 눌러주세요.';}}
+}
+p.addEventListener('click',()=>{if(v.paused)startGuide();else{v.pause();p.textContent='▶ 설치동영상 계속 재생';}});
+v.addEventListener('play',()=>{p.textContent='⏸ 설치동영상 일시정지';});
+v.addEventListener('pause',()=>{if(!v.ended)p.textContent='▶ 설치동영상 계속 재생';});
+v.addEventListener('ended',()=>{b.style.display='block';p.textContent='▶ 설치동영상 다시 보기';s.textContent='✅ 설치동영상이 끝났습니다. 아래 업데이트 설치 버튼을 누르세요.';});
+</script></body></html>
