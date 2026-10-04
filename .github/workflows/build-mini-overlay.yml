@@ -26,14 +26,17 @@ jobs:
         with:
           path: ~/.android/debug.keystore
           key: hanghae-mini-stable-debug-keystore-v1
-      - name: Ensure stable debug signing key exists
+      - name: Verify original v1.0.16 signing key
         run: |
           set -euo pipefail
-          mkdir -p "$HOME/.android"
-          if [ ! -f "$HOME/.android/debug.keystore" ]; then
-            keytool -genkeypair -v               -keystore "$HOME/.android/debug.keystore"               -storepass android               -alias androiddebugkey               -keypass android               -keyalg RSA               -keysize 2048               -validity 10000               -dname "CN=Hanghae Freedom Mini Stable Debug,O=Hanghae,C=KR"
-          fi
-          keytool -list -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey >/dev/null
+          test -s "$HOME/.android/debug.keystore"
+          echo '=== CACHED KEY FINGERPRINT ==='
+          keytool -list -v -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey
+          EXPECTED_SHA256="2B:38:34:54:29:14:34:25:26:42:89:81:80:56:4B:B8:BC:4A:A4:E6:15:F4:47:60:0C:20:B4:FE:67:19:6E:3B"
+          ACTUAL_SHA256=$(keytool -list -v -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey | sed -n 's/^[[:space:]]*SHA256: //p' | head -1)
+          echo "EXPECTED_SHA256=$EXPECTED_SHA256"
+          echo "ACTUAL_SHA256=$ACTUAL_SHA256"
+          test "$ACTUAL_SHA256" = "$EXPECTED_SHA256"
       - name: Build both APK editions
         working-directory: mini-overlay
         run: |
@@ -58,8 +61,8 @@ jobs:
           "$APKSIGNER" verify --print-certs "$OLD"
           echo '=== NEW V1.0.18 CERT ==='
           "$APKSIGNER" verify --print-certs "$NAV"
-          OLD_CERT=$("$APKSIGNER" verify --print-certs "$OLD" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p' | head -1)
-          NEW_CERT=$("$APKSIGNER" verify --print-certs "$NAV" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p' | head -1)
+          OLD_CERT=$("$APKSIGNER" verify --print-certs "$OLD" | sed -n 's/^V2 Signer: certificate SHA-256 digest: //p' | head -1)
+          NEW_CERT=$("$APKSIGNER" verify --print-certs "$NAV" | sed -n 's/^V2 Signer: certificate SHA-256 digest: //p' | head -1)
           OLD_PKG=$("$AAPT" dump badging "$OLD" | sed -n "s/^package: name='\([^']*\)'.*/\1/p" | head -1)
           NEW_PKG=$("$AAPT" dump badging "$NAV" | sed -n "s/^package: name='\([^']*\)'.*/\1/p" | head -1)
           echo "OLD_CERT=$OLD_CERT"
