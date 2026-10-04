@@ -101,15 +101,15 @@ public class OverlayService extends Service {
         Button b=new Button(this);
         b.setText(text);
         b.setTextColor(Color.WHITE);
-        b.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP,cappedSp(12f));
+        b.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP,cappedSp(11f));
         b.setAllCaps(false);
         b.setSingleLine(true);
         b.setEllipsize(null);
         b.setIncludeFontPadding(false);
         b.setGravity(Gravity.CENTER);
-        b.setPadding(dp(10),0,dp(10),0);
-        b.setMinHeight(dp(42));
-        b.setMinimumHeight(dp(42));
+        b.setPadding(dp(7),0,dp(7),0);
+        b.setMinHeight(dp(34));
+        b.setMinimumHeight(dp(34));
         b.setMinWidth(dp(54));
         b.setMinimumWidth(dp(54));
         b.setBackground(bg(color,0x66FFD35A,13));
@@ -126,8 +126,8 @@ public class OverlayService extends Service {
         else minW=64;
 
         b.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
-        LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,dp(44));
-        p.setMargins(dp(3),dp(2),dp(3),dp(2));
+        LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,dp(36));
+        p.setMargins(dp(4),dp(1),dp(4),dp(1));
         b.setLayoutParams(p);
         b.setMinWidth(dp(minW));
         b.setMinimumWidth(dp(minW));
@@ -142,13 +142,13 @@ public class OverlayService extends Service {
 
     private void showOverlay(){
         if(root!=null||wm==null)return;
-        root=new LinearLayout(this);root.setOrientation(LinearLayout.VERTICAL);root.setPadding(dp(5),dp(4),dp(5),dp(4));root.setBackground(bg(0xF20A1D30,0xCCF3C954,18));
+        root=new LinearLayout(this);root.setOrientation(LinearLayout.VERTICAL);root.setPadding(0,0,0,0);root.setBackgroundColor(Color.TRANSPARENT);
 
         LinearLayout bar=new LinearLayout(this);bar.setOrientation(LinearLayout.VERTICAL);bar.setGravity(Gravity.CENTER_HORIZONTAL);
         anchor=new TextView(this);anchor.setText("⚓");anchor.setTextSize(19f);anchor.setTextColor(0xFFFFD96A);anchor.setGravity(Gravity.CENTER);
         anchor.setBackground(bg(0xEE08233E,0xCCF3C954,14));anchor.setLayoutParams(new LinearLayout.LayoutParams(dp(38),dp(38)));bar.addView(anchor);
 
-        menu=new LinearLayout(this);menu.setOrientation(LinearLayout.VERTICAL);menu.setGravity(Gravity.CENTER_HORIZONTAL);menu.setVisibility(View.VISIBLE);
+        menu=new LinearLayout(this);menu.setOrientation(LinearLayout.VERTICAL);menu.setGravity(Gravity.CENTER_HORIZONTAL);menu.setPadding(dp(3),dp(3),dp(3),dp(3));menu.setBackground(bg(0xF20A1D30,0xCCF3C954,12));menu.setVisibility(View.VISIBLE);
         Button freedom=btn("🚢 항행의자유",0xEE0C7AA8),
                navigator=btn("🧭 항해사앱",0xEE8A5B18),
                analysis=btn("📊 분석방 V4",0xEE17639A), chatgpt=btn("🤖 ChatGPT",0xEE168A5B),
@@ -165,8 +165,9 @@ public class OverlayService extends Service {
         menuScroll.setVisibility(View.GONE);
         menuScroll.addView(menu,new ScrollView.LayoutParams(-1,-2));
         int screenW=getResources().getDisplayMetrics().widthPixels;
-        int menuW=Math.max(dp(150),Math.min(dp(180),screenW-dp(150)));
-        int menuH=Math.min(dp(310),getResources().getDisplayMetrics().heightPixels-dp(300));
+        int menuW=dp(170);
+        if(screenW<dp(250))menuW=Math.max(dp(150),screenW-dp(70));
+        int menuH=dp(310);
         bar.addView(menuScroll,new LinearLayout.LayoutParams(menuW,menuH));
         root.addView(bar,new LinearLayout.LayoutParams(-2,-2));
 
@@ -218,10 +219,7 @@ public class OverlayService extends Service {
         expanded=!expanded;
         if(menu!=null && menu.getParent() instanceof View) ((View)menu.getParent()).setVisibility(expanded?View.VISIBLE:View.GONE);
         if(expanded){
-            try{
-                String ver=getPackageManager().getPackageInfo(getPackageName(),0).versionName;
-                setNow("항행의자유 이동아이콘 v"+ver+" · 업데이트 버튼 준비");
-            }catch(Exception ignored){}
+            if(now!=null)now.setVisibility(View.GONE);
         }else{
             collapseStations();
         }
