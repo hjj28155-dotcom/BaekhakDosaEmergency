@@ -561,8 +561,16 @@ public class OverlayService extends Service {
     private void openAnalysisV4(){
         collapseStations();
         collapseMenu();
+        try{
+            Intent i=new Intent();
+            i.setClassName("com.navigator.analysis.v4","com.navigator.analysis.v4.MainActivity");
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
+            setNow("📊 분석방 V4 실행");
+            return;
+        }catch(Exception ignored){}
         if(launchPackage("com.navigator.analysis.v4","📊 분석방 V4 실행")) return;
-        toast("분석방 V4가 설치되어 있지 않습니다.");
+        toast("분석방 V4를 실행할 수 없습니다.");
     }
 
     private void openChatGPT(){
