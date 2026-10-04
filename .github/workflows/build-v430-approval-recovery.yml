@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - '.github/workflows/build-v430-approval-recovery.yml'
+      - 'build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/index.html'
 permissions:
   contents: write
 jobs:
@@ -37,3 +38,5 @@ jobs:
           git add -f 항행의자유_V4.0.32_승인흐름복구_R11.apk FREEDOM_V3_FINAL_LATEST.apk
           git commit -m "Publish V4.0.32 approval flow recovery R11" || exit 0
           git push origin main
+
+# trigger-r11: 20261004-1
