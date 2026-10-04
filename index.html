@@ -1,15 +1,37 @@
-<!doctype html><html lang="ko"><head>
+<!doctype html>
+<html lang="ko"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta http-equiv="Cache-Control" content="no-store,no-cache,must-revalidate,max-age=0"><title>항행의자유 설치</title>
-<style>*{box-sizing:border-box}body{margin:0;background:linear-gradient(#03182c,#00101f);color:#fff;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif}.wrap{max-width:720px;margin:auto;padding:28px 16px 52px;text-align:center}.card{margin-top:18px;padding:18px;background:#08253c;border:1px solid #315d78;border-radius:18px}h1{color:#ffe39a;margin:0 0 8px;font-size:38px}.sub{color:#d5e5ef;line-height:1.65;font-size:17px}video{display:block;width:100%;margin:16px 0 0;border-radius:14px;background:#000;max-height:62vh}.status{margin-top:13px;color:#8fe8ff;font-weight:800;line-height:1.55}#scrollStage{display:none}.scroll{display:block;width:100%;height:auto;border-radius:14px;margin-top:18px}.btn{display:block;width:100%;padding:20px;margin-top:18px;border:0;border-radius:15px;background:#dca20f;color:#071522;text-decoration:none;font-size:23px;font-weight:900}.note{margin-top:16px;color:#b8cbd8;font-size:15px;line-height:1.65}</style></head><body>
-<div class="wrap"><h1>항행의자유</h1><div class="card">
-<div class="sub"><b>1단계 · 설치동영상</b><br>설치 안내를 끝까지 확인해 주세요.</div>
-<video id="installVideo" controls playsinline webkit-playsinline preload="metadata" src="https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/install_guide_final.mp4?v=20261004-finalflow"></video>
-<div id="status" class="status">▶ 설치동영상을 재생해 주세요.</div>
-<div id="scrollStage">
-<img class="scroll" src="welcome_scroll_final.png?v=20261004-finalflow" alt="항행의자유 환영 두루마리">
-<a class="btn" href="https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/latest-apk">📱 두루마리 확인 · 설치/실행</a>
+<meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
+<title>항행의자유 설치</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(#03182c,#00101f);color:#fff;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif}.wrap{max-width:720px;margin:auto;padding:28px 16px 50px;text-align:center}h1{color:#ffe39a;margin:0 0 10px}.sub{color:#c5d8e7;line-height:1.6}.card{margin-top:18px;padding:18px;background:#08253c;border:1px solid #315d78;border-radius:18px}.btn{display:block;width:100%;padding:18px;margin-top:14px;border:1px solid #e3c56a;border-radius:15px;background:linear-gradient(#8a6718,#493407);color:#fff3b0;font-size:19px;font-weight:900;text-decoration:none}video{display:block;width:100%;margin-top:14px;border-radius:14px;background:#000}.status{margin-top:12px;color:#8fe8ff;font-weight:800;line-height:1.55}.install{display:none}.note{margin-top:12px;color:#b8cbd8;font-size:14px;line-height:1.6}
+</style></head><body>
+<div class="wrap"><h1>항행의자유</h1><div class="sub">설치동영상과 안내음악을 확인한 뒤 최신판을 설치합니다.</div>
+<div class="card">
+
+<video id="video" playsinline preload="auto" controls><source src="freedom_guide_latest.mp4?v=20261004-clean1" type="video/mp4"></video>
+<audio id="audio" preload="auto" src="kimkwangseok_ileona.mp3?v=20261004-clean1"></audio>
+<div id="status" class="status">영상의 ▶ 버튼을 눌러주세요.</div>
+<div id="scrollStage" class="install">
+<img src="welcome_scroll_final.png" alt="항행의자유 환영 두루마리" style="display:block;width:100%;height:auto;border-radius:14px;margin-top:14px">
+<a id="install" class="btn" href="https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/latest-apk">두루마리 확인 · 항행의자유 V4.0.32 R11 설치로 진행</a>
 </div>
-<div class="note"><b>기존 앱은 삭제하지 마세요.</b><br>설치동영상 종료 → 환영 두루마리 → 설치/실행 순서로 진행합니다.</div>
+<div class="note">기존 앱은 삭제하지 마십시오. 설치동영상 종료 후 환영 두루마리를 확인하고 다음 단계로 진행합니다.</div>
 </div></div>
-<script>(function(){const v=document.getElementById('installVideo'),stage=document.getElementById('scrollStage'),s=document.getElementById('status');let done=false;function finish(){if(done)return;done=true;stage.style.display='block';s.textContent='✅ 설치동영상 종료 · 환영 두루마리를 확인해 주세요.';setTimeout(()=>stage.scrollIntoView({behavior:'smooth',block:'start'}),100)}v.addEventListener('play',()=>{if(!done)s.textContent='🎬 설치동영상 재생 중'});v.addEventListener('ended',finish);v.addEventListener('timeupdate',()=>{if(!done&&Number.isFinite(v.duration)&&v.duration>0&&v.currentTime>=v.duration-1)finish()});v.addEventListener('pause',()=>{if(!done&&Number.isFinite(v.duration)&&v.duration>0&&v.currentTime>=v.duration-1.5)finish()});setInterval(()=>{if(!done&&Number.isFinite(v.duration)&&v.duration>0&&(v.ended||v.currentTime>=v.duration-1))finish()},500);})();</script></body></html>
+<script>
+const v=document.getElementById('video');
+const a=document.getElementById('audio');
+const install=document.getElementById('install');const scrollStage=document.getElementById('scrollStage');
+const status=document.getElementById('status');
+let finished=false;
+function sync(force=false){if(!a)return;try{const t=v.currentTime||0;if(force||Math.abs((a.currentTime||0)-t)>.20)a.currentTime=t;}catch(e){}}
+async function playAudio(){if(!a||finished)return;try{a.muted=false;a.volume=1;sync(true);await a.play();status.textContent='🔊 설치동영상과 안내음악 재생 중';}catch(e){status.textContent='영상 재생 중';}}
+function finish(){if(finished)return;finished=true;try{v.pause();}catch(e){}try{a.pause();}catch(e){}if(scrollStage)scrollStage.style.display='block';status.textContent='✅ 설치동영상 종료 · 환영 두루마리를 확인한 뒤 다음 단계로 진행하세요.';setTimeout(()=>scrollStage.scrollIntoView({behavior:'smooth',block:'start'}),80);}
+v.controls=true;
+v.addEventListener('play',()=>{finished=false;if(scrollStage)scrollStage.style.display='none';playAudio();});
+v.addEventListener('pause',()=>{if(!finished)try{a.pause();}catch(e){}});
+v.addEventListener('seeking',()=>{try{a.pause();}catch(e){}sync(true);});
+v.addEventListener('seeked',()=>{sync(true);if(Number.isFinite(v.duration)&&v.duration>0&&v.currentTime>=v.duration-.75){finish();return;}if(!v.paused)playAudio();});
+v.addEventListener('timeupdate',()=>{if(finished)return;sync(false);if(Number.isFinite(v.duration)&&v.duration>0&&v.currentTime>=v.duration-.40)finish();});
+v.addEventListener('ended',finish);
+</script></body></html>
