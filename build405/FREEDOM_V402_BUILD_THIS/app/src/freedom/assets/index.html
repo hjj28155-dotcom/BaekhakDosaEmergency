@@ -1904,7 +1904,67 @@ function v330Print(){
   };
 })();
 </script>
-</body></html>`);
+
+<script id="r12AuthoritativeOnboarding">
+(function(){
+ const KEY='freedom_r12_onboarding';
+ function state(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return {}}}
+ function saveState(x){try{localStorage.setItem(KEY,JSON.stringify(x||{}))}catch(e){}}
+ function approval(){try{const raw=AndroidHost.getSpecialApprovalSummary();return typeof raw==='string'?JSON.parse(raw||'{}'):(raw||{})}catch(e){return {}}}
+ function clearLegacy(){
+   ['startupVideoGate','approvalHardLock','installGuideOverlay'].forEach(id=>{const e=document.getElementById(id);if(e)e.remove()});
+   document.body.style.overflow='';
+ }
+ function gate(){
+   let g=document.getElementById('r12Gate');if(g)return g;
+   g=document.createElement('div');g.id='r12Gate';g.style.cssText='position:fixed;inset:0;z-index:2147483647;background:#00152a;color:#fff;overflow:auto;font-family:system-ui,-apple-system,Noto Sans KR,sans-serif';document.body.appendChild(g);document.body.style.overflow='hidden';return g;
+ }
+ function showScroll(){
+   clearLegacy();const g=gate();
+   g.innerHTML='<div style="max-width:760px;margin:auto;padding:16px;text-align:center"><img src="welcome_scroll_final.png" style="display:block;width:100%;height:auto;border-radius:16px"><button id="r12Next" style="width:100%;margin-top:14px;padding:18px;border-radius:14px;border:1px solid #e2c66d;background:#74550d;color:#fff3b0;font-size:19px;font-weight:900">다음 · 승인요청</button></div>';
+   document.getElementById('r12Next').onclick=showApproval;
+ }
+ function showApproval(){
+   clearLegacy();const g=gate(),q=approval();
+   if(q.approved===true){showGuide();return}
+   g.innerHTML='<div style="max-width:650px;margin:8vh auto;padding:22px"><div style="border:1px solid #d2b355;border-radius:18px;background:#082f50;padding:20px"><h2 style="color:#ffe58a">🔒 승인 후 이용 가능</h2><input id="r12Name" placeholder="본인 실명" style="width:100%;padding:14px;margin:8px 0;background:#00182b;color:#fff;border:1px solid #54728a;border-radius:10px"><input id="r12Ref" placeholder="누구의 지인인지 입력" style="width:100%;padding:14px;margin:8px 0;background:#00182b;color:#fff;border:1px solid #54728a;border-radius:10px"><button id="r12Req" style="width:49%;padding:15px">승인요청</button><button id="r12Check" style="width:49%;padding:15px">승인확인</button><div id="r12Status" style="margin-top:14px;color:#8ff0c5">승인요청을 진행해 주세요.</div></div></div>';
+   const st=document.getElementById('r12Status');
+   document.getElementById('r12Req').onclick=async()=>{
+     const n=document.getElementById('r12Name').value.trim(),r=document.getElementById('r12Ref').value.trim();
+     if(!n||!r){st.textContent='실명과 지인 정보를 모두 입력해 주세요.';return}
+     st.textContent='승인요청 전송 중...';
+     try{
+       if(window.AndroidHost&&typeof AndroidHost.requestSpecialApproval==='function'){AndroidHost.requestSpecialApproval(1244,n,r);st.textContent='승인요청 전송됨 · 항해사 승인을 기다려 주세요.';}
+       else if(typeof v428DirectApprovalRequest==='function'){await v428DirectApprovalRequest(1244,n,r);st.textContent='승인요청 접수됨 · 항해사 승인을 기다려 주세요.';}
+       else st.textContent='승인 연결 오류';
+     }catch(e){try{if(typeof v428DirectApprovalRequest==='function'){await v428DirectApprovalRequest(1244,n,r);st.textContent='승인요청 접수됨 · 항해사 승인을 기다려 주세요.';}else throw e}catch(_){st.textContent='승인 서버 연결을 확인해 주세요.'}}
+   };
+   document.getElementById('r12Check').onclick=()=>{
+     const q=approval();if(q.approved===true){showGuide();return}
+     st.textContent='승인 상태 확인 중...';try{if(AndroidHost.checkSpecialApproval)AndroidHost.checkSpecialApproval()}catch(e){}
+     setTimeout(()=>{const z=approval();if(z.approved===true)showGuide();else st.textContent='승인대기 · 승인 후 다시 확인해 주세요.'},1200);
+   };
+ }
+ function showGuide(){
+   clearLegacy();const g=gate();
+   g.innerHTML='<div style="position:absolute;inset:0;background:#000"><video id="r12Video" controls playsinline preload="auto" style="width:100%;height:100%;object-fit:contain;background:#000" src="freedom_onboarding_postscroll_20260928.mp4"></video></div>';
+   const v=document.getElementById('r12Video');v.muted=false;v.volume=1;try{const p=v.play();if(p&&p.catch)p.catch(()=>{})}catch(e){}
+   v.addEventListener('ended',()=>{saveState({done:true});const x=document.getElementById('r12Gate');if(x)x.remove();document.body.style.overflow='';try{if(window.unlockApprovedApp)window.unlockApprovedApp()}catch(e){}},{once:true});
+ }
+ function boot(){
+   clearLegacy();
+   const q=approval(),st=state();
+   if(q.approved===true&&st.done===true){const x=document.getElementById('r12Gate');if(x)x.remove();document.body.style.overflow='';return}
+   if(q.approved===true){showGuide();return}
+   showScroll();
+ }
+ // disable legacy automatic onboarding entry points
+ window.startFreedomIntroVideo=function(){};
+ window.beginApprovedOnboardingSequence=function(){};
+ window.showApprovalHardLock=function(){};
+ window.addEventListener('load',()=>setTimeout(boot,1500),{once:true});
+})();
+</script></body></html>`);
  w.document.close();setTimeout(()=>{try{w.print()}catch(e){}},250);
 }
 function v330ResultPage(round){
