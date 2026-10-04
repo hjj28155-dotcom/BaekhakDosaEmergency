@@ -48,7 +48,6 @@ h1{font-size:30px;line-height:1.25;color:#ffe39a;margin:0 0 8px}
     </div>
 
     <a id="apk" class="btn apk" href="HANGHAE_MINI_MP3_FM_AM_YOUTUBE-debug.apk?v=1.0.17-20261004">📱 최신 APK 바로 설치</a>
-    <a id="zip" class="btn zip" href="HANGHAE_MINI_LATEST.zip?v=1.0.15-20261002">💬 카카오톡용 ZIP 받기</a>
 
     <div class="steps">
       <h2>설치 순서</h2>
@@ -63,13 +62,13 @@ h1{font-size:30px;line-height:1.25;color:#ffe39a;margin:0 0 8px}
     </div>
 
     <div class="small">
-      카카오톡 안에서 APK 다운로드가 막히면 ZIP 버튼을 사용하세요.<br>
-      ZIP을 받은 뒤 ‘내 파일 → 다운로드 → HANGHAE_MINI_LATEST.zip → 압축 풀기 → APK 설치’ 순서로 진행합니다.
+      이 이동아이콘 APK 하나만 설치하면 됩니다.<br>
+      항행의자유 본앱 설치는 이동아이콘의 <b>항행의자유</b> 버튼에서 사용자가 원할 때 선택할 수 있습니다.
     </div>
   </div>
 </div>
 <script>
-for (const id of ['apk','zip']) {
+for (const id of ['apk']) {
   document.getElementById(id).addEventListener('click', function() {
     const u=new URL(this.href,location.href);
     u.searchParams.set('t',Date.now());
