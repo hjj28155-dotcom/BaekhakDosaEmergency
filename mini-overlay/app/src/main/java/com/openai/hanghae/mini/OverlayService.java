@@ -569,14 +569,7 @@ public class OverlayService extends Service {
         collapseStations();
         collapseMenu();
         if(launchPackage("com.openai.chatgpt","🤖 ChatGPT 실행")) return;
-        try{
-            Intent web=new Intent(Intent.ACTION_VIEW,Uri.parse("https://chatgpt.com/"));
-            web.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(web);
-            setNow("🤖 ChatGPT를 엽니다.");
-        }catch(Exception e){
-            toast("ChatGPT를 열 수 없습니다.");
-        }
+        toast("ChatGPT 앱이 설치되어 있지 않거나 실행할 수 없습니다.");
     }
 
     private boolean launchPackage(String pkg,String status){
