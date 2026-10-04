@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ko"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-store,no-cache,must-revalidate,max-age=0">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>항해사 전용 점검</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(#03182c,#00101f);color:#fff;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif}
+.wrap{max-width:720px;margin:auto;padding:28px 16px 52px;text-align:center}
+.card{margin-top:18px;padding:18px;background:#08253c;border:1px solid #315d78;border-radius:18px}
+h1{color:#ffe39a;margin:0 0 8px;font-size:34px}
+.badge{display:inline-block;background:#123f5e;color:#bfe8ff;border-radius:999px;padding:8px 14px;font-weight:800}
+.sub{color:#d5e5ef;line-height:1.65;font-size:17px;margin-top:14px}
+video{display:block;width:100%;margin:16px 0 0;border-radius:14px;background:#000;max-height:62vh}
+.status{margin-top:13px;color:#8fe8ff;font-weight:800;line-height:1.55}
+.lock{margin-top:18px;padding:17px;border:1px solid #795f25;border-radius:14px;background:#3b2910;color:#ffe8a8;line-height:1.6}
+</style></head><body>
+<div class="wrap">
+<h1>항행의자유</h1>
+<div class="badge">항해사 전용 점검 화면</div>
+<div class="card">
+<div class="sub"><b>설치동영상 점검</b><br>아래 영상의 ▶ 버튼을 눌러 설치동영상이 정상으로 먼저 나오는지만 확인해 주세요.</div>
+<video id="installVideo" controls playsinline webkit-playsinline preload="metadata"
+ src="https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/install_guide_final.mp4?v=hanghaesa-check-20261004"></video>
+<div id="status" class="status">▶ 설치동영상을 재생해 주세요.</div>
+<div class="lock">🔒 실제 설치/업데이트 다운로드는 아직 잠겨 있습니다.<br>항해사 확인 후 공개 배포 링크를 다시 열겠습니다.</div>
+</div></div>
+<script>
+const v=document.getElementById('installVideo'),s=document.getElementById('status');
+v.addEventListener('play',()=>s.textContent='🎬 설치동영상 재생 중');
+v.addEventListener('ended',()=>s.textContent='✅ 설치동영상 재생 완료 · 항해사 확인 대기');
+v.addEventListener('error',()=>s.textContent='❌ 설치동영상을 불러오지 못했습니다.');
+</script>
+</body></html>
