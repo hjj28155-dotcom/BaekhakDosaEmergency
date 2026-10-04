@@ -23,6 +23,12 @@ android {
             applicationId 'com.navigator.freedom.navigatoricon'
             buildConfigField 'boolean', 'NAVIGATOR_EDITION', 'true'
         }
+        bridge {
+            dimension 'edition'
+            applicationId 'com.navigator.freedom.miniicon.v18'
+            buildConfigField 'boolean', 'NAVIGATOR_EDITION', 'false'
+            resValue 'string', 'app_name', '항행의자유 이동아이콘 새버전'
+        }
     }
 
     buildFeatures { buildConfig true }
