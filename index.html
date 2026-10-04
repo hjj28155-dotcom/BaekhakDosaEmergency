@@ -3,7 +3,35 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
-<title>항행의자유 최신 업데이트</title><script>if(!location.search.includes("r=20261004-final2")){location.replace(location.pathname+"?r=20261004-final2");}</script>
+<title>항행의자유 최신 업데이트</title><script>
+const v=document.getElementById('guide');
+const p=document.getElementById('playBtn');
+const install=document.getElementById('installBtn');
+let finished=false;
+function finishGuide(){
+ if(finished)return;
+ finished=true;
+ try{v.pause();}catch(e){}
+ install.style.display='block';
+ install.scrollIntoView({behavior:'smooth',block:'center'});
+}
+async function playGuide(){
+ finished=false;
+ install.style.display='none';
+ try{
+   v.muted=false;
+   v.volume=1;
+   if(v.ended || (Number.isFinite(v.duration)&&v.duration>0&&v.currentTime>=v.duration-1))v.currentTime=0;
+   await v.play();
+ }catch(e){
+   v.controls=true;
+ }
+}
+p.addEventListener('click',playGuide);
+v.addEventListener('ended',finishGuide);
+v.addEventListener('seeked',()=>{if(Number.isFinite(v.duration)&&v.duration>0&&v.currentTime>=v.duration-1)finishGuide();});
+v.addEventListener('timeupdate',()=>{if(Number.isFinite(v.duration)&&v.duration>0&&v.currentTime>=v.duration-.4)finishGuide();});
+</script>
 <style>
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#03182c,#00101f);color:#fff;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif}
 .wrap{max-width:720px;margin:auto;padding:28px 16px 48px;text-align:center}h1{color:#ffe39a;font-size:30px}.sub{color:#c5d8e7;line-height:1.6}
@@ -14,8 +42,8 @@ video{width:100%;border-radius:14px;background:#000;margin-top:14px}.btn{display
 <body><div class="wrap"><h1>항행의자유</h1><div class="sub">최신 설치동영상을 확인한 뒤 업데이트를 진행합니다.</div>
 <div class="card">
 <button id="playBtn" class="btn" type="button">▶ 설치동영상 재생</button>
-<video id="guide" playsinline preload="metadata" controls><source src="freedom_guide_latest.mp4?v=20261004-recovery" type="video/mp4"></video>
-<div id="status" class="status">재생 버튼을 눌러 설치동영상을 시작하세요.</div>
+<video id="guide" playsinline preload="auto" controls style="display:block;width:100%;min-height:240px;background:#000;margin-top:14px"><source src="freedom_guide_latest.mp4?v=20261004-final3" type="video/mp4"></video>
+
 <a id="installBtn" class="btn install" href="https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/latest-apk">최신 항행의자유 V4.0.30 업데이트 설치</a>
 <div class="emergency">영상 재생에 문제가 있을 경우 <a href="https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/latest-apk">최신판 설치로 바로 진행</a></div>
 </div></div>
@@ -23,7 +51,7 @@ video{width:100%;border-radius:14px;background:#000;margin-top:14px}.btn{display
 const v=document.getElementById('guide');
 const p=document.getElementById('playBtn');
 const b=document.getElementById('installBtn');
-const s=document.getElementById('status');
+const s=null;
 let finished=false;
 
 function showInstall(){
