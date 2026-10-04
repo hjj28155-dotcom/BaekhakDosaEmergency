@@ -65,7 +65,7 @@ h1{margin:0 0 8px;color:#ffe39a;font-size:30px}
 <div class="step"><b>7</b>승인요청 접수 후 안내동영상</div>
 <div class="step"><b>8</b>승인완료 후 홈화면 실행</div>
 </div>
-<button id="downloadBtn" class="btn" type="button" onclick="downloadLatestApk()">최신 항행의자유 업데이트 설치</button>
+<a id="downloadBtn" class="btn" href="https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/latest-apk">최신 항행의자유 V4.0.30 업데이트 설치</a>
 <div class="ok">배포 파일: 항행의자유_V4.0.30_사용자직접업데이트_R9.apk</div>
 <div class="note">영상은 1~10 순서로 재생되며, 일시중지·재생바 앞뒤 이동·종료가 가능합니다. 화면과 노래는 같은 위치로 함께 이동합니다.</div>
 </div>
@@ -216,9 +216,7 @@ function finishGuideSong(){
   if(st)st.textContent='✅ 설치 설명서 + 김광석 〈일어나〉 전체 재생 완료 · 다운로드가 열렸습니다.';
 }
 
-function downloadLatestApk(){
-  location.href='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/latest-apk';
-}
+function downloadLatestApk(){ location.href='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/latest-apk'; }
 
 window.addEventListener('load',()=>{
   const v=document.getElementById('installGuideVideo');
