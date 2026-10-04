@@ -26,9 +26,9 @@ async function startGuide(){
  try{v.muted=false; await v.play(); p.textContent='⏸ 설치동영상 일시정지'; s.textContent='설치동영상 재생 중입니다.';}
  catch(e){try{v.muted=true;await v.play();p.textContent='⏸ 설치동영상 일시정지';s.textContent='영상 재생 중입니다. 소리는 영상의 음량 버튼을 확인하세요.';}catch(_){s.textContent='재생이 차단되었습니다. 영상의 ▶ 버튼을 눌러주세요.';}}
 }
-p.addEventListener('click',()=>{if(v.paused)startGuide();else{v.pause();p.textContent='▶ 설치동영상 계속 재생';}});
+p.addEventListener('click',()=>{startGuide();});
 v.addEventListener('play',()=>{p.textContent='⏸ 설치동영상 일시정지';});
-v.addEventListener('pause',()=>{if(!v.ended)p.textContent='▶ 설치동영상 계속 재생';});
+v.addEventListener('pause',()=>{if(!v.ended&&!guideFinished)p.textContent='▶ 설치동영상 재생';});
 let guideFinished=false;
 function finishGuide(){
  if(guideFinished)return;
