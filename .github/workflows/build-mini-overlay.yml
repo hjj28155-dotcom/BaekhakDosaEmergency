@@ -44,7 +44,7 @@ jobs:
         run: |
           set -euo pipefail
           OLD=/tmp/HANGHAE_NAVIGATOR_MINI-v1.0.16-original.apk
-          git show a0d59b6204c3137670c6025d87bff6537fcc1680:HANGHAE_NAVIGATOR_MINI-v1.0.16.apk > "$OLD"
+          curl -fL --retry 3 -o "$OLD" "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/a0d59b6204c3137670c6025d87bff6537fcc1680/HANGHAE_NAVIGATOR_MINI-v1.0.16.apk"
           NAV=$(find mini-overlay/app/build/outputs/apk/navigator/debug -type f -name '*.apk' | head -1)
           test -s "$OLD"
           test -s "$NAV"
