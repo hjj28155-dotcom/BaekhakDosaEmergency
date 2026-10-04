@@ -55,12 +55,12 @@ jobs:
           cp "$DIST" HANGHAE_MINI_MP3_FM_AM_YOUTUBE-debug.apk
           cp "$DIST" '항행의자유_배포용_이동아이콘.apk'
           cp "$NAV" HANGHAE_NAVIGATOR_MINI-debug.apk
-          cp "$NAV" HANGHAE_NAVIGATOR_MINI-v1.0.17.apk
+          cp "$NAV" HANGHAE_NAVIGATOR_MINI-v1.0.18.apk
           cp "$NAV" '항해사_전용_이동아이콘.apk'
-          cp "$NAV" '항해사_전용_이동아이콘_v1.0.17.apk'
+          cp "$NAV" '항해사_전용_이동아이콘_v1.0.18.apk'
 
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -f HANGHAE_MINI_MP3_FM_AM_YOUTUBE-debug.apk HANGHAE_NAVIGATOR_MINI-debug.apk HANGHAE_NAVIGATOR_MINI-v1.0.17.apk '항행의자유_배포용_이동아이콘.apk' '항해사_전용_이동아이콘.apk' '항해사_전용_이동아이콘_v1.0.17.apk'
-          git commit -m 'Publish move icon v1.0.17 APKs' || exit 0
+          git add -f HANGHAE_MINI_MP3_FM_AM_YOUTUBE-debug.apk HANGHAE_NAVIGATOR_MINI-debug.apk HANGHAE_NAVIGATOR_MINI-v1.0.18.apk '항행의자유_배포용_이동아이콘.apk' '항해사_전용_이동아이콘.apk' '항해사_전용_이동아이콘_v1.0.18.apk'
+          git commit -m 'Publish move icon v1.0.18 APKs' || exit 0
           git push origin HEAD:main
