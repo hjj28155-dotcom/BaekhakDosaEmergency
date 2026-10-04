@@ -11,17 +11,17 @@
 <button id="start" class="btn" type="button">▶ 설치동영상 재생</button>
 <video id="video" playsinline preload="auto" controls><source src="freedom_guide_latest.mp4?v=20261004-clean1" type="video/mp4"></video>
 <audio id="audio" preload="auto" src="kimkwangseok_ileona.mp3?v=20261004-clean1"></audio>
-<div id="status" class="status">위 재생 버튼을 누르세요.</div>
+<button id="startBottom" class="btn" type="button">▶ 설치동영상 재생</button><div id="status" class="status">재생 버튼을 누르세요.</div>
 <a id="install" class="btn install" href="https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/latest-apk">최신 항행의자유 V4.0.30 업데이트 설치</a>
 <div class="note">기존 앱은 삭제하지 마십시오. 영상의 재생바를 끝까지 이동해도 설치 단계로 넘어갑니다.</div>
 </div></div>
 <script>
-const v=document.getElementById('video'),a=document.getElementById('audio'),start=document.getElementById('start'),install=document.getElementById('install'),status=document.getElementById('status');
+const v=document.getElementById('video'),a=document.getElementById('audio'),start=document.getElementById('start'),startBottom=document.getElementById('startBottom'),install=document.getElementById('install'),status=document.getElementById('status');
 let finished=false;
 function sync(force=false){if(!a)return;try{const t=v.currentTime||0;if(force||Math.abs((a.currentTime||0)-t)>.20)a.currentTime=t;}catch(e){}}
 async function audioPlay(){if(!a)return;try{a.muted=false;a.volume=1;sync(true);await a.play();}catch(e){}}
 async function begin(){
- finished=false;install.style.display='none';start.style.display='none';
+ finished=false;install.style.display='none';start.style.display='none';if(startBottom)startBottom.style.display='none';
  try{v.currentTime=0;}catch(e){} try{a.currentTime=0;}catch(e){}
  v.muted=true;
  await audioPlay();
@@ -30,10 +30,10 @@ async function begin(){
 function finish(){
  if(finished)return;finished=true;
  try{v.pause();}catch(e){}try{a.pause();}catch(e){}
- start.style.display='none';install.style.display='block';status.textContent='✅ 설치동영상 종료 · 아래 최신 업데이트 설치 버튼을 누르세요.';
+ start.style.display='none';if(startBottom)startBottom.style.display='none';install.style.display='block';status.textContent='✅ 설치동영상 종료 · 아래 최신 업데이트 설치 버튼을 누르세요.';
  setTimeout(()=>install.scrollIntoView({behavior:'smooth',block:'center'}),80);
 }
-start.addEventListener('click',begin);
+start.addEventListener('click',begin);if(startBottom)startBottom.addEventListener('click',begin);
 v.addEventListener('play',()=>{if(!finished)audioPlay();});
 v.addEventListener('pause',()=>{if(!finished)try{a.pause();}catch(e){}});
 v.addEventListener('seeking',()=>{try{a.pause();}catch(e){}sync(true);});
