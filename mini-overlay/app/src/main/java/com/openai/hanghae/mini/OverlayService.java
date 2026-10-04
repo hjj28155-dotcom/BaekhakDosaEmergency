@@ -144,11 +144,11 @@ public class OverlayService extends Service {
         if(root!=null||wm==null)return;
         root=new LinearLayout(this);root.setOrientation(LinearLayout.VERTICAL);root.setPadding(dp(5),dp(4),dp(5),dp(4));root.setBackground(bg(0xF20A1D30,0xCCF3C954,18));
 
-        LinearLayout bar=new LinearLayout(this);bar.setOrientation(LinearLayout.HORIZONTAL);bar.setGravity(Gravity.CENTER_VERTICAL);
+        LinearLayout bar=new LinearLayout(this);bar.setOrientation(LinearLayout.VERTICAL);bar.setGravity(Gravity.CENTER_HORIZONTAL);
         anchor=new TextView(this);anchor.setText("⚓");anchor.setTextSize(19f);anchor.setTextColor(0xFFFFD96A);anchor.setGravity(Gravity.CENTER);
         anchor.setBackground(bg(0xEE08233E,0xCCF3C954,14));anchor.setLayoutParams(new LinearLayout.LayoutParams(dp(44),dp(44)));bar.addView(anchor);
 
-        menu=new LinearLayout(this);menu.setOrientation(LinearLayout.HORIZONTAL);menu.setGravity(Gravity.CENTER_VERTICAL);menu.setVisibility(View.VISIBLE);
+        menu=new LinearLayout(this);menu.setOrientation(LinearLayout.VERTICAL);menu.setGravity(Gravity.CENTER_HORIZONTAL);menu.setVisibility(View.VISIBLE);
         Button freedom=btn("🚢 항행의자유",0xEE0C7AA8),
                navigator=btn("🧭 항해사앱",0xEE8A5B18),
                analysis=btn("📊 분석방 V4",0xEE17639A), chatgpt=btn("🤖 ChatGPT",0xEE168A5B),
@@ -159,15 +159,16 @@ public class OverlayService extends Service {
         if(BuildConfig.NAVIGATOR_EDITION){ menu.addView(navigator); menu.addView(analysis); menu.addView(chatgpt); }
         menu.addView(mp3);menu.addView(fm);menu.addView(am);menu.addView(yt);menu.addView(avi);menu.addView(mp4);menu.addView(hide);menu.addView(stop);menu.addView(update);
 
-        HorizontalScrollView menuScroll=new HorizontalScrollView(this);
-        menuScroll.setHorizontalScrollBarEnabled(true);
+        ScrollView menuScroll=new ScrollView(this);
+        menuScroll.setVerticalScrollBarEnabled(true);
         menuScroll.setFillViewport(false);
         menuScroll.setVisibility(View.GONE);
-        menuScroll.addView(menu,new HorizontalScrollView.LayoutParams(-2,-1));
+        menuScroll.addView(menu,new ScrollView.LayoutParams(-1,-2));
         int screenW=getResources().getDisplayMetrics().widthPixels;
-        int menuW=Math.max(dp(220),Math.min(dp(360),screenW-dp(70)));
-        bar.addView(menuScroll,new LinearLayout.LayoutParams(menuW,dp(52)));
-        root.addView(bar,new LinearLayout.LayoutParams(-2,dp(52)));
+        int menuW=Math.max(dp(220),Math.min(dp(300),screenW-dp(70)));
+        int menuH=Math.min(dp(560),getResources().getDisplayMetrics().heightPixels-dp(140));
+        bar.addView(menuScroll,new LinearLayout.LayoutParams(menuW,menuH));
+        root.addView(bar,new LinearLayout.LayoutParams(-2,-2));
 
         now=new TextView(this);now.setTextColor(0xFFFFE58A);now.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP,12f);now.setPadding(dp(8),dp(4),dp(8),dp(5));now.setMaxLines(2);now.setVisibility(View.GONE);
         root.addView(now,new LinearLayout.LayoutParams(-2,-2));
