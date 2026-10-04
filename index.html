@@ -1,60 +1,15 @@
-<!doctype html>
-<html lang="ko"><head>
+<!doctype html><html lang="ko"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta http-equiv="Cache-Control" content="no-store,no-cache,must-revalidate,max-age=0">
-<meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
-<title>항행의자유 V4.0.33 R12 설치</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;background:linear-gradient(#03182c,#00101f);color:#fff;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif}
-.wrap{max-width:720px;margin:auto;padding:28px 16px 52px;text-align:center}
-.card{margin-top:18px;padding:18px;background:#08253c;border:1px solid #315d78;border-radius:18px}
-h1{color:#ffe39a;margin:0 0 8px;font-size:38px}
-.ok{color:#8ff0c5;font-weight:900;font-size:19px;line-height:1.5}
-.sub{color:#d5e5ef;line-height:1.65;font-size:17px}
-video{display:block;width:100%;margin:16px 0 0;border-radius:14px;background:#000;max-height:62vh}
-.status{margin-top:13px;color:#8fe8ff;font-weight:800;line-height:1.55}
-.btn{display:none;width:100%;padding:20px;margin-top:18px;border:0;border-radius:15px;background:#dca20f;color:#071522;text-decoration:none;font-size:23px;font-weight:900}
-.note{margin-top:16px;color:#b8cbd8;font-size:15px;line-height:1.65}
-</style></head><body>
-<div class="wrap">
-<h1>항행의자유</h1>
-<div class="ok">V4.0.33 승인흐름복구 R12 · 배포 정상</div>
-<div class="card">
-<div class="sub"><b>1단계 · 설치동영상</b><br>아래 영상의 ▶ 버튼을 눌러 설치 안내를 먼저 확인해 주세요.</div>
-<video id="installVideo" controls playsinline webkit-playsinline preload="metadata"
- src="https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/install_guide_final.mp4?v=20261004-r12-installvideo"></video>
+<meta http-equiv="Cache-Control" content="no-store,no-cache,must-revalidate,max-age=0"><title>항행의자유 설치</title>
+<style>*{box-sizing:border-box}body{margin:0;background:linear-gradient(#03182c,#00101f);color:#fff;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif}.wrap{max-width:720px;margin:auto;padding:28px 16px 52px;text-align:center}.card{margin-top:18px;padding:18px;background:#08253c;border:1px solid #315d78;border-radius:18px}h1{color:#ffe39a;margin:0 0 8px;font-size:38px}.sub{color:#d5e5ef;line-height:1.65;font-size:17px}video{display:block;width:100%;margin:16px 0 0;border-radius:14px;background:#000;max-height:62vh}.status{margin-top:13px;color:#8fe8ff;font-weight:800;line-height:1.55}#scrollStage{display:none}.scroll{display:block;width:100%;height:auto;border-radius:14px;margin-top:18px}.btn{display:block;width:100%;padding:20px;margin-top:18px;border:0;border-radius:15px;background:#dca20f;color:#071522;text-decoration:none;font-size:23px;font-weight:900}.note{margin-top:16px;color:#b8cbd8;font-size:15px;line-height:1.65}</style></head><body>
+<div class="wrap"><h1>항행의자유</h1><div class="card">
+<div class="sub"><b>1단계 · 설치동영상</b><br>설치 안내를 끝까지 확인해 주세요.</div>
+<video id="installVideo" controls playsinline webkit-playsinline preload="metadata" src="https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/install_guide_final.mp4?v=20261004-finalflow"></video>
 <div id="status" class="status">▶ 설치동영상을 재생해 주세요.</div>
-<a id="installBtn" class="btn" href="https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/FREEDOM_V3_FINAL_LATEST.apk?v=40033-r12-hotfix-20261004-1810" download="항행의자유_V4.0.33_R12.apk">📱 최신버전 설치하기</a>
-<div class="note"><b>기존 앱은 삭제하지 마세요.</b><br>설치동영상이 끝나면 설치 버튼이 나타납니다. 설치 후 앱을 실행하면 환영 두루마리 → 승인요청 → 승인대기 → 항해사 승인 → 승인확인 → 안내동영상 1회 → 홈 순서로 진행합니다.</div>
+<div id="scrollStage">
+<img class="scroll" src="welcome_scroll_final.png?v=20261004-finalflow" alt="항행의자유 환영 두루마리">
+<a class="btn" href="https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/latest-apk">📱 두루마리 확인 · 설치/실행</a>
+</div>
+<div class="note"><b>기존 앱은 삭제하지 마세요.</b><br>설치동영상 종료 → 환영 두루마리 → 설치/실행 순서로 진행합니다.</div>
 </div></div>
-<script>
-(function(){
- const v=document.getElementById('installVideo');
- const b=document.getElementById('installBtn');
- const s=document.getElementById('status');
- let done=false;
- function finish(){
-   if(done)return; done=true;
-   b.style.display='block';
-   s.textContent='✅ 설치동영상 확인 완료 · 아래 최신버전 설치하기를 눌러 주세요.';
-   setTimeout(()=>b.scrollIntoView({behavior:'smooth',block:'center'}),100);
- }
- v.addEventListener('play',()=>{if(!done)s.textContent='🎬 설치동영상 재생 중';});
- v.addEventListener('ended',finish,{once:true});
- v.addEventListener('timeupdate',()=>{
-   if(done||!Number.isFinite(v.duration)||v.duration<=0)return;
-   if(v.currentTime>=v.duration-1.0)finish();
- });
- v.addEventListener('pause',()=>{
-   if(done||!Number.isFinite(v.duration)||v.duration<=0)return;
-   if(v.currentTime>=v.duration-1.5)finish();
- });
- setInterval(()=>{
-   if(done||!Number.isFinite(v.duration)||v.duration<=0)return;
-   if(v.ended || v.currentTime>=v.duration-1.0)finish();
- },500);
- v.addEventListener('error',()=>{s.textContent='❌ 설치동영상을 불러오지 못했습니다. 잠시 후 다시 열어 주세요.';b.style.display='none';});
-})();
-</script>
-</body></html>
+<script>(function(){const v=document.getElementById('installVideo'),stage=document.getElementById('scrollStage'),s=document.getElementById('status');let done=false;function finish(){if(done)return;done=true;stage.style.display='block';s.textContent='✅ 설치동영상 종료 · 환영 두루마리를 확인해 주세요.';setTimeout(()=>stage.scrollIntoView({behavior:'smooth',block:'start'}),100)}v.addEventListener('play',()=>{if(!done)s.textContent='🎬 설치동영상 재생 중'});v.addEventListener('ended',finish);v.addEventListener('timeupdate',()=>{if(!done&&Number.isFinite(v.duration)&&v.duration>0&&v.currentTime>=v.duration-1)finish()});v.addEventListener('pause',()=>{if(!done&&Number.isFinite(v.duration)&&v.duration>0&&v.currentTime>=v.duration-1.5)finish()});setInterval(()=>{if(!done&&Number.isFinite(v.duration)&&v.duration>0&&(v.ended||v.currentTime>=v.duration-1))finish()},500);})();</script></body></html>
