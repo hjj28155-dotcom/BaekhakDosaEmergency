@@ -1,4 +1,4 @@
-name: Build Freedom V4.0.33 Approval Recovery
+name: Build Freedom V4.0.34 Approval Recovery
 on:
   push:
     paths:
@@ -23,22 +23,24 @@ jobs:
           ./gradlew assembleDebug --no-daemon
           APK=$(find app/build/outputs/apk/debug -type f -name '*.apk' | head -1)
           test -s "$APK"
-          cp "$APK" "$GITHUB_WORKSPACE/항행의자유_V4.0.33_승인흐름복구_R12.apk"
-          sha256sum "$GITHUB_WORKSPACE/항행의자유_V4.0.33_승인흐름복구_R12.apk"
+          cp "$APK" "$GITHUB_WORKSPACE/항행의자유_V4.0.34_승인흐름복구_R13.apk"
+          sha256sum "$GITHUB_WORKSPACE/항행의자유_V4.0.34_승인흐름복구_R13.apk"
       - uses: actions/upload-artifact@v4
         with:
-          name: HANGHAE_FREEDOM_V4_0_33_APPROVAL_RECOVERY_R12
-          path: 항행의자유_V4.0.33_승인흐름복구_R12.apk
+          name: HANGHAE_FREEDOM_V4_0_34_APPROVAL_RECOVERY_R13
+          path: 항행의자유_V4.0.34_승인흐름복구_R13.apk
       - name: Publish APK and latest alias
         run: |
           set -euo pipefail
-          cp 항행의자유_V4.0.33_승인흐름복구_R12.apk FREEDOM_V3_FINAL_LATEST.apk
+          cp 항행의자유_V4.0.34_승인흐름복구_R13.apk FREEDOM_V3_FINAL_LATEST.apk
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f 항행의자유_V4.0.33_승인흐름복구_R12.apk FREEDOM_V3_FINAL_LATEST.apk
-          git commit -m "Publish V4.0.33 approval flow recovery R12" || exit 0
+          git add -f 항행의자유_V4.0.34_승인흐름복구_R13.apk FREEDOM_V3_FINAL_LATEST.apk
+          git commit -m "Publish V4.0.34 approval flow recovery R13" || exit 0
           git push origin main
 
 # trigger-r11: 20261004-2
 
-# trigger-r12: 20261004-final-order-2
+
+
+# trigger-r13: 20261005-final-1
