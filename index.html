@@ -77,39 +77,44 @@ const install=document.getElementById('downloadBtn');
 const status=document.getElementById('guideStatus');
 let done=false;
 
-async function startGuideSong(){
-  if(done)return;
-  if(start)start.style.display='none';
-  try{
-    v.muted=true;
-    v.currentTime=0;
-    if(a){a.pause();a.currentTime=0;a.muted=false;a.volume=1;}
-    if(a)await a.play();
-    await v.play();
-    if(status)status.textContent='🔊 설치동영상과 안내음악 재생 중';
-  }catch(e){
-    if(status)status.textContent='▶ 영상 화면의 재생 버튼을 눌러주세요.';
-    try{await v.play();}catch(_){}
-  }
+function syncAudio(){
+ if(!a||!v)return;
+ try{
+   const t=v.currentTime||0;
+   if(Math.abs((a.currentTime||0)-t)>0.18)a.currentTime=t;
+ }catch(e){}
 }
-
-function finishGuide(){
-  if(done)return;
-  done=true;
-  try{v.pause();}catch(e){}
-  try{if(a)a.pause();}catch(e){}
-  if(start)start.style.display='none';
-  if(install){install.style.display='block';install.style.opacity='1';install.removeAttribute('disabled');}
-  if(status)status.textContent='✅ 설치동영상 종료 · 아래 최신 업데이트 설치 버튼을 누르세요.';
-  setTimeout(()=>{try{install.scrollIntoView({behavior:'smooth',block:'center'});}catch(e){}},100);
+async function playBoth(){
+ done=false;
+ if(install)install.style.display='none';
+ if(start)start.style.display='none';
+ try{
+   v.muted=true;
+   if(v.ended || (Number.isFinite(v.duration)&&v.currentTime>=v.duration-1))v.currentTime=0;
+   if(a){a.muted=false;a.volume=1;a.currentTime=v.currentTime||0;await a.play();}
+   await v.play();
+   if(status)status.textContent='🔊 설치동영상과 노래 동기 재생 중';
+ }catch(e){
+   try{await v.play();}catch(_){}
+ }
 }
-
-if(start)start.onclick=startGuideSong;
+function finish(){
+ if(done)return; done=true;
+ try{v.pause();}catch(e){} try{if(a)a.pause();}catch(e){}
+ if(start)start.style.display='none';
+ if(install){install.style.display='block';install.style.opacity='1';install.removeAttribute('disabled');}
+ if(status)status.textContent='✅ 설치동영상 종료 · 아래 최신 업데이트 설치 버튼을 누르세요.';
+ setTimeout(()=>{try{install.scrollIntoView({behavior:'smooth',block:'center'});}catch(e){}},100);
+}
+if(start)start.onclick=playBoth;
 if(v){
-  v.controls=true;
-  v.addEventListener('ended',finishGuide);
-  v.addEventListener('seeked',()=>{if(Number.isFinite(v.duration)&&v.duration>0&&v.currentTime>=v.duration-0.75)finishGuide();});
-  v.addEventListener('timeupdate',()=>{if(Number.isFinite(v.duration)&&v.duration>0&&v.currentTime>=v.duration-0.4)finishGuide();});
+ v.controls=true;
+ v.addEventListener('play',async()=>{syncAudio();try{if(a&&a.paused)await a.play();}catch(e){}});
+ v.addEventListener('pause',()=>{try{if(a&&!done)a.pause();}catch(e){}});
+ v.addEventListener('seeking',()=>{try{if(a)a.pause();}catch(e){} syncAudio();});
+ v.addEventListener('seeked',async()=>{syncAudio();if(Number.isFinite(v.duration)&&v.duration>0&&v.currentTime>=v.duration-.75){finish();return;}try{if(a&&!v.paused)await a.play();}catch(e){}});
+ v.addEventListener('timeupdate',()=>{if(done)return;syncAudio();if(Number.isFinite(v.duration)&&v.duration>0&&v.currentTime>=v.duration-.4)finish();});
+ v.addEventListener('ended',finish);
 }
 </script>
 </body>
