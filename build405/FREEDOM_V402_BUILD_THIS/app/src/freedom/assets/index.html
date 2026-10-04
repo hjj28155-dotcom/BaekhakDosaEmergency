@@ -1905,7 +1905,23 @@ function v330Print(){
 })();
 </script>
 
-</body></html>`);
+
+<script id="r13AuthoritativeOnboarding">
+(function(){
+ const KEY='freedom_r13_done';
+ const getApproval=()=>{try{const x=AndroidHost.getSpecialApprovalSummary();return typeof x==='string'?JSON.parse(x||'{}'):(x||{})}catch(e){return {}}};
+ const rm=()=>{['startupVideoGate','approvalHardLock','installGuideOverlay','r13Gate'].forEach(id=>{const e=document.getElementById(id);if(e)e.remove()});document.body.style.overflow='';};
+ const gate=()=>{let g=document.getElementById('r13Gate');if(!g){g=document.createElement('div');g.id='r13Gate';g.style.cssText='position:fixed;inset:0;z-index:2147483647;background:#00152a;color:#fff;overflow:auto;font-family:system-ui,-apple-system,Noto Sans KR,sans-serif';document.body.appendChild(g)}document.body.style.overflow='hidden';return g};
+ function scroll(){rm();const g=gate();g.innerHTML='<div style="max-width:760px;margin:auto;padding:16px;text-align:center"><img src="welcome_scroll_final.png" style="display:block;width:100%;height:auto;border-radius:16px"><button id="r13Next" style="width:100%;margin-top:14px;padding:18px;border-radius:14px;border:1px solid #e2c66d;background:#74550d;color:#fff3b0;font-size:19px;font-weight:900">다음 · 승인요청</button></div>';document.getElementById('r13Next').onclick=approval;}
+ function approval(){rm();const q=getApproval();if(q.approved===true){guide();return}const g=gate();g.innerHTML='<div style="max-width:650px;margin:8vh auto;padding:22px"><div style="border:1px solid #d2b355;border-radius:18px;background:#082f50;padding:20px"><h2 style="color:#ffe58a">🔒 승인 후 이용 가능</h2><input id="r13Name" placeholder="본인 실명" style="width:100%;padding:14px;margin:8px 0"><input id="r13Ref" placeholder="누구의 지인인지 입력" style="width:100%;padding:14px;margin:8px 0"><button id="r13Req" style="width:49%;padding:15px">승인요청</button><button id="r13Check" style="width:49%;padding:15px">승인확인</button><div id="r13Status" style="margin-top:14px;color:#8ff0c5">승인요청을 진행해 주세요.</div></div></div>';const st=document.getElementById('r13Status');document.getElementById('r13Req').onclick=async()=>{const n=document.getElementById('r13Name').value.trim(),r=document.getElementById('r13Ref').value.trim();if(!n||!r){st.textContent='실명과 지인 정보를 모두 입력해 주세요.';return}st.textContent='승인요청 전송 중...';try{if(window.AndroidHost&&typeof AndroidHost.requestSpecialApproval==='function'){AndroidHost.requestSpecialApproval(1244,n,r);st.textContent='승인요청 전송됨 · 항해사 승인을 기다려 주세요.'}else if(typeof v428DirectApprovalRequest==='function'){await v428DirectApprovalRequest(1244,n,r);st.textContent='승인요청 접수됨 · 항해사 승인을 기다려 주세요.'}else throw new Error()}catch(e){try{if(typeof v428DirectApprovalRequest==='function'){await v428DirectApprovalRequest(1244,n,r);st.textContent='승인요청 접수됨 · 항해사 승인을 기다려 주세요.'}else throw e}catch(_){st.textContent='승인 서버 연결을 확인해 주세요.'}}};document.getElementById('r13Check').onclick=()=>{const q=getApproval();if(q.approved===true){guide();return}st.textContent='승인 상태 확인 중...';try{if(AndroidHost.checkSpecialApproval)AndroidHost.checkSpecialApproval()}catch(e){}setTimeout(()=>{const z=getApproval();if(z.approved===true)guide();else st.textContent='승인대기 · 승인 후 다시 확인해 주세요.'},1200)};}
+ function guide(){rm();const g=gate();g.innerHTML='<video id="r13Video" controls playsinline preload="auto" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000" src="freedom_onboarding_postscroll_20260928.mp4"></video>';const v=document.getElementById('r13Video');v.muted=false;v.volume=1;try{const p=v.play();if(p&&p.catch)p.catch(()=>{})}catch(e){}v.addEventListener('ended',()=>{try{localStorage.setItem(KEY,'1')}catch(e){}rm();try{if(window.unlockApprovedApp)window.unlockApprovedApp()}catch(e){}},{once:true});}
+ function boot(){rm();const q=getApproval();let done=false;try{done=localStorage.getItem(KEY)==='1'}catch(e){}if(q.approved===true&&done){rm();return}if(q.approved===true){guide();return}scroll();}
+ window.startFreedomIntroVideo=function(){};
+ window.beginApprovedOnboardingSequence=function(){};
+ window.showApprovalHardLock=function(){};
+ window.addEventListener('load',()=>setTimeout(boot,1200),{once:true});
+})();
+</script></body></html>`);
  w.document.close();setTimeout(()=>{try{w.print()}catch(e){}},250);
 }
 function v330ResultPage(round){
