@@ -20,41 +20,40 @@ video{width:100%;border-radius:14px;background:#000;margin-top:14px}.btn{display
 <div class="emergency">영상 재생에 문제가 있을 경우 <a href="https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/latest-apk">최신판 설치로 바로 진행</a></div>
 </div></div>
 <script>
-const v=document.getElementById('guide'), p=document.getElementById('playBtn'), b=document.getElementById('installBtn'), s=document.getElementById('status');
-async function startGuide(){
- guideFinished=false;
- try{
-   v.pause();
-   if(Number.isFinite(v.duration)&&v.duration>0&&v.currentTime>=v.duration-1)v.currentTime=0;
-   v.muted=false;
-   await v.play();
-   p.textContent='▶ 설치동영상 재생';
-   s.textContent='설치동영상 재생 중입니다.';
- }catch(e){
-   try{
-     v.muted=true;
-     await v.play();
-     p.textContent='▶ 설치동영상 재생';
-     s.textContent='영상 재생 중입니다. 소리는 영상의 음량 버튼을 확인하세요.';
-   }catch(_){
-     p.textContent='▶ 설치동영상 재생';
-     s.textContent='재생이 차단되었습니다. 영상 화면의 ▶ 버튼을 눌러주세요.';
-   }
- }
+const v=document.getElementById('guide');
+const p=document.getElementById('playBtn');
+const b=document.getElementById('installBtn');
+const s=document.getElementById('status');
+let finished=false;
+
+function showInstall(){
+  if(finished)return;
+  finished=true;
+  try{v.pause();}catch(e){}
+  b.style.display='block';
+  s.textContent='✅ 설치동영상이 종료되었습니다. 아래 업데이트 설치 버튼을 누르세요.';
+  b.scrollIntoView({behavior:'smooth',block:'center'});
 }
-p.addEventListener('click',()=>{startGuide();});
-v.addEventListener('play',()=>{p.textContent='▶ 설치동영상 재생';});
-v.addEventListener('pause',()=>{p.textContent='▶ 설치동영상 재생';});
-let guideFinished=false;
-function finishGuide(){
- if(guideFinished)return;
- guideFinished=true;
- try{v.pause(); if(Number.isFinite(v.duration)&&v.duration>0)v.currentTime=v.duration;}catch(e){}
- b.style.display='block';
- p.textContent='▶ 설치동영상 재생';
- s.textContent='✅ 설치동영상이 끝났습니다. 아래 업데이트 설치 버튼을 누르세요.';
+
+async function playGuide(){
+  finished=false;
+  b.style.display='none';
+  try{
+    if(v.ended || (Number.isFinite(v.duration)&&v.duration>0&&v.currentTime>=v.duration-1)){v.currentTime=0;}
+    await v.play();
+    s.textContent='설치동영상 재생 중입니다.';
+  }catch(e){
+    try{v.muted=true;await v.play();s.textContent='설치동영상 재생 중입니다.';}
+    catch(_){s.textContent='영상 화면의 ▶ 버튼을 눌러 재생하세요.';}
+  }
 }
-v.addEventListener('ended',finishGuide);
-v.addEventListener('timeupdate',()=>{if(Number.isFinite(v.duration)&&v.duration>0&&v.currentTime>=v.duration-0.35)finishGuide();});
-v.addEventListener('seeked',()=>{if(Number.isFinite(v.duration)&&v.duration>0&&v.currentTime>=v.duration-0.75)finishGuide();});
+
+p.addEventListener('click',playGuide);
+v.addEventListener('ended',showInstall);
+v.addEventListener('timeupdate',()=>{
+  if(!finished && Number.isFinite(v.duration)&&v.duration>0 && v.currentTime>=v.duration-0.5) showInstall();
+});
+v.addEventListener('seeked',()=>{
+  if(!finished && Number.isFinite(v.duration)&&v.duration>0 && v.currentTime>=v.duration-1.0) showInstall();
+});
 </script></body></html>
