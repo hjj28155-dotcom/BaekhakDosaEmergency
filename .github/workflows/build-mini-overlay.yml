@@ -25,7 +25,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.android/debug.keystore
-          key: hanghae-mini-stable-debug-keystore-v1-20261004-094344
+          key: hanghae-mini-stable-debug-keystore-v1
       - name: Restore original navigator signing key
         run: |
           set -euo pipefail
