@@ -2338,12 +2338,16 @@ setTimeout(()=>{
     o.innerHTML=`
       <div style="position:absolute;inset:0;background:#00152a;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px">
         <img src="welcome_scroll_final.png" alt="항행의자유 환영 두루마리" style="display:block;max-width:100%;max-height:88vh;width:auto;height:auto;object-fit:contain;border-radius:14px;box-shadow:0 12px 42px rgba(0,0,0,.55)">
-        <button id="postIntroScrollButton" type="button" style="margin-top:10px;min-width:240px;border:1px solid #e2c66d;background:linear-gradient(#8d6b1c,#493407);color:#fff3b0;border-radius:15px;padding:13px 22px;font-size:17px;font-weight:900;box-shadow:0 6px 18px rgba(0,0,0,.4);touch-action:manipulation">다음 · 설치동영상</button>
+        <button id="postIntroScrollButton" type="button" style="margin-top:10px;min-width:240px;border:1px solid #e2c66d;background:linear-gradient(#8d6b1c,#493407);color:#fff3b0;border-radius:15px;padding:13px 22px;font-size:17px;font-weight:900;box-shadow:0 6px 18px rgba(0,0,0,.4);touch-action:manipulation">다음 · 승인요청</button>
       </div>`;
     const btn=document.getElementById('postIntroScrollButton');
     if(btn){
       let fired=false;
-      const go=(ev)=>{if(ev){ev.preventDefault();ev.stopPropagation();}if(fired)return;fired=true;openPostIntroScroll();};
+      const go=(ev)=>{if(ev){ev.preventDefault();ev.stopPropagation();}if(fired)return;fired=true;
+        let q={};try{if(window.AndroidHost&&AndroidHost.getSpecialApprovalSummary){const raw=AndroidHost.getSpecialApprovalSummary();q=typeof raw==='string'?JSON.parse(raw||'{}'):(raw||{});}}catch(e){}
+        const gate=document.getElementById('startupVideoGate');if(gate)gate.remove();document.body.style.overflow='';
+        if(q.approved===true){openPostIntroScroll();}else{setTimeout(()=>{try{if(window.showApprovalHardLock)window.showApprovalHardLock();else specialApprovalPage();}catch(e){try{specialApprovalPage();}catch(_){} }},50);}
+      };
       btn.addEventListener('click',go,{once:true});
       btn.addEventListener('pointerup',go,{once:true});
       btn.addEventListener('touchend',go,{once:true,passive:false});
@@ -2469,18 +2473,10 @@ setTimeout(()=>{
         return;
       }
 
-      // Always show the welcome scroll. If not approved, show approval window over it.
+      // First run: show ONLY the welcome scroll. Approval opens after the user taps Next.
       beginApprovedOnboardingSequence();
-      if(q.approved!==true){
-        setTimeout(function(){
-          try{if(window.showApprovalHardLock)window.showApprovalHardLock();}catch(e){}
-        },0);
-      }
     }catch(e){
       beginApprovedOnboardingSequence();
-      setTimeout(function(){
-        try{if(window.showApprovalHardLock)window.showApprovalHardLock();}catch(x){}
-      },0);
     }
   }
 
