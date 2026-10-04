@@ -290,6 +290,33 @@ window.addEventListener('load',()=>{
   }
 });
 
+
+/* 20261004 forced end/audio recovery */
+(function(){
+ const v=document.getElementById('installGuideVideo');
+ const a=document.getElementById('guideSongAudio');
+ const b=document.getElementById('downloadBtn');
+ const st=document.getElementById('guideStatus');
+ if(!v||!b)return;
+ function forceNext(){
+   try{v.pause();}catch(e){}
+   try{if(a)a.pause();}catch(e){}
+   SESSION_ACTIVE=false; SESSION_DONE=true; GUIDE_ENDED=true;
+   if(b){b.style.display='block';b.style.opacity='1';b.removeAttribute('disabled');}
+   if(st)st.textContent='✅ 설치동영상이 종료되었습니다. 아래 최신 업데이트 설치 버튼을 누르세요.';
+   setTimeout(()=>{try{b.scrollIntoView({behavior:'smooth',block:'center'});}catch(e){}},100);
+ }
+ function atEnd(){return Number.isFinite(v.duration)&&v.duration>0&&v.currentTime>=v.duration-0.75;}
+ v.addEventListener('ended',forceNext);
+ v.addEventListener('seeked',()=>{if(atEnd())forceNext();});
+ v.addEventListener('timeupdate',()=>{if(atEnd())forceNext();});
+ const start=document.getElementById('guideStartBtn');
+ if(start&&a){
+   start.addEventListener('click',async()=>{
+     try{a.muted=false;a.volume=1;if(Math.abs((a.currentTime||0)-(v.currentTime||0))>1)a.currentTime=v.currentTime||0;await a.play();}catch(e){}
+   },true);
+ }
+})();
 </script>
 </body>
 </html>
