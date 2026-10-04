@@ -38,14 +38,16 @@ jobs:
         working-directory: mini-overlay
         run: |
           set -euo pipefail
-          gradle assembleDistributionDebug assembleNavigatorDebug --no-daemon
+          gradle assembleDistributionDebug assembleNavigatorDebug assembleBridgeDebug --no-daemon
       - name: Publish both APK editions
         run: |
           set -euo pipefail
           DIST=$(find mini-overlay/app/build/outputs/apk/distribution/debug -type f -name '*.apk' | head -1)
           NAV=$(find mini-overlay/app/build/outputs/apk/navigator/debug -type f -name '*.apk' | head -1)
+          BRIDGE=$(find mini-overlay/app/build/outputs/apk/bridge/debug -type f -name '*.apk' | head -1)
           test -s "$DIST"
           test -s "$NAV"
+          test -s "$BRIDGE"
 
           # Refresh tracked branch BEFORE copying binary outputs.
           # Built APKs live under ignored build/ paths, so reset does not remove them.
@@ -58,9 +60,11 @@ jobs:
           cp "$NAV" HANGHAE_NAVIGATOR_MINI-v1.0.18.apk
           cp "$NAV" '항해사_전용_이동아이콘.apk'
           cp "$NAV" '항해사_전용_이동아이콘_v1.0.18.apk'
+          cp "$BRIDGE" HANGHAE_MOVEICON_V1.0.18_BRIDGE.apk
+          cp "$BRIDGE" '항행의자유_이동아이콘_v1.0.18_교체판.apk'
 
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -f HANGHAE_MINI_MP3_FM_AM_YOUTUBE-debug.apk HANGHAE_NAVIGATOR_MINI-debug.apk HANGHAE_NAVIGATOR_MINI-v1.0.18.apk '항행의자유_배포용_이동아이콘.apk' '항해사_전용_이동아이콘.apk' '항해사_전용_이동아이콘_v1.0.18.apk'
+          git add -f HANGHAE_MINI_MP3_FM_AM_YOUTUBE-debug.apk HANGHAE_NAVIGATOR_MINI-debug.apk HANGHAE_NAVIGATOR_MINI-v1.0.18.apk HANGHAE_MOVEICON_V1.0.18_BRIDGE.apk '항행의자유_배포용_이동아이콘.apk' '항해사_전용_이동아이콘.apk' '항해사_전용_이동아이콘_v1.0.18.apk' '항행의자유_이동아이콘_v1.0.18_교체판.apk'
           git commit -m 'Publish move icon v1.0.18 APKs' || exit 0
           git push origin HEAD:main
