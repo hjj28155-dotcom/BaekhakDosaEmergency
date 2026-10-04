@@ -2,30 +2,30 @@
 <html lang="ko"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-store,no-cache,must-revalidate,max-age=0">
-<title>항행의자유 설치·업데이트</title>
+<meta name="theme-color" content="#03182c"><title>항행의자유 설치·업데이트</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(#03182c,#00101f);color:#fff;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif}
 .wrap{max-width:720px;margin:auto;padding:24px 16px 50px;text-align:center}.card{background:#08253c;border:1px solid #315d78;border-radius:18px;padding:18px}
 h1{color:#ffe39a;margin:0 0 8px;font-size:32px}.sub{color:#d5e5ef;line-height:1.6;font-size:17px}
 video{display:block;width:100%;margin:16px 0 0;border-radius:14px;background:#000;max-height:62vh}
-#next{display:none}.scroll{margin:22px auto;padding:28px 20px;max-width:620px;background:#f1dfad;color:#30230f;border:10px solid #8b5a27;border-radius:10px;box-shadow:0 8px 24px #0008;font-weight:800;font-size:20px;line-height:1.7}
-.btn{display:block;margin:16px auto 0;padding:18px 16px;background:#17639a;color:#fff;text-decoration:none;border-radius:14px;font-size:20px;font-weight:900}
+#next{display:none}.scrollImg{display:block;width:100%;height:auto;margin:22px auto 0;border-radius:12px;box-shadow:0 8px 24px #0008}
+.btn{display:block;margin:18px auto 0;padding:18px 16px;background:#17639a;color:#fff;text-decoration:none;border-radius:14px;font-size:20px;font-weight:900}
 .note{margin-top:14px;color:#bcd0dc;line-height:1.55;font-size:15px}.status{margin-top:12px;color:#8fe8ff;font-weight:800}
 </style></head><body><div class="wrap">
 <h1>⚓ 항행의자유</h1>
-<div class="card" id="videoStage">
-<div class="sub"><b>설치 안내 동영상</b><br>동영상을 끝까지 보시면 다음 안내가 열립니다.</div>
-<video id="guide" controls playsinline webkit-playsinline preload="metadata" src="항행의자유_인사소개.mp4?v=20261004"></video>
-<div id="status" class="status">▶ 동영상을 재생해 주세요.</div>
+<div class="card">
+<div class="sub"><b>설치 안내 동영상</b><br>동영상을 끝까지 보시면 두루마리 안내가 열립니다.</div>
+<video id="guide" controls playsinline webkit-playsinline preload="metadata" src="build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/install_guide_final.mp4?v=20261004-2148"></video>
+<div id="status" class="status">▶ 설치동영상을 재생해 주세요.</div>
 </div>
 <div id="next">
-<div class="scroll">📜 항행의자유 설치 안내<br><br>설치동영상을 모두 보셨습니다.<br>아래 버튼으로 설치·업데이트를 계속 진행해 주세요.</div>
-<a class="btn" href="navigator-update.html">📱 설치 / 업데이트 / 실행 페이지로 이동</a>
+<img class="scrollImg" src="welcome_scroll_final.png?v=20261004-2148" alt="항행의자유 설치 안내 두루마리">
+<a class="btn" href="navigator-update.html?v=20261004-2148">📱 설치 / 업데이트 / 실행 페이지로 이동</a>
 <div class="note">기존 설치자는 기존 앱을 임의로 삭제하지 말고 업데이트 안내에 따라 진행해 주세요.</div>
 </div></div>
 <script>
 const v=document.getElementById('guide'),n=document.getElementById('next'),s=document.getElementById('status');
 v.addEventListener('play',()=>s.textContent='🎬 설치동영상 재생 중');
 v.addEventListener('ended',()=>{s.textContent='✅ 설치동영상 재생 완료';n.style.display='block';setTimeout(()=>n.scrollIntoView({behavior:'smooth',block:'start'}),250)});
-v.addEventListener('error',()=>s.textContent='❌ 동영상을 불러오지 못했습니다. 잠시 후 다시 열어 주세요.');
+v.addEventListener('error',()=>s.textContent='❌ 설치동영상을 불러오지 못했습니다. 잠시 후 다시 열어 주세요.');
 </script></body></html>
