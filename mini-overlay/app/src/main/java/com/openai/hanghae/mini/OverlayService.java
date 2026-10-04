@@ -146,7 +146,7 @@ public class OverlayService extends Service {
 
         LinearLayout bar=new LinearLayout(this);bar.setOrientation(LinearLayout.VERTICAL);bar.setGravity(Gravity.CENTER_HORIZONTAL);
         anchor=new TextView(this);anchor.setText("⚓");anchor.setTextSize(19f);anchor.setTextColor(0xFFFFD96A);anchor.setGravity(Gravity.CENTER);
-        anchor.setBackground(bg(0xEE08233E,0xCCF3C954,14));anchor.setLayoutParams(new LinearLayout.LayoutParams(dp(44),dp(44)));bar.addView(anchor);
+        anchor.setBackground(bg(0xEE08233E,0xCCF3C954,14));anchor.setLayoutParams(new LinearLayout.LayoutParams(dp(38),dp(38)));bar.addView(anchor);
 
         menu=new LinearLayout(this);menu.setOrientation(LinearLayout.VERTICAL);menu.setGravity(Gravity.CENTER_HORIZONTAL);menu.setVisibility(View.VISIBLE);
         Button freedom=btn("🚢 항행의자유",0xEE0C7AA8),
@@ -165,8 +165,8 @@ public class OverlayService extends Service {
         menuScroll.setVisibility(View.GONE);
         menuScroll.addView(menu,new ScrollView.LayoutParams(-1,-2));
         int screenW=getResources().getDisplayMetrics().widthPixels;
-        int menuW=Math.max(dp(220),Math.min(dp(300),screenW-dp(70)));
-        int menuH=Math.min(dp(560),getResources().getDisplayMetrics().heightPixels-dp(140));
+        int menuW=Math.max(dp(150),Math.min(dp(180),screenW-dp(150)));
+        int menuH=Math.min(dp(310),getResources().getDisplayMetrics().heightPixels-dp(300));
         bar.addView(menuScroll,new LinearLayout.LayoutParams(menuW,menuH));
         root.addView(bar,new LinearLayout.LayoutParams(-2,-2));
 
