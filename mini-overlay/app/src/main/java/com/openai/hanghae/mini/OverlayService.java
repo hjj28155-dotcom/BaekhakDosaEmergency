@@ -151,11 +151,12 @@ public class OverlayService extends Service {
         menu=new LinearLayout(this);menu.setOrientation(LinearLayout.HORIZONTAL);menu.setGravity(Gravity.CENTER_VERTICAL);menu.setVisibility(View.VISIBLE);
         Button freedom=btn("🚢 항행의자유",0xEE0C7AA8),
                navigator=btn("🧭 항해사앱",0xEE8A5B18),
+               analysis=btn("📊 분석방 V4",0xEE17639A), chatgpt=btn("🤖 ChatGPT",0xEE168A5B),
                mp3=btn("🎵 MP3",0xEE1068C8), fm=btn("📻 FM",0xEE5B34D6), am=btn("📡 AM",0xEE6D2DB7),
                yt=btn("유튜브",0xEEDB1F28), avi=btn("AVI",0xEE8A4D1E), mp4=btn("MP4",0xEE1F7A5B),
                hide=btn("아이콘 숨김",0xEE455A64), stop=btn("■ 종료",0xEED52D46), update=btn("업데이트",0xEE087F5B);
         menu.addView(freedom);
-        if(BuildConfig.NAVIGATOR_EDITION) menu.addView(navigator);
+        if(BuildConfig.NAVIGATOR_EDITION){ menu.addView(navigator); menu.addView(analysis); menu.addView(chatgpt); }
         menu.addView(mp3);menu.addView(fm);menu.addView(am);menu.addView(yt);menu.addView(avi);menu.addView(mp4);menu.addView(hide);menu.addView(stop);menu.addView(update);
 
         HorizontalScrollView menuScroll=new HorizontalScrollView(this);
@@ -175,7 +176,11 @@ public class OverlayService extends Service {
         root.addView(stationPanel,new LinearLayout.LayoutParams(-1,-2));
 
         freedom.setOnClickListener(v->openFreedomApp());
-        if(BuildConfig.NAVIGATOR_EDITION) navigator.setOnClickListener(v->openNavigatorApp());
+        if(BuildConfig.NAVIGATOR_EDITION){
+            navigator.setOnClickListener(v->openNavigatorApp());
+            analysis.setOnClickListener(v->openAnalysisV4());
+            chatgpt.setOnClickListener(v->openChatGPT());
+        }
         mp3.setOnClickListener(v->{showMp3Controls();toggleLocalMp3();});
         fm.setOnClickListener(v->showStations(true));
         am.setOnClickListener(v->showStations(false));
@@ -549,6 +554,27 @@ public class OverlayService extends Service {
             setNow("🧭 구글드라이브의 항해사앱 최신본을 엽니다.");
         }catch(Exception e){
             toast("항해사앱을 열 수 없습니다.");
+        }
+    }
+
+    private void openAnalysisV4(){
+        collapseStations();
+        collapseMenu();
+        if(launchPackage("com.navigator.analysis.v4","📊 분석방 V4 실행")) return;
+        toast("분석방 V4가 설치되어 있지 않습니다.");
+    }
+
+    private void openChatGPT(){
+        collapseStations();
+        collapseMenu();
+        if(launchPackage("com.openai.chatgpt","🤖 ChatGPT 실행")) return;
+        try{
+            Intent web=new Intent(Intent.ACTION_VIEW,Uri.parse("https://chatgpt.com/"));
+            web.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(web);
+            setNow("🤖 ChatGPT를 엽니다.");
+        }catch(Exception e){
+            toast("ChatGPT를 열 수 없습니다.");
         }
     }
 
