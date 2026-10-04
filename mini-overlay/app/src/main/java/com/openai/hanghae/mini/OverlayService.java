@@ -523,16 +523,15 @@ public class OverlayService extends Service {
         collapseStations();
         collapseMenu();
 
-        if(launchPackage("com.navigator.freedom.v3final","🚢 항행의자유 앱 실행")) return;
-        if(launchByLabel("항행의자유","🚢 항행의자유 앱 실행")) return;
-
+        // v1.0.18: 항행의자유 버튼은 설치 여부와 관계없이 항상 설치/실행 페이지를 엽니다.
+        // 사용자가 설치동영상을 먼저 확인한 뒤 본인 의사로 설치/업데이트를 선택하도록 고정합니다.
         try{
-            Intent web=new Intent(Intent.ACTION_VIEW,Uri.parse("https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/index.html?v=40033-r12-hotfix-20261004-1750"));
+            Intent web=new Intent(Intent.ACTION_VIEW,Uri.parse("https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/index.html?v=40033-r12-installvideo-v18"));
             web.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(web);
             setNow("🚢 항행의자유 설치/실행 페이지를 엽니다.");
         }catch(Exception e){
-            toast("항행의자유 앱을 열 수 없습니다.");
+            toast("항행의자유 설치/실행 페이지를 열 수 없습니다.");
         }
     }
 
@@ -626,8 +625,8 @@ public class OverlayService extends Service {
         setNow("⬇ 업데이트 다운로드 시작 · 0%");
 
         final String apkUrl=BuildConfig.NAVIGATOR_EDITION
-                ?"https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/HANGHAE_NAVIGATOR_MINI-debug.apk?v=1.0.17"
-                :"https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/HANGHAE_MINI_MP3_FM_AM_YOUTUBE-debug.apk?v=1.0.17";
+                ?"https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/HANGHAE_NAVIGATOR_MINI-debug.apk?v=1.0.18"
+                :"https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/HANGHAE_MINI_MP3_FM_AM_YOUTUBE-debug.apk?v=1.0.18";
 
         new Thread(() -> {
             HttpURLConnection conn=null;
