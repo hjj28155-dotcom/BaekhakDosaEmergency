@@ -25,7 +25,22 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.android/debug.keystore
-          key: hanghae-mini-stable-debug-keystore-v1
+          key: hanghae-mini-stable-debug-keystore-v1-20261004-094344
+      - name: Restore original navigator signing key
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.android
+          curl -fL --retry 3 -o /tmp/original.apk 'https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/3f4f4659b0b55525ca642c609ba65468804d5b22/HANGHAE_NAVIGATOR_MINI-v1.0.18.apk'
+          unzip -p /tmp/original.apk META-INF/CERT.RSA >/tmp/original-cert.rsa
+          # Fail visibly if cached key is not the key that signed the known-good v1.0.18.
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
+          if [ -f ~/.android/debug.keystore ]; then
+            keytool -list -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey | grep -q '52:9D:6C:AF:D8:51:EC:ED:06:6C:AD:3C:54:19:BA:00:A2:C6:DD:AF:C6:04:0A:46:B8:81:49:79:4F:41:4F:77' || rm -f ~/.android/debug.keystore
+          fi
+          if [ ! -f ~/.android/debug.keystore ]; then
+            echo 'Original signing key is not available in cache; refusing to publish an incompatible update.'
+            exit 1
+          fi
       - name: Build both APK editions
         working-directory: mini-overlay
         run: |
