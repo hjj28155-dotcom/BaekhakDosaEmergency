@@ -23,19 +23,35 @@ video{width:100%;border-radius:14px;background:#000;margin-top:14px}.btn{display
 const v=document.getElementById('guide'), p=document.getElementById('playBtn'), b=document.getElementById('installBtn'), s=document.getElementById('status');
 async function startGuide(){
  guideFinished=false;
- try{v.muted=false; await v.play(); p.textContent='⏸ 설치동영상 일시정지'; s.textContent='설치동영상 재생 중입니다.';}
- catch(e){try{v.muted=true;await v.play();p.textContent='⏸ 설치동영상 일시정지';s.textContent='영상 재생 중입니다. 소리는 영상의 음량 버튼을 확인하세요.';}catch(_){s.textContent='재생이 차단되었습니다. 영상의 ▶ 버튼을 눌러주세요.';}}
+ try{
+   v.pause();
+   if(Number.isFinite(v.duration)&&v.duration>0&&v.currentTime>=v.duration-1)v.currentTime=0;
+   v.muted=false;
+   await v.play();
+   p.textContent='▶ 설치동영상 재생';
+   s.textContent='설치동영상 재생 중입니다.';
+ }catch(e){
+   try{
+     v.muted=true;
+     await v.play();
+     p.textContent='▶ 설치동영상 재생';
+     s.textContent='영상 재생 중입니다. 소리는 영상의 음량 버튼을 확인하세요.';
+   }catch(_){
+     p.textContent='▶ 설치동영상 재생';
+     s.textContent='재생이 차단되었습니다. 영상 화면의 ▶ 버튼을 눌러주세요.';
+   }
+ }
 }
 p.addEventListener('click',()=>{startGuide();});
-v.addEventListener('play',()=>{p.textContent='⏸ 설치동영상 일시정지';});
-v.addEventListener('pause',()=>{if(!v.ended&&!guideFinished)p.textContent='▶ 설치동영상 재생';});
+v.addEventListener('play',()=>{p.textContent='▶ 설치동영상 재생';});
+v.addEventListener('pause',()=>{p.textContent='▶ 설치동영상 재생';});
 let guideFinished=false;
 function finishGuide(){
  if(guideFinished)return;
  guideFinished=true;
  try{v.pause(); if(Number.isFinite(v.duration)&&v.duration>0)v.currentTime=v.duration;}catch(e){}
  b.style.display='block';
- p.textContent='▶ 설치동영상 다시 보기';
+ p.textContent='▶ 설치동영상 재생';
  s.textContent='✅ 설치동영상이 끝났습니다. 아래 업데이트 설치 버튼을 누르세요.';
 }
 v.addEventListener('ended',finishGuide);
