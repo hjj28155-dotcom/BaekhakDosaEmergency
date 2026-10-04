@@ -39,6 +39,36 @@ jobs:
         run: |
           set -euo pipefail
           gradle assembleDistributionDebug assembleNavigatorDebug assembleBridgeDebug --no-daemon
+      - name: Verify update compatibility against original v1.0.16
+        working-directory: .
+        run: |
+          set -euo pipefail
+          OLD=/tmp/HANGHAE_NAVIGATOR_MINI-v1.0.16-original.apk
+          git show a0d59b6204c3137670c6025d87bff6537fcc1680:HANGHAE_NAVIGATOR_MINI-v1.0.16.apk > "$OLD"
+          NAV=$(find mini-overlay/app/build/outputs/apk/navigator/debug -type f -name '*.apk' | head -1)
+          test -s "$OLD"
+          test -s "$NAV"
+          AAPT=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
+          echo '=== ORIGINAL V1.0.16 BADGING ==='
+          "$AAPT" dump badging "$OLD" | head -5
+          echo '=== NEW V1.0.18 BADGING ==='
+          "$AAPT" dump badging "$NAV" | head -5
+          echo '=== ORIGINAL V1.0.16 CERT ==='
+          "$APKSIGNER" verify --print-certs "$OLD"
+          echo '=== NEW V1.0.18 CERT ==='
+          "$APKSIGNER" verify --print-certs "$NAV"
+          OLD_CERT=$("$APKSIGNER" verify --print-certs "$OLD" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p' | head -1)
+          NEW_CERT=$("$APKSIGNER" verify --print-certs "$NAV" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p' | head -1)
+          OLD_PKG=$("$AAPT" dump badging "$OLD" | sed -n "s/^package: name='\([^']*\)'.*/\1/p" | head -1)
+          NEW_PKG=$("$AAPT" dump badging "$NAV" | sed -n "s/^package: name='\([^']*\)'.*/\1/p" | head -1)
+          echo "OLD_CERT=$OLD_CERT"
+          echo "NEW_CERT=$NEW_CERT"
+          echo "OLD_PKG=$OLD_PKG"
+          echo "NEW_PKG=$NEW_PKG"
+          test "$OLD_CERT" = "$NEW_CERT"
+          test "$OLD_PKG" = "$NEW_PKG"
+
       - name: Publish both APK editions
         run: |
           set -euo pipefail
