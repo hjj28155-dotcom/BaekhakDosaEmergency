@@ -527,7 +527,7 @@ public class OverlayService extends Service {
         if(launchByLabel("항행의자유","🚢 항행의자유 앱 실행")) return;
 
         try{
-            Intent web=new Intent(Intent.ACTION_VIEW,Uri.parse("https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/"));
+            Intent web=new Intent(Intent.ACTION_VIEW,Uri.parse("https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/index.html?v=40033-r12-hotfix-20261004-1750"));
             web.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(web);
             setNow("🚢 항행의자유 설치/실행 페이지를 엽니다.");
@@ -626,8 +626,8 @@ public class OverlayService extends Service {
         setNow("⬇ 업데이트 다운로드 시작 · 0%");
 
         final String apkUrl=BuildConfig.NAVIGATOR_EDITION
-                ?"https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/HANGHAE_NAVIGATOR_MINI-debug.apk?v=1.0.15"
-                :"https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/HANGHAE_MINI_MP3_FM_AM_YOUTUBE-debug.apk?v=1.0.15";
+                ?"https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/HANGHAE_NAVIGATOR_MINI-debug.apk?v=1.0.17"
+                :"https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/HANGHAE_MINI_MP3_FM_AM_YOUTUBE-debug.apk?v=1.0.17";
 
         new Thread(() -> {
             HttpURLConnection conn=null;
