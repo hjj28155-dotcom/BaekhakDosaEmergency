@@ -44,8 +44,16 @@ video{display:block;width:100%;margin:16px 0 0;border-radius:14px;background:#00
  v.addEventListener('ended',finish,{once:true});
  v.addEventListener('timeupdate',()=>{
    if(done||!Number.isFinite(v.duration)||v.duration<=0)return;
-   if(v.currentTime>=v.duration-0.35)finish();
+   if(v.currentTime>=v.duration-1.0)finish();
  });
+ v.addEventListener('pause',()=>{
+   if(done||!Number.isFinite(v.duration)||v.duration<=0)return;
+   if(v.currentTime>=v.duration-1.5)finish();
+ });
+ setInterval(()=>{
+   if(done||!Number.isFinite(v.duration)||v.duration<=0)return;
+   if(v.ended || v.currentTime>=v.duration-1.0)finish();
+ },500);
  v.addEventListener('error',()=>{s.textContent='❌ 설치동영상을 불러오지 못했습니다. 잠시 후 다시 열어 주세요.';b.style.display='none';});
 })();
 </script>
