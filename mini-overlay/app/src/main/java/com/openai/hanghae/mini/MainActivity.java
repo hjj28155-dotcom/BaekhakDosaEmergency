@@ -30,7 +30,7 @@ import java.util.Locale;
 
 public class MainActivity extends Activity {
     private static final int REQ_AUDIO=77;
-    private static final String UPDATE_URL="https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/HANGHAE_MINI_MP3_FM_AM_YOUTUBE-debug.apk?v=20261002-0045";
+    private static final String UPDATE_URL="https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/HANGHAE_MINI_MP3_FM_AM_YOUTUBE-debug.apk?v=1.0.17-20261004";
 
     private boolean pendingStart=false;
     private long updateDownloadId=-1L;
