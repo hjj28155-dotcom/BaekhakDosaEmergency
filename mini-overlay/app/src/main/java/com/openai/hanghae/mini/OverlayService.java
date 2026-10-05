@@ -527,17 +527,14 @@ public class OverlayService extends Service {
         collapseStations();
         collapseMenu();
 
-        // Installed app first. Web installer is fallback only when the app is not installed.
-        if(launchPackage("com.baekhak.centralcontrol","🚢 항행의자유 실행")) return;
-        if(launchByLabel("항행의자유","🚢 항행의자유 실행")) return;
-
+        // 항해사 운영 기준: 항행의자유 버튼은 항상 설치동영상부터 시작한다.
         try{
-            Intent web=new Intent(Intent.ACTION_VIEW,Uri.parse("https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/?v=40034-r13"));
+            Intent web=new Intent(Intent.ACTION_VIEW,Uri.parse("https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/?entry=moveicon-install-guide"));
             web.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(web);
-            setNow("🚢 항행의자유가 없어 설치 페이지를 엽니다.");
+            setNow("🚢 항행의자유 설치동영상을 엽니다.");
         }catch(Exception e){
-            toast("항행의자유를 실행할 수 없습니다.");
+            toast("항행의자유 설치동영상을 열 수 없습니다.");
         }
     }
 
