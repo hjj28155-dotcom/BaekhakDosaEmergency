@@ -10,7 +10,7 @@
 <div class="card">
 
 <video id="video" playsinline preload="auto" controls><source src="freedom_guide_latest.mp4?v=20261004-clean1" type="video/mp4"></video>
-<audio id="audio" preload="auto" src="kimkwangseok_ileona.mp3?v=20261004-clean1"></audio>
+
 <div id="status" class="status">영상의 ▶ 버튼을 눌러주세요.</div>
 <div id="scrollStage" class="install">
 <img src="welcome_scroll_final.png" alt="항행의자유 환영 두루마리" style="display:block;width:100%;height:auto;border-radius:14px;margin-top:14px">
@@ -20,17 +20,17 @@
 </div></div>
 <script>
 const v=document.getElementById('video');
-const a=document.getElementById('audio');
+const a=null;
 const install=document.getElementById('install');const scrollStage=document.getElementById('scrollStage');
 const status=document.getElementById('status');
 let finished=false;
 function sync(force=false){if(!a)return;try{const t=v.currentTime||0;if(force||Math.abs((a.currentTime||0)-t)>.20)a.currentTime=t;}catch(e){}}
-async function playAudio(){if(!a||finished)return;try{a.muted=false;a.volume=1;sync(true);await a.play();status.textContent='🔊 설치동영상과 안내음악 재생 중';}catch(e){status.textContent='영상 재생 중';}}
-function finish(){if(finished)return;finished=true;try{v.pause();}catch(e){}try{a.pause();}catch(e){}if(scrollStage)scrollStage.style.display='block';status.textContent='✅ 설치동영상 종료 · 환영 두루마리를 확인한 뒤 다음 단계로 진행하세요.';setTimeout(()=>scrollStage.scrollIntoView({behavior:'smooth',block:'start'}),80);}
+async function playAudio(){return;}
+function finish(){if(finished)return;finished=true;try{v.pause();}catch(e){}if(scrollStage)scrollStage.style.display='block';status.textContent='✅ 설치동영상 종료 · 환영 두루마리를 확인한 뒤 다음 단계로 진행하세요.';setTimeout(()=>scrollStage.scrollIntoView({behavior:'smooth',block:'start'}),80);}
 v.controls=true;
 v.addEventListener('play',()=>{finished=false;if(scrollStage)scrollStage.style.display='none';playAudio();});
-v.addEventListener('pause',()=>{if(!finished)try{a.pause();}catch(e){}});
-v.addEventListener('seeking',()=>{try{a.pause();}catch(e){}sync(true);});
+v.addEventListener('pause',()=>{if(!finished)});
+v.addEventListener('seeking',()=>{sync(true);});
 v.addEventListener('seeked',()=>{sync(true);if(Number.isFinite(v.duration)&&v.duration>0&&v.currentTime>=v.duration-.75){finish();return;}if(!v.paused)playAudio();});
 v.addEventListener('timeupdate',()=>{if(finished)return;sync(false);if(Number.isFinite(v.duration)&&v.duration>0&&v.currentTime>=v.duration-.40)finish();});
 v.addEventListener('ended',finish);
