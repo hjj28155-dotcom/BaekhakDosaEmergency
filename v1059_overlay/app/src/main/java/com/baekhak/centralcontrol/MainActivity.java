@@ -998,3 +998,1195 @@ public class MainActivity extends Activity {
         // 1) 시스템 DocumentsUI를 명시적으로 호출
         if (tryExplicitDocumentsUi(base, requestCode)) return true;
         // 2) 현재 기기에 등록된 안전한 파일선택기 중 A-IDE를 제외하고 선택
+        if (tryResolvedSafePicker(base, requestCode)) return true;
+        // 3) 마지막 수단: 패키지 미지정 표준 Intent
+        try {
+            startActivityForResult(new Intent(base), requestCode);
+            return true;
+        } catch (Exception ignored) {}
+
+        Toast.makeText(this, "시스템 파일 선택 화면을 열지 못했습니다.", Toast.LENGTH_LONG).show();
+        return false;
+    }
+
+
+    private void openSavedMusicLibraryChooser() {
+        runOnUiThread(() -> {
+            try {
+                final java.util.List<MusicLibraryFiles.Track> list = new MusicLibraryStore(this).read();
+                if (list == null || list.isEmpty()) {
+                    chooseMultipleMusicFiles();
+                    return;
+                }
+
+                String currentId = "";
+                try {
+                    JSONObject state = new JSONObject(MusicPlaybackService.snapshot(this));
+                    currentId = state.optString("id", "");
+                } catch (Exception ignored) {}
+
+                CharSequence[] rows = new CharSequence[list.size()];
+                int checked = -1;
+                for (int i = 0; i < list.size(); i++) {
+                    MusicLibraryFiles.Track t = list.get(i);
+                    rows[i] = t.name;
+                    if (t.id.equals(currentId)) checked = i;
+                }
+
+                final int initialChecked = checked;
+                android.app.AlertDialog dialog = new android.app.AlertDialog.Builder(MainActivity.this)
+                        .setTitle("저장된 MP3 · " + list.size() + "곡")
+                        .setSingleChoiceItems(rows, initialChecked, null)
+                        .setNegativeButton("닫기", null)
+                        .setNeutralButton("음악폴더 다시 불러오기", null)
+                        .setPositiveButton("선택곡 재생", null)
+                        .create();
+
+                dialog.setOnShowListener(x -> {
+                    dialog.getButton(android.app.AlertDialog.BUTTON_NEUTRAL).setText("MP3 추가 불러오기");
+                    dialog.getButton(android.app.AlertDialog.BUTTON_NEUTRAL).setOnClickListener(v -> {
+                        dialog.dismiss();
+                        chooseMultipleMusicFiles();
+                    });
+                    dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+                        int which = dialog.getListView().getCheckedItemPosition();
+                        if (which < 0 || which >= list.size()) {
+                            Toast.makeText(MainActivity.this, "재생할 곡을 선택해 주세요.", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        MusicLibraryFiles.Track t = list.get(which);
+                        try {
+                            musicPrefs().edit()
+                                    .putBoolean("music_use_default", false)
+                                    .putBoolean(MUSIC_ENABLED, true)
+                                    .apply();
+                            Intent play = new Intent(MainActivity.this, MusicPlaybackService.class)
+                                    .setAction(MusicPlaybackService.ACTION_SELECT)
+                                    .putExtra(MusicPlaybackService.EXTRA_TRACK, t.id);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(play);
+                            else startService(play);
+                            Toast.makeText(MainActivity.this, "재생: " + t.name, Toast.LENGTH_SHORT).show();
+                            dialog.dismiss();
+                        } catch (Exception e) {
+                            Toast.makeText(MainActivity.this, "선택한 음악을 재생하지 못했습니다.", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                });
+                dialog.show();
+            } catch (Exception e) {
+                Toast.makeText(this, "저장된 음악목록을 열지 못했습니다.", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void handleSavedMusicIntent(Intent intent) {
+        if (intent != null && intent.getBooleanExtra("v3_force_local_music_folder", false)) {
+            intent.removeExtra("v3_force_local_music_folder");
+            openSavedMusicLibraryChooser();
+            return;
+        }
+        if (intent == null || !intent.getBooleanExtra(EXTRA_OPEN_SAVED_MUSIC, false)) return;
+        intent.removeExtra(EXTRA_OPEN_SAVED_MUSIC);
+        openSavedMusicLibraryChooser();
+    }
+
+    private void handleOverlayUpdateIntent(Intent intent) {
+        if (intent == null || !intent.getBooleanExtra(EXTRA_OPEN_UPDATE, false)) return;
+        intent.removeExtra(EXTRA_OPEN_UPDATE);
+        overlayUpdateScreenActive = true;
+        suspendOverlayForUpdate();
+        if (webView != null) {
+            webView.postDelayed(() -> webView.evaluateJavascript(
+                    "if(window.updatePage){window.updatePage();setTimeout(function(){var m=document.getElementById('modal');if(m){m.classList.add('updateFullScreen');m.style.position='fixed';m.style.left='0';m.style.top='0';m.style.right='0';m.style.bottom='0';m.style.width='100vw';m.style.height='100dvh';m.style.margin='0';m.style.zIndex='2147483000';m.style.display='block';}},30);}else if(window.openM){window.openM('update');}", null), 450);
+        }
+    }
+
+    private void suspendOverlayForUpdate() {
+        try {
+            Intent s = new Intent(this, OverlayControlService.class).setAction(OverlayControlService.ACTION_SUSPEND);
+            if (Build.VERSION.SDK_INT >= 26) startForegroundService(s); else startService(s);
+        } catch (Exception ignored) {}
+    }
+
+    private void chooseMusicFile() {
+        runOnUiThread(() -> {
+            Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            i.addCategory(Intent.CATEGORY_OPENABLE);
+            i.setType("audio/*");
+            i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                try { i.putExtra(DocumentsContract.EXTRA_INITIAL_URI,
+                        Uri.parse("content://com.android.externalstorage.documents/document/primary%3AMusic")); }
+                catch (Exception ignored) {}
+            }
+            startPreferredFilesPicker(i, MUSIC_PICKER);
+        });
+    }
+
+    private void chooseMusicFolder() {
+        // V1059: 자동 폴더/MediaStore 전체검색 금지. 필요한 MP3만 직접 선택합니다.
+        chooseMultipleMusicFiles();
+    }
+
+    private void autoLoadPhoneMusic(boolean openChooserAfter) {
+        // V1059 compatibility shim: 과거 호출도 전체검색하지 않고 직접 선택으로 전환합니다.
+        chooseMultipleMusicFiles();
+    }
+    private void refreshOurMusicFolder() {
+        chooseMultipleMusicFiles();
+    }
+    private void importMusicFolderAsync(Uri tree) {
+        new Thread(()->{try{int count=saveMusicFolder(tree);musicImportResult(true,count,"");}
+            catch(Exception e){musicImportResult(false,-1,e.getMessage());}},"V3-MusicFolderImport").start();
+    }
+    private void musicImportResult(boolean ok,int count,String error) {
+        runOnUiThread(()->{
+            Toast.makeText(this,ok?"우리 음악폴더 "+count+"곡 저장 완료":String.valueOf(error)+" · 기존 목록은 유지됩니다.",Toast.LENGTH_LONG).show();
+            try{JSONObject j=new JSONObject();j.put("ok",ok);j.put("count",count);j.put("error",error);
+                if(webView!=null)webView.evaluateJavascript("if(window.onMusicLibraryChanged)onMusicLibraryChanged("+j.toString()+");",null);
+            }catch(Exception ignored){}
+            if(ok && count>0) {
+                // 폴더 저장 직후 곡목록을 보여 주고 사용자가 첫 재생곡을 직접 선택합니다.
+                scoreHandler.postDelayed(this::openSavedMusicLibraryChooser, 250);
+            }
+        });
+    }
+
+    private void chooseMultipleMusicFiles() {
+        runOnUiThread(() -> {
+            // STAGE4.38: 앱 내부 MediaStore 목록이 아니라 Samsung '내 파일'을 직접 엽니다.
+            // 사용자가 실제로 보관한 Music / melon 등의 폴더에서 곡을 고르게 합니다.
+            try {
+                Intent s = new Intent("com.sec.android.app.myfiles.PICK_DATA_MULTIPLE");
+                s.setPackage("com.sec.android.app.myfiles");
+                s.putExtra("CONTENT_TYPE", "audio/*");
+                s.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                s.putExtra("FOLDERPATH", "/storage/emulated/0/Music");
+                s.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                s.addCategory(Intent.CATEGORY_DEFAULT);
+                startActivityForResult(s, MUSIC_MULTI_PICKER);
+                return;
+            } catch (Exception ignored) {}
+
+            // 일부 One UI 버전은 PICK_DATA_MULTIPLE 대신 PICK_DATA만 제공합니다.
+            // 이 경우에도 내 파일을 우선 열고, 다중 선택 가능 여부는 내 파일 구현에 맡깁니다.
+            try {
+                Intent s = new Intent("com.sec.android.app.myfiles.PICK_DATA");
+                s.setPackage("com.sec.android.app.myfiles");
+                s.putExtra("CONTENT_TYPE", "audio/*");
+                s.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                s.putExtra("FOLDERPATH", "/storage/emulated/0/Music");
+                s.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                s.addCategory(Intent.CATEGORY_DEFAULT);
+                startActivityForResult(s, MUSIC_MULTI_PICKER);
+                return;
+            } catch (Exception ignored) {}
+
+            // Samsung 내 파일 전용 선택 액션이 없는 기기에서만 Android 표준 파일 선택기로 대체합니다.
+            String[] docPkgs = new String[]{"com.google.android.documentsui", "com.android.documentsui"};
+            for (String pkg : docPkgs) {
+                try {
+                    Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                    i.setPackage(pkg);
+                    i.addCategory(Intent.CATEGORY_OPENABLE);
+                    i.setType("audio/*");
+                    i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                    i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        try { i.putExtra(DocumentsContract.EXTRA_INITIAL_URI,
+                                Uri.parse("content://com.android.externalstorage.documents/document/primary%3AMusic")); }
+                        catch (Exception ignored) {}
+                    }
+                    startActivityForResult(i, MUSIC_MULTI_PICKER);
+                    return;
+                } catch (Exception ignored) {}
+            }
+            try {
+                Intent fallback=new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                fallback.addCategory(Intent.CATEGORY_OPENABLE);
+                fallback.setType("audio/*");fallback.putExtra(Intent.EXTRA_ALLOW_MULTIPLE,true);
+                fallback.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION|Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+                if(Build.VERSION.SDK_INT>=26)fallback.putExtra(DocumentsContract.EXTRA_INITIAL_URI,Uri.parse("content://com.android.externalstorage.documents/document/primary%3AMusic"));
+                startActivityForResult(fallback,MUSIC_MULTI_PICKER);return;
+            }catch(Exception ignored){}
+            Toast.makeText(this, "음악 선택 화면을 열지 못했습니다. 우리 음악폴더 연결을 사용해 주세요.", Toast.LENGTH_LONG).show();
+        });
+    }
+
+    private int saveMultipleMusicFiles(Intent data) throws Exception {
+        ArrayList<Uri> uris = new ArrayList<>();
+        if(data.getClipData()!=null) for(int i=0;i<data.getClipData().getItemCount();i++) {
+            Uri u=data.getClipData().getItemAt(i).getUri();if(u!=null)uris.add(u);
+        }
+        if(data.getData()!=null)uris.add(data.getData());
+        // One UI can return paths in an extra rather than ClipData. Collect them too.
+        if(data.getExtras()!=null) for(String key:new String[]{"SELECTED_FILES","selectedItems","selected_files","filePaths","uris"}) {
+            Object value=data.getExtras().get(key);
+            if(value instanceof java.util.Collection)for(Object v:(java.util.Collection<?>)value)addMusicResultUri(uris,v);
+            else if(value instanceof Object[])for(Object v:(Object[])value)addMusicResultUri(uris,v);
+        }
+        int count=new MusicLibraryStore(this).appendUris(uris,data.getFlags());
+        musicLibraryChanged(count);return count;
+    }
+    private void addMusicResultUri(ArrayList<Uri> uris,Object value) {
+        if(value instanceof Uri)uris.add((Uri)value);
+        else if(value instanceof String){String v=(String)value;if(v.startsWith("/"))uris.add(Uri.fromFile(new File(v)));else if(v.startsWith("content://")||v.startsWith("file://"))uris.add(Uri.parse(v));}
+    }
+    private void musicLibraryChanged(int count) {
+        musicPrefs().edit().putString(MUSIC_NAME,"우리 음악폴더 · "+count+"곡").apply();
+        if(musicEnabled()||MusicPlaybackService.isRunning())sendMusicCommand(MusicPlaybackService.ACTION_RELOAD);
+    }
+
+
+
+
+
+
+
+    private boolean looksLikeAudio(String name, String mime) {
+        if (mime != null && mime.toLowerCase().startsWith("audio/")) return true;
+        String n = name == null ? "" : name.toLowerCase();
+        return n.endsWith(".mp3") || n.endsWith(".m4a") || n.endsWith(".aac") || n.endsWith(".wav") || n.endsWith(".ogg") || n.endsWith(".flac");
+    }
+
+
+
+
+
+    private int saveMusicFolder(Uri treeUri) throws Exception {
+        int count=new MusicLibraryStore(this).appendFolder(treeUri);
+        musicLibraryChanged(count);return count;
+    }
+
+    private int musicPlaylistCount() {
+        try{return new MusicLibraryStore(this).read().size();}catch(Exception e){return -1;}
+    }
+
+    private void saveSelectedMusic(Uri uri, String name) throws Exception {
+        ArrayList<Uri> uris=new ArrayList<>();uris.add(uri);
+        int count=new MusicLibraryStore(this).appendUris(uris,Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        musicLibraryChanged(count);
+    }
+
+    private void clearSelectedMusic() {
+        // '기본 음악으로' changes playback mode; it must NEVER erase a saved MP3 library.
+        sendMusicCommand(MusicPlaybackService.ACTION_DEFAULT);
+    }
+
+    @Override protected void onResume() {
+        super.onResume();
+        if (overlayUpdateScreenActive) suspendOverlayForUpdate();
+        if (musicEnabled()) startBackgroundMusic(); // Resume the same saved song; no reset.
+        handleSavedMusicIntent(getIntent());
+        handleOverlayUpdateIntent(getIntent());
+        // STAGE4.51: V2·V3 공용 승인 서버 연동 유지. 특별승인 요청이 이미 있다면, 항해사 승인 후 앱으로 돌아오는 즉시
+        // 서버 승인 상태를 다시 확인해 별도 버튼 없이 자동으로 잠금을 해제합니다.
+        if (!isSpecialApprovedLocal()) {
+            SharedPreferences sp = specialApprovalPrefs();
+            String token = sp.getString("request_token", "");
+            if (token != null && !token.isEmpty()) {
+                checkSpecialApprovalAsync();
+            }
+        }
+    }
+
+    @Override protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handleOverlayAudioPermissionRequest(intent);
+        handleSavedMusicIntent(intent);
+        handleOverlayUpdateIntent(intent);
+    }
+
+    private void handleOverlayAudioPermissionRequest(Intent intent) {
+        if (intent == null || !intent.getBooleanExtra("v3_request_audio_permission", false)) return;
+        intent.removeExtra("v3_request_audio_permission");
+        if (hasAudioLibraryPermission()) {
+            Toast.makeText(this, "음악 권한이 이미 허용되어 있습니다. 이동아이콘의 MP3를 눌러 재생해 주세요.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        try {
+            if (Build.VERSION.SDK_INT >= 33) {
+                requestPermissions(new String[]{android.Manifest.permission.READ_MEDIA_AUDIO}, AUTO_AUDIO_PERMISSION);
+            } else if (Build.VERSION.SDK_INT >= 23) {
+                requestPermissions(new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, AUTO_AUDIO_PERMISSION);
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "설정에서 음악 및 오디오 권한을 허용해 주세요.", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    // V3.1.06: one-time permission for direct phone MP3 playback from the floating Music button.
+    private void requestAutoAudioPermissionOnce() {
+        if (Build.VERSION.SDK_INT < 23 || hasAudioLibraryPermission()) return;
+        SharedPreferences p = getSharedPreferences("v3_music_preferences", MODE_PRIVATE);
+        if (p.getBoolean("auto_audio_permission_asked", false)) return;
+        p.edit().putBoolean("auto_audio_permission_asked", true).apply();
+        try {
+            if (Build.VERSION.SDK_INT >= 33) {
+                requestPermissions(new String[]{android.Manifest.permission.READ_MEDIA_AUDIO}, AUTO_AUDIO_PERMISSION);
+            } else {
+                requestPermissions(new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, AUTO_AUDIO_PERMISSION);
+            }
+        } catch (Exception ignored) {}
+    }
+
+    // ---------------- Internal music library (no external picker) ----------------
+    private boolean hasAudioLibraryPermission() {
+        if (Build.VERSION.SDK_INT >= 33) {
+            return checkSelfPermission(android.Manifest.permission.READ_MEDIA_AUDIO)
+                    == android.content.pm.PackageManager.PERMISSION_GRANTED;
+        }
+        if (Build.VERSION.SDK_INT >= 23) {
+            return checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+                    == android.content.pm.PackageManager.PERMISSION_GRANTED;
+        }
+        return true;
+    }
+
+    private void requestDeviceMusicLibrary(String mode) {
+        pendingMusicLibraryMode = (mode == null || mode.trim().isEmpty()) ? "multi" : mode.trim();
+        runOnUiThread(() -> {
+            Toast.makeText(this, "휴대폰 음악목록을 불러오는 중입니다.", Toast.LENGTH_SHORT).show();
+            if (hasAudioLibraryPermission()) {
+                showNativeMusicMultiPicker();
+                return;
+            }
+            try {
+                if (Build.VERSION.SDK_INT >= 33) {
+                    requestPermissions(new String[]{android.Manifest.permission.READ_MEDIA_AUDIO}, AUDIO_LIBRARY_PERMISSION);
+                } else {
+                    requestPermissions(new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, AUDIO_LIBRARY_PERMISSION);
+                }
+            } catch (Exception e) {
+                deliverDeviceMusicLibraryError("음악 및 오디오 권한을 요청하지 못했습니다.");
+            }
+        });
+    }
+
+    private void showNativeMusicMultiPicker() {
+        new Thread(() -> {
+            try {
+                final ArrayList<Long> ids = new ArrayList<>();
+                final ArrayList<String> labels = new ArrayList<>();
+                Uri base = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                String[] projection = new String[]{
+                        MediaStore.Audio.Media._ID,
+                        MediaStore.Audio.Media.DISPLAY_NAME,
+                        MediaStore.Audio.Media.ARTIST,
+                        MediaStore.Audio.Media.DURATION
+                };
+                String selection = null;
+                if (Build.VERSION.SDK_INT >= 29) selection = MediaStore.Audio.Media.IS_MUSIC + "!=0";
+                String sort = MediaStore.Audio.Media.DISPLAY_NAME + " COLLATE NOCASE ASC";
+                try (Cursor c = getContentResolver().query(base, projection, selection, null, sort)) {
+                    if (c != null) {
+                        int idIx = c.getColumnIndex(MediaStore.Audio.Media._ID);
+                        int nameIx = c.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME);
+                        int artistIx = c.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+                        while (c.moveToNext()) {
+                            long id = idIx >= 0 ? c.getLong(idIx) : -1L;
+                            if (id < 0) continue;
+                            String name = nameIx >= 0 ? c.getString(nameIx) : ("track_" + id);
+                            String artist = artistIx >= 0 ? c.getString(artistIx) : "";
+                            if (name == null || name.trim().isEmpty()) name = "음악 " + (ids.size() + 1);
+                            ids.add(id);
+                            if (artist == null || artist.trim().isEmpty() || "<unknown>".equalsIgnoreCase(artist.trim())) labels.add(name);
+                            else labels.add(name + "  ·  " + artist);
+                        }
+                    }
+                }
+                runOnUiThread(() -> {
+                    if (ids.isEmpty()) {
+                        Toast.makeText(this, "휴대폰에서 재생 가능한 음악을 찾지 못했습니다.", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    final boolean[] checked = new boolean[ids.size()];
+                    CharSequence[] rows = labels.toArray(new CharSequence[0]);
+                    android.app.AlertDialog dialog = new android.app.AlertDialog.Builder(MainActivity.this)
+                            .setTitle("연속 재생 음악 선택")
+                            .setMultiChoiceItems(rows, checked, (d, which, isChecked) -> checked[which] = isChecked)
+                            .setNegativeButton("취소", null)
+                            .setPositiveButton("선택 음악 재생", null)
+                            .create();
+                    dialog.setOnShowListener(x -> dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+                        JSONArray picked = new JSONArray();
+                        for (int i = 0; i < checked.length; i++) if (checked[i]) picked.put(ids.get(i));
+                        if (picked.length() == 0) {
+                            Toast.makeText(MainActivity.this, "음악을 한 곡 이상 선택해 주세요.", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        dialog.dismiss();
+                        Toast.makeText(MainActivity.this, "선택한 음악을 재생목록에 저장합니다.", Toast.LENGTH_SHORT).show();
+                        saveDeviceMusicSelection(picked.toString());
+                    }));
+                    dialog.show();
+                });
+            } catch (Exception e) {
+                deliverDeviceMusicLibraryError("휴대폰 음악목록을 읽지 못했습니다.");
+            }
+        }, "V3-NativeMusicPicker").start();
+    }
+
+    private JSONArray readDeviceMusicLibrary() throws Exception {
+        JSONArray out = new JSONArray();
+        Uri base = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        ArrayList<String> cols = new ArrayList<>();
+        cols.add(MediaStore.Audio.Media._ID);
+        cols.add(MediaStore.Audio.Media.DISPLAY_NAME);
+        cols.add(MediaStore.Audio.Media.ARTIST);
+        cols.add(MediaStore.Audio.Media.DURATION);
+        if (Build.VERSION.SDK_INT >= 29) cols.add(MediaStore.Audio.Media.RELATIVE_PATH);
+        String[] projection = cols.toArray(new String[0]);
+        String sort = MediaStore.Audio.Media.DISPLAY_NAME + " COLLATE NOCASE ASC";
+        try (Cursor c = getContentResolver().query(base, projection, null, null, sort)) {
+            if (c == null) return out;
+            int idIx = c.getColumnIndex(MediaStore.Audio.Media._ID);
+            int nameIx = c.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME);
+            int artistIx = c.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+            int durIx = c.getColumnIndex(MediaStore.Audio.Media.DURATION);
+            int pathIx = Build.VERSION.SDK_INT >= 29 ? c.getColumnIndex(MediaStore.Audio.Media.RELATIVE_PATH) : -1;
+            while (c.moveToNext()) {
+                long id = idIx >= 0 ? c.getLong(idIx) : -1L;
+                if (id < 0) continue;
+                String name = nameIx >= 0 ? c.getString(nameIx) : ("track_" + id);
+                String artist = artistIx >= 0 ? c.getString(artistIx) : "";
+                long duration = durIx >= 0 ? c.getLong(durIx) : 0L;
+                String path = pathIx >= 0 ? c.getString(pathIx) : "Music/";
+                if (name == null || name.trim().isEmpty()) name = "track_" + id;
+                if (!looksLikeAudio(name, "audio/*")) continue;
+                JSONObject x = new JSONObject();
+                x.put("id", id);
+                x.put("name", name);
+                x.put("artist", artist == null ? "" : artist);
+                x.put("duration", duration);
+                x.put("path", path == null || path.trim().isEmpty() ? "Music/" : path);
+                out.put(x);
+            }
+        }
+        return out;
+    }
+
+    private void deliverDeviceMusicLibrary(String mode) {
+        final String m = (mode == null || mode.trim().isEmpty()) ? "multi" : mode;
+        new Thread(() -> {
+            try {
+                JSONObject payload = new JSONObject();
+                payload.put("ok", true);
+                payload.put("mode", m);
+                payload.put("items", readDeviceMusicLibrary());
+                final String json = payload.toString();
+                webView.post(() -> webView.evaluateJavascript("onDeviceMusicLibrary(" + json + ");", null));
+            } catch (Exception e) {
+                deliverDeviceMusicLibraryError("휴대폰 음악 목록을 읽지 못했습니다.");
+            }
+        }, "V3-MusicLibrary").start();
+    }
+
+    private void deliverDeviceMusicLibraryError(String message) {
+        try {
+            JSONObject payload = new JSONObject();
+            payload.put("ok", false);
+            payload.put("mode", pendingMusicLibraryMode);
+            payload.put("error", message == null ? "음악 목록 오류" : message);
+            final String json = payload.toString();
+            webView.post(() -> webView.evaluateJavascript("onDeviceMusicLibrary(" + json + ");", null));
+        } catch (Exception ignored) {}
+    }
+
+    private int copyMediaIdsToPlaylist(JSONArray ids) throws Exception {
+        ArrayList<Uri> uris=new ArrayList<>();
+        for(int i=0;i<ids.length();i++){long id=ids.optLong(i,-1);if(id>=0)uris.add(ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,id));}
+        int count=new MusicLibraryStore(this).appendUris(uris,Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        musicLibraryChanged(count);return count;
+    }
+
+    private void saveDeviceMusicSelection(String idsJson) {
+        new Thread(() -> {
+            try {
+                JSONArray ids = new JSONArray(idsJson == null ? "[]" : idsJson);
+                int count = copyMediaIdsToPlaylist(ids);
+                JSONObject r = new JSONObject(); r.put("ok", true); r.put("count", count);
+                final String json = r.toString();
+                webView.post(() -> webView.evaluateJavascript("onDeviceMusicPlaylistSaved(" + json + ");", null));
+            } catch (Exception e) {
+                try {
+                    JSONObject r = new JSONObject(); r.put("ok", false); r.put("error", e.getMessage() == null ? "음악 저장 실패" : e.getMessage());
+                    final String json = r.toString();
+                    webView.post(() -> webView.evaluateJavascript("onDeviceMusicPlaylistSaved(" + json + ");", null));
+                } catch (Exception ignored) {}
+            }
+        }, "V3-MusicSave").start();
+    }
+
+    @Override public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == AUTO_AUDIO_PERMISSION) {
+            boolean ok = grantResults != null && grantResults.length > 0
+                    && grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED;
+            Toast.makeText(this,
+                    ok ? "음악 및 오디오 권한이 허용되었습니다. 필요한 MP3를 직접 선택해 주세요."
+                       : "MP3 파일 접근 권한을 허용해 주세요.",
+                    Toast.LENGTH_LONG).show();
+            if (ok) chooseMultipleMusicFiles();
+            return;
+        }
+        if (requestCode == AUDIO_LIBRARY_PERMISSION) {
+            boolean ok = grantResults != null && grantResults.length > 0
+                    && grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED;
+            if (ok) showNativeMusicMultiPicker();
+            else deliverDeviceMusicLibraryError("음악 및 오디오 권한이 필요합니다. 설정에서 권한을 허용해 주세요.");
+        }
+    }
+
+    // 다른 앱으로 이동하거나 화면이 꺼져도 포그라운드 서비스가 음악을 계속 재생합니다.
+    @Override protected void onPause() {
+        super.onPause();
+        // 업데이트 화면이 활성화된 동안에는 다른 앱/설치화면으로 이동해도 오버레이를 다시 띄우지 않는다.
+        if (overlayUpdateScreenActive) suspendOverlayForUpdate();
+    }
+
+    @Override protected void onDestroy() {
+        // Activity 재생성/종료만으로 배경음악 서비스는 끄지 않습니다.
+        // 성적 안내용 TTS/축하음악과 실행 인트로 바다소리만 Activity 종료 시 정리합니다.
+        stopScoreFanfare();
+        try {
+            if (scoreTts != null) {
+                scoreTts.stop();
+                scoreTts.shutdown();
+                scoreTts = null;
+            }
+        } catch (Exception ignored) {}
+        try {
+            if (launchSeaPlayer != null) {
+                launchSeaPlayer.release();
+                launchSeaPlayer = null;
+            }
+        } catch (Exception ignored) {}
+        try {
+            releaseNativeVoyageMedia();
+            if (launchVideo != null) {
+                if (rootLayout != null) rootLayout.removeView(launchVideo);
+                launchVideo = null;
+            }
+        } catch (Exception ignored) {}
+        try {
+            if (launchTts != null) {
+                launchTts.stop();
+                launchTts.shutdown();
+                launchTts = null;
+            }
+        } catch (Exception ignored) {}
+        try { stopRadioDirectInternal(); } catch (Exception ignored) {}
+        super.onDestroy();
+    }
+
+    private void initScoreTts() {
+        try {
+            scoreTts = new TextToSpeech(getApplicationContext(), status -> {
+                if (status == TextToSpeech.SUCCESS) {
+                    try {
+                        int lang = scoreTts.setLanguage(Locale.KOREAN);
+                        scoreTtsReady = lang != TextToSpeech.LANG_MISSING_DATA && lang != TextToSpeech.LANG_NOT_SUPPORTED;
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            scoreTts.setAudioAttributes(new AudioAttributes.Builder()
+                                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                                    .build());
+                        }
+                        if (scoreTtsReady && pendingScoreSpeech != null && !pendingScoreSpeech.trim().isEmpty()) {
+                            String text = pendingScoreSpeech;
+                            int rank = pendingScoreRank;
+                            pendingScoreSpeech = null;
+                            pendingScoreRank = 0;
+                            speakScoreNow(text, rank);
+                        }
+                    } catch (Exception ignored) {}
+                }
+            });
+        } catch (Exception ignored) {
+            scoreTtsReady = false;
+        }
+    }
+
+    private void stopScoreFanfare() {
+        try {
+            if (scoreFanfarePlayer != null) {
+                try { scoreFanfarePlayer.stop(); } catch (Exception ignored) {}
+                try { scoreFanfarePlayer.release(); } catch (Exception ignored) {}
+                scoreFanfarePlayer = null;
+            }
+        } catch (Exception ignored) {}
+    }
+
+    private void playScoreFanfare() {
+        runOnUiThread(() -> {
+            try {
+                stopScoreFanfare();
+                scoreFanfarePlayer = MediaPlayer.create(MainActivity.this, R.raw.v3_congrats_fanfare);
+                if (scoreFanfarePlayer != null) {
+                    scoreFanfarePlayer.setVolume(0.82f, 0.82f);
+                    scoreFanfarePlayer.setOnCompletionListener(mp -> {
+                        try { mp.release(); } catch (Exception ignored) {}
+                        if (scoreFanfarePlayer == mp) scoreFanfarePlayer = null;
+                    });
+                    scoreFanfarePlayer.start();
+                }
+            } catch (Exception ignored) {}
+        });
+    }
+
+    private void speakScoreNow(String text, int rankNo) {
+        if (text == null || text.trim().isEmpty()) return;
+        runOnUiThread(() -> {
+            try {
+                if (scoreTts == null || !scoreTtsReady) {
+                    pendingScoreSpeech = text;
+                    pendingScoreRank = rankNo;
+                    return;
+                }
+                scoreTts.setSpeechRate(rankNo > 0 && rankNo <= 2 ? 0.90f : 0.96f);
+                scoreTts.setPitch(rankNo > 0 ? 1.03f : 1.0f);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    scoreTts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "v3_score_voice");
+                } else {
+                    scoreTts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+                }
+            } catch (Exception ignored) {}
+        });
+    }
+
+    private void playCelebrationWithVoice(String text, int rankNo) {
+        playScoreFanfare();
+        scoreHandler.postDelayed(() -> speakScoreNow(text, rankNo), 650L);
+    }
+
+    private void speakConsolationVoice(String text) {
+        stopScoreFanfare();
+        scoreHandler.postDelayed(() -> speakScoreNow(text, 0), 180L);
+    }
+
+    private void setDownloadInitialUri(Intent i) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            try {
+                i.putExtra(DocumentsContract.EXTRA_INITIAL_URI,
+                        Uri.parse("content://com.android.externalstorage.documents/document/primary%3ADownload"));
+            } catch (Exception ignored) {}
+        }
+    }
+
+    private void chooseApkUpdateFile() {
+        runOnUiThread(() -> {
+            // STAGE4.35: 업데이트 경로는 Samsung 내 파일로만 고정합니다.
+            // 시스템 ACTION_OPEN_DOCUMENT/GET_CONTENT는 사용하지 않으므로
+            // AndroidIDE/A-IDE가 파일선택 요청을 가로챌 수 없습니다.
+            try {
+                Intent s = new Intent("com.sec.android.app.myfiles.PICK_DATA");
+                s.setPackage("com.sec.android.app.myfiles");
+                s.putExtra("CONTENT_TYPE", "*/*");
+                s.putExtra("FOLDERPATH", "/storage/emulated/0/Download");
+                s.addCategory(Intent.CATEGORY_DEFAULT);
+                s.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                startActivityForResult(s, APK_UPDATE_PICKER);
+                Toast.makeText(this, "내 파일에서 업데이트 APK를 선택해 주세요.", Toast.LENGTH_SHORT).show();
+                return;
+            } catch (Exception ignored) {}
+
+            // PICK_DATA를 지원하지 않는 Samsung 버전은 내 파일 앱 자체를 엽니다.
+            // 사용자가 Download 폴더의 APK를 누르면 Android 설치 화면으로 이어집니다.
+            try {
+                Intent launch = getPackageManager().getLaunchIntentForPackage("com.sec.android.app.myfiles");
+                if (launch != null) {
+                    launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(launch);
+                    Toast.makeText(this, "내 파일의 Download 폴더에서 업데이트 APK를 눌러 설치해 주세요.", Toast.LENGTH_LONG).show();
+                    return;
+                }
+            } catch (Exception ignored) {}
+
+            Toast.makeText(this, "Samsung 내 파일 앱을 열지 못했습니다.", Toast.LENGTH_LONG).show();
+        });
+    }
+
+    private void launchApkInstaller(Uri uri) {
+        try {
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setDataAndType(uri, "application/vnd.android.package-archive");
+            i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
+        } catch (Exception e) {
+            Toast.makeText(this, "APK 설치 화면을 열지 못했습니다.", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == APK_UPDATE_PICKER) {
+            if (resultCode == RESULT_OK && data != null && data.getData() != null) {
+                Uri uri = data.getData();
+                String name = displayName(uri);
+                String type = getContentResolver().getType(uri);
+                boolean looksApk = (name != null && name.toLowerCase().endsWith(".apk"))
+                        || "application/vnd.android.package-archive".equals(type)
+                        || "application/octet-stream".equals(type);
+                if (!looksApk) {
+                    Toast.makeText(this, "APK 파일을 선택해 주세요.", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                Toast.makeText(this, "업데이트 APK 선택 완료", Toast.LENGTH_SHORT).show();
+                launchApkInstaller(uri);
+            }
+            return;
+        }
+
+        if (requestCode == UPDATE_PICKER) {
+            if (resultCode == RESULT_OK && data != null && data.getData() != null) {
+                try { alert(installUpdate(readUri(data.getData())) ? "V3 업데이트 적용 완료" : "업데이트 파일이 올바르지 않습니다."); }
+                catch (Exception e) { alert("업데이트 적용 실패"); }
+            }
+            return;
+        }
+
+        if (requestCode == TEXT_PICKER) {
+            if (resultCode == RESULT_OK && data != null && data.getData() != null) {
+                try {
+                    Uri uri = data.getData();
+                    String name = displayName(uri);
+                    String text = readUri(uri);
+                    String js = "receiveText(" + JSONObject.quote(name) + "," + JSONObject.quote(text) + ");";
+                    webView.post(() -> webView.evaluateJavascript(js, null));
+                } catch (Exception e) { alert("원문 TXT 불러오기 실패"); }
+            }
+            return;
+        }
+
+        if (requestCode == LEGACY_BACKUP_PICKER) {
+            if (resultCode == RESULT_OK && data != null && data.getData() != null) {
+                try {
+                    Uri uri = data.getData();
+                    sendLegacyBackupToJs(displayName(uri), readUri(uri));
+                } catch (Exception e) { alert("백업 JSON을 읽지 못했습니다."); }
+            }
+            return;
+        }
+
+        if(requestCode==MUSIC_PICKER || requestCode==MUSIC_MULTI_PICKER) {
+            if(resultCode==RESULT_OK && data!=null) {
+                final Intent picked=data;
+                new Thread(()->{try{int count=saveMultipleMusicFiles(picked);musicImportResult(true,count,"");}
+                    catch(Exception e){musicImportResult(false,-1,e.getMessage());}},"V3-MusicImport").start();
+            }
+            return; // Cancel never modifies playlist/position/selected folder.
+        }
+        if(requestCode==MUSIC_FOLDER_PICKER) {
+            if(resultCode==RESULT_OK && data!=null && data.getData()!=null) {
+                Uri tree = data.getData();
+                try {
+                    final int flags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                    getContentResolver().takePersistableUriPermission(tree, flags | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                } catch (Exception ignored) {}
+                musicPrefs().edit()
+                        .putString("music_library_folder_uri", tree.toString())
+                        .putString(MUSIC_TREE_URI, tree.toString())
+                        .apply();
+                importMusicFolderAsync(tree);
+            }
+            return;
+        }
+
+        if (requestCode == SAVE_PICKER) {
+            if (resultCode == RESULT_OK && data != null && data.getData() != null && pendingData != null) {
+                try (OutputStream out = getContentResolver().openOutputStream(data.getData())) {
+                    if (out == null) throw new Exception("save failed");
+                    out.write(pendingData.getBytes(StandardCharsets.UTF_8));
+                    out.flush();
+                    alert("파일 저장 완료");
+                } catch (Exception e) { alert("파일 저장 실패"); }
+            }
+            pendingData = null;
+            pendingName = null;
+            pendingMime = null;
+        }
+    }
+
+    private String httpGet(String urlText) throws Exception {
+        HttpURLConnection conn = null;
+        try {
+            URL url = new URL(urlText);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setConnectTimeout(12000);
+            conn.setReadTimeout(12000);
+            conn.setUseCaches(false);
+            conn.setRequestProperty("Accept", "application/json, text/plain, */*");
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 Chrome/140 Mobile Safari/537.36");
+            conn.setRequestProperty("X-Requested-With", "XMLHttpRequest");
+            conn.setRequestProperty("Referer", "https://www.dhlottery.co.kr/lt645/result");
+            int code = conn.getResponseCode();
+            InputStream in = (code >= 200 && code < 300) ? conn.getInputStream() : conn.getErrorStream();
+            if (in == null) throw new Exception("HTTP " + code);
+            String body = new String(readAll(in), StandardCharsets.UTF_8);
+            if (code < 200 || code >= 300) throw new Exception("HTTP " + code);
+            return body;
+        } finally {
+            if (conn != null) conn.disconnect();
+        }
+    }
+
+    private JSONObject parseWinningNewApi(int round, String body) throws Exception {
+        JSONObject root = new JSONObject(body);
+        JSONObject data = root.optJSONObject("data");
+        JSONArray list = data == null ? null : data.optJSONArray("list");
+        if (list == null || list.length() == 0) throw new Exception("당첨결과 없음");
+        JSONObject rec = null;
+        for (int i = 0; i < list.length(); i++) {
+            JSONObject x = list.optJSONObject(i);
+            if (x != null && x.optInt("ltEpsd", -1) == round) { rec = x; break; }
+        }
+        if (rec == null) rec = list.optJSONObject(0);
+        if (rec == null || rec.optInt("ltEpsd", -1) != round) throw new Exception("회차 결과 없음");
+        JSONArray nums = new JSONArray();
+        for (int i = 1; i <= 6; i++) {
+            int n = rec.optInt("tm" + i + "WnNo", 0);
+            if (n < 1 || n > 45) throw new Exception("당첨번호 형식 오류");
+            nums.put(n);
+        }
+        int bonus = rec.optInt("bnsWnNo", 0);
+        JSONObject out = new JSONObject();
+        out.put("ok", true);
+        out.put("round", round);
+        out.put("numbers", nums);
+        out.put("bonus", bonus);
+        out.put("date", rec.optString("ltRflYmd", ""));
+        out.put("source", "동행복권");
+        return out;
+    }
+
+    private JSONObject parseWinningLegacyApi(int round, String body) throws Exception {
+        JSONObject j = new JSONObject(body);
+        if (!"success".equalsIgnoreCase(j.optString("returnValue", ""))) throw new Exception("결과 없음");
+        JSONArray nums = new JSONArray();
+        for (int i = 1; i <= 6; i++) {
+            int n = j.optInt("drwtNo" + i, 0);
+            if (n < 1 || n > 45) throw new Exception("당첨번호 형식 오류");
+            nums.put(n);
+        }
+        JSONObject out = new JSONObject();
+        out.put("ok", true);
+        out.put("round", round);
+        out.put("numbers", nums);
+        out.put("bonus", j.optInt("bnusNo", 0));
+        out.put("date", j.optString("drwNoDate", ""));
+        out.put("source", "동행복권");
+        return out;
+    }
+
+    private void deliverWinningResult(JSONObject result) {
+        final String json = result == null ? "{}" : result.toString();
+        webView.post(() -> webView.evaluateJavascript(
+                "(function(d){" +
+                "try{if(window.__v3WinningResult)window.__v3WinningResult(d);}catch(e){}" +
+                "try{var f=document.getElementById('engineFrame');if(f&&f.contentWindow&&f.contentWindow.__baekhakWinningResult)f.contentWindow.__baekhakWinningResult(d);}catch(e){}" +
+                "})(" + json + ");", null));
+    }
+
+    private void fetchWinningNumbersAsync(final int round) {
+        if (round < 1 || round > 9999) {
+            try {
+                JSONObject e = new JSONObject(); e.put("ok", false); e.put("round", round); e.put("error", "회차 번호가 올바르지 않습니다.");
+                deliverWinningResult(e);
+            } catch (Exception ignored) {}
+            return;
+        }
+        new Thread(() -> {
+            JSONObject result = null;
+            String lastError = "당첨번호를 조회하지 못했습니다.";
+            try {
+                long ts = System.currentTimeMillis();
+                String body = httpGet("https://www.dhlottery.co.kr/lt645/selectPstLt645Info.do?srchLtEpsd=" + round + "&_=" + ts);
+                result = parseWinningNewApi(round, body);
+            } catch (Exception e) {
+                lastError = e.getMessage() == null ? lastError : e.getMessage();
+                try {
+                    String body = httpGet("https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=" + round);
+                    result = parseWinningLegacyApi(round, body);
+                } catch (Exception e2) {
+                    if (e2.getMessage() != null) lastError = e2.getMessage();
+                }
+            }
+            if (result == null) {
+                try {
+                    result = new JSONObject();
+                    result.put("ok", false);
+                    result.put("round", round);
+                    result.put("error", "제" + round + "회 당첨번호가 아직 발표되지 않았거나 네트워크 조회에 실패했습니다. (" + lastError + ")");
+                } catch (Exception ignored) {}
+            }
+            deliverWinningResult(result);
+        }, "V3-WinningLookup").start();
+    }
+
+    private String handleMusicAction(String action) {
+        String a = action == null ? "" : action.trim().toLowerCase(java.util.Locale.ROOT);
+        try {
+            if ("folder".equals(a)) { chooseMusicFolder(); return "필요한 MP3를 직접 선택합니다."; }
+            if ("refreshfolder".equals(a)) { refreshOurMusicFolder(); return "필요한 MP3를 추가로 직접 선택합니다."; }
+            if ("library".equals(a)) { sendMusicCommand(MusicPlaybackService.ACTION_LIBRARY); return "저장된 음악을 이어 재생합니다."; }
+            if ("multi".equals(a)) { chooseMultipleMusicFiles(); return "내 파일에서 연속곡을 선택합니다."; }
+            if ("single".equals(a)) { chooseMusicFile(); return "한 곡 선택 화면을 엽니다."; }
+            if ("prev".equals(a)) { sendMusicCommand(MusicPlaybackService.ACTION_PREV); return "이전 곡으로 이동했습니다."; }
+            if ("play".equals(a)) { musicPrefs().edit().putBoolean(MUSIC_ENABLED, true).apply(); sendMusicCommand(MusicPlaybackService.ACTION_PLAY); return "선택한 음악 재생을 시작했습니다."; }
+            if ("pause".equals(a)) { musicPrefs().edit().putBoolean(MUSIC_ENABLED, false).apply(); sendMusicCommand(MusicPlaybackService.ACTION_PAUSE); return "일시정지했습니다."; }
+            if ("next".equals(a)) { sendMusicCommand(MusicPlaybackService.ACTION_NEXT); return "다음 곡으로 이동했습니다."; }
+            if ("toggle".equals(a)) { return toggleBackgroundMusic() ? "재생을 시작했습니다." : "일시정지했습니다."; }
+            if ("stop".equals(a)) { stopBackgroundMusic(); return "음악을 종료했습니다."; }
+            if ("reset".equals(a)) { clearSelectedMusic(); return "기본 음악으로 전환했습니다. 우리 음악폴더의 곡은 보존됩니다."; }
+            return "알 수 없는 음악 명령입니다.";
+        } catch (Exception e) {
+            return "음악 기능 처리 중 오류가 발생했습니다.";
+        }
+    }
+
+
+    private void stopRadioDirectInternal() {
+        radioPlaying = false;
+        radioName = "";
+        radioUrl = "";
+        try {
+            if (radioPlayer != null) {
+                try { radioPlayer.setOnPreparedListener(null); } catch (Exception ignored) {}
+                try { radioPlayer.setOnErrorListener(null); } catch (Exception ignored) {}
+                try { radioPlayer.stop(); } catch (Exception ignored) {}
+                try { radioPlayer.reset(); } catch (Exception ignored) {}
+                try { radioPlayer.release(); } catch (Exception ignored) {}
+            }
+        } catch (Exception ignored) {}
+        radioPlayer = null;
+    }
+
+    private void stopRadioDirect() {
+        runOnUiThread(this::stopRadioDirectInternal);
+    }
+
+    private void playRadioDirect(String url, String name) {
+        final String u = url == null ? "" : url.trim();
+        final String n = name == null ? "FM 라디오" : name.trim();
+        if (!(u.startsWith("https://") || u.startsWith("http://"))) return;
+        runOnUiThread(() -> {
+            stopRadioDirectInternal();
+            try {
+                // Local music and radio should not overlap.
+                try { stopBackgroundMusic(); } catch (Exception ignored) {}
+                MediaPlayer mp = new MediaPlayer();
+                radioPlayer = mp;
+                radioUrl = u;
+                radioName = n.isEmpty() ? "FM 라디오" : n;
+                mp.setAudioAttributes(new AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .build());
+                mp.setDataSource(u);
+                mp.setOnPreparedListener(done -> {
+                    if (radioPlayer != done) return;
+                    try {
+                        done.start();
+                        radioPlaying = true;
+                    } catch (Exception e) {
+                        stopRadioDirectInternal();
+                    }
+                });
+                mp.setOnErrorListener((bad, what, extra) -> {
+                    if (radioPlayer == bad) stopRadioDirectInternal();
+                    return true;
+                });
+                mp.prepareAsync();
+            } catch (Exception e) {
+                stopRadioDirectInternal();
+            }
+        });
+    }
+
+    private String radioStateJson() {
+        JSONObject j = new JSONObject();
+        try {
+            boolean p = radioPlaying;
+            try { p = p && radioPlayer != null && radioPlayer.isPlaying(); } catch (Exception ignored) {}
+            j.put("playing", p);
+            j.put("name", radioName == null ? "" : radioName);
+            j.put("url", radioUrl == null ? "" : radioUrl);
+        } catch (Exception ignored) {}
+        return j.toString();
+    }
+
+    public final class AndroidHostBridge {
+        @JavascriptInterface public void launchIntroDone() { runOnUiThread(() -> finishLaunchIntroNative()); }
+        @JavascriptInterface public void requestUpdateStats() { requestUpdateStatsAsync(); }
+        @JavascriptInterface public void requestNamedUpdateStats() { requestNamedUpdateStatsAsync(); }
+        @JavascriptInterface public String getUpdateDisplayName() { return getStoredUpdateDisplayName(); }
+        @JavascriptInterface public void setUpdateDisplayNameAndReport(String name) { setUpdateDisplayNameAndReportAsync(name); }
+        @JavascriptInterface public boolean isSpecialApproved() { return isSpecialApprovedLocal(); }
+        @JavascriptInterface public String getSpecialApprovalSummary() { return specialApprovalSummaryJson(); }
+        @JavascriptInterface public void requestSpecialApproval(int round, String applicantName, String referrerName) { requestSpecialApprovalAsync(round, applicantName, referrerName); }
+        @JavascriptInterface public String getApprovalApplicantName() { return specialApprovalPrefs().getString("applicant_name", ""); }
+        @JavascriptInterface public String getApprovalReferrerName() { return specialApprovalPrefs().getString("referrer_name", ""); }
+        @JavascriptInterface public void checkSpecialApproval() { checkSpecialApprovalAsync(); }
+        @JavascriptInterface public String musicAction(String action) { return handleMusicAction(action); }
+        @JavascriptInterface public void playRadioDirect(String url, String name) { MainActivity.this.playRadioDirect(url, name); }
+        @JavascriptInterface public void stopRadioDirect() { MainActivity.this.stopRadioDirect(); }
+        @JavascriptInterface public String getRadioDirectState() { return MainActivity.this.radioStateJson(); }
+        @JavascriptInterface public boolean isOverlayIconEnabled() { return MainActivity.this.isOverlayControlEnabled(); }
+        @JavascriptInterface public void setOverlayIconEnabled(boolean enabled) {
+            runOnUiThread(() -> MainActivity.this.setOverlayControlEnabled(enabled));
+        }
+
+        @JavascriptInterface public void openRadioPage(String url) {
+            final String u = url == null ? "" : url.trim();
+            if (!(u.startsWith("https://") || u.startsWith("http://"))) return;
+            runOnUiThread(() -> {
+                try {
+                    Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(u));
+                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(i);
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "라디오 페이지를 열지 못했습니다.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+        @JavascriptInterface public void playCelebrationWithVoice(String text, int rankNo) { MainActivity.this.playCelebrationWithVoice(text, rankNo); }
+        @JavascriptInterface public void speakCelebration(String text, int rankNo) { MainActivity.this.speakScoreNow(text, rankNo); }
+        @JavascriptInterface public void speakConsolation(String text) { MainActivity.this.speakConsolationVoice(text); }
+        @JavascriptInterface public void stopScoreVoice() {
+            runOnUiThread(() -> {
+                try { if (scoreTts != null) scoreTts.stop(); } catch (Exception ignored) {}
+                stopScoreFanfare();
+            });
+        }
+        @JavascriptInterface public void exitApp() {
+            runOnUiThread(() -> closeAppScreen());
+        }
+
+        @JavascriptInterface public void chooseUpdate() {
+            runOnUiThread(() -> {
+                Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                i.addCategory(Intent.CATEGORY_OPENABLE);
+                i.setType("*/*");
+                i.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"text/html", "text/plain", "application/octet-stream"});
+                setDownloadInitialUri(i);
+                try { startActivityForResult(i, UPDATE_PICKER); }
+                catch (Exception e) { alert("HTML 업데이트 파일 선택기를 열 수 없습니다."); }
+            });
+        }
+        @JavascriptInterface public void chooseApkUpdate() { chooseApkUpdateFile(); }
+        @JavascriptInterface public String getNativeVersion() {
+            try {
+                android.content.pm.PackageInfo p = getPackageManager().getPackageInfo(getPackageName(), 0);
+                String name = p.versionName == null ? "V3 native" : p.versionName;
+                long code = android.os.Build.VERSION.SDK_INT >= 28 ? p.getLongVersionCode() : p.versionCode;
+                return name + " (" + code + ")";
+            } catch (Exception e) {
+                return "V3 native";
+            }
+        }
+
+        @JavascriptInterface public void chooseText() {
+            runOnUiThread(() -> {
+                Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                i.addCategory(Intent.CATEGORY_OPENABLE);
+                i.setType("text/plain");
+                try { startActivityForResult(i, TEXT_PICKER); }
+                catch (Exception e) { alert("TXT 선택기를 열 수 없습니다."); }
+            });
+        }
+
+        @JavascriptInterface public void chooseLegacyBackup() {
+            runOnUiThread(() -> {
+                Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                i.addCategory(Intent.CATEGORY_OPENABLE);
+                i.setType("*/*");
+                i.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"application/json", "text/plain", "application/octet-stream"});
+                try { startActivityForResult(i, LEGACY_BACKUP_PICKER); }
+                catch (Exception e) { alert("백업 JSON 선택기를 열 수 없습니다."); }
+            });
+        }
+
+        @JavascriptInterface public boolean applyUpdateHtml(String html) { return installUpdate(html); }
+
+        @JavascriptInterface public String backupJsonV37(String json) {
+            return saveBackupDirectSync(json);
+        }
+
+        @JavascriptInterface public void backupJson(String json) {
+            if (json != null && !json.isEmpty()) saveBackupDirect(json);
+        }
+
+        @JavascriptInterface public void saveText(String name, String text) {
+            if (text != null) createSave(name == null ? "항행의자유_V3_기록.txt" : name, "text/plain", text);
+        }
+
+        @JavascriptInterface public void copyText(String text) {
+            if (text == null) return;
+            runOnUiThread(() -> {
+                try {
+                    ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                    if (cm != null) cm.setPrimaryClip(ClipData.newPlainText("Final5", text));
+                } catch (Exception ignored) {}
+            });
+        }
+
+        @JavascriptInterface public boolean clearInstalledUpdate() {
+            File f = new File(getFilesDir(), UPDATE_FILE);
+            return !f.exists() || f.delete();
+        }
+
+        // V1 방식 계승: 휴대폰 음원을 선택하면 앱 내부에 복사해 보존합니다.
+        @JavascriptInterface public void fetchWinningNumbers(int round) { fetchWinningNumbersAsync(round); }
+        @JavascriptInterface public String getMusicState() { return MusicPlaybackService.snapshot(MainActivity.this); }
+        @JavascriptInterface public String getSavedMusicLibrary() { return new MusicLibraryStore(MainActivity.this).asJson(); }
+        @JavascriptInterface public void playSavedMusic(String id) {
+            runOnUiThread(()->{
+                try{Intent i=new Intent(MainActivity.this,MusicPlaybackService.class).setAction(MusicPlaybackService.ACTION_SELECT).putExtra(MusicPlaybackService.EXTRA_TRACK,id);
+                    if(Build.VERSION.SDK_INT>=26)startForegroundService(i);else startService(i);
+                }catch(Exception e){Toast.makeText(MainActivity.this,"음악 재생을 시작하지 못했습니다.",Toast.LENGTH_LONG).show();}
+            });
+        }
+        @JavascriptInterface public void openOurMusicFolder() { chooseMusicFolder(); }
+        @JavascriptInterface public void openDeviceMusicLibrary(String mode) { chooseMultipleMusicFiles(); }
+        @JavascriptInterface public void saveDeviceMusicSelection(String idsJson) { MainActivity.this.saveDeviceMusicSelection(idsJson); }
+        @JavascriptInterface public void chooseMusic() { chooseMusicFile(); }
+        @JavascriptInterface public void chooseMusicFolder() { chooseMusicFolder(); }
+        @JavascriptInterface public void chooseMultipleMusic() { chooseMultipleMusicFiles(); }
+        @JavascriptInterface public void musicNext() { sendMusicCommand(MusicPlaybackService.ACTION_NEXT); }
+        @JavascriptInterface public void musicPrev() { sendMusicCommand(MusicPlaybackService.ACTION_PREV); }
+        @JavascriptInterface public void stopMusic() { stopBackgroundMusic(); }
+        @JavascriptInterface public int getMusicPlaylistCount() { return musicPlaylistCount(); }
+        @JavascriptInterface public String getMusicName() { return musicName(); }
+        @JavascriptInterface public boolean isMusicEnabled() { return musicEnabled(); }
+        @JavascriptInterface public int getMusicVolume() { return musicVolume(); }
+        @JavascriptInterface public boolean toggleMusic() { return toggleBackgroundMusic(); }
+        @JavascriptInterface public void setMusicVolume(int percent) { applyMusicVolume(percent); }
+        @JavascriptInterface public void clearMusic() { clearSelectedMusic(); }
+        @JavascriptInterface public void finishOverlayUpdateScreen() {
+            runOnUiThread(() -> { overlayUpdateScreenActive = false; restoreOverlayAfterUpdate(); });
+        }
+    }
+
+
+    private void restoreOverlayAfterUpdate() {
+        try {
+            Intent s = new Intent(this, OverlayControlService.class).setAction(OverlayControlService.ACTION_RESUME);
+            if (Build.VERSION.SDK_INT >= 26) startForegroundService(s); else startService(s);
+        } catch (Exception ignored) {}
+    }
+
+    @Override public void onBackPressed() {
+        overlayUpdateScreenActive = false;
+        restoreOverlayAfterUpdate();
+        if (launchVideoActive) { closeAppScreen(); return; }
+        if (webView != null && webView.canGoBack()) webView.goBack();
+        else {
+            // 뒤로가기/종료로 앱 화면을 닫아도 배경음악 서비스는 별도로 유지됩니다.
+            closeAppScreen();
+        }
+    }
+}
