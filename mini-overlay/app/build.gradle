@@ -7,8 +7,8 @@ android {
     defaultConfig {
         minSdk 23
         targetSdk 35
-        versionCode 10064
-        versionName '1.0.64'
+        versionCode 10065
+        versionName '1.0.65'
     }
 
     flavorDimensions 'edition'
