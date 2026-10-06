@@ -193,9 +193,9 @@ public class OverlayService extends Service {
         mp4.setOnClickListener(v->showDownloadVideos("mp4"));
         myfiles.setOnClickListener(v->openExternalApp("com.sec.android.app.myfiles","내 파일","content://com.sec.android.app.myfiles.FileProvider/",""));
         bithumb.setOnClickListener(v->openExternalApp("com.btckorea.bithumb","빗썸","https://www.bithumb.com/","빗썸"));
-        yesfile.setOnClickListener(v->openExternalApp("","예스파일","https://www.yesfile.com/","예스파일"));
+        yesfile.setOnClickListener(v->openExternalApp("com.mnt.aos.yesfile.shortcuts","예스파일","https://www.yesfile.com/","예스파일"));
         kakao.setOnClickListener(v->openExternalApp("com.kakao.talk","카카오톡","https://www.kakaocorp.com/page/service/service/KakaoTalk","카카오톡"));
-        nh.setOnClickListener(v->openExternalApp("","NH올원뱅크","https://www.nhbank.com/","NH올원뱅크"));
+        nh.setOnClickListener(v->openExternalApp("com.nonghyup.nhallonebank","NH올원뱅크","https://www.nhbank.com/","NH올원뱅크"));
         hide.setOnClickListener(v->hideOverlayOnly());
         stop.setOnClickListener(v->{stopMedia();collapseStations();collapseMenu();toast("음악 · 라디오를 종료했습니다.");});
         update.setOnClickListener(v->{collapseStations();collapseMenu();openUpdater();});
