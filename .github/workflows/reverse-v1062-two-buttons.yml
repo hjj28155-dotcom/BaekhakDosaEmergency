@@ -1,0 +1,45 @@
+name: Reverse V1062 two buttons
+on:
+  push:
+    paths:
+      - '.github/workflows/reverse-v1062-two-buttons.yml'
+permissions:
+  contents: write
+jobs:
+  reverse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download V1062 APK
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 --connect-timeout 20             'https://drive.usercontent.google.com/download?id=1xqwMUIeWKzDBdT4wmWCMsk88P1-UBt4K&export=download&confirm=t'             -o /tmp/v1062.apk
+          test -s /tmp/v1062.apk
+          unzip -t /tmp/v1062.apk >/dev/null
+          sha256sum /tmp/v1062.apk
+      - name: Install JADX
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3             'https://github.com/skylot/jadx/releases/download/v1.5.3/jadx-1.5.3.zip'             -o /tmp/jadx.zip
+          unzip -q /tmp/jadx.zip -d /tmp/jadx
+      - name: Decompile target classes
+        run: |
+          set -euo pipefail
+          /tmp/jadx/bin/jadx -d /tmp/jadx-out /tmp/v1062.apk
+          rm -rf reverse-v1062
+          mkdir -p reverse-v1062
+          cp /tmp/jadx-out/sources/com/baekhak/centralcontrol/OverlayControlService.java reverse-v1062/
+          cp /tmp/jadx-out/sources/com/baekhak/centralcontrol/MainActivity.java reverse-v1062/
+          cp /tmp/jadx-out/sources/com/baekhak/centralcontrol/MusicPlaybackService.java reverse-v1062/
+          cp /tmp/jadx-out/sources/com/baekhak/centralcontrol/OverlayUpdateActivity.java reverse-v1062/
+          cp /tmp/jadx-out/sources/com/baekhak/centralcontrol/MusicLibraryStore.java reverse-v1062/ || true
+          cp /tmp/jadx-out/sources/com/baekhak/centralcontrol/MusicLibraryFiles.java reverse-v1062/ || true
+      - name: Commit extracted source
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add reverse-v1062
+          git commit -m 'Extract V1062 source for MP3 and update repair' || exit 0
+          git pull --rebase origin main
+          git push
