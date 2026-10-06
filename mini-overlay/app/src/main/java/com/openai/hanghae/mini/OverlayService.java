@@ -184,7 +184,7 @@ public class OverlayService extends Service {
         stationPanel=new LinearLayout(this);stationPanel.setOrientation(LinearLayout.VERTICAL);stationPanel.setVisibility(View.GONE);
         root.addView(stationPanel,new LinearLayout.LayoutParams(-1,-2));
 
-        freedom.setOnClickListener(v->{collapseStations();collapseMenu();toast("항행의자유는 현재 준비 중입니다.");});
+        freedom.setOnClickListener(v->openFreedomApp());
         if(BuildConfig.NAVIGATOR_EDITION) navigator.setOnClickListener(v->openNavigatorApp());
         analysis.setOnClickListener(v->openAnalysisV4());
         chatgpt.setOnClickListener(v->openChatGPT());
@@ -565,15 +565,14 @@ public class OverlayService extends Service {
     private void openFreedomApp(){
         collapseStations();
         collapseMenu();
-
-        // 항해사 운영 기준: 항행의자유 버튼은 항상 설치동영상부터 시작한다.
+        // 확정 시작점: 두루마리부터 시작하는 항행의자유 온보딩.
         try{
-            Intent web=new Intent(Intent.ACTION_VIEW,Uri.parse("https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/?entry=moveicon-install-guide"));
+            Intent web=new Intent(Intent.ACTION_VIEW,Uri.parse("https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/?entry=moveicon-onboarding"));
             web.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(web);
-            setNow("🚢 항행의자유 설치동영상을 엽니다.");
+            setNow("🚢 항행의자유 신규설치 안내를 엽니다.");
         }catch(Exception e){
-            toast("항행의자유 설치동영상을 열 수 없습니다.");
+            toast("항행의자유 신규설치 안내를 열 수 없습니다.");
         }
     }
 
