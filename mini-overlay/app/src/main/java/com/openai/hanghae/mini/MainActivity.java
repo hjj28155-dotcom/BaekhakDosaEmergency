@@ -81,7 +81,12 @@ public class MainActivity extends Activity {
         root.addView(title,new LinearLayout.LayoutParams(-1,-2));
 
         TextView info=new TextView(this);
-        info.setText("\n⚓ 이동아이콘 전용\nMP3 · FM · AM · YouTube\n\n원할 때만 켜고 끌 수 있습니다.\n꺼둔 상태는 앱 재실행·재부팅 후에도 유지됩니다.");
+        info.setText("
+⚓ 이동아이콘 전용
+MP3 · FM · AM · YouTube
+
+원할 때만 켜고 끌 수 있습니다.
+꺼둔 상태는 앱 재실행·재부팅 후에도 유지됩니다.");
         info.setTextColor(Color.WHITE);
         info.setTextSize(16);
         info.setGravity(Gravity.CENTER);
@@ -178,7 +183,8 @@ public class MainActivity extends Activity {
 
     private void startDirectUpdate(){
         try{
-            String page=BuildConfig.NAVIGATOR_EDITION?NAVIGATOR_UPDATE_PAGE:PUBLIC_UPDATE_PAGE;\n            Intent web=new Intent(Intent.ACTION_VIEW,Uri.parse(page));
+            String page=BuildConfig.NAVIGATOR_EDITION?NAVIGATOR_UPDATE_PAGE:PUBLIC_UPDATE_PAGE;
+            Intent web=new Intent(Intent.ACTION_VIEW,Uri.parse(page));
             startActivity(web);
             setUpdateState("설치 및 업데이트 창을 열었습니다.",0,false);
         }catch(Exception e){
