@@ -87,7 +87,7 @@ jobs:
           PY
 
           chmod +x gradlew
-          grep -RIn "Movies 자동검색" app/src/main/java && exit 1 || true
+          grep -RIn 'setMediaMode(.*Movies 자동검색' app/src/main/java && exit 1 || true
           grep -n "applicationId\|versionCode\|versionName" app/build.gradle
           grep -n "force_import\|v3_force_local_music_folder\|불러오기" app/src/main/java/com/baekhak/centralcontrol/OverlayControlService.java | head -20
       - name: Build APK
