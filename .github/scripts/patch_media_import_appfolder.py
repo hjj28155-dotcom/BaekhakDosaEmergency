@@ -1,7 +1,7 @@
 from pathlib import Path
 p=Path("build405/FREEDOM_V402_BUILD_THIS/app/src/main/java/com/baekhak/centralcontrol/MainActivity.java")
 s=p.read_text(encoding="utf-8")
-s=s.replace("private static final int MUSIC_MULTI_PICKER = 4311;","private static final int MUSIC_MULTI_PICKER = 4311;\n    private static final int VIDEO_MULTI_PICKER = 4314;\n    private static final String VIDEO_DIR = \"v3_video_library\";")
+s=s.replace("private static final int MUSIC_MULTI_PICKER = 4311;","private static final int MUSIC_MULTI_PICKER = 4311;\n    private static final int VIDEO_MULTI_PICKER = 4314;\n    private static final String VIDEO_DIR = \"v3_video_library\";\n    private static final String VIDEO_PREFS = \"v3_video_preferences\";\n    private static final String VIDEO_VOLUME = \"video_volume\";")
 anchor='    private String httpGet(String urlText) throws Exception {'
 insert=r'''
     private void chooseMultipleVideoFiles() {
@@ -67,6 +67,12 @@ insert=r'''
         return a.toString();
     }
 
+    private int videoVolume() { return getSharedPreferences(VIDEO_PREFS,MODE_PRIVATE).getInt(VIDEO_VOLUME,70); }
+    private void setVideoVolume(int percent) {
+        int p=Math.max(0,Math.min(100,percent));
+        getSharedPreferences(VIDEO_PREFS,MODE_PRIVATE).edit().putInt(VIDEO_VOLUME,p).apply();
+    }
+
     private void playSavedVideo(String path) {
         runOnUiThread(()->{
             try{
@@ -107,6 +113,8 @@ bridge='        @JavascriptInterface public void openOurMusicFolder() { chooseMu
 bridge_insert=r'''        @JavascriptInterface public void chooseMultipleVideos() { chooseMultipleVideoFiles(); }
         @JavascriptInterface public String getSavedVideoLibrary() { return savedVideoLibraryJson(); }
         @JavascriptInterface public void playSavedVideo(String path) { MainActivity.this.playSavedVideo(path); }
+        @JavascriptInterface public int getVideoVolume() { return MainActivity.this.videoVolume(); }
+        @JavascriptInterface public void setVideoVolume(int percent) { MainActivity.this.setVideoVolume(percent); }
 '''
 s=s.replace(bridge,bridge_insert+bridge)
 p.write_text(s,encoding="utf-8")
