@@ -160,7 +160,9 @@ public class OverlayService extends Service {
         menu.addView(freedom);
         if(BuildConfig.NAVIGATOR_EDITION) menu.addView(navigator);\n        menu.addView(analysis);menu.addView(chatgpt);
         menu.addView(mp3);menu.addView(fm);menu.addView(am);menu.addView(yt);menu.addView(avi);menu.addView(mp4);
-        menu.addView(myfiles);menu.addView(bithumb);menu.addView(yesfile);menu.addView(kakao);menu.addView(nh);
+        if(BuildConfig.NAVIGATOR_EDITION){
+            menu.addView(myfiles);menu.addView(bithumb);menu.addView(yesfile);menu.addView(kakao);menu.addView(nh);
+        }
         menu.addView(hide);menu.addView(stop);menu.addView(update);
 
         ScrollView menuScroll=new ScrollView(this);
@@ -191,11 +193,13 @@ public class OverlayService extends Service {
         yt.setOnClickListener(v->openYoutube());
         avi.setOnClickListener(v->showDownloadVideos("avi"));
         mp4.setOnClickListener(v->showDownloadVideos("mp4"));
-        myfiles.setOnClickListener(v->openExternalApp("com.sec.android.app.myfiles","내 파일","content://com.sec.android.app.myfiles.FileProvider/",""));
-        bithumb.setOnClickListener(v->openExternalApp("com.btckorea.bithumb","빗썸","https://www.bithumb.com/","빗썸"));
-        yesfile.setOnClickListener(v->openExternalApp("com.mnt.aos.yesfile.shortcuts","예스파일","https://www.yesfile.com/","예스파일"));
-        kakao.setOnClickListener(v->openExternalApp("com.kakao.talk","카카오톡","https://www.kakaocorp.com/page/service/service/KakaoTalk","카카오톡"));
-        nh.setOnClickListener(v->openExternalApp("com.nonghyup.nhallonebank","NH올원뱅크","https://www.nhbank.com/","NH올원뱅크"));
+        if(BuildConfig.NAVIGATOR_EDITION){
+            myfiles.setOnClickListener(v->openExternalApp("com.sec.android.app.myfiles","내 파일","content://com.sec.android.app.myfiles.FileProvider/",""));
+            bithumb.setOnClickListener(v->openExternalApp("com.btckorea.bithumb","빗썸","https://www.bithumb.com/","빗썸"));
+            yesfile.setOnClickListener(v->openExternalApp("com.mnt.aos.yesfile.shortcuts","예스파일","https://www.yesfile.com/","예스파일"));
+            kakao.setOnClickListener(v->openExternalApp("com.kakao.talk","카카오톡","https://www.kakaocorp.com/page/service/service/KakaoTalk","카카오톡"));
+            nh.setOnClickListener(v->openExternalApp("com.nonghyup.nhallonebank","NH올원뱅크","https://www.nhbank.com/","NH올원뱅크"));
+        }
         hide.setOnClickListener(v->hideOverlayOnly());
         stop.setOnClickListener(v->{stopMedia();collapseStations();collapseMenu();toast("음악 · 라디오를 종료했습니다.");});
         update.setOnClickListener(v->{collapseStations();collapseMenu();openUpdater();});
