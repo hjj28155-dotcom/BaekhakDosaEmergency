@@ -78,10 +78,32 @@ insert=r'''
             try{
                 File f=new File(path==null?"":path);
                 if(!f.isFile() || !f.getCanonicalPath().startsWith(videoLibraryDir().getCanonicalPath())) throw new Exception("not found");
-                Intent i=new Intent(Intent.ACTION_VIEW);
-                i.setDataAndType(androidx.core.content.FileProvider.getUriForFile(this,getPackageName()+".fileprovider",f),"video/mp4");
-                i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                startActivity(i);
+                // No AndroidX dependency: play the private app-folder MP4 inside this Activity.
+                MediaPlayer mp=new MediaPlayer();
+                TextureView tv=new TextureView(this);
+                tv.setBackgroundColor(Color.BLACK);
+                FrameLayout.LayoutParams vp=new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,FrameLayout.LayoutParams.MATCH_PARENT);
+                vp.gravity=Gravity.CENTER;
+                rootLayout.addView(tv,vp);
+                webView.setVisibility(View.INVISIBLE);
+                tv.setSurfaceTextureListener(new TextureView.SurfaceTextureListener(){
+                    @Override public void onSurfaceTextureAvailable(SurfaceTexture st,int w,int h){
+                        try{
+                            Surface sf=new Surface(st);
+                            mp.setSurface(sf);
+                            mp.setDataSource(f.getAbsolutePath());
+                            float vol=Math.max(0f,Math.min(1f,videoVolume()/100f));
+                            mp.setVolume(vol,vol);
+                            mp.setOnPreparedListener(x->x.start());
+                            mp.setOnCompletionListener(x->{try{x.release();}catch(Exception ignored){} try{rootLayout.removeView(tv);}catch(Exception ignored){} webView.setVisibility(View.VISIBLE);});
+                            mp.setOnErrorListener((x,what,extra)->{try{x.release();}catch(Exception ignored){} try{rootLayout.removeView(tv);}catch(Exception ignored){} webView.setVisibility(View.VISIBLE);return true;});
+                            mp.prepareAsync();
+                        }catch(Exception e){try{rootLayout.removeView(tv);}catch(Exception ignored){} webView.setVisibility(View.VISIBLE);}
+                    }
+                    @Override public void onSurfaceTextureSizeChanged(SurfaceTexture st,int w,int h){}
+                    @Override public boolean onSurfaceTextureDestroyed(SurfaceTexture st){try{mp.release();}catch(Exception ignored){} webView.setVisibility(View.VISIBLE);return true;}
+                    @Override public void onSurfaceTextureUpdated(SurfaceTexture st){}
+                });
             }catch(Exception e){Toast.makeText(this,"저장된 MP4를 열지 못했습니다.",Toast.LENGTH_LONG).show();}
         });
     }
