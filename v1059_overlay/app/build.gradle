@@ -1,0 +1,52 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'com.baekhak.centralcontrol'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'com.navigator.freedom.overlayicon'
+        minSdk 23
+        targetSdk 35
+        versionCode 1059
+        versionName "1.0.59"
+    }
+    buildFeatures { buildConfig true }
+    buildTypes {
+        release { minifyEnabled false; shrinkResources false }
+        debug { debuggable false }
+    }
+    sourceSets {
+        main {
+            manifest.srcFile 'src/main/AndroidManifest.xml'
+            // Explicitly include both resource trees. AndroidIDE previously linked the
+            // manifest before seeing the ship icon in the overlay source set.
+            res.srcDirs = ['src/main/res', 'src/freedom/res']
+            assets.srcDirs = ['src/main/assets', 'src/freedom/assets']
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            outputFileName = "OVERLAY_ICON_V1059_MANUAL_PRIVATE_MEDIA_FIX-debug.apk"
+        }
+    }
+}
+
+tasks.matching { it.name == 'assembleDebug' }.configureEach {
+    doLast {
+        copy {
+            from(layout.buildDirectory.dir('outputs/apk/debug')) { include '*.apk' }
+            into(rootProject.layout.projectDirectory.dir('APK_OUTPUT'))
+            eachFile { relativePath = new RelativePath(true, name) }
+            includeEmptyDirs = false
+        }
+        println 'APK_OUTPUT: OVERLAY_ICON_V1059_MANUAL_PRIVATE_MEDIA_FIX-debug.apk'
+    }
+}
+
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+
+android.applicationVariants.all { variant -> if (variant.buildType.name == "debug") { variant.outputs.all { outputFileName = "OVERLAY_ICON_V1059_MANUAL_PRIVATE_MEDIA_FIX-debug.apk" } } }
