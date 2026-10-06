@@ -15,14 +15,18 @@ new_method = '''    private void openFreedomApp(){
         collapseStations();
         collapseMenu();
 
-        // 확정 순서 시작: 이동아이콘 -> 항행의자유 홈.
-        // 홈 이후 공지사항 -> 설치 및 업데이트 설명서 ->
-        // 설치 설명서 전체화면 -> 설치동영상은 항행의자유 앱 안에서 진행한다.
-        if(launchPackage("com.navigator.freedom.v3final","🚢 항행의자유 실행")) return;
-        if(launchPackage("com.navigator.freedom","🚢 항행의자유 실행")) return;
-        if(launchByLabel("항행의자유","🚢 항행의자유 실행")) return;
-
-        toast("항행의자유 앱을 찾을 수 없습니다.");
+        // 확정 순서 시작:
+        // 이동아이콘 '항행의자유' -> 신규설치 온보딩의 두루마리 화면.
+        // 이후 두루마리 클릭 -> 설치동영상 -> 승인요청 -> 서버접수 ->
+        // 안내동영상 -> 승인대기 -> 항해사앱 승인 -> 승인완료 확인 -> 홈.
+        try{
+            Intent web=new Intent(Intent.ACTION_VIEW,Uri.parse("https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/?entry=moveicon-onboarding"));
+            web.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(web);
+            setNow("🚢 항행의자유 신규설치 안내를 엽니다.");
+        }catch(Exception e){
+            toast("항행의자유 신규설치 안내를 열 수 없습니다.");
+        }
     }
 '''
 s = s[:start] + new_method + s[end:]
