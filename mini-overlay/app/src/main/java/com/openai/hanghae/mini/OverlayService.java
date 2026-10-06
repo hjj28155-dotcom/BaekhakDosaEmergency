@@ -158,7 +158,8 @@ public class OverlayService extends Service {
                kakao=btn("카카오톡",0xEE455A64), nh=btn("NH올원뱅크",0xEE455A64),
                hide=btn("아이콘 숨김",0xEE455A64), stop=btn("■ 종료",0xEED52D46), update=btn("업데이트",0xEE087F5B);
         menu.addView(freedom);
-        if(BuildConfig.NAVIGATOR_EDITION) menu.addView(navigator);\n        menu.addView(analysis);menu.addView(chatgpt);
+        if(BuildConfig.NAVIGATOR_EDITION) menu.addView(navigator);
+        menu.addView(analysis);menu.addView(chatgpt);
         menu.addView(mp3);menu.addView(fm);menu.addView(am);menu.addView(yt);menu.addView(avi);menu.addView(mp4);
         if(BuildConfig.NAVIGATOR_EDITION){
             menu.addView(myfiles);menu.addView(bithumb);menu.addView(yesfile);menu.addView(kakao);menu.addView(nh);
@@ -701,7 +702,10 @@ public class OverlayService extends Service {
         collapseStations();
         collapseMenu();
         try{
-            String page=BuildConfig.NAVIGATOR_EDITION\n                ?"https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/navigator-moveicon.html"\n                :"https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/moveicon.html";\n            Intent web=new Intent(Intent.ACTION_VIEW,Uri.parse(page));
+            String page=BuildConfig.NAVIGATOR_EDITION
+                ?"https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/navigator-moveicon.html"
+                :"https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/moveicon.html";
+            Intent web=new Intent(Intent.ACTION_VIEW,Uri.parse(page));
             web.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(web);
             setNow("⬆ 설치 및 업데이트 창을 엽니다.");
