@@ -2,7 +2,7 @@ name: V1062 media import and PIP controls
 on:
   push:
     branches: [v1059-build-temp]
-    paths: ['.github/workflows/v1062-build.yml']
+    paths: ['.github/workflows/v1061-build.yml']
 permissions:
   contents: read
 jobs:
