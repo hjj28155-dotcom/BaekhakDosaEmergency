@@ -154,10 +154,14 @@ public class OverlayService extends Service {
                analysis=btn("📊 분석방 V4",0xEE17639A), chatgpt=btn("🤖 ChatGPT",0xEE168A5B),
                mp3=btn("🎵 MP3",0xEE1068C8), fm=btn("📻 FM",0xEE5B34D6), am=btn("📡 AM",0xEE6D2DB7),
                yt=btn("유튜브",0xEEDB1F28), avi=btn("AVI",0xEE8A4D1E), mp4=btn("MP4",0xEE1F7A5B),
+               myfiles=btn("내 파일",0xEE455A64), bithumb=btn("빗썸",0xEE455A64), yesfile=btn("예스파일",0xEE455A64),
+               kakao=btn("카카오톡",0xEE455A64), nh=btn("NH올원뱅크",0xEE455A64),
                hide=btn("아이콘 숨김",0xEE455A64), stop=btn("■ 종료",0xEED52D46), update=btn("업데이트",0xEE087F5B);
         menu.addView(freedom);
-        if(BuildConfig.NAVIGATOR_EDITION){ menu.addView(navigator); menu.addView(analysis); menu.addView(chatgpt); }
-        menu.addView(mp3);menu.addView(fm);menu.addView(am);menu.addView(yt);menu.addView(avi);menu.addView(mp4);menu.addView(hide);menu.addView(stop);menu.addView(update);
+        menu.addView(navigator);menu.addView(analysis);menu.addView(chatgpt);
+        menu.addView(mp3);menu.addView(fm);menu.addView(am);menu.addView(yt);menu.addView(avi);menu.addView(mp4);
+        menu.addView(myfiles);menu.addView(bithumb);menu.addView(yesfile);menu.addView(kakao);menu.addView(nh);
+        menu.addView(hide);menu.addView(stop);menu.addView(update);
 
         ScrollView menuScroll=new ScrollView(this);
         menuScroll.setVerticalScrollBarEnabled(true);
@@ -177,18 +181,21 @@ public class OverlayService extends Service {
         stationPanel=new LinearLayout(this);stationPanel.setOrientation(LinearLayout.VERTICAL);stationPanel.setVisibility(View.GONE);
         root.addView(stationPanel,new LinearLayout.LayoutParams(-1,-2));
 
-        freedom.setOnClickListener(v->openFreedomApp());
-        if(BuildConfig.NAVIGATOR_EDITION){
-            navigator.setOnClickListener(v->openNavigatorApp());
-            analysis.setOnClickListener(v->openAnalysisV4());
-            chatgpt.setOnClickListener(v->openChatGPT());
-        }
+        freedom.setOnClickListener(v->{collapseStations();collapseMenu();toast("항행의자유는 현재 준비 중입니다.");});
+        navigator.setOnClickListener(v->openNavigatorApp());
+        analysis.setOnClickListener(v->openAnalysisV4());
+        chatgpt.setOnClickListener(v->openChatGPT());
         mp3.setOnClickListener(v->{showMp3Controls();toggleLocalMp3();});
         fm.setOnClickListener(v->showStations(true));
         am.setOnClickListener(v->showStations(false));
         yt.setOnClickListener(v->openYoutube());
         avi.setOnClickListener(v->showDownloadVideos("avi"));
         mp4.setOnClickListener(v->showDownloadVideos("mp4"));
+        myfiles.setOnClickListener(v->openExternalApp("com.sec.android.app.myfiles","내 파일","content://com.sec.android.app.myfiles.FileProvider/",""));
+        bithumb.setOnClickListener(v->openExternalApp("com.btckorea.bithumb","빗썸","https://www.bithumb.com/","빗썸"));
+        yesfile.setOnClickListener(v->openExternalApp("","예스파일","https://www.yesfile.com/","예스파일"));
+        kakao.setOnClickListener(v->openExternalApp("com.kakao.talk","카카오톡","https://www.kakaocorp.com/page/service/service/KakaoTalk","카카오톡"));
+        nh.setOnClickListener(v->openExternalApp("","NH올원뱅크","https://www.nhbank.com/","NH올원뱅크"));
         hide.setOnClickListener(v->hideOverlayOnly());
         stop.setOnClickListener(v->{stopMedia();collapseStations();collapseMenu();toast("음악 · 라디오를 종료했습니다.");});
         update.setOnClickListener(v->{collapseStations();collapseMenu();openUpdater();});
@@ -641,7 +648,38 @@ public class OverlayService extends Service {
         try{Intent y=new Intent(Intent.ACTION_VIEW,Uri.parse("https://www.youtube.com"));y.setPackage("com.google.android.youtube");y.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);startActivity(y);}
         catch(Exception e){try{Intent y=new Intent(Intent.ACTION_VIEW,Uri.parse("https://www.youtube.com"));y.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);startActivity(y);}catch(Exception x){toast("YouTube를 열 수 없습니다.");}}
     }
+    private void openExternalApp(String pkg,String label,String fallbackUrl,String keyword){
+        collapseStations();
+        collapseMenu();
+        if(pkg!=null && pkg.length()>0 && launchPackage(pkg,"✅ "+label+" 실행")) return;
+        String k=(keyword==null||keyword.length()==0)?label:keyword;
+        if(launchByLabel(k,"✅ "+label+" 실행")) return;
+        if(fallbackUrl!=null && fallbackUrl.startsWith("http")){
+            try{
+                Intent web=new Intent(Intent.ACTION_VIEW,Uri.parse(fallbackUrl));
+                web.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(web);
+                setNow("🌐 "+label+" 페이지를 엽니다.");
+                return;
+            }catch(Exception ignored){}
+        }
+        toast(label+"을(를) 열 수 없습니다.");
+    }
+
     private void openUpdater(){
+        collapseStations();
+        collapseMenu();
+        try{
+            Intent web=new Intent(Intent.ACTION_VIEW,Uri.parse("https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/moveicon.html"));
+            web.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(web);
+            setNow("⬆ 설치 및 업데이트 창을 엽니다.");
+        }catch(Exception e){
+            toast("설치 및 업데이트 창을 열 수 없습니다.");
+        }
+    }
+
+    private void openUpdaterLegacy(){
         if(updateBusy){
             setNow("⬇ 업데이트 다운로드 진행 중…");
             return;
