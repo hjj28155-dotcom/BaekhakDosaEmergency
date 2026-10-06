@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Apply confirmed Freedom button flow
+        run: python3 .github/scripts/patch_moveicon_freedom_home.py
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
