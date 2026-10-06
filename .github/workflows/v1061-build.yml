@@ -25,7 +25,8 @@ jobs:
           unzip -q source.zip -d /tmp/v1063
           cd /tmp/v1063/FREEDOM_V402_BUILD_THIS
 
-          curl -fL --retry 3 'https://drive.google.com/uc?export=download&id=1pGo99z20VgngTnVaCCteejIN_m7IaP0C' -o /tmp/v1063_patch.zip
+          python3 -m pip install -q gdown
+          gdown --id 1pGo99z20VgngTnVaCCteejIN_m7IaP0C -O /tmp/v1063_patch.zip
           unzip -oq /tmp/v1063_patch.zip -d .
 
           # Existing app must remain untouched: install as a completely separate package.
@@ -41,7 +42,7 @@ jobs:
           sed -i 's/android:label="@string\/app_name"/android:label="이동아이콘 V1063"/' app/src/main/AndroidManifest.xml
 
           # Keep the established anchor icon.
-          cp app/src/main/res/drawable/v3_ship_icon.png app/src/main/res/drawable/overlay_anchor_icon.png
+          rm -f app/src/main/res/drawable/overlay_anchor_icon.png
           chmod +x gradlew
 
           grep -n "applicationId\|versionCode\|versionName\|outputFileName" app/build.gradle
