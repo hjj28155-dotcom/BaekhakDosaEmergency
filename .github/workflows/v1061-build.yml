@@ -26,7 +26,7 @@ jobs:
           cd /tmp/v1063/FREEDOM_V402_BUILD_THIS
 
           python3 -m pip install -q gdown
-          gdown --id 1pGo99z20VgngTnVaCCteejIN_m7IaP0C -O /tmp/v1063_patch.zip
+          gdown 1pGo99z20VgngTnVaCCteejIN_m7IaP0C -O /tmp/v1063_patch.zip
           unzip -oq /tmp/v1063_patch.zip -d .
 
           # Existing app must remain untouched: install as a completely separate package.
