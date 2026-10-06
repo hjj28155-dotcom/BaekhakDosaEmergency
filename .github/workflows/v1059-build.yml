@@ -1,0 +1,70 @@
+name: Build V1059 Manual Private Media
+on:
+  push:
+    branches: [v1059-build-temp]
+    paths: ['.github/workflows/v1059-build.yml']
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Prepare V1059 project
+        run: |
+          set -euxo pipefail
+          rm -rf /tmp/v1059
+          mkdir -p /tmp/v1059
+          unzip -q source.zip -d /tmp/v1059
+          PROJECT=/tmp/v1059/FREEDOM_V402_BUILD_THIS
+          test -d "$PROJECT/app"
+          cp -a v1059_overlay/. "$PROJECT/"
+          chmod +x "$PROJECT/gradlew"
+          grep -q "applicationId 'com.navigator.freedom.overlayicon'" "$PROJECT/app/build.gradle"
+          grep -q "versionCode 1059" "$PROJECT/app/build.gradle"
+          grep -q "class LocalMediaPickerActivity" "$PROJECT/app/src/main/java/com/baekhak/centralcontrol/LocalMediaPickerActivity.java"
+          grep -q "class VideoLibraryStore" "$PROJECT/app/src/main/java/com/baekhak/centralcontrol/VideoLibraryStore.java"
+          grep -q "MP3 추가 불러오기" "$PROJECT/app/src/main/java/com/baekhak/centralcontrol/MainActivity.java"
+          grep -q "휴대폰 전체 음악 자동검색 금지" "$PROJECT/app/src/main/java/com/baekhak/centralcontrol/MusicPlaybackService.java"
+
+      - name: Build APK
+        run: |
+          set -euxo pipefail
+          PROJECT=/tmp/v1059/FREEDOM_V402_BUILD_THIS
+          cd "$PROJECT"
+          gradle clean assembleDebug --no-daemon --stacktrace
+          APK=$(find app/build/outputs/apk/debug -type f -name '*.apk' | head -1)
+          test -s "$APK"
+          cp "$APK" "$GITHUB_WORKSPACE/OVERLAY_ICON_V1059_MANUAL_PRIVATE_MEDIA_FIX-debug.apk"
+          sha256sum "$GITHUB_WORKSPACE/OVERLAY_ICON_V1059_MANUAL_PRIVATE_MEDIA_FIX-debug.apk" | tee "$GITHUB_WORKSPACE/V1059_SHA256.txt"
+
+      - name: Verify APK
+        run: |
+          set -euxo pipefail
+          APK="$GITHUB_WORKSPACE/OVERLAY_ICON_V1059_MANUAL_PRIVATE_MEDIA_FIX-debug.apk"
+          AAPT=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
+          "$AAPT" dump badging "$APK" | head -8 | tee "$GITHUB_WORKSPACE/V1059_BADGING.txt"
+          "$APKSIGNER" verify --print-certs "$APK" | tee "$GITHUB_WORKSPACE/V1059_SIGNATURE.txt"
+          grep -q "package: name='com.navigator.freedom.overlayicon'" "$GITHUB_WORKSPACE/V1059_BADGING.txt"
+          grep -q "versionCode='1059'" "$GITHUB_WORKSPACE/V1059_BADGING.txt"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OVERLAY_ICON_V1059_MANUAL_PRIVATE_MEDIA_FIX
+          path: |
+            OVERLAY_ICON_V1059_MANUAL_PRIVATE_MEDIA_FIX-debug.apk
+            V1059_SHA256.txt
+            V1059_BADGING.txt
+            V1059_SIGNATURE.txt
+          retention-days: 7
