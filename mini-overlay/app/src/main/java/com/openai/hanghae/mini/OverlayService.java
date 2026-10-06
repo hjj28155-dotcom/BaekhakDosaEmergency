@@ -674,7 +674,7 @@ public class OverlayService extends Service {
         collapseStations();
         collapseMenu();
         try{
-            Intent web=new Intent(Intent.ACTION_VIEW,Uri.parse("https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/moveicon.html"));
+            String page=BuildConfig.NAVIGATOR_EDITION\n                ?"https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/navigator-moveicon.html"\n                :"https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/moveicon.html";\n            Intent web=new Intent(Intent.ACTION_VIEW,Uri.parse(page));
             web.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(web);
             setNow("⬆ 설치 및 업데이트 창을 엽니다.");
