@@ -6,32 +6,24 @@
 <style>
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(#03182c,#00101f);color:#fff;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif}.wrap{max-width:720px;margin:auto;padding:28px 16px 50px;text-align:center}h1{color:#ffe39a;margin:0 0 10px}.sub{color:#c5d8e7;line-height:1.6}.card{margin-top:18px;padding:18px;background:#08253c;border:1px solid #315d78;border-radius:18px}.btn{display:block;width:100%;padding:18px;margin-top:14px;border:1px solid #e3c56a;border-radius:15px;background:linear-gradient(#8a6718,#493407);color:#fff3b0;font-size:19px;font-weight:900;text-decoration:none}video{display:block;width:100%;margin-top:14px;border-radius:14px;background:#000}.status{margin-top:12px;color:#8fe8ff;font-weight:800;line-height:1.55}.install{display:none}.note{margin-top:12px;color:#b8cbd8;font-size:14px;line-height:1.6}
 </style><meta name="r13-deploy" content="20261005-0918"></head><body>
-<div class="wrap"><h1>항행의자유</h1><div class="sub">설치동영상과 안내음악을 확인한 뒤 최신판을 설치합니다.</div>
+<div class="wrap"><h1>항행의자유</h1><div class="sub">신규 설치 및 업데이트 안내</div>
 <div class="card">
-
-<video id="video" playsinline preload="auto" controls><source src="freedom_guide_latest.mp4?v=20261004-clean1" type="video/mp4"></video>
-
-<div id="status" class="status">영상의 ▶ 버튼을 눌러주세요.</div>
-<div id="scrollStage" class="install">
+<div id="scrollStage">
 <img src="welcome_scroll_final.png" alt="항행의자유 환영 두루마리" style="display:block;width:100%;height:auto;border-radius:14px;margin-top:14px">
-<a id="install" class="btn" href="https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/latest-apk">두루마리 확인 · 항행의자유 V4.0.35 R14 설치로 진행</a>
+<button id="scrollNext" class="btn" type="button">두루마리 클릭 · 설치동영상</button>
 </div>
-<div class="note">기존 앱은 삭제하지 마십시오. 설치동영상 종료 후 환영 두루마리를 확인하고 다음 단계로 진행합니다.</div>
+<div id="videoStage" style="display:none">
+<video id="video" playsinline preload="auto" controls><source src="freedom_guide_latest.mp4?v=20261007-flow1" type="video/mp4"></video>
+<div id="status" class="status">설치동영상을 끝까지 시청해 주세요.</div>
+</div>
+<div class="note">두루마리 → 설치동영상 → 승인요청 → 서버접수 → 안내동영상 → 승인대기 → 항해사앱 승인 → 승인완료 확인 → 홈</div>
 </div></div>
 <script>
+const scrollStage=document.getElementById('scrollStage');
+const videoStage=document.getElementById('videoStage');
+const btn=document.getElementById('scrollNext');
 const v=document.getElementById('video');
-const a=null;
-const install=document.getElementById('install');const scrollStage=document.getElementById('scrollStage');
 const status=document.getElementById('status');
-let finished=false;
-function sync(force=false){if(!a)return;try{const t=v.currentTime||0;if(force||Math.abs((a.currentTime||0)-t)>.20)a.currentTime=t;}catch(e){}}
-async function playAudio(){return;}
-function finish(){if(finished)return;finished=true;try{v.pause();}catch(e){}if(scrollStage)scrollStage.style.display='block';status.textContent='✅ 설치동영상 종료 · 환영 두루마리를 확인한 뒤 다음 단계로 진행하세요.';setTimeout(()=>scrollStage.scrollIntoView({behavior:'smooth',block:'start'}),80);}
-v.controls=true;
-v.addEventListener('play',()=>{finished=false;if(scrollStage)scrollStage.style.display='none';playAudio();});
-v.addEventListener('pause',()=>{if(!finished)});
-v.addEventListener('seeking',()=>{sync(true);});
-v.addEventListener('seeked',()=>{sync(true);if(Number.isFinite(v.duration)&&v.duration>0&&v.currentTime>=v.duration-.75){finish();return;}if(!v.paused)playAudio();});
-v.addEventListener('timeupdate',()=>{if(finished)return;sync(false);if(Number.isFinite(v.duration)&&v.duration>0&&v.currentTime>=v.duration-.40)finish();});
-v.addEventListener('ended',finish);
+btn.addEventListener('click',()=>{scrollStage.style.display='none';videoStage.style.display='block';try{v.load();const p=v.play();if(p&&p.catch)p.catch(()=>{});}catch(e){}});
+v.addEventListener('ended',()=>{status.textContent='✅ 설치동영상 완료 · 항행의자유 설치/업데이트로 진행합니다.';window.location.href='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/latest-apk';});
 </script></body></html>
