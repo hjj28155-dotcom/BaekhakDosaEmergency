@@ -30,7 +30,8 @@ import java.util.Locale;
 
 public class MainActivity extends Activity {
     private static final int REQ_AUDIO=77;
-    private static final String UPDATE_PAGE="https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/moveicon.html";
+    private static final String PUBLIC_UPDATE_PAGE="https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/moveicon.html";
+    private static final String NAVIGATOR_UPDATE_PAGE="https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/navigator-moveicon.html";
 
     private boolean pendingStart=false;
     private long updateDownloadId=-1L;
@@ -177,7 +178,7 @@ public class MainActivity extends Activity {
 
     private void startDirectUpdate(){
         try{
-            Intent web=new Intent(Intent.ACTION_VIEW,Uri.parse(UPDATE_PAGE));
+            String page=BuildConfig.NAVIGATOR_EDITION?NAVIGATOR_UPDATE_PAGE:PUBLIC_UPDATE_PAGE;\n            Intent web=new Intent(Intent.ACTION_VIEW,Uri.parse(page));
             startActivity(web);
             setUpdateState("설치 및 업데이트 창을 열었습니다.",0,false);
         }catch(Exception e){
