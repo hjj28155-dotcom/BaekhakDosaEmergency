@@ -30,7 +30,7 @@ import java.util.Locale;
 
 public class MainActivity extends Activity {
     private static final int REQ_AUDIO=77;
-    private static final String UPDATE_URL="https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/HANGHAE_NAVIGATOR_MINI-debug.apk?v=1.0.19-20261004";
+    private static final String UPDATE_PAGE="https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/moveicon.html";
 
     private boolean pendingStart=false;
     private long updateDownloadId=-1L;
@@ -177,71 +177,11 @@ public class MainActivity extends Activity {
 
     private void startDirectUpdate(){
         try{
-            DownloadManager dm=(DownloadManager)getSystemService(DOWNLOAD_SERVICE);
-            if(dm==null){
-                setUpdateState("업데이트를 시작하지 못했습니다.",0,false);
-                return;
-            }
-
-            if(updateDownloadId>=0L){
-                setUpdateState("이미 업데이트 파일을 내려받는 중입니다.",updateProgress==null?0:updateProgress.getProgress(),true);
-                return;
-            }
-
-            String fileName="항행의자유_이동아이콘_업데이트_"+System.currentTimeMillis()+".apk";
-            DownloadManager.Request req=new DownloadManager.Request(Uri.parse(UPDATE_URL));
-            req.setTitle("항행의자유 이동아이콘 업데이트");
-            req.setDescription("최신 APK를 내려받는 중입니다.");
-            req.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-            req.setMimeType("application/vnd.android.package-archive");
-            req.setAllowedOverMetered(true);
-            req.setAllowedOverRoaming(true);
-            req.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,fileName);
-
-            if(updateReceiver!=null){
-                try{unregisterReceiver(updateReceiver);}catch(Exception ignored){}
-            }
-
-            updateReceiver=new BroadcastReceiver(){
-                @Override public void onReceive(Context context, Intent intent){
-                    long id=intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID,-1L);
-                    if(id!=updateDownloadId)return;
-                    progressHandler.removeCallbacks(progressPoller);
-                    queryDownloadProgress();
-                    try{
-                        Uri uri=dm.getUriForDownloadedFile(id);
-                        if(uri==null){
-                            setUpdateState("다운로드는 끝났지만 설치 파일을 열지 못했습니다. 다운로드 폴더를 확인해 주세요.",100,false);
-                            updateDownloadId=-1L;
-                            return;
-                        }
-                        setUpdateState("✅ 다운로드 완료 · 다운로드 폴더에 저장됨 · 설치 화면을 여는 중",100,true);
-                        Intent install=new Intent(Intent.ACTION_VIEW);
-                        install.setDataAndType(uri,"application/vnd.android.package-archive");
-                        install.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION|Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(install);
-                    }catch(Exception e){
-                        setUpdateState("✅ 다운로드 완료 · 다운로드 폴더에서 APK를 눌러 설치해 주세요.",100,true);
-                    }finally{
-                        updateDownloadId=-1L;
-                    }
-                }
-            };
-
-            IntentFilter filter=new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
-            if(Build.VERSION.SDK_INT>=33) registerReceiver(updateReceiver,filter,Context.RECEIVER_NOT_EXPORTED);
-            else registerReceiver(updateReceiver,filter);
-
-            updateDownloadId=dm.enqueue(req);
-            if(updateButton!=null) updateButton.setEnabled(false);
-            setUpdateState("⬇ 다운로드 시작 · 0%",0,true);
-            progressHandler.removeCallbacks(progressPoller);
-            progressHandler.post(progressPoller);
-
+            Intent web=new Intent(Intent.ACTION_VIEW,Uri.parse(UPDATE_PAGE));
+            startActivity(web);
+            setUpdateState("설치 및 업데이트 창을 열었습니다.",0,false);
         }catch(Exception e){
-            updateDownloadId=-1L;
-            if(updateButton!=null) updateButton.setEnabled(true);
-            setUpdateState("업데이트를 시작하지 못했습니다.",0,false);
+            setUpdateState("설치 및 업데이트 창을 열 수 없습니다.",0,false);
         }
     }
 
