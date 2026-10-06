@@ -158,7 +158,7 @@ public class OverlayService extends Service {
                kakao=btn("카카오톡",0xEE455A64), nh=btn("NH올원뱅크",0xEE455A64),
                hide=btn("아이콘 숨김",0xEE455A64), stop=btn("■ 종료",0xEED52D46), update=btn("업데이트",0xEE087F5B);
         menu.addView(freedom);
-        menu.addView(navigator);menu.addView(analysis);menu.addView(chatgpt);
+        if(BuildConfig.NAVIGATOR_EDITION) menu.addView(navigator);\n        menu.addView(analysis);menu.addView(chatgpt);
         menu.addView(mp3);menu.addView(fm);menu.addView(am);menu.addView(yt);menu.addView(avi);menu.addView(mp4);
         menu.addView(myfiles);menu.addView(bithumb);menu.addView(yesfile);menu.addView(kakao);menu.addView(nh);
         menu.addView(hide);menu.addView(stop);menu.addView(update);
@@ -182,7 +182,7 @@ public class OverlayService extends Service {
         root.addView(stationPanel,new LinearLayout.LayoutParams(-1,-2));
 
         freedom.setOnClickListener(v->{collapseStations();collapseMenu();toast("항행의자유는 현재 준비 중입니다.");});
-        navigator.setOnClickListener(v->openNavigatorApp());
+        if(BuildConfig.NAVIGATOR_EDITION) navigator.setOnClickListener(v->openNavigatorApp());
         analysis.setOnClickListener(v->openAnalysisV4());
         chatgpt.setOnClickListener(v->openChatGPT());
         mp3.setOnClickListener(v->{showMp3Controls();toggleLocalMp3();});
