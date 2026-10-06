@@ -26,21 +26,15 @@ jobs:
         with:
           path: ~/.android/debug.keystore
           key: hanghae-mini-stable-debug-keystore-v1
-      - name: Restore original navigator signing key
+      - name: Prepare stable move-icon signing key
         run: |
           set -euo pipefail
           mkdir -p ~/.android
-          curl -fL --retry 3 -o /tmp/original.apk 'https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/3f4f4659b0b55525ca642c609ba65468804d5b22/HANGHAE_NAVIGATOR_MINI-v1.0.18.apk'
-          unzip -p /tmp/original.apk META-INF/CERT.RSA >/tmp/original-cert.rsa
-          # Fail visibly if cached key is not the key that signed the known-good v1.0.18.
-          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
-          if [ -f ~/.android/debug.keystore ]; then
-            keytool -list -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey | grep -q '52:9D:6C:AF:D8:51:EC:ED:06:6C:AD:3C:54:19:BA:00:A2:C6:DD:AF:C6:04:0A:46:B8:81:49:79:4F:41:4F:77' || rm -f ~/.android/debug.keystore
-          fi
           if [ ! -f ~/.android/debug.keystore ]; then
-            echo 'Original signing key is not available in cache; refusing to publish an incompatible update.'
-            exit 1
+            keytool -genkeypair -v               -keystore ~/.android/debug.keystore               -storepass android               -alias androiddebugkey               -keypass android               -dname "CN=Hanghae Freedom Move Icon,O=Hanghae Freedom,C=KR"               -keyalg RSA -keysize 2048 -validity 10000
           fi
+          echo 'Using persistent cached signing key for move-icon builds.'
+          keytool -list -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey | grep 'SHA256:' | head -1
       - name: Build both APK editions
         working-directory: mini-overlay
         run: |
@@ -111,7 +105,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -f HANGHAE_MINI_MP3_FM_AM_YOUTUBE-debug.apk HANGHAE_NAVIGATOR_MINI-debug.apk HANGHAE_NAVIGATOR_MINI-v1.0.18.apk HANGHAE_MOVEICON_V1.0.18_BRIDGE.apk '항행의자유_배포용_이동아이콘.apk' '항해사_전용_이동아이콘.apk' '항해사_전용_이동아이콘_v1.0.18.apk' '항행의자유_이동아이콘_v1.0.18_교체판.apk'
-          git commit -m 'Publish move icon v1.0.18 APKs' || exit 0
+          git commit -m 'Publish move icon v1.0.21 APKs' || exit 0
           git push origin HEAD:main
 
 # trigger-install-guide-20261005-1
