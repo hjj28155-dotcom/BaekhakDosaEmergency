@@ -298,10 +298,19 @@ public class OverlayService extends Service {
         localTrackNames.clear();
 
         Uri base=MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        String[] proj={MediaStore.Audio.Media._ID,MediaStore.Audio.Media.DISPLAY_NAME};
-        String selection=MediaStore.Audio.Media.DURATION+">?";
-        String[] args={"10000"};
+        String[] proj;
+        String selection;
+        String[] args;
         String sort=MediaStore.Audio.Media.DISPLAY_NAME+" COLLATE NOCASE ASC";
+        if(Build.VERSION.SDK_INT>=29){
+            proj=new String[]{MediaStore.Audio.Media._ID,MediaStore.Audio.Media.DISPLAY_NAME,MediaStore.Audio.Media.RELATIVE_PATH};
+            selection=MediaStore.Audio.Media.DURATION+">? AND "+MediaStore.Audio.Media.RELATIVE_PATH+" LIKE ?";
+            args=new String[]{"10000",Environment.DIRECTORY_DOWNLOADS+"/이동아이콘/MP3/%"};
+        }else{
+            proj=new String[]{MediaStore.Audio.Media._ID,MediaStore.Audio.Media.DISPLAY_NAME};
+            selection=MediaStore.Audio.Media.DURATION+">?";
+            args=new String[]{"10000"};
+        }
 
         try(Cursor c=getContentResolver().query(base,proj,selection,args,sort)){
             if(c!=null){
@@ -320,6 +329,24 @@ public class OverlayService extends Service {
         }catch(Exception e){
             toast("MP3 목록을 불러오지 못했습니다.");
             return false;
+        }
+        if(localTrackIds.isEmpty() && Build.VERSION.SDK_INT>=29){
+            try(Cursor c=getContentResolver().query(
+                    base,
+                    new String[]{MediaStore.Audio.Media._ID,MediaStore.Audio.Media.DISPLAY_NAME},
+                    MediaStore.Audio.Media.DURATION+">?",
+                    new String[]{"10000"},
+                    sort)){
+                if(c!=null){
+                    int idCol=c.getColumnIndexOrThrow(MediaStore.Audio.Media._ID);
+                    int nameCol=c.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME);
+                    while(c.moveToNext()){
+                        localTrackIds.add(c.getLong(idCol));
+                        String n=c.getString(nameCol);
+                        localTrackNames.add(n==null?"MP3":n);
+                    }
+                }
+            }catch(Exception ignored){}
         }
         return !localTrackIds.isEmpty();
     }
@@ -428,7 +455,7 @@ public class OverlayService extends Service {
         if(Build.VERSION.SDK_INT>=29){
             projection=new String[]{MediaStore.Files.FileColumns._ID,MediaStore.Files.FileColumns.DISPLAY_NAME,MediaStore.Files.FileColumns.MIME_TYPE};
             selection=MediaStore.Files.FileColumns.RELATIVE_PATH+" LIKE ? AND "+MediaStore.Files.FileColumns.DISPLAY_NAME+" LIKE ?";
-            args=new String[]{Environment.DIRECTORY_DOWNLOADS+"/%","%."+ext};
+            args=new String[]{Environment.DIRECTORY_DOWNLOADS+"/이동아이콘/MP4/%","%."+ext};
         }else{
             projection=new String[]{MediaStore.Files.FileColumns._ID,MediaStore.Files.FileColumns.DISPLAY_NAME,MediaStore.Files.FileColumns.MIME_TYPE};
             selection=MediaStore.Files.FileColumns.DISPLAY_NAME+" LIKE ?";
