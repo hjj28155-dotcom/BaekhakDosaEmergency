@@ -1,0 +1,19 @@
+name: V1059 inspect source
+on:
+  push:
+    branches: [v1059-build-temp]
+    paths: ['.github/workflows/v1059-inspect.yml']
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect source zip
+        run: |
+          set -euxo pipefail
+          unzip -l source.zip | head -80 || true
+          rm -rf /tmp/v1059src
+          mkdir -p /tmp/v1059src
+          unzip -q source.zip -d /tmp/v1059src
+          find /tmp/v1059src -maxdepth 3 -type f | head -100
+          find /tmp/v1059src -name build.gradle -print -exec sed -n '1,180p' {} \;
