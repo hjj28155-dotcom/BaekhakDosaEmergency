@@ -36,14 +36,17 @@ jobs:
             keytool -genkeypair -v               -keystore ~/.android/debug.keystore               -storepass android               -alias androiddebugkey               -keypass android               -dname "CN=Hanghae Freedom Move Icon,O=Hanghae Freedom,C=KR"               -keyalg RSA -keysize 2048 -validity 10000
           fi
           echo 'Using persistent cached signing key for move-icon builds.'
-          keytool -list -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey | grep 'SHA256:' | head -1
+          EXPECTED_SHA256="2B:38:34:54:29:14:34:25:26:42:89:81:80:56:4B:B8:BC:4A:A4:E6:15:F4:47:60:0C:20:B4:FE:67:19:6E:3B"
+          ACTUAL_SHA256=$(keytool -list -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey | sed -n 's/^[[:space:]]*SHA256: //p' | head -1)
+          echo "EXPECTED_SHA256=$EXPECTED_SHA256"
+          echo "ACTUAL_SHA256=$ACTUAL_SHA256"
+          test "$ACTUAL_SHA256" = "$EXPECTED_SHA256"
       - name: Build both APK editions
         working-directory: mini-overlay
         run: |
           set -euo pipefail
           gradle assembleDistributionDebug assembleNavigatorDebug assembleBridgeDebug --no-daemon
       - name: Verify distribution update compatibility against original v1.0.16
-        if: ${{ false }}
         working-directory: .
         run: |
           set -euo pipefail
