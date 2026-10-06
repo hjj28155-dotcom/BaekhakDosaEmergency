@@ -1,4 +1,4 @@
-name: V1063 manual media fixed
+name: V1064 manual media fixed
 on:
   push:
     branches: [v1059-build-temp]
@@ -17,13 +17,13 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
-      - name: Prepare V1063 corrected source
+      - name: Prepare V1064 corrected source
         run: |
           set -euxo pipefail
-          rm -rf /tmp/v1063
-          mkdir -p /tmp/v1063
-          unzip -q source.zip -d /tmp/v1063
-          cd /tmp/v1063/FREEDOM_V402_BUILD_THIS
+          rm -rf /tmp/v1064
+          mkdir -p /tmp/v1064
+          unzip -q source.zip -d /tmp/v1064
+          cd /tmp/v1064/FREEDOM_V402_BUILD_THIS
           unzip -oq "$GITHUB_WORKSPACE/build_inputs/v1060_patch_text.zip" -d .
 
           python3 - <<'PY'
@@ -31,14 +31,14 @@ jobs:
 
           p=Path("app/build.gradle")
           s=p.read_text()
-          s=s.replace("applicationId 'com.navigator.freedom.overlayicon'","applicationId 'com.navigator.freedom.overlayicon.v1063test'")
-          s=s.replace("versionCode 1060","versionCode 1063")
-          s=s.replace('versionName "1.0.60"','versionName "1.0.63-test"')
-          s=s.replace("OVERLAY_ICON_V1060_VIDEO_PIP_MANUAL_PRIVATE-debug.apk","OVERLAY_ICON_V1063_MANUAL_MEDIA_ANCHOR-debug.apk")
+          s=s.replace("applicationId 'com.navigator.freedom.overlayicon'","applicationId 'com.navigator.freedom.overlayicon.v1064test'")
+          s=s.replace("versionCode 1060","versionCode 1064")
+          s=s.replace('versionName "1.0.60"','versionName "1.0.64-test"')
+          s=s.replace("OVERLAY_ICON_V1060_VIDEO_PIP_MANUAL_PRIVATE-debug.apk","OVERLAY_ICON_V1064_MANUAL_MEDIA_ANCHOR-debug.apk")
           p.write_text(s)
 
           p=Path("app/src/main/AndroidManifest.xml")
-          s=p.read_text().replace('android:label="@string/app_name"','android:label="이동아이콘 V1063"')
+          s=p.read_text().replace('android:label="@string/app_name"','android:label="이동아이콘 V1064"')
           p.write_text(s)
 
           p=Path("app/src/main/java/com/baekhak/centralcontrol/OverlayControlService.java")
@@ -86,33 +86,44 @@ jobs:
           </vector>''')
           PY
 
+
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path("app/src/main/java/com/baekhak/centralcontrol/OverlayControlService.java")
+          s=p.read_text()
+          s=s.replace('setMediaMode("MP3", "불러오기");','setMediaMode("MP3", "V1064 직접불러오기");')
+          s=s.replace('setMediaMode("AVI", "불러오기");','setMediaMode("AVI", "V1064 직접불러오기");')
+          s=s.replace('setMediaMode("MP4", "불러오기");','setMediaMode("MP4", "V1064 직접불러오기");')
+          s=s.replace('setMediaMode("MP3", "");','setMediaMode("MP3", "V1064 직접불러오기");')
+          p.write_text(s)
+          PY
           chmod +x gradlew
           grep -RIn 'setMediaMode(.*Movies 자동검색' app/src/main/java && exit 1 || true
           grep -n "applicationId\|versionCode\|versionName" app/build.gradle
           grep -n "force_import\|v3_force_local_music_folder\|불러오기" app/src/main/java/com/baekhak/centralcontrol/OverlayControlService.java | head -20
       - name: Build APK
-        working-directory: /tmp/v1063/FREEDOM_V402_BUILD_THIS
+        working-directory: /tmp/v1064/FREEDOM_V402_BUILD_THIS
         run: |
           set -euxo pipefail
           gradle assembleDebug --no-daemon
           APK=$(find app/build/outputs/apk/debug -type f -name '*.apk' | head -1)
           test -s "$APK"
-          cp "$APK" /tmp/OVERLAY_ICON_V1063_MANUAL_MEDIA_ANCHOR-debug.apk
+          cp "$APK" /tmp/OVERLAY_ICON_V1064_MANUAL_MEDIA_ANCHOR-debug.apk
       - name: Verify APK
         run: |
           set -euxo pipefail
-          APK=/tmp/OVERLAY_ICON_V1063_MANUAL_MEDIA_ANCHOR-debug.apk
+          APK=/tmp/OVERLAY_ICON_V1064_MANUAL_MEDIA_ANCHOR-debug.apk
           AAPT=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
           APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
-          "$AAPT" dump badging "$APK" | head -12 | tee /tmp/V1063_BADGING.txt
-          "$APKSIGNER" verify --verbose --print-certs "$APK" | tee /tmp/V1063_SIGNATURE.txt
+          "$AAPT" dump badging "$APK" | head -12 | tee /tmp/V1064_BADGING.txt
+          "$APKSIGNER" verify --verbose --print-certs "$APK" | tee /tmp/V1064_SIGNATURE.txt
           unzip -t "$APK" >/dev/null
-          sha256sum "$APK" | tee /tmp/V1063_SHA256.txt
+          sha256sum "$APK" | tee /tmp/V1064_SHA256.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: OVERLAY_ICON_V1063_SEPARATE_PIP_FIT_ANCHOR
+          name: OVERLAY_ICON_V1064_SEPARATE_PIP_FIT_ANCHOR
           path: |
-            /tmp/OVERLAY_ICON_V1063_MANUAL_MEDIA_ANCHOR-debug.apk
-            /tmp/V1063_BADGING.txt
-            /tmp/V1063_SIGNATURE.txt
-            /tmp/V1063_SHA256.txt
+            /tmp/OVERLAY_ICON_V1064_MANUAL_MEDIA_ANCHOR-debug.apk
+            /tmp/V1064_BADGING.txt
+            /tmp/V1064_SIGNATURE.txt
+            /tmp/V1064_SHA256.txt
