@@ -25,7 +25,7 @@ jobs:
           unzip -q source.zip -d /tmp/v1061
           cd /tmp/v1061/FREEDOM_V402_BUILD_THIS
 
-          curl -fL --retry 3 'https://drive.usercontent.google.com/download?id=11NFCZXyd4hsi66BDkrR8ggUEKZ1Za1GM&export=download&confirm=t' -o /tmp/v1060_patch.zip
+          cp "$GITHUB_WORKSPACE/build_inputs/v1060_patch_text.zip" /tmp/v1060_patch.zip
           unzip -oq /tmp/v1060_patch.zip -d .
 
           # Existing app must remain untouched: install as a completely separate package.
