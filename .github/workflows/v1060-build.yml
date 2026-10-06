@@ -1,4 +1,4 @@
-name: V1060 build PIP video
+name: V1060 build PIP video + anchor icon
 on:
   push:
     branches: [v1059-build-temp]
@@ -27,7 +27,9 @@ jobs:
           curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-1d60-8206-b873-4d1afc029391/raw?se=2026-10-06T00%3A56%3A03Z&sp=r&sv=2026-02-06&sr=b&scid=301c2f2f-a478-58ee-909d-b7a4286f3de2&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-05T23%3A13%3A00Z&ske=2026-10-06T23%3A13%3A00Z&sks=b&skv=2026-02-06&sig=6bL146yq23JcsNm7A2exWQknBzPMtNrJFfHACwcfEdg%3D' -o /tmp/v1060_patch.zip
           echo 'da67e1f7cbfbde42839a23bcd279056d7eee5a826365c8ae34674ba27a75ef4d  /tmp/v1060_patch.zip' | sha256sum -c -
           unzip -oq /tmp/v1060_patch.zip -d .
-          cp app/src/main/res/drawable/v3_ship_icon.png app/src/main/res/drawable/overlay_anchor_icon.png
+          curl -fL --retry 3 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-2bb0-8206-b10f-10a5671e39b9/raw?se=2026-10-06T00%3A59%3A53Z&sp=r&sv=2026-02-06&sr=b&scid=579e7083-7063-5a28-95f1-7433c7c167fb&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-05T18%3A59%3A57Z&ske=2026-10-06T18%3A59%3A57Z&sks=b&skv=2026-02-06&sig=dFS5H2FIK%2BzVHWSlmO4u3iHO2PP7%2BskwMl5cj6JJC9U%3D' -o /tmp/v1060_icon.zip
+          echo '5db233ed703b9d91b76b6d1f611cd68ad663c5ffdf97e313b29d61b81cf6c086  /tmp/v1060_icon.zip' | sha256sum -c -
+          unzip -oq /tmp/v1060_icon.zip -d app/src/main/res/drawable
           chmod +x gradlew
       - name: Build APK
         working-directory: /tmp/v1060/FREEDOM_V402_BUILD_THIS
