@@ -4,6 +4,7 @@ on:
     paths:
       - '.github/workflows/build-v430-approval-recovery.yml'
       - 'build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/index.html'
+      - '.github/scripts/patch_all_perpect_success_flow.py'
 permissions:
   contents: write
 jobs:
@@ -15,6 +16,10 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+      - name: Apply exact ALL PERPECT SUCCESS flow
+        run: |
+          sed 's|build407/FREEDOM_V402_BUILD_THIS|build405/FREEDOM_V402_BUILD_THIS|g' .github/scripts/patch_all_perpect_success_flow.py > /tmp/aps.py
+          python3 /tmp/aps.py
       - name: Build approval recovery
         working-directory: build405/FREEDOM_V402_BUILD_THIS
         run: |
