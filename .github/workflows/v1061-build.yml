@@ -17,37 +17,79 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
-      - name: Prepare V1063 separate-package source
+      - name: Prepare V1063 corrected source
         run: |
           set -euxo pipefail
           rm -rf /tmp/v1063
           mkdir -p /tmp/v1063
           unzip -q source.zip -d /tmp/v1063
           cd /tmp/v1063/FREEDOM_V402_BUILD_THIS
+          unzip -oq "$GITHUB_WORKSPACE/build_inputs/v1060_patch_text.zip" -d .
 
-          python3 -m pip install -q gdown
-          gdown 1pGo99z20VgngTnVaCCteejIN_m7IaP0C -O /tmp/v1063_patch.zip
-          unzip -oq /tmp/v1063_patch.zip -d .
+          python3 - <<'PY'
+          from pathlib import Path
 
-          # Existing app must remain untouched: install as a completely separate package.
-          sed -i "s/applicationId 'com.navigator.freedom.overlayicon'/applicationId 'com.navigator.freedom.overlayicon.v1063test'/" app/build.gradle
-          sed -i 's/versionCode 1060/versionCode 1062/' app/build.gradle
-          sed -i 's/versionName "1.0.60"/versionName "1.0.62-test"/' app/build.gradle
-          sed -i 's/OVERLAY_ICON_V1060_VIDEO_PIP_MANUAL_PRIVATE-debug.apk/OVERLAY_ICON_V1063_MANUAL_MEDIA_ANCHOR-debug.apk/g' app/build.gradle
+          p=Path("app/build.gradle")
+          s=p.read_text()
+          s=s.replace("applicationId 'com.navigator.freedom.overlayicon'","applicationId 'com.navigator.freedom.overlayicon.v1063test'")
+          s=s.replace("versionCode 1060","versionCode 1063")
+          s=s.replace('versionName "1.0.60"','versionName "1.0.63-test"')
+          s=s.replace("OVERLAY_ICON_V1060_VIDEO_PIP_MANUAL_PRIVATE-debug.apk","OVERLAY_ICON_V1063_MANUAL_MEDIA_ANCHOR-debug.apk")
+          p.write_text(s)
 
-          # Full screen: preserve aspect ratio and show black margins instead of cropping.
-          sed -i 's/full?MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING:MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT/MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT/' app/src/main/java/com/baekhak/centralcontrol/LocalMediaPickerActivity.java
+          p=Path("app/src/main/AndroidManifest.xml")
+          s=p.read_text().replace('android:label="@string/app_name"','android:label="이동아이콘 V1063"')
+          p.write_text(s)
 
-          # Make the test edition easy to distinguish in installer/app list.
-          sed -i 's/android:label="@string\/app_name"/android:label="이동아이콘 V1063"/' app/src/main/AndroidManifest.xml
+          p=Path("app/src/main/java/com/baekhak/centralcontrol/OverlayControlService.java")
+          s=p.read_text()
+          s=s.replace('setMediaMode("MP3", "");','setMediaMode("MP3", "불러오기");')
+          s=s.replace('open.putExtra(MainActivity.EXTRA_OPEN_SAVED_MUSIC, true);','open.putExtra(MainActivity.EXTRA_OPEN_SAVED_MUSIC, true);\n            open.putExtra("v3_force_local_music_folder", true);',1)
+          s=s.replace('setMediaMode("AVI", "Movies 자동검색"); openVideo("video/x-msvideo");','setMediaMode("AVI", "불러오기"); openVideo("video/x-msvideo");')
+          s=s.replace('setMediaMode("MP4", "Movies 자동검색"); openVideo("video/mp4");','setMediaMode("MP4", "불러오기"); openVideo("video/mp4");')
+          s=s.replace('i.putExtra("control","open");','i.putExtra("control","open");\n            i.putExtra("force_import", true);')
+          s=s.replace('toast("휴대폰 동영상을 자동검색할 수 없습니다.");','toast("동영상 불러오기를 열 수 없습니다.");')
+          p.write_text(s)
 
-          # Keep the established anchor icon.
-          rm -f app/src/main/res/drawable/overlay_anchor_icon.png
+          p=Path("app/src/main/java/com/baekhak/centralcontrol/MainActivity.java")
+          s=p.read_text()
+          old='''        if (intent != null && intent.getBooleanExtra("v3_force_local_music_folder", false)) {
+              intent.removeExtra("v3_force_local_music_folder");
+              openSavedMusicLibraryChooser();
+              return;
+          }'''
+          new='''        if (intent != null && intent.getBooleanExtra("v3_force_local_music_folder", false)) {
+              intent.removeExtra("v3_force_local_music_folder");
+              chooseMultipleMusicFiles();
+              return;
+          }'''
+          s=s.replace(old,new)
+          p.write_text(s)
+
+          p=Path("app/src/main/java/com/baekhak/centralcontrol/LocalMediaPickerActivity.java")
+          s=p.read_text()
+          s=s.replace('pendingControl=i==null?"open":i.getStringExtra("control"); if(pendingControl==null)pendingControl="open";',
+                      'pendingControl=i==null?"open":i.getStringExtra("control"); if(pendingControl==null)pendingControl="open";\n        boolean forceImport=i!=null&&i.getBooleanExtra("force_import",false);')
+          s=s.replace('if(!first && "toggle".equals(pendingControl) && currentUri!=null){ toggle(); return; }',
+                      'if(!first && "toggle".equals(pendingControl) && currentUri!=null){ toggle(); return; }\n        if(forceImport){ openVideoPicker(); return; }')
+          s=s.replace('full?MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING:MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT',
+                      'MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT')
+          p.write_text(s)
+
+          d=Path("app/src/main/res/drawable")
+          d.mkdir(parents=True,exist_ok=True)
+          (d/"overlay_anchor_icon.png").unlink(missing_ok=True)
+          (d/"overlay_anchor_icon.xml").write_text('''<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
+            <path android:fillColor="#0B3048" android:pathData="M54,4A50,50 0,1 0,54 104A50,50 0,1 0,54 4"/>
+            <path android:fillColor="#F5F5F5" android:pathData="M50,20h8v12h10v7H58v33c8,-2 14,-8 17,-16l-9,-1 14,-15 14,15 -10,1c-4,18 -16,31 -30,31S28,74 24,56l-10,-1 14,-15 14,15 -9,1c3,8 9,14 17,16V39H40v-7h10z"/>
+            <path android:fillColor="#F5F5F5" android:pathData="M54,12a8,8 0,1 0,0 16a8,8 0,1 0,0 -16M54,18a2,2 0,1 1,0 4a2,2 0,1 1,0 -4"/>
+          </vector>''')
+          PY
+
           chmod +x gradlew
-
-          grep -n "applicationId\|versionCode\|versionName\|outputFileName" app/build.gradle
-          grep -n "VIDEO_SCALING_MODE" app/src/main/java/com/baekhak/centralcontrol/LocalMediaPickerActivity.java
-          grep -n "LocalMediaPickerActivity\|android:label" app/src/main/AndroidManifest.xml
+          grep -RIn "Movies 자동검색" app/src/main/java && exit 1 || true
+          grep -n "applicationId\|versionCode\|versionName" app/build.gradle
+          grep -n "force_import\|v3_force_local_music_folder\|불러오기" app/src/main/java/com/baekhak/centralcontrol/OverlayControlService.java | head -20
       - name: Build APK
         working-directory: /tmp/v1063/FREEDOM_V402_BUILD_THIS
         run: |
