@@ -16,6 +16,8 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+      - name: Apply MP3 MP4 import app-folder volume patch
+        run: python3 .github/scripts/patch_media_import_appfolder.py
       - name: Apply exact ALL PERPECT SUCCESS flow
         run: |
           sed 's|build407/FREEDOM_V402_BUILD_THIS|build405/FREEDOM_V402_BUILD_THIS|g' .github/scripts/patch_all_perpect_success_flow.py > /tmp/aps.py
