@@ -1,4 +1,4 @@
-name: V1062 media import and PIP controls
+name: V1063 manual media fixed
 on:
   push:
     branches: [v1059-build-temp]
@@ -17,28 +17,28 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
-      - name: Prepare V1062 separate-package source
+      - name: Prepare V1063 separate-package source
         run: |
           set -euxo pipefail
-          rm -rf /tmp/v1062
-          mkdir -p /tmp/v1062
-          unzip -q source.zip -d /tmp/v1062
-          cd /tmp/v1062/FREEDOM_V402_BUILD_THIS
+          rm -rf /tmp/v1063
+          mkdir -p /tmp/v1063
+          unzip -q source.zip -d /tmp/v1063
+          cd /tmp/v1063/FREEDOM_V402_BUILD_THIS
 
-          curl -fL --retry 3 'https://sdmntprjapaneast.oaiusercontent.com/files/00000000-4e8c-8209-bdec-c08ff815d284/raw?se=2026-10-06T02%3A21%3A02Z&sp=r&sv=2026-02-06&sr=b&scid=3079fc19-37a1-56d8-8057-4bdd3d93f5ca&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-06T01%3A57%3A32Z&ske=2026-10-07T01%3A57%3A32Z&sks=b&skv=2026-02-06&sig=v%2BuGHKxQ8APgJySanwygmSVxf/t7w1GeIDm45ZWo9BQ%3D' -o /tmp/v1062_patch.zip
-          unzip -oq /tmp/v1062_patch.zip -d .
+          curl -fL --retry 3 'https://drive.google.com/uc?export=download&id=1pGo99z20VgngTnVaCCteejIN_m7IaP0C' -o /tmp/v1063_patch.zip
+          unzip -oq /tmp/v1063_patch.zip -d .
 
           # Existing app must remain untouched: install as a completely separate package.
-          sed -i "s/applicationId 'com.navigator.freedom.overlayicon'/applicationId 'com.navigator.freedom.overlayicon.v1062test'/" app/build.gradle
+          sed -i "s/applicationId 'com.navigator.freedom.overlayicon'/applicationId 'com.navigator.freedom.overlayicon.v1063test'/" app/build.gradle
           sed -i 's/versionCode 1060/versionCode 1062/' app/build.gradle
           sed -i 's/versionName "1.0.60"/versionName "1.0.62-test"/' app/build.gradle
-          sed -i 's/OVERLAY_ICON_V1060_VIDEO_PIP_MANUAL_PRIVATE-debug.apk/OVERLAY_ICON_V1062_SEPARATE_PIP_FIT_ANCHOR-debug.apk/g' app/build.gradle
+          sed -i 's/OVERLAY_ICON_V1060_VIDEO_PIP_MANUAL_PRIVATE-debug.apk/OVERLAY_ICON_V1063_MANUAL_MEDIA_ANCHOR-debug.apk/g' app/build.gradle
 
           # Full screen: preserve aspect ratio and show black margins instead of cropping.
           sed -i 's/full?MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING:MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT/MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT/' app/src/main/java/com/baekhak/centralcontrol/LocalMediaPickerActivity.java
 
           # Make the test edition easy to distinguish in installer/app list.
-          sed -i 's/android:label="@string\/app_name"/android:label="이동아이콘 V1062"/' app/src/main/AndroidManifest.xml
+          sed -i 's/android:label="@string\/app_name"/android:label="이동아이콘 V1063"/' app/src/main/AndroidManifest.xml
 
           # Keep the established anchor icon.
           cp app/src/main/res/drawable/v3_ship_icon.png app/src/main/res/drawable/overlay_anchor_icon.png
@@ -48,28 +48,28 @@ jobs:
           grep -n "VIDEO_SCALING_MODE" app/src/main/java/com/baekhak/centralcontrol/LocalMediaPickerActivity.java
           grep -n "LocalMediaPickerActivity\|android:label" app/src/main/AndroidManifest.xml
       - name: Build APK
-        working-directory: /tmp/v1062/FREEDOM_V402_BUILD_THIS
+        working-directory: /tmp/v1063/FREEDOM_V402_BUILD_THIS
         run: |
           set -euxo pipefail
           gradle assembleDebug --no-daemon
           APK=$(find app/build/outputs/apk/debug -type f -name '*.apk' | head -1)
           test -s "$APK"
-          cp "$APK" /tmp/OVERLAY_ICON_V1062_SEPARATE_PIP_FIT_ANCHOR-debug.apk
+          cp "$APK" /tmp/OVERLAY_ICON_V1063_MANUAL_MEDIA_ANCHOR-debug.apk
       - name: Verify APK
         run: |
           set -euxo pipefail
-          APK=/tmp/OVERLAY_ICON_V1062_SEPARATE_PIP_FIT_ANCHOR-debug.apk
+          APK=/tmp/OVERLAY_ICON_V1063_MANUAL_MEDIA_ANCHOR-debug.apk
           AAPT=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
           APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
-          "$AAPT" dump badging "$APK" | head -12 | tee /tmp/V1062_BADGING.txt
-          "$APKSIGNER" verify --verbose --print-certs "$APK" | tee /tmp/V1062_SIGNATURE.txt
+          "$AAPT" dump badging "$APK" | head -12 | tee /tmp/V1063_BADGING.txt
+          "$APKSIGNER" verify --verbose --print-certs "$APK" | tee /tmp/V1063_SIGNATURE.txt
           unzip -t "$APK" >/dev/null
-          sha256sum "$APK" | tee /tmp/V1062_SHA256.txt
+          sha256sum "$APK" | tee /tmp/V1063_SHA256.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: OVERLAY_ICON_V1062_SEPARATE_PIP_FIT_ANCHOR
+          name: OVERLAY_ICON_V1063_SEPARATE_PIP_FIT_ANCHOR
           path: |
-            /tmp/OVERLAY_ICON_V1062_SEPARATE_PIP_FIT_ANCHOR-debug.apk
-            /tmp/V1062_BADGING.txt
-            /tmp/V1062_SIGNATURE.txt
-            /tmp/V1062_SHA256.txt
+            /tmp/OVERLAY_ICON_V1063_MANUAL_MEDIA_ANCHOR-debug.apk
+            /tmp/V1063_BADGING.txt
+            /tmp/V1063_SIGNATURE.txt
+            /tmp/V1063_SHA256.txt
