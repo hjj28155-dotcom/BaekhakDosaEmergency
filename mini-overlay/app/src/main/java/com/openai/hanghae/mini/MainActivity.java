@@ -52,9 +52,17 @@ public class MainActivity extends Activity {
 
     @Override public void onCreate(Bundle b){
         super.onCreate(b);
-        setContentView(buildUi());
-        if(getIntent()!=null && getIntent().getBooleanExtra("direct_update",false)){
+        boolean extras=getIntent()!=null && getIntent().getBooleanExtra("open_extra_features",false);
+        boolean direct=getIntent()!=null && getIntent().getBooleanExtra("direct_update",false);
+        if(extras){
+            setContentView(buildExtraFeaturesUi());
+        }else if(direct){
+            setContentView(buildUi());
             startDirectUpdate();
+        }else{
+            // Normal launcher tap: start/show the overlay, never expose the management screen.
+            startRequested();
+            finish();
         }
     }
 
@@ -64,6 +72,22 @@ public class MainActivity extends Activity {
             pendingStart=false;
             ensureAudioPermissionAndStart();
         }
+    }
+
+    private LinearLayout buildExtraFeaturesUi(){
+        LinearLayout root=new LinearLayout(this);
+        root.setOrientation(LinearLayout.VERTICAL);root.setGravity(Gravity.CENTER_HORIZONTAL);
+        root.setPadding(dp(22),dp(36),dp(22),dp(28));root.setBackgroundColor(Color.rgb(4,24,42));
+        TextView title=new TextView(this);title.setText("⚓ 추가기능");title.setTextColor(Color.rgb(255,225,128));title.setTextSize(24);title.setGravity(Gravity.CENTER);root.addView(title,new LinearLayout.LayoutParams(-1,-2));
+        Button nav=button("🧭 항해사앱");nav.setOnClickListener(v->launchPackageOrWeb("com.baekhak.dosa.v3","https://drive.google.com/"));root.addView(nav);
+        Button analysis=button("📊 분석방 V4");analysis.setOnClickListener(v->launchPackageOrWeb("com.navigator.analysis.v4",""));root.addView(analysis);
+        Button chat=button("🤖 ChatGPT");chat.setOnClickListener(v->launchPackageOrWeb("com.openai.chatgpt","https://chatgpt.com/"));root.addView(chat);
+        Button close=button("닫기");close.setOnClickListener(v->finish());root.addView(close);
+        return root;
+    }
+    private void launchPackageOrWeb(String pkg,String web){
+        try{Intent i=getPackageManager().getLaunchIntentForPackage(pkg);if(i!=null){startActivity(i);return;}}catch(Exception ignored){}
+        if(web!=null&&!web.isEmpty())try{startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(web)));}catch(Exception ignored){}
     }
 
     private LinearLayout buildUi(){
