@@ -158,8 +158,7 @@ public class OverlayService extends Service {
                kakao=btn("카카오톡",0xEE455A64), nh=btn("NH올원뱅크",0xEE455A64),
                hide=btn("아이콘 숨김",0xEE455A64), stop=btn("■ 종료",0xEED52D46), update=btn("업데이트",0xEE087F5B);
         menu.addView(freedom);
-        if(BuildConfig.NAVIGATOR_EDITION) menu.addView(navigator);
-        menu.addView(analysis);menu.addView(chatgpt);
+        // Public MASTER: only the 10 core functions live in the normal menu.
         menu.addView(mp3);menu.addView(fm);menu.addView(am);menu.addView(yt);menu.addView(avi);menu.addView(mp4);
         if(BuildConfig.NAVIGATOR_EDITION){
             menu.addView(myfiles);menu.addView(bithumb);menu.addView(yesfile);menu.addView(kakao);menu.addView(nh);
@@ -214,7 +213,18 @@ public class OverlayService extends Service {
         final float[] down=new float[2];final int[] pos=new int[2];final boolean[] moved=new boolean[1];
         anchor.setOnTouchListener((v,e)->{
             switch(e.getActionMasked()){
-                case MotionEvent.ACTION_DOWN:down[0]=e.getRawX();down[1]=e.getRawY();pos[0]=lp.x;pos[1]=lp.y;moved[0]=false;return true;
+                case MotionEvent.ACTION_DOWN:
+                    down[0]=e.getRawX();down[1]=e.getRawY();pos[0]=lp.x;pos[1]=lp.y;moved[0]=false;
+                    anchor.postDelayed(()->{
+                        if(!moved[0]){
+                            Intent add=new Intent(OverlayService.this,MainActivity.class);
+                            add.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            add.putExtra("open_extra_features",true);
+                            try{startActivity(add);toast("추가기능");}catch(Exception ex){toast("추가기능을 열 수 없습니다.");}
+                            moved[0]=true;
+                        }
+                    },650);
+                    return true;
                 case MotionEvent.ACTION_MOVE:
                     int dx=(int)(e.getRawX()-down[0]),dy=(int)(e.getRawY()-down[1]);
                     if(Math.abs(dx)>dp(5)||Math.abs(dy)>dp(5))moved[0]=true;
