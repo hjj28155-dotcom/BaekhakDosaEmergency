@@ -68,8 +68,10 @@ jobs:
 
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -f OVERLAY_ICON_V1062_MP3_UPDATE_TV_LIVE.apk OVERLAY_ICON_V1062_MP3_UPDATE_TV_LIVE_v1.0.64.apk
+          git add -f OVERLAY_ICON_V1062_MP3_UPDATE_TV_LIVE.apk OVERLAY_ICON_V1062_MP3_UPDATE_TV_LIVE_v1.0.74.apk
           git commit -m 'Publish V1062 MP3 update TV live fix APK' || exit 0
           git push origin HEAD:main
 
 # final-v1062-fix-source-20261007
+
+# publish-path-fix-20261007
