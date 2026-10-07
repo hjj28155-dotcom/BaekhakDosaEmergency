@@ -1,0 +1,92 @@
+name: Build v1.0.82 Test Move Icon
+on:
+  push:
+    paths:
+      - '.github/workflows/build-v1082-test.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download v1.0.82 source
+        run: |
+          set -euo pipefail
+          curl -fL --retry 2 --connect-timeout 20 'https://sdmntprindiasocentral.oaiusercontent.com/files/00000000-1c84-8211-b729-858c9dc80354/raw?se=2026-10-07T13%3A25%3A17Z&sp=r&sv=2026-02-06&sr=b&scid=ef4c93a7-1237-59a7-b6e0-9d71c81b56c3&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T00%3A48%3A29Z&ske=2026-10-08T00%3A48%3A29Z&sks=b&skv=2026-02-06&sig=FmpqiwVsDvuxTwuzs/0lFpjdWfvPpOLyw5WOuDvi1BE%3D' -o /tmp/v1082.zip
+          unzip -q /tmp/v1082.zip -d /tmp/v1082
+          test -f /tmp/v1082/OVERLAY_ICON_V1057/app/build.gradle
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Restore persistent test signing key
+        uses: actions/cache@v4
+        with:
+          path: ~/.hanghae/test1080.jks
+          key: hanghae-v1080-test-signing-v1
+
+      - name: Prepare persistent test signing key
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.hanghae
+          if [ ! -f ~/.hanghae/test1080.jks ]; then
+            keytool -genkeypair -v               -keystore ~/.hanghae/test1080.jks               -storepass android               -alias androiddebugkey               -keypass android               -dname "CN=Hanghae MoveIcon Test 1080,O=Hanghae Freedom,C=KR"               -keyalg RSA -keysize 2048 -validity 10000
+          fi
+          keytool -list -v -keystore ~/.hanghae/test1080.jks -storepass android -alias androiddebugkey | grep -E 'Owner:|SHA256:'
+
+      - name: Build APK
+        working-directory: /tmp/v1082/OVERLAY_ICON_V1057
+        run: |
+          set -euo pipefail
+          gradle clean assembleDebug --no-daemon --no-build-cache
+          APK=$(find app/build/outputs/apk -type f -name '*.apk' | head -1)
+          test -s "$APK"
+          cp "$APK" /tmp/Hanghae_MoveIcon_v1.0.82_TEST.apk
+
+      - name: Verify upgrade compatibility with v1.0.81
+        run: |
+          set -euo pipefail
+          curl -fL --retry 2 'https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/v1.0.81-test/Hanghae_MoveIcon_v1.0.81_TEST.apk' -o /tmp/old.apk
+          AAPT=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
+          "$AAPT" dump badging /tmp/old.apk | head -1
+          "$AAPT" dump badging /tmp/Hanghae_MoveIcon_v1.0.82_TEST.apk | head -1
+          "$APKSIGNER" verify --verbose --print-certs /tmp/Hanghae_MoveIcon_v1.0.82_TEST.apk
+
+          OLD_PKG=$("$AAPT" dump badging /tmp/old.apk | sed -n "s/^package: name='\([^']*\)'.*/\1/p")
+          NEW_PKG=$("$AAPT" dump badging /tmp/Hanghae_MoveIcon_v1.0.82_TEST.apk | sed -n "s/^package: name='\([^']*\)'.*/\1/p")
+          OLD_CODE=$("$AAPT" dump badging /tmp/old.apk | sed -n "s/^package:.*versionCode='\([^']*\)'.*/\1/p")
+          NEW_CODE=$("$AAPT" dump badging /tmp/Hanghae_MoveIcon_v1.0.82_TEST.apk | sed -n "s/^package:.*versionCode='\([^']*\)'.*/\1/p")
+          OLD_CERT=$("$APKSIGNER" verify --print-certs /tmp/old.apk 2>&1 | grep -m1 'certificate SHA-256 digest:' | sed 's/.*digest: //')
+          NEW_CERT=$("$APKSIGNER" verify --print-certs /tmp/Hanghae_MoveIcon_v1.0.82_TEST.apk 2>&1 | grep -m1 'certificate SHA-256 digest:' | sed 's/.*digest: //')
+
+          echo "OLD_PKG=$OLD_PKG"
+          echo "NEW_PKG=$NEW_PKG"
+          echo "OLD_CODE=$OLD_CODE"
+          echo "NEW_CODE=$NEW_CODE"
+          echo "OLD_CERT=$OLD_CERT"
+          echo "NEW_CERT=$NEW_CERT"
+          test "$OLD_PKG" = "$NEW_PKG"
+          test "$OLD_CERT" = "$NEW_CERT"
+          test "$NEW_CODE" -gt "$OLD_CODE"
+          echo 'UPGRADE_COMPATIBILITY=PASS'
+
+      - name: Publish test release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release delete v1.0.82-test --yes --cleanup-tag || true
+          git push origin :refs/tags/v1.0.82-test || true
+          gh release create v1.0.82-test             "/tmp/Hanghae_MoveIcon_v1.0.82_TEST.apk#항행의자유 이동아이콘 v1.0.82 TEST APK"             --target main             --title "항행의자유 이동아이콘 v1.0.82 TEST"             --notes "MP3 선택창 중복 표시와 V3 화면 잔류를 수정했습니다. MP4는 내 파일 > Movies에서 시작하고 Movies/이동아이콘/MP4 앱폴더에 저장합니다."
