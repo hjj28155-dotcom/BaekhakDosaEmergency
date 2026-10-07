@@ -1,0 +1,56 @@
+name: Verify v1.0.76 vs v1.0.79 Install Compatibility
+on:
+  push:
+    paths:
+      - '.github/workflows/verify-v1076-v1079.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download APKs
+        run: |
+          set -euo pipefail
+          curl -fL --retry 2 'https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE_STABLE_v1.0.76.apk' -o /tmp/v1076.apk
+          curl -fL --retry 2 'https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE_STABLE_v1.0.79.apk' -o /tmp/v1079.apk
+          test -s /tmp/v1076.apk
+          test -s /tmp/v1079.apk
+
+      - name: Verify metadata and signing
+        run: |
+          set -euo pipefail
+          AAPT=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
+          echo '=== v1.0.76 BADGING ==='
+          "$AAPT" dump badging /tmp/v1076.apk | head -1
+          echo '=== v1.0.79 BADGING ==='
+          "$AAPT" dump badging /tmp/v1079.apk | head -1
+          echo '=== v1.0.76 CERTS ==='
+          "$APKSIGNER" verify --verbose --print-certs /tmp/v1076.apk
+          echo '=== v1.0.79 CERTS ==='
+          "$APKSIGNER" verify --verbose --print-certs /tmp/v1079.apk
+
+          OLD_PKG=$("$AAPT" dump badging /tmp/v1076.apk | sed -n "s/^package: name='\([^']*\)'.*/\1/p")
+          NEW_PKG=$("$AAPT" dump badging /tmp/v1079.apk | sed -n "s/^package: name='\([^']*\)'.*/\1/p")
+          OLD_CODE=$("$AAPT" dump badging /tmp/v1076.apk | sed -n "s/^package:.*versionCode='\([^']*\)'.*/\1/p")
+          NEW_CODE=$("$AAPT" dump badging /tmp/v1079.apk | sed -n "s/^package:.*versionCode='\([^']*\)'.*/\1/p")
+          OLD_CERT=$("$APKSIGNER" verify --print-certs /tmp/v1076.apk 2>&1 | grep -m1 'Signer #1 certificate SHA-256 digest:' | sed 's/.*digest: //')
+          NEW_CERT=$("$APKSIGNER" verify --print-certs /tmp/v1079.apk 2>&1 | grep -m1 'Signer #1 certificate SHA-256 digest:' | sed 's/.*digest: //')
+
+          echo "OLD_PKG=$OLD_PKG"
+          echo "NEW_PKG=$NEW_PKG"
+          echo "OLD_CODE=$OLD_CODE"
+          echo "NEW_CODE=$NEW_CODE"
+          echo "OLD_CERT=$OLD_CERT"
+          echo "NEW_CERT=$NEW_CERT"
+
+          test "$OLD_PKG" = "$NEW_PKG"
+          test "$OLD_CERT" = "$NEW_CERT"
+          test "$NEW_CODE" -gt "$OLD_CODE"
+          echo 'INSTALL_COMPATIBILITY_CHECK=PASS'
