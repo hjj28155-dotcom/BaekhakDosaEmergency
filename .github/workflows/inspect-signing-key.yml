@@ -1,0 +1,23 @@
+name: Inspect Stable Signing Key
+on:
+  push:
+    paths:
+      - '.github/workflows/inspect-signing-key.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore stable key
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: hanghae-mini-stable-debug-keystore-v1
+      - name: Print stable key fingerprint
+        run: |
+          set -euo pipefail
+          test -f ~/.android/debug.keystore
+          keytool -list -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey | grep -E 'SHA256:|Owner:|Valid from:'
