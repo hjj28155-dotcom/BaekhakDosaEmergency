@@ -7,15 +7,15 @@ android {
     defaultConfig {
         minSdk 23
         targetSdk 35
-        versionCode 10066
-        versionName '1.0.66'
+        versionCode 10067
+        versionName '1.0.67'
     }
 
     flavorDimensions 'edition'
     productFlavors {
         distribution {
             dimension 'edition'
-            applicationId 'com.navigator.freedom.miniicon'
+            applicationId 'com.navigator.freedom.moveicon'
             buildConfigField 'boolean', 'NAVIGATOR_EDITION', 'false'
         }
         navigator {
