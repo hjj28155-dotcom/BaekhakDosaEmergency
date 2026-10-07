@@ -1,0 +1,73 @@
+name: Build V1062 MP3 Update TV Fix
+on:
+  push:
+    paths:
+      - '.github/workflows/build-v1062-mp3-update-tv.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: v1062-mp3-update-tv-publish
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download patched V1062-lineage source
+        run: |
+          set -euo pipefail
+          curl -fL --retry 2 --connect-timeout 20 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-a7f0-8206-960d-e78e3f98f165/raw?se=2026-10-07T07%3A49%3A41Z&sp=r&sv=2026-02-06&sr=b&scid=d65cb4c3-d081-5459-89f2-0b873b43249f&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T01%3A23%3A30Z&ske=2026-10-08T01%3A23%3A30Z&sks=b&skv=2026-02-06&sig=etDXhVaHOPqVZ9UdLtWayuDSplBGgituYDtVvUhF7qE%3D' -o /tmp/v1062fix.zip
+          test -s /tmp/v1062fix.zip
+          unzip -q /tmp/v1062fix.zip -d /tmp/v1062fix
+          test -f /tmp/v1062fix/OVERLAY_ICON_V1057/app/build.gradle
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Persist stable signing key
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: v1062-fix-stable-debug-keystore-v1
+
+      - name: Prepare stable signing key
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.android
+          if [ ! -f ~/.android/debug.keystore ]; then
+            keytool -genkeypair -v               -keystore ~/.android/debug.keystore               -storepass android               -alias androiddebugkey               -keypass android               -dname "CN=Hanghae Freedom V1062 Fix,O=Hanghae Freedom,C=KR"               -keyalg RSA -keysize 2048 -validity 10000
+          fi
+
+      - name: Build APK
+        working-directory: /tmp/v1062fix/OVERLAY_ICON_V1057
+        run: |
+          set -euo pipefail
+          gradle assembleDebug --no-daemon
+          find app/build/outputs/apk -type f -name '*.apk' -print
+          test -n "$(find app/build/outputs/apk -type f -name '*.apk' | head -1)"
+
+      - name: Publish APK
+        run: |
+          set -euo pipefail
+          APK=$(find /tmp/v1062fix/OVERLAY_ICON_V1057/app/build/outputs/apk -type f -name '*.apk' | head -1)
+          test -s "$APK"
+          cp "$APK" /tmp/OVERLAY_ICON_V1062_MP3_UPDATE_TV_LIVE.apk
+
+          git fetch origin main
+          git reset --hard origin/main
+          cp /tmp/OVERLAY_ICON_V1062_MP3_UPDATE_TV_LIVE.apk OVERLAY_ICON_V1062_MP3_UPDATE_TV_LIVE.apk
+          cp /tmp/OVERLAY_ICON_V1062_MP3_UPDATE_TV_LIVE.apk OVERLAY_ICON_V1062_MP3_UPDATE_TV_LIVE_v1.0.64.apk
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f OVERLAY_ICON_V1062_MP3_UPDATE_TV_LIVE.apk OVERLAY_ICON_V1062_MP3_UPDATE_TV_LIVE_v1.0.64.apk
+          git commit -m 'Publish V1062 MP3 update TV live fix APK' || exit 0
+          git push origin HEAD:main
