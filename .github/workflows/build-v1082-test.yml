@@ -20,6 +20,7 @@ jobs:
           curl -fL --retry 2 --connect-timeout 20 'https://sdmntprindiasocentral.oaiusercontent.com/files/00000000-1c84-8211-b729-858c9dc80354/raw?se=2026-10-07T13%3A25%3A17Z&sp=r&sv=2026-02-06&sr=b&scid=ef4c93a7-1237-59a7-b6e0-9d71c81b56c3&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T00%3A48%3A29Z&ske=2026-10-08T00%3A48%3A29Z&sks=b&skv=2026-02-06&sig=FmpqiwVsDvuxTwuzs/0lFpjdWfvPpOLyw5WOuDvi1BE%3D' -o /tmp/v1082.zip
           unzip -q /tmp/v1082.zip -d /tmp/v1082
           test -f /tmp/v1082/OVERLAY_ICON_V1057/app/build.gradle
+          sed -i '6i import android.content.ContentValues;' /tmp/v1082/OVERLAY_ICON_V1057/app/src/main/java/com/baekhak/centralcontrol/LocalMediaPickerActivity.java
 
       - uses: actions/setup-java@v5
         with:
