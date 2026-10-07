@@ -522,9 +522,13 @@ public class OverlayService extends Service {
         }
     }
 
+    private String[][] activeStations=null;
+    private int stationIndex=0;
+    private boolean stationFm=true;
+
     private void showStations(boolean fm){
-        if(stationPanel==null)return;stationPanel.removeAllViews();stationPanel.setVisibility(View.VISIBLE);
-        String[][] list=fm?new String[][]{
+        stationFm=fm;
+        activeStations=fm?new String[][]{
             {"KBS 클래식FM","https://radio.bsod.kr/stream?stn=kbs&ch=1fm"},
             {"MBC FM4U","https://radio.bsod.kr/stream?stn=mbc&ch=fm4u"},
             {"SBS 파워FM","https://radio.bsod.kr/stream?stn=sbs&ch=powerfm"},
@@ -534,8 +538,26 @@ public class OverlayService extends Service {
             {"MBC 표준FM","https://radio.bsod.kr/stream?stn=mbc&ch=sfm"},
             {"SBS 러브FM","https://radio.bsod.kr/stream?stn=sbs&ch=lovefm"}
         };
-        TextView title=station("▼ "+(fm?"FM":"AM")+" 인터넷 채널 선택");title.setTextColor(0xFFFFD96A);title.setOnClickListener(v->collapseStations());stationPanel.addView(title);
-        for(String[] s:list){TextView item=station("▶ "+s[0]);item.setOnClickListener(v->{playUrl(s[0],s[1]);collapseStations();});stationPanel.addView(item);}
+        stationIndex=Math.max(0,Math.min(stationIndex,activeStations.length-1));
+        renderStationBar();
+    }
+
+    private void renderStationBar(){
+        if(stationPanel==null||activeStations==null||activeStations.length==0)return;
+        stationPanel.removeAllViews();stationPanel.setVisibility(View.VISIBLE);
+        TextView current=station((stationFm?"📻 FM · ":"📡 AM · ")+activeStations[stationIndex][0]);
+        current.setTextColor(0xFFFFD96A);stationPanel.addView(current);
+        LinearLayout row=new LinearLayout(this);row.setOrientation(LinearLayout.HORIZONTAL);row.setGravity(Gravity.CENTER);
+        Button prev=new Button(this);prev.setText("◀ 이전채널");prev.setTextSize(10f);prev.setAllCaps(false);
+        Button play=new Button(this);play.setText("▶ 재생 / ■ 중지");play.setTextSize(10f);play.setAllCaps(false);
+        Button next=new Button(this);next.setText("다음채널 ▶");next.setTextSize(10f);next.setAllCaps(false);
+        prev.setOnClickListener(v->{stationIndex=(stationIndex-1+activeStations.length)%activeStations.length;renderStationBar();});
+        next.setOnClickListener(v->{stationIndex=(stationIndex+1)%activeStations.length;renderStationBar();});
+        play.setOnClickListener(v->{if(player!=null){stopMedia();renderStationBar();}else playUrl(activeStations[stationIndex][0],activeStations[stationIndex][1]);});
+        row.addView(prev,new LinearLayout.LayoutParams(dp(88),dp(42)));
+        row.addView(play,new LinearLayout.LayoutParams(dp(100),dp(42)));
+        row.addView(next,new LinearLayout.LayoutParams(dp(88),dp(42)));
+        stationPanel.addView(row);
     }
 
     private void playUrl(String name,String url){playUri(name,Uri.parse(url),false);}
