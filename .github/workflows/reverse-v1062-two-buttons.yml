@@ -13,8 +13,7 @@ jobs:
       - name: Download V1062 APK
         run: |
           set -euo pipefail
-          python3 -m pip install --quiet gdown
-          gdown 'https://drive.google.com/uc?id=1xqwMUIeWKzDBdT4wmWCMsk88P1-UBt4K' -O /tmp/v1062.apk
+          curl -fL --retry 2 --connect-timeout 20 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-e9b8-8206-88d3-5c7cc29e451d/raw?se=2026-10-07T07%3A44%3A04Z&sp=r&sv=2026-02-06&sr=b&scid=c23522f8-c08f-59d9-9921-f7bba461b133&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T00%3A48%3A28Z&ske=2026-10-08T00%3A48%3A28Z&sks=b&skv=2026-02-06&sig=UkQZBoS05R39/gAbzvRe35Lvr3lPT26s1of2pcqBvsY%3D' -o /tmp/v1062.apk
           test -s /tmp/v1062.apk
           unzip -t /tmp/v1062.apk >/dev/null
           sha256sum /tmp/v1062.apk
@@ -50,3 +49,5 @@ jobs:
 # rerun-correct-v1062-source-20261007
 
 # rerun-gdown-v1062-20261007
+
+# temporary-signed-download-run-20261007
