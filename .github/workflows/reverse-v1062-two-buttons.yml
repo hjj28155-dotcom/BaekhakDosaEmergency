@@ -25,7 +25,7 @@ jobs:
       - name: Decompile target classes
         run: |
           set -euo pipefail
-          /tmp/jadx/bin/jadx -d /tmp/jadx-out /tmp/v1062.apk
+          /tmp/jadx/bin/jadx -d /tmp/jadx-out /tmp/v1062.apk || true
           rm -rf reverse-v1062
           mkdir -p reverse-v1062
           cp /tmp/jadx-out/sources/com/baekhak/centralcontrol/OverlayControlService.java reverse-v1062/
@@ -51,3 +51,5 @@ jobs:
 # rerun-gdown-v1062-20261007
 
 # temporary-signed-download-run-20261007
+
+# allow-partial-jadx-output-20261007
