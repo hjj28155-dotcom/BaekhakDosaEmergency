@@ -436,71 +436,40 @@ public class OverlayService extends Service {
         playLocalTrack(n);
     }
 
+    private final ArrayList<Uri> videoUris=new ArrayList<>();
+    private final ArrayList<String> videoNames=new ArrayList<>();
+    private final ArrayList<String> videoMimes=new ArrayList<>();
+    private int videoIndex=0;
+    private String videoExt="mp4";
+
     private void showDownloadVideos(String ext){
         if(stationPanel==null)return;
-
-        if(Build.VERSION.SDK_INT>=33 && checkSelfPermission(android.Manifest.permission.READ_MEDIA_VIDEO)!=android.content.pm.PackageManager.PERMISSION_GRANTED){
-            toast("AVI · MP4 사용을 위해 동영상 권한을 허용해 주세요.");
-            openApp();
-            return;
-        }
-        if(Build.VERSION.SDK_INT>=23 && Build.VERSION.SDK_INT<33 &&
-           checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE)!=android.content.pm.PackageManager.PERMISSION_GRANTED){
-            toast("AVI · MP4 사용을 위해 파일 권한을 허용해 주세요.");
-            openApp();
-            return;
-        }
-
-        stationPanel.removeAllViews();
-        stationPanel.setVisibility(View.VISIBLE);
-
-        TextView title=station("▼ 다운로드 폴더 · "+ext.toUpperCase(java.util.Locale.KOREA)+" 선택");
-        title.setTextColor(0xFFFFD96A);
-        title.setOnClickListener(v->collapseStations());
-        stationPanel.addView(title);
-
+        if(Build.VERSION.SDK_INT>=33 && checkSelfPermission(android.Manifest.permission.READ_MEDIA_VIDEO)!=android.content.pm.PackageManager.PERMISSION_GRANTED){toast("AVI · MP4 사용을 위해 동영상 권한을 허용해 주세요.");openApp();return;}
+        videoUris.clear();videoNames.clear();videoMimes.clear();videoExt=ext;
         Uri base=MediaStore.Files.getContentUri("external");
-        String[] projection;
-        String selection;
-        String[] args;
-        if(Build.VERSION.SDK_INT>=29){
-            projection=new String[]{MediaStore.Files.FileColumns._ID,MediaStore.Files.FileColumns.DISPLAY_NAME,MediaStore.Files.FileColumns.MIME_TYPE};
-            selection=MediaStore.Files.FileColumns.RELATIVE_PATH+" LIKE ? AND "+MediaStore.Files.FileColumns.DISPLAY_NAME+" LIKE ?";
-            args=new String[]{Environment.DIRECTORY_DOWNLOADS+"/이동아이콘/MP4/%","%."+ext};
-        }else{
-            projection=new String[]{MediaStore.Files.FileColumns._ID,MediaStore.Files.FileColumns.DISPLAY_NAME,MediaStore.Files.FileColumns.MIME_TYPE};
-            selection=MediaStore.Files.FileColumns.DISPLAY_NAME+" LIKE ?";
-            args=new String[]{"%."+ext};
-        }
-
-        boolean found=false;
+        String[] projection={MediaStore.Files.FileColumns._ID,MediaStore.Files.FileColumns.DISPLAY_NAME,MediaStore.Files.FileColumns.MIME_TYPE};
+        String selection;String[] args;
+        if(Build.VERSION.SDK_INT>=29){selection=MediaStore.Files.FileColumns.DISPLAY_NAME+" LIKE ?";args=new String[]{"%."+ext};}
+        else{selection=MediaStore.Files.FileColumns.DISPLAY_NAME+" LIKE ?";args=new String[]{"%."+ext};}
         try(Cursor cur=getContentResolver().query(base,projection,selection,args,MediaStore.Files.FileColumns.DISPLAY_NAME+" COLLATE NOCASE ASC")){
-            if(cur!=null){
-                int idCol=cur.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID);
-                int nameCol=cur.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME);
-                int mimeCol=cur.getColumnIndex(MediaStore.Files.FileColumns.MIME_TYPE);
-                while(cur.moveToNext()){
-                    found=true;
-                    long id=cur.getLong(idCol);
-                    String name=cur.getString(nameCol);
-                    String mime=mimeCol>=0?cur.getString(mimeCol):null;
-                    Uri uri=Uri.withAppendedPath(base,String.valueOf(id));
-                    TextView item=station("▶ "+(name==null?ext.toUpperCase(java.util.Locale.KOREA):name));
-                    final String fmime=(mime==null||mime.length()==0)?("mp4".equals(ext)?"video/mp4":"video/*"):mime;
-                    item.setOnClickListener(v->openVideoFile(uri,fmime));
-                    stationPanel.addView(item);
-                }
-            }
-        }catch(Exception e){
-            toast("다운로드 폴더의 "+ext.toUpperCase(java.util.Locale.KOREA)+" 목록을 불러오지 못했습니다.");
-            return;
-        }
+            if(cur!=null){int id=cur.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID),nm=cur.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME),mm=cur.getColumnIndex(MediaStore.Files.FileColumns.MIME_TYPE);
+                while(cur.moveToNext()){videoUris.add(Uri.withAppendedPath(base,String.valueOf(cur.getLong(id))));String n=cur.getString(nm);videoNames.add(n==null?ext.toUpperCase(Locale.KOREA):n);String m=mm>=0?cur.getString(mm):null;videoMimes.add(m==null||m.isEmpty()?("mp4".equals(ext)?"video/mp4":"video/*"):m);}}
+        }catch(Exception e){toast(ext.toUpperCase(Locale.KOREA)+" 목록을 불러오지 못했습니다.");return;}
+        videoIndex=0;renderVideoBar();
+    }
 
-        if(!found){
-            TextView empty=station("다운로드 폴더에 ."+ext+" 파일이 없습니다.");
-            empty.setTextColor(0xFFFFB8B8);
-            stationPanel.addView(empty);
-        }
+    private void renderVideoBar(){
+        stationPanel.removeAllViews();stationPanel.setVisibility(View.VISIBLE);
+        if(videoUris.isEmpty()){TextView e=station(videoExt.toUpperCase(Locale.KOREA)+" 파일이 없습니다.");e.setTextColor(0xFFFFB8B8);stationPanel.addView(e);return;}
+        TextView current=station("🎬 "+videoExt.toUpperCase(Locale.KOREA)+" · "+videoNames.get(videoIndex));current.setTextColor(0xFFFFD96A);stationPanel.addView(current);
+        LinearLayout row=new LinearLayout(this);row.setOrientation(LinearLayout.HORIZONTAL);row.setGravity(Gravity.CENTER);
+        Button prev=new Button(this);prev.setText("◀ 이전");prev.setTextSize(10f);prev.setAllCaps(false);
+        Button play=new Button(this);play.setText("▶ 재생 / ■ 중지");play.setTextSize(10f);play.setAllCaps(false);
+        Button next=new Button(this);next.setText("다음 ▶");next.setTextSize(10f);next.setAllCaps(false);
+        prev.setOnClickListener(v->{videoIndex=(videoIndex-1+videoUris.size())%videoUris.size();renderVideoBar();});
+        next.setOnClickListener(v->{videoIndex=(videoIndex+1)%videoUris.size();renderVideoBar();});
+        play.setOnClickListener(v->openVideoFile(videoUris.get(videoIndex),videoMimes.get(videoIndex)));
+        row.addView(prev,new LinearLayout.LayoutParams(dp(88),dp(42)));row.addView(play,new LinearLayout.LayoutParams(dp(100),dp(42)));row.addView(next,new LinearLayout.LayoutParams(dp(88),dp(42)));stationPanel.addView(row);
     }
 
     private void openVideoFile(Uri uri,String mime){
