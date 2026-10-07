@@ -1,0 +1,32 @@
+name: Publish v1.0.79 Release APK
+on:
+  push:
+    paths:
+      - '.github/workflows/publish-v1079-release.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare release asset
+        run: |
+          set -euo pipefail
+          SRC="OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE_STABLE_v1.0.79.apk"
+          test -s "$SRC"
+          cp "$SRC" "Hanghae_MoveIcon_v1.0.79.apk"
+          ls -lh "Hanghae_MoveIcon_v1.0.79.apk"
+
+      - name: Publish release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release delete v1.0.79 --yes --cleanup-tag || true
+          git push origin :refs/tags/v1.0.79 || true
+          gh release create v1.0.79             "Hanghae_MoveIcon_v1.0.79.apk#항행의자유 이동아이콘 v1.0.79 APK"             --target main             --title "항행의자유 이동아이콘 v1.0.79"             --notes "v1.0.79 설치용 APK. MP3 전체곡 재생, V3 화면 자동 복귀, 메뉴 스크롤/위치이동/바깥터치 접기 반영."
