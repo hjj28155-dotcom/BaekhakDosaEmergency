@@ -14,8 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Apply confirmed Freedom button flow
-        run: python3 .github/scripts/patch_moveicon_freedom_home.py
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -111,7 +109,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -f HANGHAE_MINI_MP3_FM_AM_YOUTUBE-debug.apk HANGHAE_NAVIGATOR_MINI-debug.apk HANGHAE_NAVIGATOR_MINI-v1.0.18.apk HANGHAE_MOVEICON_V1.0.18_BRIDGE.apk '항행의자유_배포용_이동아이콘.apk' '항해사_전용_이동아이콘.apk' '항해사_전용_이동아이콘_v1.0.18.apk' '항행의자유_이동아이콘_v1.0.18_교체판.apk'
-          git commit -m 'Publish fresh-install move icon v1.0.65 APKs' || exit 0
+          git commit -m 'Publish move icon v1.0.72 APKs' || exit 0
           git push origin HEAD:main
 
 # trigger-install-guide-20261005-1
