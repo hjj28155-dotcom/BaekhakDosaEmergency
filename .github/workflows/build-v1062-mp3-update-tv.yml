@@ -18,7 +18,7 @@ jobs:
       - name: Download patched V1062-lineage source
         run: |
           set -euo pipefail
-          curl -fL --retry 2 --connect-timeout 20 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-8c54-8206-bb89-a9ddf9906392/raw?se=2026-10-07T10%3A39%3A14Z&sp=r&sv=2026-02-06&sr=b&scid=86640608-c489-5e52-9f3a-7b2bc4eab7d7&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T00%3A13%3A30Z&ske=2026-10-08T00%3A13%3A30Z&sks=b&skv=2026-02-06&sig=BMOo1fYjp7jmkMgMQlXeb6BXyHme2nfoKg1z2CBZzqw%3D' -o /tmp/v1062fix.zip
+          curl -fL --retry 2 --connect-timeout 20 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-bc78-8206-ac9c-17762b22c05a/raw?se=2026-10-07T10%3A57%3A35Z&sp=r&sv=2026-02-06&sr=b&scid=26a15300-573b-58ad-8692-404daf5a5f0f&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-06T23%3A11%3A38Z&ske=2026-10-07T23%3A11%3A38Z&sks=b&skv=2026-02-06&sig=dx7n3wlHPbTxXT2f0tGWeqzqggeAsAI1peI/kcCYnt8%3D' -o /tmp/v1062fix.zip
           test -s /tmp/v1062fix.zip
           unzip -q /tmp/v1062fix.zip -d /tmp/v1062fix
           test -f /tmp/v1062fix/OVERLAY_ICON_V1057/app/build.gradle
@@ -59,17 +59,17 @@ jobs:
           set -euo pipefail
           APK=$(find /tmp/v1062fix/OVERLAY_ICON_V1057/app/build/outputs/apk -type f -name '*.apk' | head -1)
           test -s "$APK"
-          cp "$APK" /tmp/OVERLAY_ICON_V1062_SCROLL_MOVE_OUTSIDE_DISMISS_STABLE.apk
+          cp "$APK" /tmp/OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE_STABLE.apk
 
           git fetch origin main
           git reset --hard origin/main
-          cp /tmp/OVERLAY_ICON_V1062_SCROLL_MOVE_OUTSIDE_DISMISS_STABLE.apk OVERLAY_ICON_V1062_SCROLL_MOVE_OUTSIDE_DISMISS_STABLE.apk
-          cp /tmp/OVERLAY_ICON_V1062_SCROLL_MOVE_OUTSIDE_DISMISS_STABLE.apk OVERLAY_ICON_V1062_SCROLL_MOVE_OUTSIDE_DISMISS_STABLE_v1.0.77.apk
+          cp /tmp/OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE_STABLE.apk OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE_STABLE.apk
+          cp /tmp/OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE_STABLE.apk OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE_STABLE_v1.0.78.apk
 
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -f OVERLAY_ICON_V1062_SCROLL_MOVE_OUTSIDE_DISMISS_STABLE.apk OVERLAY_ICON_V1062_SCROLL_MOVE_OUTSIDE_DISMISS_STABLE_v1.0.77.apk
-          git commit -m 'Publish V1062 scroll move outside-dismiss v1.0.77 APK' || exit 0
+          git add -f OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE_STABLE.apk OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE_STABLE_v1.0.78.apk
+          git commit -m 'Publish V1062 stable v1.0.78 usability fixes APK' || exit 0
           git push origin HEAD:main
 
 # final-v1062-fix-source-20261007
@@ -81,3 +81,5 @@ jobs:
 # stable-package-v1076-20261007
 
 # scroll-move-outside-dismiss-v1077-20261007
+
+# v1078-scroll-move-dismiss-mp3all-transient-20261007
