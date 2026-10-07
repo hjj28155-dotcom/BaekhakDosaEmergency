@@ -18,7 +18,7 @@ jobs:
       - name: Download patched V1062-lineage source
         run: |
           set -euo pipefail
-          curl -fL --retry 2 --connect-timeout 20 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-9f0c-8206-8588-21a11a46702c/raw?se=2026-10-07T08%3A23%3A33Z&sp=r&sv=2026-02-06&sr=b&scid=3d765782-1d59-59ea-9b17-17bd2ae821c3&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T01%3A06%3A18Z&ske=2026-10-08T01%3A06%3A18Z&sks=b&skv=2026-02-06&sig=8Ps5gj%2BGICntRiLWqUJrMuaKklzfCMeQxSflTmZRXhA%3D' -o /tmp/v1062fix.zip
+          curl -fL --retry 2 --connect-timeout 20 'https://sdmntprindiasocentral.oaiusercontent.com/files/00000000-ba34-8211-81de-7f0824ed30c6/raw?se=2026-10-07T08%3A39%3A17Z&sp=r&sv=2026-02-06&sr=b&scid=90f589cc-f562-5753-b745-2a1efd5987c8&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T01%3A12%3A58Z&ske=2026-10-08T01%3A12%3A58Z&sks=b&skv=2026-02-06&sig=/5uzxuBEZFA/IlPcFruO/XyKa2OrCycKBFxS2AiwqJQ%3D' -o /tmp/v1062fix.zip
           test -s /tmp/v1062fix.zip
           unzip -q /tmp/v1062fix.zip -d /tmp/v1062fix
           test -f /tmp/v1062fix/OVERLAY_ICON_V1057/app/build.gradle
@@ -59,17 +59,17 @@ jobs:
           set -euo pipefail
           APK=$(find /tmp/v1062fix/OVERLAY_ICON_V1057/app/build/outputs/apk -type f -name '*.apk' | head -1)
           test -s "$APK"
-          cp "$APK" /tmp/OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE.apk
+          cp "$APK" /tmp/OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE_STABLE.apk
 
           git fetch origin main
           git reset --hard origin/main
-          cp /tmp/OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE.apk OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE.apk
-          cp /tmp/OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE.apk OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE_v1.0.75.apk
+          cp /tmp/OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE_STABLE.apk OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE_STABLE.apk
+          cp /tmp/OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE_STABLE.apk OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE_STABLE_v1.0.76.apk
 
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -f OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE.apk OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE_v1.0.75.apk
-          git commit -m 'Publish V1062 MP3 MP4 app-folders TV live fix APK' || exit 0
+          git add -f OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE_STABLE.apk OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE_STABLE_v1.0.76.apk
+          git commit -m 'Publish V1062 stable package v1.0.76 APK' || exit 0
           git push origin HEAD:main
 
 # final-v1062-fix-source-20261007
@@ -77,3 +77,5 @@ jobs:
 # publish-path-fix-20261007
 
 # v1062-appfolders-mp3-mp4-20261007
+
+# stable-package-v1076-20261007
