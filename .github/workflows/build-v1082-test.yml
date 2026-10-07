@@ -17,7 +17,7 @@ jobs:
       - name: Download v1.0.82 source
         run: |
           set -euo pipefail
-          curl -fL --retry 2 --connect-timeout 20 'https://sdmntprindiasocentral.oaiusercontent.com/files/00000000-1c84-8211-b729-858c9dc80354/raw?se=2026-10-07T13%3A25%3A17Z&sp=r&sv=2026-02-06&sr=b&scid=ef4c93a7-1237-59a7-b6e0-9d71c81b56c3&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T00%3A48%3A29Z&ske=2026-10-08T00%3A48%3A29Z&sks=b&skv=2026-02-06&sig=FmpqiwVsDvuxTwuzs/0lFpjdWfvPpOLyw5WOuDvi1BE%3D' -o /tmp/v1082.zip
+          curl -fL --retry 2 --connect-timeout 20 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-4f78-8206-9547-e541eeac7ecb/raw?se=2026-10-07T14%3A08%3A06Z&sp=r&sv=2026-02-06&sr=b&scid=4ca96056-70d6-5f7a-b9b3-0e9b2fca09cd&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T01%3A23%3A29Z&ske=2026-10-08T01%3A23%3A29Z&sks=b&skv=2026-02-06&sig=TPlLoaLhG6AtQD03c1T9LxSpfhYKdI6aFFVwJAWt2g0%3D' -o /tmp/v1082.zip
           unzip -q /tmp/v1082.zip -d /tmp/v1082
           test -f /tmp/v1082/OVERLAY_ICON_V1057/app/build.gradle
           sed -i '6i import android.content.ContentValues;' /tmp/v1082/OVERLAY_ICON_V1057/app/src/main/java/com/baekhak/centralcontrol/LocalMediaPickerActivity.java
@@ -105,3 +105,5 @@ jobs:
           gh release create v1.0.82-test             "/tmp/Hanghae_MoveIcon_v1.0.82_TEST.apk#항행의자유 이동아이콘 v1.0.82 TEST APK"             --target main             --title "항행의자유 이동아이콘 v1.0.82 TEST"             --notes "MP3 선택창 중복 표시와 V3 화면 잔류를 수정했습니다. MP4는 내 파일 > Movies에서 시작하고 Movies/이동아이콘/MP4 앱폴더에 저장합니다."
 
 # retry-v1082-after-import-fix
+
+# refresh-v1082-source-url
