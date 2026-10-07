@@ -1,0 +1,91 @@
+name: Build v1.0.81 Test Move Icon
+on:
+  push:
+    paths:
+      - '.github/workflows/build-v1081-test.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download v1.0.80 test source baseline
+        run: |
+          set -euo pipefail
+          curl -fL --retry 2 --connect-timeout 20 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-3670-8206-9264-00ad67768345/raw?se=2026-10-07T13%3A10%3A00Z&sp=r&sv=2026-02-06&sr=b&scid=0ecf2339-43da-5622-bb91-29edca8b1544&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T06%3A21%3A29Z&ske=2026-10-08T06%3A21%3A29Z&sks=b&skv=2026-02-06&sig=7yNKxIv26IFsM/EiCG%2BZjE0/1uG9i9aBCYe84AtAzeM%3D' -o /tmp/v1081.zip
+          unzip -q /tmp/v1081.zip -d /tmp/v1081
+          test -f /tmp/v1081/OVERLAY_ICON_V1057/app/build.gradle
+
+      - name: Apply v1.0.81 updater fix
+        run: |
+          set -euo pipefail
+          cp .buildsrc/v1081/OverlayUpdateActivity.java /tmp/v1081/OVERLAY_ICON_V1057/app/src/main/java/com/baekhak/centralcontrol/OverlayUpdateActivity.java
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('/tmp/v1081/OVERLAY_ICON_V1057/app/build.gradle')
+          s=p.read_text()
+          s=s.replace("applicationId 'com.navigator.freedom.moveicon.test1080'","applicationId 'com.navigator.freedom.moveicon.teststable'")
+          s=s.replace("versionCode 1080001","versionCode 1081001")
+          s=s.replace('versionName "1.0.80-TEST-V1062-ANCHOR-ONLY"','versionName "1.0.81-TEST-UPDATE-CHECK"')
+          s=s.replace('debug { debuggable false }','debug { debuggable false; signingConfig signingConfigs.stableTest }')
+          s=s.replace('Hanghae_MoveIcon_v1.0.80_TEST.apk','Hanghae_MoveIcon_v1.0.81_TEST.apk')
+          p.write_text(s)
+          q=Path('/tmp/v1081/OVERLAY_ICON_V1057/app/src/freedom/res/values/strings.xml')
+          t=q.read_text().replace('이동아이콘 TEST','이동아이콘 TEST 81')
+          q.write_text(t)
+          PY
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Restore persistent test signing key
+        uses: actions/cache@v4
+        with:
+          path: ~/.hanghae/test1080.jks
+          key: hanghae-v1080-test-signing-v1
+
+      - name: Prepare persistent test signing key
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.hanghae
+          if [ ! -f ~/.hanghae/test1080.jks ]; then
+            keytool -genkeypair -v               -keystore ~/.hanghae/test1080.jks               -storepass android               -alias androiddebugkey               -keypass android               -dname "CN=Hanghae MoveIcon Test 1080,O=Hanghae Freedom,C=KR"               -keyalg RSA -keysize 2048 -validity 10000
+          fi
+          keytool -list -v -keystore ~/.hanghae/test1080.jks -storepass android -alias androiddebugkey | grep -E 'Owner:|SHA256:'
+
+      - name: Build APK
+        working-directory: /tmp/v1081/OVERLAY_ICON_V1057
+        run: |
+          set -euo pipefail
+          gradle clean assembleDebug --no-daemon --no-build-cache
+          APK=$(find app/build/outputs/apk -type f -name '*.apk' | head -1)
+          test -s "$APK"
+          cp "$APK" /tmp/Hanghae_MoveIcon_v1.0.81_TEST.apk
+
+      - name: Verify APK
+        run: |
+          set -euo pipefail
+          AAPT=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
+          "$AAPT" dump badging /tmp/Hanghae_MoveIcon_v1.0.81_TEST.apk | head -1
+          "$APKSIGNER" verify --verbose --print-certs /tmp/Hanghae_MoveIcon_v1.0.81_TEST.apk
+
+      - name: Publish test release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release delete v1.0.81-test --yes --cleanup-tag || true
+          git push origin :refs/tags/v1.0.81-test || true
+          gh release create v1.0.81-test             "/tmp/Hanghae_MoveIcon_v1.0.81_TEST.apk#항행의자유 이동아이콘 v1.0.81 TEST APK"             --target main             --title "항행의자유 이동아이콘 v1.0.81 TEST"             --notes "업데이트 버튼이 설치된 versionCode와 최신 versionCode를 비교합니다. 최신판이면 다운로드하지 않고 '최신 버전입니다'라고 표시합니다."
