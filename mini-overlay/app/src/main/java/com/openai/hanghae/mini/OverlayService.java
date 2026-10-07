@@ -90,11 +90,14 @@ public class OverlayService extends Service {
     }
 
     private Button btn(String text,int color){
-        Button b=new Button(this);b.setText(text);b.setTextColor(Color.WHITE);b.setTextSize(9.5f);b.setAllCaps(false);
-        b.setGravity(Gravity.CENTER);b.setPadding(dp(3),0,dp(3),0);b.setMinHeight(0);b.setMinimumHeight(0);b.setMinWidth(0);b.setMinimumWidth(0);
+        Button b=new Button(this);
+        b.setText(text);b.setTextColor(Color.WHITE);b.setTextSize(11f);b.setAllCaps(false);
+        b.setSingleLine(true);b.setGravity(Gravity.CENTER);b.setPadding(dp(7),0,dp(7),0);
+        b.setMinHeight(dp(34));b.setMinimumHeight(dp(34));b.setMinWidth(dp(60));b.setMinimumWidth(dp(60));
         b.setBackground(bg(color,0x66FFD35A,13));
-        int w="🎵 MP3".equals(text)?52:("📻 FM".equals(text)||"📡 AM".equals(text)?47:("업데이트".equals(text)?62:55));
-        LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(dp(w),dp(36));p.setMargins(dp(1),dp(2),dp(1),dp(2));b.setLayoutParams(p);return b;
+        LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,dp(36));
+        p.setMargins(dp(3),dp(1),dp(3),dp(1));b.setLayoutParams(p);
+        return b;
     }
 
     private TextView station(String text){
@@ -105,31 +108,37 @@ public class OverlayService extends Service {
 
     private void showOverlay(){
         if(root!=null||wm==null)return;
-        root=new LinearLayout(this);root.setOrientation(LinearLayout.VERTICAL);root.setPadding(dp(5),dp(4),dp(5),dp(4));root.setBackground(bg(0xF20A1D30,0xCCF3C954,18));
+        root=new LinearLayout(this);root.setOrientation(LinearLayout.VERTICAL);root.setPadding(0,0,0,0);root.setBackgroundColor(Color.TRANSPARENT);
 
-        LinearLayout bar=new LinearLayout(this);bar.setOrientation(LinearLayout.HORIZONTAL);bar.setGravity(Gravity.CENTER_VERTICAL);
+        LinearLayout bar=new LinearLayout(this);bar.setOrientation(LinearLayout.VERTICAL);bar.setGravity(Gravity.CENTER_HORIZONTAL);
         anchor=new TextView(this);anchor.setText("⚓");anchor.setTextSize(19f);anchor.setTextColor(0xFFFFD96A);anchor.setGravity(Gravity.CENTER);
         anchor.setBackground(bg(0xEE08233E,0xCCF3C954,14));anchor.setLayoutParams(new LinearLayout.LayoutParams(dp(39),dp(39)));bar.addView(anchor);
 
-        menu=new LinearLayout(this);menu.setOrientation(LinearLayout.HORIZONTAL);menu.setGravity(Gravity.CENTER_VERTICAL);menu.setVisibility(View.VISIBLE);
+        menu=new LinearLayout(this);menu.setOrientation(LinearLayout.VERTICAL);menu.setGravity(Gravity.CENTER_HORIZONTAL);
+        menu.setPadding(dp(3),dp(3),dp(3),dp(3));menu.setBackground(bg(0xF20A1D30,0xCCF3C954,12));menu.setVisibility(View.VISIBLE);
         Button freedom=btn("🚢 항행의자유",0xEE0C7AA8), mp3=btn("🎵 MP3",0xEE1068C8), fm=btn("📻 FM",0xEE5B34D6), am=btn("📡 AM",0xEE6D2DB7),
                yt=btn("유튜브",0xEEDB1F28), avi=btn("AVI",0xEE8A4D1E), mp4=btn("MP4",0xEE1F7A5B),
                stop=btn("■ 종료",0xEED52D46), update=btn("업데이트",0xEE087F5B);
         menu.addView(freedom);menu.addView(mp3);menu.addView(fm);menu.addView(am);menu.addView(yt);menu.addView(avi);menu.addView(mp4);menu.addView(stop);menu.addView(update);
 
-        HorizontalScrollView menuScroll=new HorizontalScrollView(this);
-        menuScroll.setHorizontalScrollBarEnabled(true);
+        ScrollView menuScroll=new ScrollView(this);
+        menuScroll.setVerticalScrollBarEnabled(true);
         menuScroll.setFillViewport(false);
         menuScroll.setVisibility(View.GONE);
-        menuScroll.addView(menu,new HorizontalScrollView.LayoutParams(-2,-1));
-        bar.addView(menuScroll,new LinearLayout.LayoutParams(dp(285),dp(46)));
-        root.addView(bar,new LinearLayout.LayoutParams(-2,dp(46)));
+        menuScroll.addView(menu,new ScrollView.LayoutParams(-1,-2));
+        int screenW=getResources().getDisplayMetrics().widthPixels;
+        int screenH=getResources().getDisplayMetrics().heightPixels;
+        int menuW=Math.min(dp(170),Math.max(dp(145),screenW-dp(18)));
+        int menuH=Math.min(dp(345),Math.max(dp(180),screenH-dp(150)));
+        bar.addView(menuScroll,new LinearLayout.LayoutParams(menuW,menuH));
+        root.addView(bar,new LinearLayout.LayoutParams(-2,-2));
 
-        now=new TextView(this);now.setTextColor(0xFFFFE58A);now.setTextSize(10.5f);now.setPadding(dp(8),dp(2),dp(8),dp(3));now.setVisibility(View.GONE);
+        now=new TextView(this);now.setTextColor(0xFFFFE58A);now.setTextSize(11f);now.setPadding(dp(8),dp(3),dp(8),dp(4));now.setMaxLines(2);now.setVisibility(View.GONE);
         root.addView(now,new LinearLayout.LayoutParams(-2,-2));
 
         stationPanel=new LinearLayout(this);stationPanel.setOrientation(LinearLayout.VERTICAL);stationPanel.setVisibility(View.GONE);
-        root.addView(stationPanel,new LinearLayout.LayoutParams(-1,-2));
+        int controlW=Math.min(dp(300),Math.max(dp(250),screenW-dp(18)));
+        root.addView(stationPanel,new LinearLayout.LayoutParams(controlW,-2));
 
         freedom.setOnClickListener(v->openFreedomApp());
         mp3.setOnClickListener(v->{showMp3Controls();toggleLocalMp3();});
@@ -154,13 +163,42 @@ public class OverlayService extends Service {
                 case MotionEvent.ACTION_MOVE:
                     int dx=(int)(e.getRawX()-down[0]),dy=(int)(e.getRawY()-down[1]);
                     if(Math.abs(dx)>dp(5)||Math.abs(dy)>dp(5))moved[0]=true;
-                    if(moved[0]){lp.x=Math.max(0,pos[0]+dx);lp.y=Math.max(0,pos[1]+dy);try{wm.updateViewLayout(root,lp);}catch(Exception ignored){}}
+                    if(moved[0]){moveOverlayTo(pos[0]+dx,pos[1]+dy);}
                     return true;
                 case MotionEvent.ACTION_UP:if(!moved[0])toggleMenu();return true;
             }return false;
         });
 
-        try{wm.addView(root,lp);}catch(Exception e){root=null;}
+        try{
+            wm.addView(root,lp);
+            root.addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or_,ob)->{
+                if((r-l)!=(or_-ol)||(b-t)!=(ob-ot)) clampOverlayToScreen();
+            });
+            clampOverlayToScreen();
+        }catch(Exception e){root=null;}
+    }
+
+    private void moveOverlayTo(int x,int y){
+        if(root==null||lp==null||wm==null)return;
+        int sw=getResources().getDisplayMetrics().widthPixels;
+        int sh=getResources().getDisplayMetrics().heightPixels;
+        int rw=root.getWidth()>0?root.getWidth():dp(39);
+        int rh=root.getHeight()>0?root.getHeight():dp(39);
+        int margin=dp(4);
+        int maxX=Math.max(margin,sw-rw-margin);
+        int maxY=Math.max(margin,sh-rh-margin);
+        lp.x=Math.max(margin,Math.min(x,maxX));
+        lp.y=Math.max(margin,Math.min(y,maxY));
+        try{wm.updateViewLayout(root,lp);}catch(Exception ignored){}
+    }
+
+    private void clampOverlayToScreen(){
+        if(root==null)return;
+        root.post(()->moveOverlayTo(lp==null?dp(8):lp.x,lp==null?dp(12):lp.y));
+    }
+
+    private void refreshOverlayBounds(){
+        if(root!=null)root.postDelayed(this::clampOverlayToScreen,24);
     }
 
     private void toggleMenu(){
@@ -174,9 +212,10 @@ public class OverlayService extends Service {
         }else{
             collapseStations();
         }
+        refreshOverlayBounds();
     }
-    private void collapseMenu(){expanded=false;if(menu!=null && menu.getParent() instanceof View)((View)menu.getParent()).setVisibility(View.GONE);}
-    private void collapseStations(){if(stationPanel!=null){stationPanel.removeAllViews();stationPanel.setVisibility(View.GONE);}}
+    private void collapseMenu(){expanded=false;if(menu!=null && menu.getParent() instanceof View)((View)menu.getParent()).setVisibility(View.GONE);refreshOverlayBounds();}
+    private void collapseStations(){if(stationPanel!=null){stationPanel.removeAllViews();stationPanel.setVisibility(View.GONE);}refreshOverlayBounds();}
 
     private void toggleLocalMp3(){
         if(player!=null&&localMode){
@@ -231,6 +270,7 @@ public class OverlayService extends Service {
         row.addView(pause,new LinearLayout.LayoutParams(dp(82),dp(42)));
         row.addView(next,new LinearLayout.LayoutParams(dp(82),dp(42)));
         stationPanel.addView(row);
+        refreshOverlayBounds();
     }
 
     private boolean loadLocalTracks(){
@@ -424,9 +464,14 @@ public class OverlayService extends Service {
         }
     }
 
+    private String[][] activeStations=null;
+    private int stationIndex=0;
+    private boolean stationFm=true;
+
     private void showStations(boolean fm){
-        if(stationPanel==null)return;stationPanel.removeAllViews();stationPanel.setVisibility(View.VISIBLE);
-        String[][] list=fm?new String[][]{
+        if(stationPanel==null)return;
+        stationFm=fm;
+        activeStations=fm?new String[][]{
             {"KBS 클래식FM","https://radio.bsod.kr/stream?stn=kbs&ch=1fm"},
             {"MBC FM4U","https://radio.bsod.kr/stream?stn=mbc&ch=fm4u"},
             {"SBS 파워FM","https://radio.bsod.kr/stream?stn=sbs&ch=powerfm"},
@@ -436,8 +481,33 @@ public class OverlayService extends Service {
             {"MBC 표준FM","https://radio.bsod.kr/stream?stn=mbc&ch=sfm"},
             {"SBS 러브FM","https://radio.bsod.kr/stream?stn=sbs&ch=lovefm"}
         };
-        TextView title=station("▼ "+(fm?"FM":"AM")+" 인터넷 채널 선택");title.setTextColor(0xFFFFD96A);title.setOnClickListener(v->collapseStations());stationPanel.addView(title);
-        for(String[] s:list){TextView item=station("▶ "+s[0]);item.setOnClickListener(v->{playUrl(s[0],s[1]);collapseStations();});stationPanel.addView(item);}
+        stationIndex=Math.max(0,Math.min(stationIndex,activeStations.length-1));
+        renderStationBar();
+    }
+
+    private void renderStationBar(){
+        if(stationPanel==null||activeStations==null||activeStations.length==0)return;
+        stationPanel.removeAllViews();stationPanel.setVisibility(View.VISIBLE);
+        TextView current=station((stationFm?"📻 FM · ":"📡 AM · ")+activeStations[stationIndex][0]);
+        current.setTextColor(0xFFFFD96A);stationPanel.addView(current);
+
+        LinearLayout row=new LinearLayout(this);row.setOrientation(LinearLayout.HORIZONTAL);row.setGravity(Gravity.CENTER);
+        Button prev=new Button(this);prev.setText("◀ 이전채널");prev.setTextSize(10f);prev.setAllCaps(false);
+        Button play=new Button(this);play.setText("▶ 재생 / ■ 중지");play.setTextSize(10f);play.setAllCaps(false);
+        Button next=new Button(this);next.setText("다음채널 ▶");next.setTextSize(10f);next.setAllCaps(false);
+
+        prev.setOnClickListener(v->{stationIndex=(stationIndex-1+activeStations.length)%activeStations.length;renderStationBar();});
+        next.setOnClickListener(v->{stationIndex=(stationIndex+1)%activeStations.length;renderStationBar();});
+        play.setOnClickListener(v->{
+            if(player!=null){stopMedia();renderStationBar();}
+            else playUrl(activeStations[stationIndex][0],activeStations[stationIndex][1]);
+        });
+
+        row.addView(prev,new LinearLayout.LayoutParams(dp(88),dp(42)));
+        row.addView(play,new LinearLayout.LayoutParams(dp(100),dp(42)));
+        row.addView(next,new LinearLayout.LayoutParams(dp(88),dp(42)));
+        stationPanel.addView(row);
+        refreshOverlayBounds();
     }
 
     private void playUrl(String name,String url){playUri(name,Uri.parse(url),false);}
@@ -472,7 +542,7 @@ public class OverlayService extends Service {
         localTrackIndex=-1;
         if(now!=null)now.setVisibility(View.GONE);
     }
-    private void setNow(String s){if(now!=null){now.setText(s);now.setVisibility(View.VISIBLE);}}
+    private void setNow(String s){if(now!=null){now.setText(s);now.setVisibility(View.VISIBLE);refreshOverlayBounds();}}
 
     private void openFreedomApp(){
         collapseStations();collapseMenu();
@@ -501,8 +571,8 @@ public class OverlayService extends Service {
         setNow("⬇ 업데이트 다운로드 시작 · 0%");
 
         final String apkUrl=BuildConfig.NAVIGATOR_EDITION
-                ?"https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/HANGHAE_NAVIGATOR_MINI-debug.apk?v=1.0.71"
-                :"https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/HANGHAE_MINI_MP3_FM_AM_YOUTUBE-debug.apk?v=1.0.71";
+                ?"https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/HANGHAE_NAVIGATOR_MINI-debug.apk?v=1.0.72"
+                :"https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/HANGHAE_MINI_MP3_FM_AM_YOUTUBE-debug.apk?v=1.0.72";
 
         new Thread(() -> {
             HttpURLConnection conn=null;
