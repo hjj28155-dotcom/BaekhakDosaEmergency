@@ -1,0 +1,71 @@
+name: Build v1.0.80 Test Move Icon
+on:
+  push:
+    paths:
+      - '.github/workflows/build-v1080-test.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download v1.0.80 test source
+        run: |
+          set -euo pipefail
+          curl -fL --retry 2 --connect-timeout 20 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-7038-8206-9194-dff51b0ac3ab/raw?se=2026-10-07T12%3A10%3A41Z&sp=r&sv=2026-02-06&sr=b&scid=6bc2f45e-b70d-5a90-a70a-d697b90434fc&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-06T23%3A58%3A29Z&ske=2026-10-07T23%3A58%3A29Z&sks=b&skv=2026-02-06&sig=eKs6n9oKsvkEnuicKIkszClRvg11wxIJn1ZhzDD%2BHP0%3D' -o /tmp/v1080.zip
+          unzip -q /tmp/v1080.zip -d /tmp/v1080
+          test -f /tmp/v1080/OVERLAY_ICON_V1057/app/build.gradle
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Restore v1.0.80 test signing key
+        uses: actions/cache@v4
+        with:
+          path: ~/.hanghae/test1080.jks
+          key: hanghae-v1080-test-signing-v1
+
+      - name: Prepare v1.0.80 test signing key
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.hanghae
+          if [ ! -f ~/.hanghae/test1080.jks ]; then
+            keytool -genkeypair -v               -keystore ~/.hanghae/test1080.jks               -storepass android               -alias androiddebugkey               -keypass android               -dname "CN=Hanghae MoveIcon Test 1080,O=Hanghae Freedom,C=KR"               -keyalg RSA -keysize 2048 -validity 10000
+          fi
+
+      - name: Build APK
+        working-directory: /tmp/v1080/OVERLAY_ICON_V1057
+        run: |
+          set -euo pipefail
+          gradle clean assembleDebug --no-daemon --no-build-cache
+          APK=$(find app/build/outputs/apk -type f -name '*.apk' | head -1)
+          test -s "$APK"
+          cp "$APK" /tmp/Hanghae_MoveIcon_v1.0.80_TEST.apk
+
+      - name: Verify APK
+        run: |
+          set -euo pipefail
+          AAPT=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
+          "$AAPT" dump badging /tmp/Hanghae_MoveIcon_v1.0.80_TEST.apk | head -1
+          "$APKSIGNER" verify --verbose --print-certs /tmp/Hanghae_MoveIcon_v1.0.80_TEST.apk
+
+      - name: Publish test release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release delete v1.0.80-test --yes --cleanup-tag || true
+          git push origin :refs/tags/v1.0.80-test || true
+          gh release create v1.0.80-test             "/tmp/Hanghae_MoveIcon_v1.0.80_TEST.apk#항행의자유 이동아이콘 v1.0.80 TEST APK"             --target main             --title "항행의자유 이동아이콘 v1.0.80 TEST"             --notes "기존 정상판을 보존한 채 병행 설치하는 테스트판. 메뉴 스크롤, 위치 이동/저장, 화면 터치 시 닻 아이콘만 남기기, MP3 전체곡 재생, MP3 후 V3 화면 자동 종료, 추가 앱 실행 보강 반영."
