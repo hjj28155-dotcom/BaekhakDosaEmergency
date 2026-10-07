@@ -18,7 +18,7 @@ jobs:
       - name: Download patched V1062-lineage source
         run: |
           set -euo pipefail
-          curl -fL --retry 2 --connect-timeout 20 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-a840-8206-883e-15dfb2118a65/raw?se=2026-10-07T11%3A15%3A44Z&sp=r&sv=2026-02-06&sr=b&scid=daff1202-223a-5a85-b0d0-f43309ca8eee&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T00%3A28%3A36Z&ske=2026-10-08T00%3A28%3A36Z&sks=b&skv=2026-02-06&sig=cWO9uhUalaqvfKWbSUTJPa1HmhXJ/8VLdkyu5fwoWEA%3D' -o /tmp/v1062fix.zip
+          curl -fL --retry 2 --connect-timeout 20 'https://sdmntprindiasocentral.oaiusercontent.com/files/00000000-814c-8211-acec-c7dc178a22db/raw?se=2026-10-07T11%3A19%3A37Z&sp=r&sv=2026-02-06&sr=b&scid=371b571f-189e-5418-9ee0-316161888b8f&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T00%3A37%3A31Z&ske=2026-10-08T00%3A37%3A31Z&sks=b&skv=2026-02-06&sig=sRdeNLzXPflKAKFFvnNM/dByfyIgNzlBSY8%2BLS8ahiU%3D' -o /tmp/v1062fix.zip
           test -s /tmp/v1062fix.zip
           unzip -q /tmp/v1062fix.zip -d /tmp/v1062fix
           test -f /tmp/v1062fix/OVERLAY_ICON_V1057/app/build.gradle
@@ -61,8 +61,10 @@ jobs:
           curl -fL --retry 2 --connect-timeout 20 'https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE_STABLE_v1.0.76.apk' -o /tmp/v1076.apk
           APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
           test -x "$APKSIGNER"
-          OLD_CERT=$("$APKSIGNER" verify --print-certs /tmp/v1076.apk | sed -n 's/^Signer #1 certificate SHA-256 digest: //p' | head -1)
-          NEW_CERT=$("$APKSIGNER" verify --print-certs "$NEW_APK" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p' | head -1)
+          OLD_CERT=$("$APKSIGNER" verify --print-certs /tmp/v1076.apk 2>&1 | awk -F': ' 'tolower($0) ~ /certificate sha-256 digest/ {print $2; exit}')
+          NEW_CERT=$("$APKSIGNER" verify --print-certs "$NEW_APK" 2>&1 | awk -F': ' 'tolower($0) ~ /certificate sha-256 digest/ {print $2; exit}')
+          if [ -z "$OLD_CERT" ]; then OLD_CERT=$(keytool -printcert -jarfile /tmp/v1076.apk 2>/dev/null | awk -F': ' '/SHA256:/ {print $2; exit}'); fi
+          if [ -z "$NEW_CERT" ]; then NEW_CERT=$(keytool -printcert -jarfile "$NEW_APK" 2>/dev/null | awk -F': ' '/SHA256:/ {print $2; exit}'); fi
           echo "v1.0.76 cert: $OLD_CERT"
           echo "v1.0.79 cert: $NEW_CERT"
           test -n "$OLD_CERT"
@@ -84,7 +86,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -f OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE_STABLE.apk OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE_STABLE_v1.0.79.apk
-          git commit -m 'Publish V1062 stable v1.0.79 install-compatible APK' || exit 0
+          git commit -m 'Publish V1062 stable v1.0.79 high-code install-compatible APK' || exit 0
           git push origin HEAD:main
 
 # final-v1062-fix-source-20261007
@@ -100,3 +102,5 @@ jobs:
 # v1078-scroll-move-dismiss-mp3all-transient-20261007
 
 # v1079-install-compat-verification-20261007
+
+# v1079-highcode-cert-check-20261007
