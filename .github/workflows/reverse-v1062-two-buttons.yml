@@ -13,7 +13,8 @@ jobs:
       - name: Download V1062 APK
         run: |
           set -euo pipefail
-          curl -fL --retry 3 --connect-timeout 20 'https://drive.usercontent.google.com/download?id=1xqwMUIeWKzDBdT4wmWCMsk88P1-UBt4K&export=download&confirm=t' -o /tmp/v1062.apk
+          python3 -m pip install --quiet gdown
+          gdown 'https://drive.google.com/uc?id=1xqwMUIeWKzDBdT4wmWCMsk88P1-UBt4K' -O /tmp/v1062.apk
           test -s /tmp/v1062.apk
           unzip -t /tmp/v1062.apk >/dev/null
           sha256sum /tmp/v1062.apk
@@ -47,3 +48,5 @@ jobs:
           git push
 
 # rerun-correct-v1062-source-20261007
+
+# rerun-gdown-v1062-20261007
