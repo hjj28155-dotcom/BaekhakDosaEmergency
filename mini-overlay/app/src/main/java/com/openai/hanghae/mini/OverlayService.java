@@ -708,19 +708,8 @@ public class OverlayService extends Service {
     }
 
     private void openUpdater(){
-        collapseStations();
-        collapseMenu();
-        try{
-            String page=BuildConfig.NAVIGATOR_EDITION
-                ?"https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/navigator-moveicon.html"
-                :"https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/moveicon.html";
-            Intent web=new Intent(Intent.ACTION_VIEW,Uri.parse(page));
-            web.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(web);
-            setNow("⬆ 설치 및 업데이트 창을 엽니다.");
-        }catch(Exception e){
-            toast("설치 및 업데이트 창을 열 수 없습니다.");
-        }
+        // Installed users update inside the app: download progress -> Android installer.
+        openUpdaterLegacy();
     }
 
     private void openUpdaterLegacy(){
@@ -732,8 +721,8 @@ public class OverlayService extends Service {
         setNow("⬇ 업데이트 다운로드 시작 · 0%");
 
         final String apkUrl=BuildConfig.NAVIGATOR_EDITION
-                ?"https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/HANGHAE_NAVIGATOR_MINI-debug.apk?v=1.0.18"
-                :"https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/HANGHAE_MINI_MP3_FM_AM_YOUTUBE-debug.apk?v=1.0.18";
+                ?"https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/HANGHAE_NAVIGATOR_MINI-debug.apk?v=1.0.69"
+                :"https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/HANGHAE_MINI_MP3_FM_AM_YOUTUBE-debug.apk?v=1.0.69";
 
         new Thread(() -> {
             HttpURLConnection conn=null;
