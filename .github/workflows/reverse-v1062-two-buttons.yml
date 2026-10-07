@@ -13,7 +13,7 @@ jobs:
       - name: Download V1062 APK
         run: |
           set -euo pipefail
-          curl -fL --retry 3 --connect-timeout 20             'https://drive.usercontent.google.com/download?id=1DHqUIc8fE7ekBwS62Z5spwb59UrI321l&export=download&confirm=t'             -o /tmp/v1062.apk
+          curl -fL --retry 3 --connect-timeout 20 'https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/raw/refs/heads/main/OVERLAY_ICON_V1062_MEDIA_PIP_CONTROL-debug.apk' -o /tmp/v1062.apk
           test -s /tmp/v1062.apk
           unzip -t /tmp/v1062.apk >/dev/null
           sha256sum /tmp/v1062.apk
