@@ -24,7 +24,7 @@ jobs:
       - name: Apply MP4-only fix
         run: |
           set -euo pipefail
-          python -c 'from pathlib import Path; p=Path("/tmp/v1082/OVERLAY_ICON_V1057/app/src/main/java/com/baekhak/centralcontrol/LocalMediaPickerActivity.java"); s=p.read_text(); s=s.replace("if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {","if (false) {"); s=s.replace("Intent samsung = new Intent(i);","Intent samsung = new Intent("com.sec.android.app.myfiles.PICK_DATA");"); s=s.replace("samsung.setPackage("com.sec.android.app.myfiles");","samsung.putExtra("CONTENT_TYPE", "video/mp4"); samsung.addCategory(Intent.CATEGORY_DEFAULT); samsung.putExtra(Intent.EXTRA_LOCAL_ONLY, true);"); s=s.replace("i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);","i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION); i.putExtra(Intent.EXTRA_LOCAL_ONLY, true);"); p.write_text(s)'
+          python -c 'from pathlib import Path; p=Path("/tmp/v1082/OVERLAY_ICON_V1057/app/src/main/java/com/baekhak/centralcontrol/LocalMediaPickerActivity.java"); s=p.read_text(); s=s.replace("if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {","if (false) {"); s=s.replace("Intent samsung = new Intent(i);","Intent samsung = new Intent(\\\"com.sec.android.app.myfiles.PICK_DATA\\\");"); s=s.replace("samsung.setPackage(\\\"com.sec.android.app.myfiles\\\");","samsung.putExtra(\\\"CONTENT_TYPE\\\", \\"video/mp4\\\"); samsung.addCategory(Intent.CATEGORY_DEFAULT); samsung.putExtra(Intent.EXTRA_LOCAL_ONLY, true);"); s=s.replace("i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);","i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION); i.putExtra(Intent.EXTRA_LOCAL_ONLY, true);"); p.write_text(s)'
       
       - uses: actions/setup-java@v5
         with:
@@ -57,7 +57,7 @@ jobs:
           gradle clean assembleDebug --no-daemon --no-build-cache
           APK=$(find app/build/outputs/apk -type f -name '*.apk' | head -1)
           test -s "$APK"
-          cp "$APK" /tmp/Hanghae_MoveIcon_v1.0.81_TEST.apk
+          cp "$APK" /tmp/Hanghae_MoveIcon_v1.0.84_TEST.apk
 
       - name: Verify APK
         run: |
@@ -73,5 +73,5 @@ jobs:
         run: |
           set -euo pipefail
           gh release delete v1.0.84-test --yes --cleanup-tag || true
-          git push origin :refs/tags/v1.0.81-test || true
-          gh release create v1.0.81-test             "/tmp/Hanghae_MoveIcon_v1.0.81_TEST.apk#항행의자유 이동아이콘 v1.0.84 TEST APK"             --target main             --title "항행의자유 이동아이콘 v1.0.81 TEST"             --notes "업데이트 버튼이 설치된 versionCode와 최신 versionCode를 비교합니다. 최신판이면 다운로드하지 않고 '최신 버전입니다'라고 표시합니다."
+          git push origin :refs/tags/v1.0.84-test || true
+          gh release create v1.0.84-test             "/tmp/Hanghae_MoveIcon_v1.0.81_TEST.apk#항행의자유 이동아이콘 v1.0.84 TEST APK"             --target main             --title "항행의자유 이동아이콘 v1.0.84 TEST"             --notes "업데이트 버튼이 설치된 versionCode와 최신 versionCode를 비교합니다. 최신판이면 다운로드하지 않고 '최신 버전입니다'라고 표시합니다."
