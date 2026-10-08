@@ -17,7 +17,14 @@ jobs:
       - name: Download v1.0.82 source
         run: |
           set -euo pipefail
-          curl -fL --retry 2 --connect-timeout 20 'https://drive.google.com/uc?export=download&id=1WUyZKGiYVBNvX3N9xfSSsc7GUczpKb5u' -o /tmp/v1082.zip
+          curl -fL --retry 3 --connect-timeout 30 -c /tmp/gcookies.txt 'https://drive.google.com/uc?export=download&id=1WUyZKGiYVBNvX3N9xfSSsc7GUczpKb5u' -o /tmp/gdrive_resp
+          if unzip -t /tmp/gdrive_resp >/dev/null 2>&1; then
+            mv /tmp/gdrive_resp /tmp/v1082.zip
+          else
+            CONFIRM=$(grep -oE 'confirm=[^&"]+' /tmp/gdrive_resp | head -1 | cut -d= -f2 || true)
+            test -n "$CONFIRM"
+            curl -fL --retry 3 --connect-timeout 30 -b /tmp/gcookies.txt "https://drive.google.com/uc?export=download&confirm=$CONFIRM&id=1WUyZKGiYVBNvX3N9xfSSsc7GUczpKb5u" -o /tmp/v1082.zip
+          fi
           unzip -q /tmp/v1082.zip -d /tmp/v1082
           test -f /tmp/v1082/OVERLAY_ICON_V1057/app/build.gradle
 
