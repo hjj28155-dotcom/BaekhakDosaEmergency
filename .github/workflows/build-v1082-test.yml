@@ -22,7 +22,7 @@ jobs:
           test -f /tmp/v1082/OVERLAY_ICON_V1057/app/build.gradle
           sed -i '6i import android.content.ContentValues;' /tmp/v1082/OVERLAY_ICON_V1057/app/src/main/java/com/baekhak/centralcontrol/LocalMediaPickerActivity.java
 
-      - name: MP4 only: app-private folder and My Files import
+      - name: "MP4 only: app-private folder and My Files import"
         run: |
           set -euo pipefail
           python - <<'PY'
