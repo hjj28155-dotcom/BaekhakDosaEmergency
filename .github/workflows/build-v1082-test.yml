@@ -20,9 +20,8 @@ jobs:
           curl -fL --retry 3 --connect-timeout 30 'https://drive.usercontent.google.com/download?export=download&confirm=t&id=1WUyZKGiYVBNvX3N9xfSSsc7GUczpKb5u' -o /tmp/v1082.zip
           unzip -q /tmp/v1082.zip -d /tmp/v1082
           test -f /tmp/v1082/OVERLAY_ICON_V1057/app/build.gradle
-          sed -i '6i import android.content.ContentValues;' /tmp/v1082/OVERLAY_ICON_V1057/app/src/main/java/com/baekhak/centralcontrol/LocalMediaPickerActivity.java
 
-      - name: "MP4 only: app-private folder and My Files import"
+      - name: MP4 only patch
         run: |
           set -euo pipefail
           python - <<'PY'
@@ -32,28 +31,62 @@ jobs:
           s=s.replace('private static final String MP4_RELATIVE_PATH = Environment.DIRECTORY_MOVIES + "/이동아이콘/MP4/";', 'private static final String MP4_APP_DIR = "moveicon_mp4_library";')
           start=s.index('    private Uri copyIntoMp4AppFolder(Uri source) throws IOException {')
           end=s.index('    private List<VideoItem> mp4AppFiles() {', start)
-          methods='''    private File mp4AppFolder() throws IOException {\n        File dir = new File(getFilesDir(), MP4_APP_DIR);\n        if (!dir.isDirectory() && !dir.mkdirs()) throw new IOException("MP4 앱폴더를 만들지 못했습니다.");\n        return dir;\n    }\n\n    private Uri copyIntoMp4AppFolder(Uri source) throws IOException {\n        String name = null;\n        try (Cursor c = getContentResolver().query(source, new String[]{android.provider.OpenableColumns.DISPLAY_NAME}, null, null, null)) {\n            if (c != null && c.moveToFirst()) {\n                int ix = c.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME);\n                if (ix >= 0) name = c.getString(ix);\n            }\n        } catch (Exception ignored) {}\n        if (name == null || name.trim().isEmpty()) name = "MP4_" + System.currentTimeMillis() + ".mp4";\n        if (!name.toLowerCase(Locale.ROOT).endsWith(".mp4")) name += ".mp4";\n        name = name.replaceAll("[\\\\/:*?\\\"<>|]", "_");\n        File outFile = new File(mp4AppFolder(), name);\n        try (java.io.InputStream in = getContentResolver().openInputStream(source);\n             java.io.OutputStream out = new java.io.FileOutputStream(outFile)) {\n            if (in == null) throw new IOException("선택한 MP4를 읽지 못했습니다.");\n            byte[] buf = new byte[1024 * 1024];\n            long total = 0; int n;\n            while ((n = in.read(buf)) != -1) { out.write(buf, 0, n); total += n; }\n            out.flush();\n            if (total <= 0) { outFile.delete(); throw new IOException("빈 MP4 파일입니다."); }\n        } catch (Exception e) {\n            outFile.delete();\n            if (e instanceof IOException) throw (IOException)e;\n            throw new IOException(e);\n        }\n        return Uri.fromFile(outFile);\n    }\n\n'''
+          methods='''    private File mp4AppFolder() throws IOException {
+        File dir = new File(getFilesDir(), MP4_APP_DIR);
+        if (!dir.isDirectory() && !dir.mkdirs()) throw new IOException("MP4 앱폴더를 만들지 못했습니다.");
+        return dir;
+    }
+
+    private Uri copyIntoMp4AppFolder(Uri source) throws IOException {
+        String name = null;
+        try (Cursor c = getContentResolver().query(source, new String[]{android.provider.OpenableColumns.DISPLAY_NAME}, null, null, null)) {
+            if (c != null && c.moveToFirst()) {
+                int ix = c.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME);
+                if (ix >= 0) name = c.getString(ix);
+            }
+        } catch (Exception ignored) {}
+        if (name == null || name.trim().isEmpty()) name = "MP4_" + System.currentTimeMillis() + ".mp4";
+        if (!name.toLowerCase(Locale.ROOT).endsWith(".mp4")) name += ".mp4";
+        name = name.replaceAll("[\\\\/:*?\"<>|]", "_");
+        File outFile = new File(mp4AppFolder(), name);
+        try (InputStream in = getContentResolver().openInputStream(source);
+             OutputStream out = new FileOutputStream(outFile)) {
+            if (in == null) throw new IOException("선택한 MP4를 읽지 못했습니다.");
+            byte[] buf = new byte[1024 * 1024];
+            long total=0; int n;
+            while ((n=in.read(buf))!=-1) { out.write(buf,0,n); total+=n; }
+            out.flush();
+            if (total<=0) throw new IOException("빈 MP4 파일입니다.");
+        } catch (Exception e) {
+            outFile.delete();
+            if (e instanceof IOException) throw (IOException)e;
+            throw new IOException(e);
+        }
+        return Uri.fromFile(outFile);
+    }
+
+'''
           s=s[:start]+methods+s[end:]
           start=s.index('    private List<VideoItem> mp4AppFiles() {')
           end=s.index('    private void playSelectedUri(Uri uri) {', start)
-          files='''    private List<VideoItem> mp4AppFiles() {\n        List<VideoItem> out = new ArrayList<>();\n        try {\n            File dir = mp4AppFolder();\n            File[] all = dir.listFiles();\n            if (all != null) {\n                Arrays.sort(all, (a,b) -> a.getName().compareToIgnoreCase(b.getName()));\n                for (File f : all) if (f.isFile() && f.length() > 0 && f.getName().toLowerCase(Locale.ROOT).endsWith(".mp4")) out.add(new VideoItem(Uri.fromFile(f), f.getName()));\n            }\n        } catch (Exception ignored) {}\n        return out;\n    }\n\n'''
-          s=s[:start]+files+s[end:]
-          p.write_text(s)
-          bg=Path('/tmp/v1082/OVERLAY_ICON_V1057/app/build.gradle')
-          b=bg.read_text().replace('versionCode 1082001','versionCode 1084001').replace('versionName "1.0.82-TEST-MP3-MP4-FLOW"','versionName "1.0.84-MP4-MYFILES-ONLY"')
-          bg.write_text(b)
-          PY
+          files='''    private List<VideoItem> mp4AppFiles() {
+        List<VideoItem> out = new ArrayList<>();
+        try {
+            File[] all = mp4AppFolder().listFiles();
+            if (all != null) {
+                Arrays.sort(all, (a,b) -> a.getName().compareToIgnoreCase(b.getName()));
+                for (File f : all) if (f.isFile() && f.length()>0 && f.getName().toLowerCase(Locale.ROOT).endsWith(".mp4"))
+                    out.add(new VideoItem(Uri.fromFile(f), f.getName()));
+            }
+        } catch (Exception ignored) {}
+        return out;
+    }
 
-      - name: MP4 only: force Samsung My Files import
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-          import re
-          p=Path('/tmp/v1082/OVERLAY_ICON_V1057/app/src/main/java/com/baekhak/centralcontrol/LocalMediaPickerActivity.java')
-          s=p.read_text()
-          pattern=r'    private void openVideoPicker\(\) \{.*?\n    \}\n\n    private void showMp4LibraryChooser'
-          replacement='''    private void openVideoPicker() {
+'''
+          s=s[:start]+files+s[end:]
+          start=s.index('    private void openVideoPicker() {')
+          end=s.index('    private void showMp4LibraryChooser', start)
+          picker='''    private void openVideoPicker() {
         try {
             if ("MP4".equals(mode)) {
                 try {
@@ -82,47 +115,13 @@ jobs:
         }
     }
 
-    private void showMp4LibraryChooser'''
-          ns,n=re.subn(pattern,replacement,s,flags=re.S)
-          if n!=1: raise SystemExit(f"openVideoPicker replacement count={n}")
-          p.write_text(ns)
-          PY
-
-      - name: Fix Android ContentValues import
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-          p=Path('/tmp/v1082/OVERLAY_ICON_V1057/app/src/main/java/com/baekhak/centralcontrol/LocalMediaPickerActivity.java')
-          s=p.read_text()
-          if 'import android.content.ContentValues;' not in s:
-              s=s.replace('import android.content.Context;', 'import android.content.Context;\nimport android.content.ContentValues;')
+'''
+          s=s[:start]+picker+s[end:]
           p.write_text(s)
+          bg=Path('/tmp/v1082/OVERLAY_ICON_V1057/app/build.gradle')
+          b=bg.read_text().replace('versionCode 1082001','versionCode 1084001').replace('versionName "1.0.82-TEST-MP3-MP4-FLOW"','versionName "1.0.84-MP4-MYFILES-ONLY"')
+          bg.write_text(b)
           PY
-
-      - uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.7'
-
-      - name: Restore persistent test signing key
-        uses: actions/cache@v4
-        with:
-          path: ~/.hanghae/test1080.jks
-          key: hanghae-v1080-test-signing-v1
-
-      - name: Prepare persistent test signing key
-        run: |
-          set -euo pipefail
-          mkdir -p ~/.hanghae
-          if [ ! -f ~/.hanghae/test1080.jks ]; then
-            keytool -genkeypair -v               -keystore ~/.hanghae/test1080.jks               -storepass android               -alias androiddebugkey               -keypass android               -dname "CN=Hanghae MoveIcon Test 1080,O=Hanghae Freedom,C=KR"               -keyalg RSA -keysize 2048 -validity 10000
-          fi
-          keytool -list -v -keystore ~/.hanghae/test1080.jks -storepass android -alias androiddebugkey | grep -E 'Owner:|SHA256:'
 
       - name: Build APK
         working-directory: /tmp/v1082/OVERLAY_ICON_V1057
@@ -136,30 +135,19 @@ jobs:
       - name: Verify upgrade compatibility with v1.0.82
         run: |
           set -euo pipefail
-          curl -fL --retry 2 'https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/v1.0.82-test/Hanghae_MoveIcon_v1.0.83_TEST.apk' -o /tmp/old.apk
+          curl -fL --retry 2 'https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/v1.0.82-test/Hanghae_MoveIcon_v1.0.82_TEST.apk' -o /tmp/old.apk
           AAPT=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
           APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
-          "$AAPT" dump badging /tmp/old.apk | head -1
-          "$AAPT" dump badging /tmp/Hanghae_MoveIcon_v1.0.83_TEST.apk | head -1
-          "$APKSIGNER" verify --verbose --print-certs /tmp/Hanghae_MoveIcon_v1.0.83_TEST.apk
-
-          OLD_PKG=$("$AAPT" dump badging /tmp/old.apk | sed -n "s/^package: name='\([^']*\)'.*/\1/p")
-          NEW_PKG=$("$AAPT" dump badging /tmp/Hanghae_MoveIcon_v1.0.83_TEST.apk | sed -n "s/^package: name='\([^']*\)'.*/\1/p")
-          OLD_CODE=$("$AAPT" dump badging /tmp/old.apk | sed -n "s/^package:.*versionCode='\([^']*\)'.*/\1/p")
-          NEW_CODE=$("$AAPT" dump badging /tmp/Hanghae_MoveIcon_v1.0.83_TEST.apk | sed -n "s/^package:.*versionCode='\([^']*\)'.*/\1/p")
+          OLD_PKG=$("$AAPT" dump badging /tmp/old.apk | sed -n "s/^package: name='\\([^']*\\)'.*/\\1/p")
+          NEW_PKG=$("$AAPT" dump badging /tmp/Hanghae_MoveIcon_v1.0.84_TEST.apk | sed -n "s/^package: name='\\([^']*\\)'.*/\\1/p")
+          OLD_CODE=$("$AAPT" dump badging /tmp/old.apk | sed -n "s/^package:.*versionCode='\\([^']*\\)'.*/\\1/p")
+          NEW_CODE=$("$AAPT" dump badging /tmp/Hanghae_MoveIcon_v1.0.84_TEST.apk | sed -n "s/^package:.*versionCode='\\([^']*\\)'.*/\\1/p")
           OLD_CERT=$("$APKSIGNER" verify --print-certs /tmp/old.apk 2>&1 | grep -m1 'certificate SHA-256 digest:' | sed 's/.*digest: //')
-          NEW_CERT=$("$APKSIGNER" verify --print-certs /tmp/Hanghae_MoveIcon_v1.0.83_TEST.apk 2>&1 | grep -m1 'certificate SHA-256 digest:' | sed 's/.*digest: //')
-
-          echo "OLD_PKG=$OLD_PKG"
-          echo "NEW_PKG=$NEW_PKG"
-          echo "OLD_CODE=$OLD_CODE"
-          echo "NEW_CODE=$NEW_CODE"
-          echo "OLD_CERT=$OLD_CERT"
-          echo "NEW_CERT=$NEW_CERT"
+          NEW_CERT=$("$APKSIGNER" verify --print-certs /tmp/Hanghae_MoveIcon_v1.0.84_TEST.apk 2>&1 | grep -m1 'certificate SHA-256 digest:' | sed 's/.*digest: //')
           test "$OLD_PKG" = "$NEW_PKG"
           test "$OLD_CERT" = "$NEW_CERT"
           test "$NEW_CODE" -gt "$OLD_CODE"
-          echo 'UPGRADE_COMPATIBILITY=PASS'
+          echo UPGRADE_COMPATIBILITY=PASS
 
       - name: Publish test release
         env:
@@ -167,9 +155,4 @@ jobs:
         run: |
           set -euo pipefail
           gh release delete v1.0.84-test --yes --cleanup-tag || true
-          git push origin :refs/tags/v1.0.83-test || true
-          gh release create v1.0.83-test             "/tmp/Hanghae_MoveIcon_v1.0.83_TEST.apk#항행의자유 이동아이콘 v1.0.82 TEST APK"             --target main             --title "항행의자유 이동아이콘 v1.0.84 TEST"             --notes "MP4만 수정했습니다. 앱 내부 MP4 폴더를 만들고, 불러오기는 휴대폰 내 파일에서 선택한 영상만 앱폴더에 저장합니다."
-
-# retry-v1082-after-import-fix
-
-# refresh-v1082-source-url
+          gh release create v1.0.84-test /tmp/Hanghae_MoveIcon_v1.0.84_TEST.apk#항행의자유 이동아이콘 v1.0.84 TEST APK --target main --title "항행의자유 이동아이콘 v1.0.84" --notes "MP4만 수정했습니다. 앱 내부 MP4 폴더와 삼성 내 파일 불러오기만 수정했습니다."
