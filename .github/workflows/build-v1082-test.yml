@@ -17,7 +17,7 @@ jobs:
       - name: Download v1.0.82 source
         run: |
           set -euo pipefail
-          curl -fL --retry 3 --connect-timeout 30 'https://drive.google.com/uc?export=download&id=1WUyZKGiYVBNvX3N9xfSSsc7GUczpKb5u' -o /tmp/v1082.zip
+          curl -fL --retry 3 --connect-timeout 30 'https://drive.usercontent.google.com/download?export=download&confirm=t&id=1WUyZKGiYVBNvX3N9xfSSsc7GUczpKb5u' -o /tmp/v1082.zip
           unzip -q /tmp/v1082.zip -d /tmp/v1082
           test -f /tmp/v1082/OVERLAY_ICON_V1057/app/build.gradle
           sed -i '6i import android.content.ContentValues;' /tmp/v1082/OVERLAY_ICON_V1057/app/src/main/java/com/baekhak/centralcontrol/LocalMediaPickerActivity.java
