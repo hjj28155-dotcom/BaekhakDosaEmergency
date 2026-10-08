@@ -1,0 +1,77 @@
+name: Build v1.0.84 MP4 My Files Only
+on:
+  push:
+    paths:
+      - '.github/workflows/build-v1085-mp4.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download v1.0.82 source
+        run: |
+          set -euo pipefail
+          curl -fL --retry 2 --connect-timeout 20 'https://drive.usercontent.google.com/download?export=download&confirm=t&id=1WUyZKGiYVBNvX3N9xfSSsc7GUczpKb5u' -o /tmp/v1082.zip
+          unzip -q /tmp/v1082.zip -d /tmp/v1082
+          test -f /tmp/v1082/OVERLAY_ICON_V1057/app/build.gradle
+
+      - name: Apply MP4-only fix
+        run: |
+          set -euo pipefail
+          python -c 'from pathlib import Path; p=Path("/tmp/v1082/OVERLAY_ICON_V1057/app/src/main/java/com/baekhak/centralcontrol/LocalMediaPickerActivity.java"); s=p.read_text(); s=s.replace("if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {","if (false) {"); s=s.replace("Intent samsung = new Intent(i);","Intent samsung = new Intent("com.sec.android.app.myfiles.PICK_DATA");"); s=s.replace("samsung.setPackage("com.sec.android.app.myfiles");","samsung.putExtra("CONTENT_TYPE", "video/mp4"); samsung.addCategory(Intent.CATEGORY_DEFAULT); samsung.putExtra(Intent.EXTRA_LOCAL_ONLY, true);"); s=s.replace("i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);","i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION); i.putExtra(Intent.EXTRA_LOCAL_ONLY, true);"); p.write_text(s)'
+      
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Restore persistent test signing key
+        uses: actions/cache@v4
+        with:
+          path: ~/.hanghae/test1080.jks
+          key: hanghae-v1080-test-signing-v1
+
+      - name: Prepare persistent test signing key
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.hanghae
+          if [ ! -f ~/.hanghae/test1080.jks ]; then
+            keytool -genkeypair -v               -keystore ~/.hanghae/test1080.jks               -storepass android               -alias androiddebugkey               -keypass android               -dname "CN=Hanghae MoveIcon Test 1080,O=Hanghae Freedom,C=KR"               -keyalg RSA -keysize 2048 -validity 10000
+          fi
+          keytool -list -v -keystore ~/.hanghae/test1080.jks -storepass android -alias androiddebugkey | grep -E 'Owner:|SHA256:'
+
+      - name: Build APK
+        working-directory: /tmp/v1082/OVERLAY_ICON_V1057
+        run: |
+          set -euo pipefail
+          gradle clean assembleDebug --no-daemon --no-build-cache
+          APK=$(find app/build/outputs/apk -type f -name '*.apk' | head -1)
+          test -s "$APK"
+          cp "$APK" /tmp/Hanghae_MoveIcon_v1.0.81_TEST.apk
+
+      - name: Verify APK
+        run: |
+          set -euo pipefail
+          AAPT=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
+          "$AAPT" dump badging /tmp/Hanghae_MoveIcon_v1.0.81_TEST.apk | head -1
+          "$APKSIGNER" verify --verbose --print-certs /tmp/Hanghae_MoveIcon_v1.0.81_TEST.apk
+
+      - name: Publish test release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release delete v1.0.84-test --yes --cleanup-tag || true
+          git push origin :refs/tags/v1.0.81-test || true
+          gh release create v1.0.81-test             "/tmp/Hanghae_MoveIcon_v1.0.81_TEST.apk#항행의자유 이동아이콘 v1.0.84 TEST APK"             --target main             --title "항행의자유 이동아이콘 v1.0.81 TEST"             --notes "업데이트 버튼이 설치된 versionCode와 최신 versionCode를 비교합니다. 최신판이면 다운로드하지 않고 '최신 버전입니다'라고 표시합니다."
