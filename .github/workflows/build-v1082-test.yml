@@ -17,7 +17,7 @@ jobs:
       - name: Download v1.0.82 source
         run: |
           set -euo pipefail
-          curl -fL --retry 2 --connect-timeout 20 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-4f78-8206-9547-e541eeac7ecb/raw?se=2026-10-07T14%3A08%3A06Z&sp=r&sv=2026-02-06&sr=b&scid=4ca96056-70d6-5f7a-b9b3-0e9b2fca09cd&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T01%3A23%3A29Z&ske=2026-10-08T01%3A23%3A29Z&sks=b&skv=2026-02-06&sig=TPlLoaLhG6AtQD03c1T9LxSpfhYKdI6aFFVwJAWt2g0%3D' -o /tmp/v1082.zip
+          curl -fL --retry 3 --connect-timeout 30 'https://drive.google.com/uc?export=download&id=1WUyZKGiYVBNvX3N9xfSSsc7GUczpKb5u' -o /tmp/v1082.zip
           unzip -q /tmp/v1082.zip -d /tmp/v1082
           test -f /tmp/v1082/OVERLAY_ICON_V1057/app/build.gradle
           sed -i '6i import android.content.ContentValues;' /tmp/v1082/OVERLAY_ICON_V1057/app/src/main/java/com/baekhak/centralcontrol/LocalMediaPickerActivity.java
@@ -92,19 +92,19 @@ jobs:
       - name: Verify upgrade compatibility with v1.0.82
         run: |
           set -euo pipefail
-          curl -fL --retry 2 'https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/v1.0.82-test/Hanghae_MoveIcon_v1.0.82_TEST.apk' -o /tmp/old.apk
+          curl -fL --retry 2 'https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/v1.0.82-test/Hanghae_MoveIcon_v1.0.83_TEST.apk' -o /tmp/old.apk
           AAPT=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
           APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
           "$AAPT" dump badging /tmp/old.apk | head -1
-          "$AAPT" dump badging /tmp/Hanghae_MoveIcon_v1.0.82_TEST.apk | head -1
-          "$APKSIGNER" verify --verbose --print-certs /tmp/Hanghae_MoveIcon_v1.0.82_TEST.apk
+          "$AAPT" dump badging /tmp/Hanghae_MoveIcon_v1.0.83_TEST.apk | head -1
+          "$APKSIGNER" verify --verbose --print-certs /tmp/Hanghae_MoveIcon_v1.0.83_TEST.apk
 
           OLD_PKG=$("$AAPT" dump badging /tmp/old.apk | sed -n "s/^package: name='\([^']*\)'.*/\1/p")
-          NEW_PKG=$("$AAPT" dump badging /tmp/Hanghae_MoveIcon_v1.0.82_TEST.apk | sed -n "s/^package: name='\([^']*\)'.*/\1/p")
+          NEW_PKG=$("$AAPT" dump badging /tmp/Hanghae_MoveIcon_v1.0.83_TEST.apk | sed -n "s/^package: name='\([^']*\)'.*/\1/p")
           OLD_CODE=$("$AAPT" dump badging /tmp/old.apk | sed -n "s/^package:.*versionCode='\([^']*\)'.*/\1/p")
-          NEW_CODE=$("$AAPT" dump badging /tmp/Hanghae_MoveIcon_v1.0.82_TEST.apk | sed -n "s/^package:.*versionCode='\([^']*\)'.*/\1/p")
+          NEW_CODE=$("$AAPT" dump badging /tmp/Hanghae_MoveIcon_v1.0.83_TEST.apk | sed -n "s/^package:.*versionCode='\([^']*\)'.*/\1/p")
           OLD_CERT=$("$APKSIGNER" verify --print-certs /tmp/old.apk 2>&1 | grep -m1 'certificate SHA-256 digest:' | sed 's/.*digest: //')
-          NEW_CERT=$("$APKSIGNER" verify --print-certs /tmp/Hanghae_MoveIcon_v1.0.82_TEST.apk 2>&1 | grep -m1 'certificate SHA-256 digest:' | sed 's/.*digest: //')
+          NEW_CERT=$("$APKSIGNER" verify --print-certs /tmp/Hanghae_MoveIcon_v1.0.83_TEST.apk 2>&1 | grep -m1 'certificate SHA-256 digest:' | sed 's/.*digest: //')
 
           echo "OLD_PKG=$OLD_PKG"
           echo "NEW_PKG=$NEW_PKG"
@@ -124,7 +124,7 @@ jobs:
           set -euo pipefail
           gh release delete v1.0.83-test --yes --cleanup-tag || true
           git push origin :refs/tags/v1.0.83-test || true
-          gh release create v1.0.83-test             "/tmp/Hanghae_MoveIcon_v1.0.82_TEST.apk#항행의자유 이동아이콘 v1.0.82 TEST APK"             --target main             --title "항행의자유 이동아이콘 v1.0.83 TEST"             --notes "MP4만 수정했습니다. 앱 내부 MP4 폴더를 만들고, 불러오기는 휴대폰 내 파일에서 선택한 영상만 앱폴더에 저장합니다."
+          gh release create v1.0.83-test             "/tmp/Hanghae_MoveIcon_v1.0.83_TEST.apk#항행의자유 이동아이콘 v1.0.82 TEST APK"             --target main             --title "항행의자유 이동아이콘 v1.0.83 TEST"             --notes "MP4만 수정했습니다. 앱 내부 MP4 폴더를 만들고, 불러오기는 휴대폰 내 파일에서 선택한 영상만 앱폴더에 저장합니다."
 
 # retry-v1082-after-import-fix
 
