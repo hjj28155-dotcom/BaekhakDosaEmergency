@@ -1,4 +1,4 @@
-name: Build v1.0.82 Test Move Icon
+name: Build v1.0.83 MP4 App Folder Fix
 on:
   push:
     paths:
@@ -21,6 +21,28 @@ jobs:
           unzip -q /tmp/v1082.zip -d /tmp/v1082
           test -f /tmp/v1082/OVERLAY_ICON_V1057/app/build.gradle
           sed -i '6i import android.content.ContentValues;' /tmp/v1082/OVERLAY_ICON_V1057/app/src/main/java/com/baekhak/centralcontrol/LocalMediaPickerActivity.java
+
+      - name: MP4 only: app-private folder and My Files import
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('/tmp/v1082/OVERLAY_ICON_V1057/app/src/main/java/com/baekhak/centralcontrol/LocalMediaPickerActivity.java')
+          s=p.read_text()
+          s=s.replace('private static final String MP4_RELATIVE_PATH = Environment.DIRECTORY_MOVIES + "/이동아이콘/MP4/";', 'private static final String MP4_APP_DIR = "moveicon_mp4_library";')
+          start=s.index('    private Uri copyIntoMp4AppFolder(Uri source) throws IOException {')
+          end=s.index('    private List<VideoItem> mp4AppFiles() {', start)
+          methods='''    private File mp4AppFolder() throws IOException {\n        File dir = new File(getFilesDir(), MP4_APP_DIR);\n        if (!dir.isDirectory() && !dir.mkdirs()) throw new IOException("MP4 앱폴더를 만들지 못했습니다.");\n        return dir;\n    }\n\n    private Uri copyIntoMp4AppFolder(Uri source) throws IOException {\n        String name = null;\n        try (Cursor c = getContentResolver().query(source, new String[]{android.provider.OpenableColumns.DISPLAY_NAME}, null, null, null)) {\n            if (c != null && c.moveToFirst()) {\n                int ix = c.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME);\n                if (ix >= 0) name = c.getString(ix);\n            }\n        } catch (Exception ignored) {}\n        if (name == null || name.trim().isEmpty()) name = "MP4_" + System.currentTimeMillis() + ".mp4";\n        if (!name.toLowerCase(Locale.ROOT).endsWith(".mp4")) name += ".mp4";\n        name = name.replaceAll("[\\\\/:*?\\\"<>|]", "_");\n        File outFile = new File(mp4AppFolder(), name);\n        try (java.io.InputStream in = getContentResolver().openInputStream(source);\n             java.io.OutputStream out = new java.io.FileOutputStream(outFile)) {\n            if (in == null) throw new IOException("선택한 MP4를 읽지 못했습니다.");\n            byte[] buf = new byte[1024 * 1024];\n            long total = 0; int n;\n            while ((n = in.read(buf)) != -1) { out.write(buf, 0, n); total += n; }\n            out.flush();\n            if (total <= 0) { outFile.delete(); throw new IOException("빈 MP4 파일입니다."); }\n        } catch (Exception e) {\n            outFile.delete();\n            if (e instanceof IOException) throw (IOException)e;\n            throw new IOException(e);\n        }\n        return Uri.fromFile(outFile);\n    }\n\n'''
+          s=s[:start]+methods+s[end:]
+          start=s.index('    private List<VideoItem> mp4AppFiles() {')
+          end=s.index('    private void playSelectedUri(Uri uri) {', start)
+          files='''    private List<VideoItem> mp4AppFiles() {\n        List<VideoItem> out = new ArrayList<>();\n        try {\n            File dir = mp4AppFolder();\n            File[] all = dir.listFiles();\n            if (all != null) {\n                Arrays.sort(all, (a,b) -> a.getName().compareToIgnoreCase(b.getName()));\n                for (File f : all) if (f.isFile() && f.length() > 0 && f.getName().toLowerCase(Locale.ROOT).endsWith(".mp4")) out.add(new VideoItem(Uri.fromFile(f), f.getName()));\n            }\n        } catch (Exception ignored) {}\n        return out;\n    }\n\n'''
+          s=s[:start]+files+s[end:]
+          p.write_text(s)
+          bg=Path('/tmp/v1082/OVERLAY_ICON_V1057/app/build.gradle')
+          b=bg.read_text().replace('versionCode 1082001','versionCode 1083001').replace('versionName "1.0.82-TEST-MP3-MP4-FLOW"','versionName "1.0.83-MP4-APP-FOLDER"')
+          bg.write_text(b)
+          PY
 
       - name: Fix Android ContentValues import
         run: |
@@ -65,12 +87,12 @@ jobs:
           gradle clean assembleDebug --no-daemon --no-build-cache
           APK=$(find app/build/outputs/apk -type f -name '*.apk' | head -1)
           test -s "$APK"
-          cp "$APK" /tmp/Hanghae_MoveIcon_v1.0.82_TEST.apk
+          cp "$APK" /tmp/Hanghae_MoveIcon_v1.0.83_TEST.apk
 
-      - name: Verify upgrade compatibility with v1.0.81
+      - name: Verify upgrade compatibility with v1.0.82
         run: |
           set -euo pipefail
-          curl -fL --retry 2 'https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/v1.0.81-test/Hanghae_MoveIcon_v1.0.81_TEST.apk' -o /tmp/old.apk
+          curl -fL --retry 2 'https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/v1.0.82-test/Hanghae_MoveIcon_v1.0.82_TEST.apk' -o /tmp/old.apk
           AAPT=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
           APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
           "$AAPT" dump badging /tmp/old.apk | head -1
@@ -100,9 +122,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          gh release delete v1.0.82-test --yes --cleanup-tag || true
-          git push origin :refs/tags/v1.0.82-test || true
-          gh release create v1.0.82-test             "/tmp/Hanghae_MoveIcon_v1.0.82_TEST.apk#항행의자유 이동아이콘 v1.0.82 TEST APK"             --target main             --title "항행의자유 이동아이콘 v1.0.82 TEST"             --notes "MP3 선택창 중복 표시와 V3 화면 잔류를 수정했습니다. MP4는 내 파일 > Movies에서 시작하고 Movies/이동아이콘/MP4 앱폴더에 저장합니다."
+          gh release delete v1.0.83-test --yes --cleanup-tag || true
+          git push origin :refs/tags/v1.0.83-test || true
+          gh release create v1.0.83-test             "/tmp/Hanghae_MoveIcon_v1.0.82_TEST.apk#항행의자유 이동아이콘 v1.0.82 TEST APK"             --target main             --title "항행의자유 이동아이콘 v1.0.83 TEST"             --notes "MP4만 수정했습니다. 앱 내부 MP4 폴더를 만들고, 불러오기는 휴대폰 내 파일에서 선택한 영상만 앱폴더에 저장합니다."
 
 # retry-v1082-after-import-fix
 
