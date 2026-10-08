@@ -1,4 +1,4 @@
-name: Build v1.0.84 MP4 My Files Only
+name: Build v1.0.85 MP4 My Files Only
 on:
   push:
     paths:
@@ -119,7 +119,7 @@ jobs:
           s=s[:start]+picker+s[end:]
           p.write_text(s)
           bg=Path('/tmp/v1082/OVERLAY_ICON_V1057/app/build.gradle')
-          b=bg.read_text().replace('versionCode 1082001','versionCode 1084001').replace('versionName "1.0.82-TEST-MP3-MP4-FLOW"','versionName "1.0.84-MP4-MYFILES-ONLY"')
+          b=bg.read_text().replace('versionCode 1082001','versionCode 1085001').replace('versionName "1.0.82-TEST-MP3-MP4-FLOW"','versionName "1.0.85-MP4-MYFILES-ONLY"')
           bg.write_text(b)
           PY
 
@@ -130,7 +130,7 @@ jobs:
           gradle clean assembleDebug --no-daemon --no-build-cache
           APK=$(find app/build/outputs/apk -type f -name '*.apk' | head -1)
           test -s "$APK"
-          cp "$APK" /tmp/Hanghae_MoveIcon_v1.0.84_TEST.apk
+          cp "$APK" /tmp/Hanghae_MoveIcon_v1.0.85_TEST.apk
 
       - name: Verify upgrade compatibility with v1.0.82
         run: |
@@ -139,11 +139,11 @@ jobs:
           AAPT=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
           APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
           OLD_PKG=$("$AAPT" dump badging /tmp/old.apk | sed -n "s/^package: name='\\([^']*\\)'.*/\\1/p")
-          NEW_PKG=$("$AAPT" dump badging /tmp/Hanghae_MoveIcon_v1.0.84_TEST.apk | sed -n "s/^package: name='\\([^']*\\)'.*/\\1/p")
+          NEW_PKG=$("$AAPT" dump badging /tmp/Hanghae_MoveIcon_v1.0.85_TEST.apk | sed -n "s/^package: name='\\([^']*\\)'.*/\\1/p")
           OLD_CODE=$("$AAPT" dump badging /tmp/old.apk | sed -n "s/^package:.*versionCode='\\([^']*\\)'.*/\\1/p")
-          NEW_CODE=$("$AAPT" dump badging /tmp/Hanghae_MoveIcon_v1.0.84_TEST.apk | sed -n "s/^package:.*versionCode='\\([^']*\\)'.*/\\1/p")
+          NEW_CODE=$("$AAPT" dump badging /tmp/Hanghae_MoveIcon_v1.0.85_TEST.apk | sed -n "s/^package:.*versionCode='\\([^']*\\)'.*/\\1/p")
           OLD_CERT=$("$APKSIGNER" verify --print-certs /tmp/old.apk 2>&1 | grep -m1 'certificate SHA-256 digest:' | sed 's/.*digest: //')
-          NEW_CERT=$("$APKSIGNER" verify --print-certs /tmp/Hanghae_MoveIcon_v1.0.84_TEST.apk 2>&1 | grep -m1 'certificate SHA-256 digest:' | sed 's/.*digest: //')
+          NEW_CERT=$("$APKSIGNER" verify --print-certs /tmp/Hanghae_MoveIcon_v1.0.85_TEST.apk 2>&1 | grep -m1 'certificate SHA-256 digest:' | sed 's/.*digest: //')
           test "$OLD_PKG" = "$NEW_PKG"
           test "$OLD_CERT" = "$NEW_CERT"
           test "$NEW_CODE" -gt "$OLD_CODE"
@@ -154,5 +154,5 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          gh release delete v1.0.84-test --yes --cleanup-tag || true
-          gh release create v1.0.84-test /tmp/Hanghae_MoveIcon_v1.0.84_TEST.apk#항행의자유 이동아이콘 v1.0.84 TEST APK --target main --title "항행의자유 이동아이콘 v1.0.84" --notes "MP4만 수정했습니다. 앱 내부 MP4 폴더와 삼성 내 파일 불러오기만 수정했습니다."
+          gh release delete v1.0.85-test --yes --cleanup-tag || true
+          gh release create v1.0.85-test /tmp/Hanghae_MoveIcon_v1.0.85_TEST.apk#항행의자유 이동아이콘 v1.0.85 TEST APK --target main --title "항행의자유 이동아이콘 v1.0.85" --notes "MP4만 수정했습니다. 앱 내부 MP4 폴더와 삼성 내 파일 불러오기만 수정했습니다."
