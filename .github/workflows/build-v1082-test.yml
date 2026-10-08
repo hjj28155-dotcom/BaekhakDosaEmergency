@@ -1,4 +1,4 @@
-name: Build v1.0.83 MP4 App Folder Fix
+name: Build v1.0.84 MP4 My Files Only
 on:
   push:
     paths:
@@ -40,8 +40,52 @@ jobs:
           s=s[:start]+files+s[end:]
           p.write_text(s)
           bg=Path('/tmp/v1082/OVERLAY_ICON_V1057/app/build.gradle')
-          b=bg.read_text().replace('versionCode 1082001','versionCode 1083001').replace('versionName "1.0.82-TEST-MP3-MP4-FLOW"','versionName "1.0.83-MP4-APP-FOLDER"')
+          b=bg.read_text().replace('versionCode 1082001','versionCode 1084001').replace('versionName "1.0.82-TEST-MP3-MP4-FLOW"','versionName "1.0.84-MP4-MYFILES-ONLY"')
           bg.write_text(b)
+          PY
+
+      - name: MP4 only: force Samsung My Files import
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('/tmp/v1082/OVERLAY_ICON_V1057/app/src/main/java/com/baekhak/centralcontrol/LocalMediaPickerActivity.java')
+          s=p.read_text()
+          pattern=r'    private void openVideoPicker\(\) \{.*?\n    \}\n\n    private void showMp4LibraryChooser'
+          replacement='''    private void openVideoPicker() {
+        try {
+            if ("MP4".equals(mode)) {
+                try {
+                    Intent samsung = new Intent("com.sec.android.app.myfiles.PICK_DATA");
+                    samsung.putExtra("CONTENT_TYPE", "video/mp4");
+                    samsung.addCategory(Intent.CATEGORY_DEFAULT);
+                    samsung.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+                    if (getPackageManager().resolveActivity(samsung, PackageManager.MATCH_DEFAULT_ONLY) != null) {
+                        startActivityForResult(samsung, REQ_PICK_VIDEO);
+                        return;
+                    }
+                } catch (Exception ignored) {}
+            }
+            Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            i.addCategory(Intent.CATEGORY_OPENABLE);
+            i.setType("AVI".equals(mode) ? "video/*" : "video/mp4");
+            i.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+            i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+            if ("MP4".equals(mode) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                Uri movies = Uri.parse("content://com.android.externalstorage.documents/document/primary%3AMovies");
+                i.putExtra(DocumentsContract.EXTRA_INITIAL_URI, movies);
+            }
+            startActivityForResult(i, REQ_PICK_VIDEO);
+        } catch (Exception e) {
+            Toast.makeText(this, mode + " 불러오기 화면을 열지 못했습니다.", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void showMp4LibraryChooser'''
+          ns,n=re.subn(pattern,replacement,s,flags=re.S)
+          if n!=1: raise SystemExit(f"openVideoPicker replacement count={n}")
+          p.write_text(ns)
           PY
 
       - name: Fix Android ContentValues import
@@ -87,7 +131,7 @@ jobs:
           gradle clean assembleDebug --no-daemon --no-build-cache
           APK=$(find app/build/outputs/apk -type f -name '*.apk' | head -1)
           test -s "$APK"
-          cp "$APK" /tmp/Hanghae_MoveIcon_v1.0.83_TEST.apk
+          cp "$APK" /tmp/Hanghae_MoveIcon_v1.0.84_TEST.apk
 
       - name: Verify upgrade compatibility with v1.0.82
         run: |
@@ -122,9 +166,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          gh release delete v1.0.83-test --yes --cleanup-tag || true
+          gh release delete v1.0.84-test --yes --cleanup-tag || true
           git push origin :refs/tags/v1.0.83-test || true
-          gh release create v1.0.83-test             "/tmp/Hanghae_MoveIcon_v1.0.83_TEST.apk#항행의자유 이동아이콘 v1.0.82 TEST APK"             --target main             --title "항행의자유 이동아이콘 v1.0.83 TEST"             --notes "MP4만 수정했습니다. 앱 내부 MP4 폴더를 만들고, 불러오기는 휴대폰 내 파일에서 선택한 영상만 앱폴더에 저장합니다."
+          gh release create v1.0.83-test             "/tmp/Hanghae_MoveIcon_v1.0.83_TEST.apk#항행의자유 이동아이콘 v1.0.82 TEST APK"             --target main             --title "항행의자유 이동아이콘 v1.0.84 TEST"             --notes "MP4만 수정했습니다. 앱 내부 MP4 폴더를 만들고, 불러오기는 휴대폰 내 파일에서 선택한 영상만 앱폴더에 저장합니다."
 
 # retry-v1082-after-import-fix
 
