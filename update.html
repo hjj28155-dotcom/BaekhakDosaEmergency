@@ -13,7 +13,9 @@ a{display:block;margin:26px auto 14px;padding:20px;background:#d59b16;color:#071
 <h1>항행의자유</h1>
 <p class="ok">V4.0.35 승인흐름복구 R14 · 배포 정상</p>
 <p class="note">환영 두루마리 → 승인요청 → 승인대기 → 항해사 승인 → 승인확인 → 안내동영상 1회 → 홈 순서로 복구된 최신 APK입니다.</p>
-<a href="https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/latest-apk">📱 최신버전 설치하기</a>
+<a href="https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/latest-apk">📥 APK 다운로드</a>
+<p id="downloadStatus" class="note" aria-live="polite">버튼을 누르면 APK 다운로드를 요청합니다. 설치창은 다운로드 후 파일을 열 때 나타납니다.</p>
+<p class="note">화면이 검게 나오면 브라우저 메뉴에서 <b>Chrome으로 열기</b>를 선택하세요. Chrome 다운로드 목록 또는 내 파일 → 다운로드에서 APK를 확인하세요.</p>
 <p class="note"><b>기존 앱은 삭제하지 말고</b> 기존 앱 위에 업데이트하세요.</p>
 <p class="small">본 앱의 분석 결과는 미래 당첨을 보장하지 않습니다.</p>
-</div></body></html>
+</div><script>document.querySelector("a").addEventListener("click",()=>{document.getElementById("downloadStatus").textContent="다운로드 요청됨 · 다운로드 완료 여부는 Chrome 다운로드 목록에서 확인하세요.";});</script></body></html>
