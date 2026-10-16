@@ -238,6 +238,7 @@ function view(page,saveHistory){
 }
 var V6={
  go:view,
+ canGoBack:function(){return screen!=='home'||historyStack.length>0},
  back:function(){if(historyStack.length)restore(historyStack.pop());else if(screen!=='home')view('home',false)},
  async checkUpdate(){
    var info=el('updateInfo'),button=el('downloadZip');
