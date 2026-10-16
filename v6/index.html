@@ -77,9 +77,10 @@ var TOKEN='hanghae_v6_device_token_v1',THEME='hanghae_v6_theme';
 var DEFAULT=[['all','전체방'],['analysis','1번방'],['controller','2번방'],['helmsman','3번방'],['freedom','4번방'],['chief','5번방']];
 var rooms=DEFAULT.map(function(r){return {room_key:r[0],display_name:r[1],fixed:true}});
 var active='analysis',screen='home',tab='files',filterRoom='',busy=false,noticeRoom='all',historyStack=[],releaseInfo=null;
-var CURRENT_VERSION_CODE=600004, CURRENT_VERSION_NAME='V6.0.3';
+var CURRENT_VERSION_CODE=600005, CURRENT_VERSION_NAME='V6.0.4';
+var ROUND_DOCS=[{"round_no":1246,"room_key":"all","title":"1246회차 백학도사 로또비법서 (신서)","source_author":"백학도사","source_text":"백학도사님의 이번회차 로또비법서 입니다\n\n1246 회차 로또비법서\n\n첫번째.대장장이의 망치가 녹이 슬었을때 알수가 있는 징표로구나.\n\n두번째. 개구리는 우물밖으로 나와 검은하늘을 바라보리로다.\n\n세번째. 흰 바둑알과 검은 바둑알의 위치가 바뀌며 승리의 뒤에 숨는구나.\n\n네번째. 종이학 천마리중 한마리만이 불에 타는구나.\n\n다섯째. 나룻배는 안개속에 흘러가며 종소리 나는 쪽으로 항하여 도착하리로다.\n\n여섯째. 돌위에 더 큰돌을 얹어서 탑을 만드리니 소원이 이루어질것이니로다.","status":"UNINTERPRETED","purchase_status":"REFERENCE_ONLY"}];
 var UPDATE_SERVICE='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/v6-update-check';
-var currentFiles=[],currentPurchase=[],currentNotices=[],currentChats=[],legacyOffset=0,legacyItems=[];
+var currentFiles=[],currentPurchase=[],currentNotices=[],currentChats=[],legacyOffset=0,legacyItems=[],selectedSinseo=1246;
 function el(id){return document.getElementById(id)}
 function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function token(){try{return localStorage.getItem(TOKEN)||''}catch(e){return ''}}
@@ -204,9 +205,27 @@ function whole(){
  '<div id="attachList">첨부자료 불러오는 중…</div><button class="primary" onclick="V6.broadcast()">➤ 전체방으로 전달하기</button>'+
  '<p class="serveronly">V6 서버 수신함에 저장됩니다. 기존 ChatGPT 원본 대화창에는 자동으로 글이 게시되지 않습니다.</p></div>';
 }
+function sinseoCards(roundStr){
+ var q=String(roundStr||'').trim();
+ var subset=ROUND_DOCS.filter(function(x){return !q||String(x.round_no)===q});
+ return subset.length?subset.map(function(x){
+  return '<div class="rowitem rows"><div><b>📜 '+esc(x.title)+'</b>'+
+   '<p class="small">원문 전사 보존 · 미해석 참고자료 · 실구매 조합 아님</p></div>'+
+   '<button class="mini" onclick="V6.openSinseo('+x.round_no+')">원문 보기</button></div>';
+ }).join(''):'해당 회차의 신서가 등록되지 않았습니다.';
+}
+function sinseoPage(){
+ var item=ROUND_DOCS.find(function(x){return x.round_no===selectedSinseo})||ROUND_DOCS[0];
+ return heading('📜 '+esc(item.title))+
+ '<div class="card"><p class="hint">백학도사 · '+item.round_no+'회차 · 이미지 원문 전사 · 미해석 참고자료</p>'+
+ '<div style="white-space:pre-wrap;line-height:1.9;overflow-wrap:break-word">'+esc(item.source_text)+'</div></div>'+
+ '<p class="serveronly">사용자 제공 화면에서 텍스트를 전사해 V6 누적 자료 DB에 등록했습니다. 원본 이미지 파일은 서버 스토리지에 따로 저장하지 않았으며, 이 원문으로 실구매 번호·구매 승인이 자동 생성되지 않습니다.</p>'+
+ '<button class="primary" onclick="V6.go(\'db\')">📊 누적DB로 이동</button>';
+}
 function appfiles(){
  var d=heading('📁 앱자료실')+'<p class="hint">각 방 전용 폴더에 올리면 자료실과 누적DB에 자동 반영됩니다.</p>';
  rooms.forEach(function(r){d+='<button class="folder" onclick="V6.room(\''+r.room_key+'\')"><b>📁 '+esc(r.display_name)+' 자료 폴더</b><span>파일 추가 ›</span></button>'});
+ d+='<div class="card"><h2>📜 회차별 신서 · 전체방 공용 참조자료</h2>'+sinseoCards('')+'</div>';
  return d;
 }
 function library(dbMode){
@@ -215,7 +234,7 @@ function library(dbMode){
  '<button class="'+(dbMode?'active':'')+'" onclick="V6.go(\'db\')">회차별 DB</button>'+
  '<button onclick="V6.go(\'purchase\')">실구매용</button><button onclick="V6.go(\'legacy\')">기존 V5 자료</button></div>'+
  '<div class="card"><label>자료 회차 (전체는 비움)</label><input id="dbRound" type="number" min="1" max="9999" placeholder="전체 회차">'+
- '<button class="primary" onclick="V6.refresh()">조회</button></div><div class="card"><div id="fileList">자료 조회 중…</div></div>'+
+ '<button class="primary" onclick="V6.refresh()">조회</button></div><div class="card"><h2>📜 회차별 신서 · 원문 DB</h2><div id="roundSourceList">'+sinseoCards('')+'</div></div><div class="card"><div id="fileList">자료 조회 중…</div></div>'+
  '<p class="serveronly">이 목록은 V6 서버에 등록된 파일의 누적 색인입니다. V5 휴대전화 내부 DB는 아직 이관되지 않았습니다.</p>';
 }
 function legacyLibrary(){
@@ -234,6 +253,7 @@ function purchase(){
  '<button class="primary" onclick="V6.refresh()">실구매 후보 조회</button></div>'+
  '<div class="card"><div id="purchaseList">조회 중…</div></div>'+
  '<div class="card"><h2>📁 실구매용 참조자료 · 각 방 자동연동</h2><div id="purchaseSourceList">등록 파일 조회 중…</div></div>'+
+ '<div class="card"><h2>📜 신서 원문 참조 · 실구매 미확정</h2><div id="purchaseSinseoList">'+sinseoCards('')+'</div></div>'+
  '<p class="serveronly">정해진 JSON 형식(문서유형 V6_PURCHASE_5, RESULT-BEFORE)의 5개 조합만 자동 추출합니다. 승인 전에는 실구매 확정으로 표시하지 않습니다.</p>';
 }
 function settings(){
@@ -291,7 +311,7 @@ function view(page,saveHistory){
  if(saveHistory!==false&&page!==screen)remember();
  screen=page;V6.side(false);
  var render=({home:home,whole:whole,appfiles:appfiles,library:function(){return library(false)},
-  db:function(){return library(true)},legacy:legacyLibrary,purchase:purchase,settings:settings,notices:notices,updates:updatePage,file:filePage})[page];
+  db:function(){return library(true)},legacy:legacyLibrary,purchase:purchase,sinseo:sinseoPage,settings:settings,notices:notices,updates:updatePage,file:filePage})[page];
  display(render?render():home());
  if(page==='whole')loadAttach();
  if(page==='library'||page==='db')V6.refresh();
@@ -302,6 +322,7 @@ function view(page,saveHistory){
 }
 var V6={
  go:view,
+ openSinseo:function(round){selectedSinseo=Number(round)||1246;view('sinseo')},
  canGoBack:function(){return screen!=='home'||historyStack.length>0},
  back:function(){if(historyStack.length)restore(historyStack.pop());else if(screen!=='home')view('home',false)},
  async checkUpdate(){
