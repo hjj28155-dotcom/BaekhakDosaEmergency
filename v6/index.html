@@ -330,9 +330,12 @@ var V6={
  room:function(id){if(screen!=='room'||active!==id)remember();active=id;tab='files';screen='room';display(roomPage());V6.refresh()},
  tab:function(t){if(t!==tab)remember();tab=t;display(roomPage());V6.refresh()},
  async loadRooms(){
-  if(!hold())return;
-  try{var res=await api('/rooms');if(res.rooms&&res.rooms.length>=6){rooms=res.rooms;renderDrawer();if(screen==='home')display(home())}}
-  catch(e){alertMsg('서버 방제 조회 실패: '+e.message)}
+  if(!hold()){rooms=mergeRooms(null);if(screen==='home')display(home());return}
+  try{
+   var res=await api('/rooms');rooms=mergeRooms(res.rooms||[]);
+   if(screen==='home')display(home());
+   if(screen==='settings')display(settings());
+  }catch(e){rooms=mergeRooms(null);alertMsg('서버 방 목록 조회 실패 · 기기 저장 이름은 유지됩니다.')}
  },
  async refresh(){
   if(!hold()){alertMsg('먼저 설정 → 기기 등록을 완료하세요.');return}
