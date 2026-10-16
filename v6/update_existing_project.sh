@@ -5,8 +5,12 @@ if [ ! -f settings.gradle ] || [ ! -f app/build.gradle ] || [ ! -f app/src/main/
   echo "[STOP] AndroidIDE의 V6_AndroidIDE_Project 최상위 폴더에서 실행해 주세요."
   exit 2
 fi
-if ! command -v curl >/dev/null 2>&1; then
-  echo "[STOP] 이 터미널에는 curl이 없습니다. AndroidIDE에서 curl 설치 여부를 확인해 주세요."
+if command -v curl >/dev/null 2>&1; then
+  DOWNLOADER=curl
+elif command -v wget >/dev/null 2>&1; then
+  DOWNLOADER=wget
+else
+  echo "[중단] curl·wget이 모두 없습니다. AndroidIDE 터미널에서 'pkg install curl'을 실행해 주세요."
   exit 2
 fi
 case "$(pwd)" in
@@ -20,7 +24,11 @@ STAGE=$(mktemp -d './.v6_600008_stage.XXXXXX')
 trap 'rm -rf "$STAGE"' EXIT HUP INT TERM
 fetch() {
   echo "파일 내려받는 중: $1"
-  curl --fail --location --silent --show-error --retry 2 --connect-timeout 20 --max-time 90 "$BASE/$1" --output "$STAGE/$2"
+  if [ "$DOWNLOADER" = curl ]; then
+    curl --fail --location --silent --show-error --retry 2 --connect-timeout 20 --max-time 90 "$BASE/$1" --output "$STAGE/$2"
+  else
+    wget -q -T 30 -t 3 -O "$STAGE/$2" "$BASE/$1"
+  fi
   test -s "$STAGE/$2" || { echo "[중단] 받은 파일이 비었습니다."; exit 3; }
 }
 fetch 'index.html' index.html
