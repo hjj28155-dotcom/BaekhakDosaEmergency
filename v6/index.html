@@ -95,7 +95,7 @@ function setToken(s){
 function theme(){try{return localStorage.getItem(THEME)||'sea'}catch(e){return 'sea'}}
 function alertMsg(s){var n=el('status');n.textContent=s;n.style.display='block';clearTimeout(alertMsg.timer);alertMsg.timer=setTimeout(function(){n.style.display='none'},8000)}
 function title(id){var r=rooms.find(function(x){return x.room_key===id});return r?r.display_name:id}
-function validZipUrl(url){try{var u=new URL(String(url||''));return u.protocol==='https:'&&u.hostname==='raw.githubusercontent.com'&&u.pathname.startsWith('/hjj28155-dotcom/BaekhakDosaEmergency/main/V6_AndroidIDE_Project_')&&u.pathname.endsWith('.zip')}catch(e){return false}}
+function validApkUrl(url){try{var u=new URL(String(url||''));return u.protocol==='https:'&&u.hostname==='raw.githubusercontent.com'&&u.pathname==='/hjj28155-dotcom/BaekhakDosaEmergency/main/V6_CENTRAL_CONTROL_20261016.apk'}catch(e){return false}}
 
 var V6_PREF_KEY="hanghae_v6_local_room_settings_v1";
 function cleanTitle(s){return String(s==null?"":s).trim().replace(/\s+/g," ")}
@@ -342,9 +342,18 @@ var V6={
  openSinseo:function(round){selectedSinseo=Number(round)||1246;view('sinseo')},
  canGoBack:function(){return el('side').classList.contains('show')||screen!=='home'||historyStack.length>0},
  back:function(){if(el('side').classList.contains('show')){V6.side(false);return}if(historyStack.length)restore(historyStack.pop());else if(screen!=='home')view('home',false)},
+ applyScreenUpdate:function(){
+   if(!window.V6NativeUpdater||typeof window.V6NativeUpdater.refreshScreen!=='function'){
+      alertMsg('이 앱에는 직접 화면 업데이트 기능이 없습니다. 이를 지원하는 V6 APK를 처음 한 번 설치해야 합니다.');
+      return;
+   }
+   var note=el('nativeUpdateState');
+   if(note)note.textContent='서버에서 최신 화면을 확인하고 있습니다. 새 버전이 있으면 자동으로 전환됩니다.';
+   try{window.V6NativeUpdater.refreshScreen()}catch(e){alertMsg('화면 업데이트 요청 실패: '+e.message)}
+ },
  async checkUpdate(){
-   var info=el('updateInfo'),button=el('downloadZip');
-   if(info)info.textContent='최신 업데이트 확인 중…';
+   var info=el('updateInfo'),button=el('downloadApk');
+   if(info)info.textContent='새 APK 확인 중…';
    if(button)button.disabled=true;
    try{
      var response=await fetch(UPDATE_SERVICE,{cache:'no-store'});
@@ -353,14 +362,15 @@ var V6={
      if(!data||!Number.isInteger(data.version_code)||!data.version_name)throw Error('업데이트 정보 형식 오류');
      releaseInfo=data;
      if(info)info.textContent=data.version_code>CURRENT_VERSION_CODE?
-       '새 버전 '+data.version_name+' ('+data.version_code+') 사용 가능 · AndroidIDE ZIP으로 업데이트하세요.':
-       '현재 설치본 '+CURRENT_VERSION_NAME+' · 최신 공개 버전 '+data.version_name+'입니다.';
-     if(button)button.disabled=!validZipUrl(data.download_zip_url);
-   }catch(e){releaseInfo=null;if(info)info.textContent='업데이트 확인 실패: '+e.message;alertMsg('업데이트 정보 확인 실패')}
+       '새 APK 버전 '+data.version_name+' ('+data.version_code+') 공개 · 동일한 서명키일 때만 덮어쓰기 가능합니다.':
+       '공개 버전 '+data.version_name+' · 화면 업데이트는 위 [지금 앱 안에서 화면 업데이트]로 확인하세요.';
+     if(button)button.disabled=!validApkUrl(data.download_apk_url);
+   }catch(e){releaseInfo=null;if(info)info.textContent='APK 확인 실패: '+e.message;alertMsg('새 APK 확인 실패')}
  },
- downloadUpdate:function(){
-   var url=releaseInfo&&releaseInfo.download_zip_url;
-   if(!validZipUrl(url))return alertMsg('업데이트 파일 주소를 확인하지 못했습니다.');
+ downloadApk:function(){
+   var url=releaseInfo&&releaseInfo.download_apk_url;
+   if(!validApkUrl(url))return alertMsg('다운로드할 APK 정보가 없습니다.');
+   if(!confirm('APK를 받으시겠습니까? 기존 앱과 서명이 다르면 덮어쓸 수 없습니다. 기존 앱을 삭제하지 마세요.'))return;
    window.location.assign(url);
  },
 
