@@ -44,6 +44,16 @@ jobs:
           set -euo pipefail
           ./gradlew :app:assembleDebug --no-daemon --stacktrace
           test -s app/build/outputs/apk/debug/app-debug.apk
+      - name: Verify updated V6 navigation and version
+        run: |
+          set -euo pipefail
+          AAPT=$(find "$ANDROID_HOME/build-tools" -name aapt -type f | sort -V | tail -1)
+          BADGE=$("$AAPT" dump badging v6/app/build/outputs/apk/debug/app-debug.apk | head -1)
+          echo "$BADGE"
+          grep -Fq "versionCode='600003'" <<< "$BADGE"
+          grep -Fq "id=\"quicknav\"" v6/app/src/main/assets/v6_fallback.html
+          grep -Fq 'V6.checkUpdate()' v6/app/src/main/assets/v6_fallback.html
+          grep -Fq 'canGoBack()' v6/app/src/main/java/kr/hanghae/v6/centralcontrol/MainActivity.java
       - name: Package complete source without caches
         run: |
           set -euo pipefail
@@ -56,11 +66,11 @@ jobs:
           test -s V6_AndroidIDE_Project/app/src/main/java/kr/hanghae/v6/centralcontrol/MainActivity.java
           test -s V6_AndroidIDE_Project/app/src/main/assets/v6_fallback.html
           test -s V6_AndroidIDE_Project/ANDROIDIDE_빌드와_V6_업데이트_안내.md
-          zip -q -r V6_AndroidIDE_Project_20261016.zip V6_AndroidIDE_Project
-          test -s V6_AndroidIDE_Project_20261016.zip
-          unzip -t V6_AndroidIDE_Project_20261016.zip | tail -2
-          sha256sum V6_AndroidIDE_Project_20261016.zip > V6_AndroidIDE_Project_20261016.zip.sha256
-          unzip -l V6_AndroidIDE_Project_20261016.zip | grep -E 'gradlew|gradle-wrapper.jar|MainActivity.java|v6_fallback.html'
+          zip -q -r V6_AndroidIDE_Project_V6_0_2_20261016.zip V6_AndroidIDE_Project
+          test -s V6_AndroidIDE_Project_V6_0_2_20261016.zip
+          unzip -t V6_AndroidIDE_Project_V6_0_2_20261016.zip | tail -2
+          sha256sum V6_AndroidIDE_Project_V6_0_2_20261016.zip > V6_AndroidIDE_Project_V6_0_2_20261016.zip.sha256
+          unzip -l V6_AndroidIDE_Project_V6_0_2_20261016.zip | grep -E 'gradlew|gradle-wrapper.jar|MainActivity.java|v6_fallback.html'
       - uses: actions/upload-artifact@v4
         with:
           name: V6-AndroidIDE-Project
@@ -72,6 +82,6 @@ jobs:
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -f V6_AndroidIDE_Project_20261016.zip V6_AndroidIDE_Project_20261016.zip.sha256
+          git add -f V6_AndroidIDE_Project_V6_0_2_20261016.zip V6_AndroidIDE_Project_V6_0_2_20261016.zip.sha256
           git commit -m 'Publish V6 AndroidIDE project ZIP with Gradle wrapper' || exit 0
           git push origin HEAD:main
