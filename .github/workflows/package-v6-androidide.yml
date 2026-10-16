@@ -74,12 +74,41 @@ jobs:
           unzip -t V6_AndroidIDE_Project_V6_0_3_20261016.zip | tail -2
           sha256sum V6_AndroidIDE_Project_V6_0_3_20261016.zip > V6_AndroidIDE_Project_V6_0_3_20261016.zip.sha256
           unzip -l V6_AndroidIDE_Project_V6_0_3_20261016.zip | grep -E 'gradlew|gradle-wrapper.jar|MainActivity.java|v6_fallback.html'
+      - name: Explain which folder to open
+        run: |
+          cat > OPEN_THIS_FOLDER.txt <<'TXT'
+          항행의자유 V6 AndroidIDE 프로젝트
+          1. ZIP 압축을 풉니다.
+          2. V6_AndroidIDE_Project 폴더를 선택합니다.
+          3. 그 폴더 안의 settings.gradle과 app 폴더를 확인합니다.
+          4. AndroidIDE에서 V6_AndroidIDE_Project 폴더를 프로젝트로 엽니다.
+          5. Build APK를 실행합니다.
+          ZIP 내부의 HTML 파일을 직접 열면 앱 화면이 아닌 소스 코드가 보일 수 있습니다.
+          TXT
       - uses: actions/upload-artifact@v4
         with:
-          name: V6-AndroidIDE-Project
-          path: V6_AndroidIDE_Project/
+          name: V6-AndroidIDE-Project-With-Root-Folder
+          path: |
+            V6_AndroidIDE_Project/
+            OPEN_THIS_FOLDER.txt
           if-no-files-found: error
           retention-days: 30
+      - name: Verify artifact has the top-level project folder
+        uses: actions/download-artifact@v4
+        with:
+          name: V6-AndroidIDE-Project-With-Root-Folder
+          path: _verify_artifact_root
+      - name: Assert actual downloaded artifact hierarchy
+        run: |
+          set -euo pipefail
+          test -s _verify_artifact_root/OPEN_THIS_FOLDER.txt
+          test -s _verify_artifact_root/V6_AndroidIDE_Project/settings.gradle
+          test -s _verify_artifact_root/V6_AndroidIDE_Project/gradlew
+          test -s _verify_artifact_root/V6_AndroidIDE_Project/gradle/wrapper/gradle-wrapper.jar
+          test -s _verify_artifact_root/V6_AndroidIDE_Project/app/src/main/AndroidManifest.xml
+          test -s _verify_artifact_root/V6_AndroidIDE_Project/app/src/main/assets/v6_fallback.html
+          test ! -e _verify_artifact_root/settings.gradle
+          echo 'PASS: project root directory intact inside downloaded artifact.'
       - name: Publish reviewed ZIP
         run: |
           set -euo pipefail
