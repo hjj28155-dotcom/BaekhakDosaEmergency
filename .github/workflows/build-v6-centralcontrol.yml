@@ -1,0 +1,84 @@
+name: Build Hanghae V6 Central Control APK
+on:
+  push:
+    paths:
+      - 'v6/**'
+      - '.github/workflows/build-v6.yml'
+permissions:
+  contents: write
+concurrency:
+  group: v6-apk-publish
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+      - name: Install Android SDK platform
+        run: |
+          set -euo pipefail
+          SDK_ROOT="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          SDKMANAGER=$(find "$SDK_ROOT/cmdline-tools" -path '*/bin/sdkmanager' -type f | sort -V | tail -1)
+          test -x "$SDKMANAGER"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0" >/dev/null
+      - name: Preserve signing key between builds
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: v6-companion-stable-debug-key-20261016
+      - name: Ensure signing key
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.android
+          if [ ! -s ~/.android/debug.keystore ]; then
+            keytool -genkeypair -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -dname "CN=Hanghae Freedom V6,O=Hanghae Freedom,C=KR" -keyalg RSA -keysize 2048 -validity 10000
+          fi
+      - name: Check V6 dashboard and authenticated API boundaries
+        run: |
+          set -euo pipefail
+          ROOT='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1'
+          curl --fail-with-body -LsS --retry 3 "$ROOT/v6-dashboard" -o /tmp/v6-dashboard.html
+          grep -Fq '항행의자유 V6' /tmp/v6-dashboard.html
+          curl --fail-with-body -LsS --retry 3 "$ROOT/v6-room-library-sync/health" -o /tmp/v6-health.json
+          grep -Fq 'v6-room-library-sync' /tmp/v6-health.json
+          STATUS=$(curl -sSL -o /tmp/v6-unauthorized.json -w '%{http_code}' "$ROOT/v6-room-library-sync/rooms")
+          test "$STATUS" = "401"
+          echo 'V6 dashboard HTML: valid; backend health: available; unauthorized access: blocked.'
+      - name: Assemble APK
+        working-directory: v6
+        run: gradle :app:assembleDebug --no-daemon --stacktrace
+      - name: Verify APK
+        run: |
+          set -euo pipefail
+          APK=$(find v6/app/build/outputs/apk/debug -name '*.apk' -type f | head -1)
+          test -s "$APK"
+          AAPT=$(find "$ANDROID_HOME/build-tools" -name aapt -type f | sort -V | tail -1)
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort -V | tail -1)
+          "$AAPT" dump badging "$APK" | head -4
+          "$APKSIGNER" verify --print-certs "$APK"
+          cp "$APK" V6_CENTRAL_CONTROL_20261016.apk
+          sha256sum V6_CENTRAL_CONTROL_20261016.apk > V6_CENTRAL_CONTROL_20261016.apk.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: V6-CENTRAL-CONTROL-APK
+          path: |
+            V6_CENTRAL_CONTROL_20261016.apk
+            V6_CENTRAL_CONTROL_20261016.apk.sha256
+          if-no-files-found: error
+          retention-days: 30
+      - name: Publish APK as direct-download file
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f V6_CENTRAL_CONTROL_20261016.apk V6_CENTRAL_CONTROL_20261016.apk.sha256
+          git commit -m 'Publish V5 whole-room companion APK' || exit 0
+          git push origin HEAD:main
