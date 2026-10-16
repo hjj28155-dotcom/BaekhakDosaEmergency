@@ -11,6 +11,10 @@ import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceError;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -23,6 +27,7 @@ public final class MainActivity extends Activity {
     private static final String HOME = "https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/v6-dashboard";
     private static final int PICKER = 611;
     private WebView web;
+    private boolean fallbackShown=false;
     private android.webkit.ValueCallback<Uri[]> uploadCallback;
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -45,12 +50,23 @@ public final class MainActivity extends Activity {
                 catch(Exception e){ Toast.makeText(MainActivity.this,"연결을 열 수 없습니다.",Toast.LENGTH_LONG).show(); }
                 return true;
             }
+            @Override public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+                if (request.isForMainFrame() && !fallbackShown) showBundledFallback();
+            }
         });
         web.setWebChromeClient(new WebChromeClient() {
             @Override public boolean onShowFileChooser(WebView view, android.webkit.ValueCallback<Uri[]> callback, FileChooserParams params) {
                 if(uploadCallback!=null) uploadCallback.onReceiveValue(null);
                 uploadCallback=callback;
-                try {startActivityForResult(params.createIntent(),PICKER);return true;}
+                try {
+                    Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                    i.addCategory(Intent.CATEGORY_OPENABLE);
+                    i.setType("*/*");
+                    i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE,true);
+                    i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    startActivityForResult(i,PICKER);
+                    return true;
+                }
                 catch(Exception e){uploadCallback=null;callback.onReceiveValue(null);return false;}
             }
         });
@@ -73,6 +89,20 @@ public final class MainActivity extends Activity {
             }
         });
         web.loadUrl(HOME);
+    }
+    private void showBundledFallback() {
+        try (InputStream in=getAssets().open("v6_fallback.html");
+             ByteArrayOutputStream out=new ByteArrayOutputStream()) {
+            byte[] buffer=new byte[8192];
+            int n;
+            while ((n=in.read(buffer))!=-1) out.write(buffer,0,n);
+            fallbackShown=true;
+            String html=new String(out.toByteArray(),StandardCharsets.UTF_8);
+            web.loadDataWithBaseURL(HOME,html,"text/html","UTF-8",HOME);
+            Toast.makeText(this,"서버 연결 문제: V6 내장 화면 표시",Toast.LENGTH_LONG).show();
+        } catch(Exception e) {
+            Toast.makeText(this,"V6 화면을 불러오지 못했습니다.",Toast.LENGTH_LONG).show();
+        }
     }
     @Override protected void onActivityResult(int requestCode,int resultCode,Intent data) {
         super.onActivityResult(requestCode,resultCode,data);
