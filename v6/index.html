@@ -1,0 +1,336 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>항행의자유 V6 · 중앙통제실</title>
+<style>
+:root{--bg:#06172c;--deep:#061d33;--panel:#0b2945;--tile:#14365a;--line:#345579;--gold:#f6d390;--fg:#edf6ff;--blue:#087bf1;--sub:#b5cee2}
+*{box-sizing:border-box}body{background:linear-gradient(120deg,#071327,#153f6b);color:var(--fg);margin:0;font:14px/1.5 system-ui,"Malgun Gothic",sans-serif}
+body[data-theme="night"]{--bg:#010914;--deep:#091021;--panel:#101a33;--tile:#1c294a;--blue:#3758db;--line:#364568}
+body[data-theme="sunrise"]{--bg:#281d31;--deep:#31233b;--panel:#423049;--tile:#49374b;--blue:#de8261;--line:#745365}
+body[data-theme="sunset"]{--bg:#23192c;--deep:#312438;--panel:#453148;--tile:#583847;--blue:#c65674;--line:#734865}
+body[data-theme="snow"]{--bg:#1c324a;--deep:#28445c;--panel:#285270;--tile:#326080;--blue:#5399d8;--line:#78a9be}
+#phone{max-width:510px;min-height:100vh;margin:0 auto;background:var(--bg);box-shadow:0 0 60px #0008;position:relative}
+button,input,textarea,select{font:inherit}button{cursor:pointer;color:var(--fg);border:1px solid var(--line);background:var(--tile);border-radius:9px;padding:10px}
+button:disabled{opacity:.48;cursor:wait}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--gold)}
+header.top{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#031125}
+header.top button{font-size:20px;border:0;background:none;padding:4px 8px}
+header.top .vtitle{text-align:center;font-size:15px;font-weight:800;color:var(--gold)}
+header.top .vtitle small{display:block;font-size:11px;color:#b5d0e5;font-weight:500}
+#page{padding:13px 14px 40px;min-height:calc(100vh - 62px)}
+.hero{height:215px;border-radius:13px;background:radial-gradient(ellipse at 50% 100%,#5878b3 0%,#1c3e76 23%,#09234b 63%,#09152f 100%);border:1px solid #3c587b;position:relative;overflow:hidden;text-align:center}
+.hero:before{content:"✦     ·        ✦         ✧";position:absolute;left:8px;right:8px;top:15px;opacity:.6;letter-spacing:10px;color:#d9ecff}
+.hero .logo{position:relative;z-index:2;font-size:25px;font-weight:900;padding-top:25px;text-shadow:0 2px 9px #021428}
+.hero small{position:relative;z-index:2;display:block;font-size:11px;color:#e4d8b1}
+.hero .sea{position:absolute;bottom:-50px;left:-18px;right:-18px;height:112px;transform:rotate(-4deg);background:repeating-linear-gradient(178deg,#042949 0px,#14437b 3px,#0a2850 7px,#152f65 11px);border-radius:50%}
+.hero .lighthouse{position:absolute;bottom:27px;left:46%;font-size:67px;z-index:1;filter:drop-shadow(0 4px 8px #071329)}
+.roomgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:12px}
+.roomgrid button{min-height:82px;background:linear-gradient(140deg,#12476e,#122c51);border:1.5px solid #368fde;font-size:15px;font-weight:900}
+.roomgrid button .icon{display:block;font-size:25px}
+.roomgrid button:nth-child(2){border-color:#f04852}
+.roomgrid button:nth-child(3){border-color:#21bf83}
+.roomgrid button:nth-child(4){border-color:#e8aa41}
+.roomgrid button:nth-child(5){border-color:#9e6af1}
+.roomgrid button:nth-child(6){border-color:#08c9eb}
+.extra{margin-top:15px}.extra h3{font-size:12px;color:var(--gold)}
+.extragrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.footnav{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:13px}
+.footnav button{padding:11px 3px;font-size:12px;font-weight:750}
+h1{font-size:20px;margin:4px 0 10px}h2{font-size:16px;margin:15px 0 8px;color:var(--gold)}
+.hint{color:var(--sub);font-size:12px;margin:7px 0 12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px;margin:11px 0}
+.rows{display:flex;align-items:center;justify-content:space-between;gap:9px}
+.rows>*{min-width:0}.rows h3{font-size:14px;margin:0}.rows p{margin:1px 0}
+.small{font-size:11px;color:var(--sub);word-break:break-word}
+.rowitem{padding:11px 3px;border-bottom:1px solid var(--line)}
+.rowitem:last-child{border-bottom:0}
+label{display:block;color:#c7e1f0;font-size:12px;font-weight:800;margin:12px 0 5px}
+input,textarea,select{width:100%;background:#081d34;border:1px solid #557f9d;color:white;border-radius:9px;padding:12px}
+textarea{min-height:104px;resize:vertical}input[type=file]{font-size:12px;padding:11px}
+.primary{background:var(--blue);border-color:#8dc0ff;color:#fff;font-weight:850;width:100%;margin-top:12px;min-height:46px}
+.mini{padding:7px 9px;font-size:12px;flex-shrink:0}.muted{color:var(--sub)}
+.tabs{display:flex;gap:7px;margin-bottom:10px;overflow-x:auto}.tabs button{white-space:nowrap;padding:9px 13px}
+.active{background:var(--blue)!important;border-color:#8dc0ff!important}
+.folder{display:flex;align-items:center;justify-content:space-between;width:100%;padding:14px;margin:8px 0;background:#0e3357}
+.folder b{font-size:14px}
+#status{position:fixed;left:50%;bottom:10px;transform:translateX(-50%);max-width:480px;width:calc(100% - 24px);z-index:20;pointer-events:none;background:#102d43ed;color:#fff2c4;border:1px solid #5e8ba8;padding:8px 12px;border-radius:11px;font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;display:none}
+#side{position:fixed;z-index:30;inset:0;background:#0009;display:none}
+#side .drawer{background:#091a31;max-width:335px;width:83%;height:100%;padding:17px;overflow-y:auto}
+#side .drawer button{display:block;text-align:left;width:100%;border:0;border-bottom:1px solid #24445d;border-radius:0;padding:12px;background:transparent}
+#side.show{display:block}
+.previewimg{width:100%;max-height:50vh;object-fit:contain}.badge{background:#293e56;border:1px solid #71889f;padding:3px 7px;border-radius:6px;font-size:10px}
+.serveronly{color:#eccb93;font-size:11px;line-height:1.6}
+</style></head>
+<body data-theme="sea"><div id="phone"><header class="top"><button onclick="V6.side()">☰</button><div class="vtitle" id="headTitle">⚓ 항행의자유 V6<small>중앙통제실</small></div><button onclick="V6.go('notices')">🔔</button></header><main id="page"></main></div>
+<div id="side" onclick="V6.side(false)"><div class="drawer" onclick="event.stopPropagation()" id="drawer"></div></div>
+<div id="status" role="status" aria-live="polite"></div>
+<script>
+(function(){
+'use strict';
+var SERVICE='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/v6-room-library-sync';
+var PAIR='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/v4-room-sync/pair';
+var TOKEN='hanghae_v6_device_token_v1',THEME='hanghae_v6_theme';
+var DEFAULT=[['all','전체방'],['analysis','1번방'],['controller','2번방'],['helmsman','3번방'],['freedom','4번방'],['chief','5번방']];
+var rooms=DEFAULT.map(function(r){return {room_key:r[0],display_name:r[1],fixed:true}});
+var active='analysis',screen='home',tab='files',filterRoom='',busy=false,noticeRoom='all';
+var currentFiles=[],currentPurchase=[],currentNotices=[],currentChats=[];
+function el(id){return document.getElementById(id)}
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function token(){try{return localStorage.getItem(TOKEN)||''}catch(e){return ''}}
+function setToken(s){try{localStorage.setItem(TOKEN,s)}catch(e){}}
+function theme(){try{return localStorage.getItem(THEME)||'sea'}catch(e){return 'sea'}}
+function alertMsg(s){var n=el('status');n.textContent=s;n.style.display='block';clearTimeout(alertMsg.timer);alertMsg.timer=setTimeout(function(){n.style.display='none'},8000)}
+function title(id){var r=rooms.find(function(x){return x.room_key===id});return r?r.display_name:id}
+function currentRound(){return Number((el('roundNumber')&&el('roundNumber').value)||1245)}
+function hold(){return !!(token()&&/^[a-f0-9]{64}$/.test(token()))}
+async function api(path,options){
+ if(!hold())throw Error('기기 등록을 먼저 완료하십시오. 설정 → 기기 연결');
+ var opt=options||{},headers={Authorization:'Bearer '+token()};
+ if(opt.json){headers['Content-Type']='application/json';opt.body=JSON.stringify(opt.json)}
+ var r=await fetch(SERVICE+path,{method:opt.method||'GET',headers:headers,body:opt.body,cache:'no-store'});
+ var j={};try{j=await r.json()}catch(e){}
+ if(!r.ok||j.error)throw Error((j.error||'연결 실패')+(j.message?' · '+j.message:''));
+ return j;
+}
+function display(s){el('page').innerHTML=s;el('headTitle').innerHTML='⚓ 항행의자유 V6<small>'+esc(screen==='home'?'중앙통제실':title(active))+'</small>'}
+function menuBtn(txt,dest){return '<button onclick="V6.go(\''+dest+'\')">'+txt+'</button>'}
+function renderDrawer(){
+ var d='<div style="font-size:20px;color:#f5d596;font-weight:900;padding:15px 0">⚓ V6 중앙통제실</div>';
+ d+=menuBtn('🏠 홈으로','home')+menuBtn('📢 전체방','whole');
+ rooms.filter(function(r){return r.room_key!=='all'}).forEach(function(r){d+='<button onclick="V6.room(\''+r.room_key+'\')">⚓ '+esc(r.display_name)+'</button>'});
+ d+=menuBtn('📁 앱자료실','appfiles')+menuBtn('🗂 라이브러리','library')+
+ menuBtn('📊 누적DB','db')+menuBtn('🖼 실구매용 5조합','purchase')+
+ menuBtn('🔔 공지사항','notices')+menuBtn('⚙ 설정 및 방제 관리','settings');
+ el('drawer').innerHTML=d;
+}
+function heading(h){return '<h1>'+h+'</h1>'}
+function home(){
+ var icons=['📢','🧭','🟢','🟠','🟣','🔵'];
+ var d='<div class="hero"><div class="logo">항행의자유 V6</div><b>중앙통제실</b><small>함께하는 항해, 하나의 바다로</small><div class="lighthouse">🗼</div><div class="sea"></div></div><div class="roomgrid">';
+ rooms.slice(0,6).forEach(function(r,i){d+='<button onclick="'+(r.room_key==='all'?"V6.go('whole')":"V6.room('"+r.room_key+"')")+'"><span class="icon">'+icons[i]+'</span>'+esc(r.display_name)+'</button>'});
+ d+='</div>';
+ if(rooms.length>6){d+='<section class="extra"><h3>새로 추가한 방</h3><div class="extragrid">';
+ rooms.slice(6).forEach(function(r){d+='<button onclick="V6.room(\''+r.room_key+'\')">🧭 '+esc(r.display_name)+'</button>'});d+='</div></section>'}
+ d+='<div class="footnav">'+menuBtn('📁 앱자료실','appfiles')+menuBtn('🗂 라이브러리','library')+menuBtn('⚙ 설정','settings')+'</div>';
+ d+='<div class="hint" style="text-align:center">자료는 각 방에 1회 업로드 · 앱자료실 · V6 누적DB 자동 색인</div>';
+ return d;
+}
+function roomTabs(){return '<div class="tabs">'+
+ '<button class="'+(tab==='chat'?'active':'')+'" onclick="V6.tab(\'chat\')">대화방</button>'+
+ '<button class="'+(tab==='files'?'active':'')+'" onclick="V6.tab(\'files\')">파일함</button>'+
+ '<button class="'+(tab==='notices'?'active':'')+'" onclick="V6.tab(\'notices\')">공지</button></div>'}
+function fileInput(){return '<label for="roundNumber">자료 회차</label><input type="number" min="1" max="9999" id="roundNumber" value="1245">'+
+ '<label for="roomPicker">담당방 자료 · 휴대전화 또는 드라이브에서 선택</label>'+
+ '<input id="roomPicker" type="file" multiple><p class="small">파일당 최대 10MB · 서버 기기 등록 필요. 원본은 V6 전용 폴더와 기존 앱 라이브러리에 색인됩니다.</p>'+
+ '<button class="primary" onclick="V6.upload()">📤 해당 방 폴더에 업로드 및 자동 연동</button><div id="uploadOutput" class="hint"></div>'}
+function fileItem(f,showRoom){
+ return '<div class="rowitem rows"><div><b>📄 '+esc(f.filename)+'</b><div class="small">'+(showRoom?esc(f.room_title)+' · ':'')+
+ esc(f.round_no)+'회 · '+Math.ceil((f.bytes||0)/1024)+'KB · '+esc(f.purchase_state==='APPROVED'?'실구매 승인':f.purchase_state==='PENDING_APPROVAL'?'실구매 검토대기':'원본 색인')+'</div></div>'+
+ '<button class="mini" onclick="V6.file(\''+f.asset_id+'\')">열기/받기</button></div>';
+}
+function roomPage(){
+ var d=heading('⚓ '+esc(title(active)))+roomTabs();
+ if(tab==='files')d+='<div class="card"><h2>📂 '+esc(title(active))+' · 전용 폴더</h2>'+fileInput()+'</div>'+
+ '<div class="card"><div class="rows"><h3>등록된 파일</h3><button class="mini" onclick="V6.refresh()">↻ 새로고침</button></div><div id="roomList">조회 중…</div></div>';
+ if(tab==='chat')d+='<div class="card"><h2>V6 서버 대화 기록</h2><p class="serveronly">원본 ChatGPT 대화방은 별도로 유지됩니다. 여기에 작성한 내용은 V6 서버에만 기록됩니다.</p>'+
+ '<div id="chatList" style="min-height:140px;max-height:330px;overflow:auto"></div>'+
+ '<textarea id="chatText" maxlength="4000" placeholder="V6 내부 대화 메시지"></textarea><button class="primary" onclick="V6.sendChat()">전송</button>'+
+ '<button style="width:100%;margin-top:7px" onclick="V6.original()">↗ 등록된 ChatGPT 원본방 열기</button></div>';
+ if(tab==='notices')d+='<div class="card"><h2>📢 '+esc(title(active))+' 공지 수신함</h2><div id="noticeList">조회 중…</div></div>';
+ return d;
+}
+function whole(){
+ return heading('📢 전체방')+'<div class="tabs"><button class="active">공지 작성</button><button onclick="V6.go(\'notices\')">전달 내역</button></div>'+
+ '<div class="card"><p class="hint">보낼 때 등록된 기본 5개 담당방과 추가방 서버 수신함에 한 번에 전달합니다.</p>'+
+ '<label for="wholeSubject">공지 제목</label><input id="wholeSubject" maxlength="180" placeholder="공지 제목을 입력하세요">'+
+ '<label for="wholeBody">공지문 / 업무 전달</label><textarea id="wholeBody" maxlength="9000" placeholder="전체 방에 전달할 내용을 작성하세요."></textarea>'+
+ '<label for="wholeAttach">첨부 자료 선택 (먼저 해당 방 폴더에 업로드된 파일)</label>'+
+ '<div id="attachList">첨부자료 불러오는 중…</div><button class="primary" onclick="V6.broadcast()">➤ 전체방으로 전달하기</button>'+
+ '<p class="serveronly">V6 서버 수신함에 저장됩니다. 기존 ChatGPT 원본 대화창에는 자동으로 글이 게시되지 않습니다.</p></div>';
+}
+function appfiles(){
+ var d=heading('📁 앱자료실')+'<p class="hint">각 방 전용 폴더에 올리면 자료실과 누적DB에 자동 반영됩니다.</p>';
+ rooms.forEach(function(r){d+='<button class="folder" onclick="V6.room(\''+r.room_key+'\')"><b>📁 '+esc(r.display_name)+' 자료 폴더</b><span>파일 추가 ›</span></button>'});
+ return d;
+}
+function library(dbMode){
+ return heading(dbMode?'📊 V6 누적DB':'🗂 라이브러리')+
+ '<div class="tabs"><button class="'+(!dbMode?'active':'')+'" onclick="V6.go(\'library\')">전체 파일</button>'+
+ '<button class="'+(dbMode?'active':'')+'" onclick="V6.go(\'db\')">회차별 DB</button>'+
+ '<button onclick="V6.go(\'purchase\')">실구매용</button></div>'+
+ '<div class="card"><label>자료 회차 (전체는 비움)</label><input id="dbRound" type="number" min="1" max="9999" placeholder="전체 회차">'+
+ '<button class="primary" onclick="V6.refresh()">조회</button></div><div class="card"><div id="fileList">자료 조회 중…</div></div>'+
+ '<p class="serveronly">이 목록은 V6 서버에 등록된 파일의 누적 색인입니다. V5 휴대전화 내부 DB는 아직 이관되지 않았습니다.</p>';
+}
+function purchase(){
+ return heading('🖼 실구매용 5조합')+
+ '<div class="card"><label>조회할 회차</label><input id="purchaseRound" type="number" min="1" max="9999" placeholder="전체 회차">'+
+ '<button class="primary" onclick="V6.refresh()">실구매 후보 조회</button></div>'+
+ '<div class="card"><div id="purchaseList">조회 중…</div></div>'+
+ '<p class="serveronly">정해진 JSON 형식(문서유형 V6_PURCHASE_5, RESULT-BEFORE)의 5개 조합만 자동 추출합니다. 승인 전에는 실구매 확정으로 표시하지 않습니다.</p>';
+}
+function settings(){
+ var d=heading('⚙ 설정 · 방제 관리')+
+ '<div class="card"><h2>기기 등록</h2><p class="small">'+(hold()?'기기 토큰이 이 앱에 저장돼 있습니다. 서버 연결 상태는 파일 조회로 확인할 수 있습니다.':'기존 V5 중앙서버에서 발급한 일회용 연결코드가 필요합니다.')+'</p>'+
+ '<label for="pairCode">일회용 연결코드</label><input id="pairCode" autocomplete="off" type="password" placeholder="연결코드 입력">'+
+ '<button class="primary" onclick="V6.pair()">연결코드로 이 기기 등록</button></div>'+
+ '<div class="card"><h2>기본 6개 방 · 방제 수정</h2>';
+ rooms.forEach(function(r){d+='<div class="rowitem"><div class="rows"><b>'+esc(r.display_name)+'</b><button class="mini" onclick="V6.rename(\''+r.room_key+'\')">이름 변경</button></div>'+
+ (r.room_key==='all'?'':('<button class="mini" style="margin-top:5px" onclick="V6.setOriginal(\''+r.room_key+'\')">↗ 원본 ChatGPT 주소 등록</button>'))+'</div>'});
+ d+='</div><div class="card"><h2>➕ 새 방 추가</h2><input id="newRoomName" maxlength="32" placeholder="새 방 이름">'+
+ '<button class="primary" onclick="V6.addRoom()">새 담당방 생성</button></div>'+
+ '<div class="card"><h2>화면 테마</h2><div class="tabs">'+
+ [['sea','바다'],['night','야간'],['sunrise','일출'],['sunset','노을'],['snow','설원']].map(function(p){return '<button class="'+(theme()===p[0]?'active':'')+'" onclick="V6.setTheme(\''+p[0]+'\')">'+p[1]+'</button>'}).join('')+
+ '</div></div><p class="serveronly">방제 변경은 V6 서버 표시 이름만 바꿉니다. 기존 ChatGPT 원본방 제목과 대화는 변경되지 않습니다.</p>';
+ return d;
+}
+function notices(){
+ return heading('🔔 공지사항')+'<div class="card"><label>공지 수신함</label><select id="noticeFilter" onchange="V6.noticeFilter(this.value)">'+
+ rooms.map(function(r){return '<option value="'+r.room_key+'" '+(noticeRoom===r.room_key?'selected':'')+'>'+esc(r.display_name)+'</option>'}).join('')+
+ '</select><div id="allNotices">조회 중…</div></div>';
+}
+function filePage(){
+ return heading('📄 파일 보기')+'<div class="card" id="fileInfo">서버 자료를 확인하는 중…</div><button onclick="V6.go(\'library\')">◀ 라이브러리로</button>';
+}
+function view(page){
+ screen=page;V6.side(false);
+ var render=({home:home,whole:whole,appfiles:appfiles,library:function(){return library(false)},
+  db:function(){return library(true)},purchase:purchase,settings:settings,notices:notices,file:filePage})[page];
+ display(render?render():home());
+ if(page==='whole')loadAttach();
+ if(page==='library'||page==='db')V6.refresh();
+ if(page==='purchase')V6.refresh();
+ if(page==='notices')V6.loadNotices();
+}
+var V6={
+ go:view,
+ side:function(state){var box=el('side');if(typeof state==='boolean'){box.classList.toggle('show',state);if(state)renderDrawer()}else{box.classList.toggle('show');if(box.classList.contains('show'))renderDrawer()}},
+ room:function(id){active=id;tab='files';screen='room';display(roomPage());V6.refresh()},
+ tab:function(t){tab=t;display(roomPage());V6.refresh()},
+ async loadRooms(){
+  if(!hold())return;
+  try{var res=await api('/rooms');if(res.rooms&&res.rooms.length>=6){rooms=res.rooms;renderDrawer();if(screen==='home')display(home())}}
+  catch(e){alertMsg('서버 방제 조회 실패: '+e.message)}
+ },
+ async refresh(){
+  if(!hold()){alertMsg('먼저 설정 → 기기 등록을 완료하세요.');return}
+  try{
+   if(screen==='room'&&tab==='files'){var rr=Number(el('roundNumber')?.value||1245);var d=await api('/files?room_key='+encodeURIComponent(active)+(rr?'&round_no='+rr:''));
+    currentFiles=d.files||[];el('roomList').innerHTML=currentFiles.length?currentFiles.map(function(x){return fileItem(x,false)}).join(''):'등록된 파일이 없습니다.'}
+   if(screen==='room'&&tab==='chat'){var m=await api('/messages?room_key='+encodeURIComponent(active));
+    currentChats=m.messages||[];el('chatList').innerHTML=currentChats.length?currentChats.slice().reverse().map(function(x){return '<div class="rowitem"><p>'+esc(x.body).replace(/\n/g,'<br>')+'</p><small class="small">'+esc(new Date(x.created_at).toLocaleString('ko-KR'))+'</small></div>'}).join(''):'이 방의 서버 대화 기록이 없습니다.'}
+   if(screen==='room'&&tab==='notices'){var n=await api('/notices?room_key='+encodeURIComponent(active));el('noticeList').innerHTML=formatNotices(n.notices||[])}
+   if(screen==='library'||screen==='db'){var raw=(el('dbRound')?.value||'').trim();var data=await api('/db'+(raw?'?round_no='+encodeURIComponent(raw):''));currentFiles=data.files||[];
+    el('fileList').innerHTML=currentFiles.length?currentFiles.map(function(x){return fileItem(x,true)}).join(''):'V6 서버에 등록된 파일이 없습니다.'}
+   if(screen==='purchase'){var pr=String(el('purchaseRound')?.value||'').trim(),q=await api('/purchase'+(pr?'?round_no='+encodeURIComponent(pr):''));currentPurchase=q.combinations||[];el('purchaseList').innerHTML=formatPurchase(currentPurchase)}
+  }catch(e){alertMsg('조회 실패: '+e.message)}
+ },
+ async upload(){
+  if(busy)return;var input=el('roomPicker'),list=Array.from(input?.files||[]);
+  if(!list.length)return alertMsg('업로드할 파일을 선택하세요.');
+  var round=currentRound();if(!Number.isInteger(round)||round<1||round>9999)return alertMsg('회차는 1~9999 범위로 입력하세요.');
+  if(list.some(function(f){return f.size<1||f.size>10485760}))return alertMsg('파일은 1바이트 이상 10MB 이하여야 합니다.');
+  busy=true;var out=el('uploadOutput');out.textContent='파일 업로드 중…';
+  try{for(var i=0;i<list.length;i++){out.textContent='원본 등록 중 '+(i+1)+' / '+list.length;
+   var form=new FormData();form.append('room_key',active);form.append('round_no',String(round));form.append('file',list[i],list[i].name);
+   var x=await api('/upload',{method:'POST',body:form});
+   out.textContent+=' · '+(x.duplicate?'동일 자료 등록됨':'자료실·V6 누적DB 색인 완료')+(x.purchase_state==='PENDING_APPROVAL'?' · 실구매 검토 대기':'')+'\n';
+  }input.value='';alertMsg('선택한 파일 처리 완료 · 자료실/누적DB 자동 연동 확인');await V6.refresh()}
+  catch(e){out.textContent+='오류: '+e.message;alertMsg('업로드 실패: '+e.message)}finally{busy=false}
+ },
+ async broadcast(){
+  if(busy)return;var subject=el('wholeSubject')?.value.trim(),body=el('wholeBody')?.value.trim();
+  if(!subject||!body)return alertMsg('공지 제목과 내용을 입력하세요.');
+  if(!confirm('모든 V6 담당방 서버 수신함으로 전달하겠습니까?'))return;
+  var ids=Array.from(document.querySelectorAll('[data-attach]:checked')).map(function(x){return x.value});
+  busy=true;
+  try{var r=await api('/broadcast',{method:'POST',json:{subject:subject,body:body,attachment_ids:ids}});
+   alertMsg('공지 저장 완료 · 수신함 '+r.delivered_inboxes+'개 (원본 ChatGPT 자동 게시 아님)');
+   el('wholeSubject').value='';el('wholeBody').value='';
+  }catch(e){alertMsg('공지 전달 실패: '+e.message)}finally{busy=false}
+ },
+ async sendChat(){
+  var s=el('chatText')?.value.trim();if(!s)return alertMsg('메시지를 입력하세요.');
+  try{await api('/messages',{method:'POST',json:{room_key:active,body:s}});el('chatText').value='';V6.refresh()}
+  catch(e){alertMsg('메시지 저장 실패: '+e.message)}
+ },
+ async loadNotices(){
+  if(!hold())return alertMsg('기기 등록이 필요합니다.');
+  try{var r=await api('/notices?room_key='+noticeRoom);el('allNotices').innerHTML=formatNotices(r.notices||[])}
+  catch(e){alertMsg('공지 조회 실패: '+e.message)}
+ },
+ noticeFilter:function(id){noticeRoom=id;V6.loadNotices()},
+ async file(id){
+  screen='file';display(filePage());try{
+   var x=await api('/download/'+id);
+   if(!x.url)throw Error('다운로드 주소가 없습니다.');
+   var info=currentFiles.find(function(z){return z.asset_id===id})||{filename:'자료 원본'};
+   var url=esc(x.url),name=esc(info.filename);
+   el('fileInfo').innerHTML='<h2>'+name+'</h2><p class="small">원본 파일 · 60초 임시 다운로드 주소</p>'+
+    (/\.(jpg|jpeg|png|gif|webp)$/i.test(info.filename)?'<img class="previewimg" src="'+url+'" alt="등록 파일 미리보기">':'')+
+    '<a class="primary" style="display:block;text-align:center;text-decoration:none" href="'+url+'" target="_blank" rel="noopener noreferrer">⬇ 원본 파일 열기 / 다운로드</a>';
+  }catch(e){el('fileInfo').textContent='원본 파일 조회 실패: '+e.message}
+ },
+ async pair(){
+  var code=String(el('pairCode')?.value||'').trim();
+  if(code.length<20)return alertMsg('유효한 일회용 기기 연결코드를 입력하세요.');
+  try{var r=await fetch(PAIR,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:code})});
+   var j=await r.json();if(!r.ok||!j.token)throw Error(j.error||'기기 연결 실패');
+   setToken(j.token);el('pairCode').value='';await V6.loadRooms();alertMsg('기기 연결 완료 · '+(j.device_id||''));
+  }catch(e){alertMsg('기기 등록 실패: '+e.message)}
+ },
+ async rename(id){
+  var old=title(id),name=prompt('방제 변경: '+old,old);if(name===null)return;
+  try{var r=await api('/room-rename',{method:'POST',json:{room_key:id,name:name}});
+   rooms.find(function(x){return x.room_key===id}).display_name=r.room.display_name;
+   view('settings');alertMsg('방제 변경 완료');}catch(e){alertMsg('변경 실패: '+e.message)}
+ },
+ async addRoom(){
+  var name=String(el('newRoomName')?.value||'').trim();if(!name)return alertMsg('추가할 방 이름을 입력하세요.');
+  try{await api('/room-add',{method:'POST',json:{name:name}});await V6.loadRooms();view('settings');alertMsg('새 방 추가 완료')}
+  catch(e){alertMsg('방 추가 실패: '+e.message)}
+ },
+ async setOriginal(id){
+  var k='v6_original_'+id,old=localStorage.getItem(k)||'',value=prompt('기존 ChatGPT /c/ 원본 대화 주소',old);
+  if(value===null)return;value=value.trim();
+  try{if(value){var url=new URL(value);if(url.protocol!=='https:'||!['chatgpt.com','chat.openai.com'].includes(url.hostname)||!/^\/c\/[a-z0-9-]+\/?$/i.test(url.pathname))throw Error('ChatGPT /c/ 주소만 등록됩니다.')}
+   localStorage.setItem(k,value);alertMsg('원본방 바로가기 주소를 이 기기에 저장했습니다. 원본 대화 자체는 변경되지 않습니다.');
+  }catch(e){alertMsg('주소가 올바르지 않습니다: '+e.message)}
+ },
+ original:function(){
+  var url=localStorage.getItem('v6_original_'+active);
+  if(!url)return alertMsg('설정에서 '+title(active)+' 원본 ChatGPT 주소를 먼저 등록하세요.');
+  window.open(url,'_blank','noopener,noreferrer');
+ },
+ setTheme:function(name){if(!['sea','night','sunrise','sunset','snow'].includes(name))return;localStorage.setItem(THEME,name);document.body.dataset.theme=name;view('settings')}
+};
+function formatNotices(list){
+ return list.length?list.map(function(n){
+  return '<div class="rowitem"><b>📢 '+esc(n.subject)+'</b><p>'+esc(n.body).replace(/\n/g,'<br>')+'</p>'+
+   '<span class="small">'+esc(new Date(n.created_at).toLocaleString('ko-KR'))+' · 첨부 '+(n.attachment_ids||[]).length+'건</span>'+
+   (n.attachment_ids||[]).map(function(id){return '<button class="mini" onclick="V6.file(\''+id+'\')">📎 첨부파일</button>'}).join('')+'</div>';
+ }).join(''):'등록된 공지가 없습니다.';
+}
+function formatPurchase(list){
+ if(!list.length)return '아직 V6에서 자동 추출된 실구매 5조합이 없습니다.';
+ var byId={};list.forEach(function(x){(byId[x.asset_id]??=[]).push(x)});
+ return Object.keys(byId).map(function(id){var rows=byId[id],pending=rows[0].approval_status!=='APPROVED';
+  return '<div class="rowitem"><b>'+rows[0].round_no+'회 · '+(pending?'형식검증 완료 / 승인 대기':'실구매 승인 완료')+'</b>'+
+   rows.map(function(x){return '<div style="padding:5px">'+x.set_index+'조합 : <strong>'+x.numbers.join(' · ')+'</strong></div>'}).join('')+
+   (pending&&rows.length===5?'<button class="mini" onclick="V6.approve(\''+id+'\')">실구매 최종 승인</button>':'')+'</div>';
+ }).join('');
+}
+V6.approve=async function(id){
+ if(!confirm('검증한 5조합을 실구매용으로 최종 승인하시겠습니까?'))return;
+ try{await api('/purchase-approve',{method:'POST',json:{asset_id:id,confirm:true}});alertMsg('실구매 승인 상태 저장');V6.refresh()}
+ catch(e){alertMsg('실구매 승인 실패: '+e.message)}
+};
+async function loadAttach(){
+ if(!hold())return;
+ try{var files=(await api('/library')).files||[];
+  el('attachList').innerHTML=files.length?files.slice(0,30).map(function(f){return '<label style="display:flex;gap:8px;align-items:center"><input data-attach type="checkbox" style="width:auto" value="'+f.asset_id+'">'+esc(f.filename)+'</label>'}).join(''):'등록된 V6 파일 없음 · 담당방 파일함에서 먼저 업로드해 주세요.';
+ }catch(e){el('attachList').textContent='첨부 목록 조회 실패: '+e.message}
+}
+window.V6=V6;document.body.dataset.theme=theme();view('home');V6.loadRooms();
+})();
+</script></body></html>
