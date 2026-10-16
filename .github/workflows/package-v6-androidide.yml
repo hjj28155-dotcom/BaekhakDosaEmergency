@@ -50,7 +50,7 @@ jobs:
           AAPT=$(find "$ANDROID_HOME/build-tools" -name aapt -type f | sort -V | tail -1)
           BADGE=$("$AAPT" dump badging v6/app/build/outputs/apk/debug/app-debug.apk | head -1)
           echo "$BADGE"
-          grep -Fq "versionCode='600005'" <<< "$BADGE"
+          grep -Fq "versionCode='600006'" <<< "$BADGE"
           grep -Fq "id=\"quicknav\"" v6/app/src/main/assets/v6_fallback.html
           grep -Fq 'V6.checkUpdate()' v6/app/src/main/assets/v6_fallback.html
           grep -Fq 'canGoBack()' v6/app/src/main/java/kr/hanghae/v6/centralcontrol/MainActivity.java
@@ -59,6 +59,8 @@ jobs:
           grep -Fq '방제 저장' v6/app/src/main/assets/v6_fallback.html
           grep -Fq 'checkDevice(){' v6/app/src/main/assets/v6_fallback.html
           grep -Fq '기기 토큰 저장 실패' v6/app/src/main/assets/v6_fallback.html
+          grep -Fq 'menuRoom:function(id)' v6/app/src/main/assets/v6_fallback.html
+          grep -Fq 'menuGo:function(dest)' v6/app/src/main/assets/v6_fallback.html
           grep -Fq '1246회차 백학도사' v6/app/src/main/assets/v6_fallback.html
       - name: Package complete source without caches
         run: |
@@ -72,11 +74,11 @@ jobs:
           test -s V6_AndroidIDE_Project/app/src/main/java/kr/hanghae/v6/centralcontrol/MainActivity.java
           test -s V6_AndroidIDE_Project/app/src/main/assets/v6_fallback.html
           test -s V6_AndroidIDE_Project/ANDROIDIDE_빌드와_V6_업데이트_안내.md
-          zip -q -r V6_AndroidIDE_Project_V6_0_4_20261017.zip V6_AndroidIDE_Project
-          test -s V6_AndroidIDE_Project_V6_0_4_20261017.zip
-          unzip -t V6_AndroidIDE_Project_V6_0_4_20261017.zip | tail -2
-          sha256sum V6_AndroidIDE_Project_V6_0_4_20261017.zip > V6_AndroidIDE_Project_V6_0_4_20261017.zip.sha256
-          unzip -l V6_AndroidIDE_Project_V6_0_4_20261017.zip | grep -E 'gradlew|gradle-wrapper.jar|MainActivity.java|v6_fallback.html'
+          zip -q -r V6_AndroidIDE_Project_V6_0_5_20261017.zip V6_AndroidIDE_Project
+          test -s V6_AndroidIDE_Project_V6_0_5_20261017.zip
+          unzip -t V6_AndroidIDE_Project_V6_0_5_20261017.zip | tail -2
+          sha256sum V6_AndroidIDE_Project_V6_0_5_20261017.zip > V6_AndroidIDE_Project_V6_0_5_20261017.zip.sha256
+          unzip -l V6_AndroidIDE_Project_V6_0_5_20261017.zip | grep -E 'gradlew|gradle-wrapper.jar|MainActivity.java|v6_fallback.html'
       - name: Explain which folder to open
         run: |
           cat > OPEN_THIS_FOLDER.txt <<'TXT'
@@ -117,6 +119,6 @@ jobs:
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -f V6_AndroidIDE_Project_V6_0_4_20261017.zip V6_AndroidIDE_Project_V6_0_4_20261017.zip.sha256
+          git add -f V6_AndroidIDE_Project_V6_0_5_20261017.zip V6_AndroidIDE_Project_V6_0_5_20261017.zip.sha256
           git commit -m 'Publish V6 AndroidIDE project ZIP with Gradle wrapper' || exit 0
           git push origin HEAD:main
