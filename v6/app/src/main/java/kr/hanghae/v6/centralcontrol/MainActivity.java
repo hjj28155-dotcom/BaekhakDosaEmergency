@@ -15,6 +15,13 @@ import android.webkit.WebResourceError;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.net.URL;
+import java.net.HttpURLConnection;
+import java.io.File;
+import java.io.FileOutputStream;
+import android.webkit.JavascriptInterface;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -28,6 +35,10 @@ public final class MainActivity extends Activity {
     private static final int PICKER = 611;
     private WebView web;
     private boolean fallbackShown=false;
+    private static final String LOCAL_UI_CACHE="v6_screen_cache.html";
+    private static final int MAX_UI_BYTES=1024*1024;
+    private static final Pattern UI_VERSION=Pattern.compile("CURRENT_VERSION_CODE\\s*=\\s*(\\d+)");
+    private volatile int displayedUiVersion=0;
     private android.webkit.ValueCallback<Uri[]> uploadCallback;
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -42,6 +53,7 @@ public final class MainActivity extends Activity {
         s.setLoadsImagesAutomatically(true);
         s.setMediaPlaybackRequiresUserGesture(true);
         CookieManager.getInstance().setAcceptCookie(true);
+        web.addJavascriptInterface(new NativeUpdateBridge(),"V6NativeUpdater");
         web.setWebViewClient(new WebViewClient() {
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
@@ -90,19 +102,102 @@ public final class MainActivity extends Activity {
         });
         loadPackagedV6Home();
     }
-    private void loadPackagedV6Home() {
-        try (InputStream in=getAssets().open("v6_fallback.html");
-             ByteArrayOutputStream out=new ByteArrayOutputStream()) {
+    // UI updates are HTTPS-only and may never install or replace APK code.
+    // Save only reviewed HTML with an increasing version number, never execute network requests on UI thread.
+    private static int htmlVersion(String html) {
+        if (html == null || html.length() > MAX_UI_BYTES || !html.trim().toLowerCase(java.util.Locale.ROOT).startsWith("<!doctype html>")) return 0;
+        if (!html.contains("id=\"phone\"") || !html.contains("window.V6=V6") || !html.contains("항행의자유 V6")) return 0;
+        Matcher m = UI_VERSION.matcher(html);
+        if(!m.find())return 0;
+        try {return Integer.parseInt(m.group(1));}catch(Exception e){return 0;}
+    }
+    private static byte[] readBounded(InputStream stream) throws Exception {
+        try(ByteArrayOutputStream bytes=new ByteArrayOutputStream()) {
             byte[] buffer=new byte[8192];
-            int n;
-            while ((n=in.read(buffer))!=-1) out.write(buffer,0,n);
+            int n,total=0;
+            while((n=stream.read(buffer))!=-1){
+                total+=n;
+                if(total>MAX_UI_BYTES)throw new IllegalArgumentException("UI document exceeds 1MB");
+                bytes.write(buffer,0,n);
+            }
+            return bytes.toByteArray();
+        }
+    }
+    private void loadDocument(String html,int version) {
+        if(web==null)return;
+        if(version<displayedUiVersion)return; // Never replace a newer UI with an older cached document.
+        displayedUiVersion=version;
+        web.loadDataWithBaseURL(HOME,html,"text/html","UTF-8",HOME);
+    }
+    private void loadPackagedV6Home() {
+        try(InputStream in=getAssets().open("v6_fallback.html")) {
+            String local=new String(readBounded(in),StandardCharsets.UTF_8);
+            int localVersion=htmlVersion(local);
+            if(localVersion==0)throw new IllegalStateException("Invalid bundled V6 home");
+            File cache=new File(getFilesDir(),LOCAL_UI_CACHE);
+            if(cache.isFile() && cache.length()>0 && cache.length()<=MAX_UI_BYTES) {
+                try(InputStream cached=new java.io.FileInputStream(cache)){
+                    String remoteCached=new String(readBounded(cached),StandardCharsets.UTF_8);
+                    int cacheVersion=htmlVersion(remoteCached);
+                    if(cacheVersion>localVersion){local=remoteCached;localVersion=cacheVersion;}
+                }catch(Exception ignored){}
+            }
             fallbackShown=true;
-            String html=new String(out.toByteArray(),StandardCharsets.UTF_8);
-            web.loadDataWithBaseURL(HOME,html,"text/html","UTF-8",HOME);
-            // Bundled HTML is loaded as text/html to prevent a raw-source display.
-        } catch(Exception e) {
+            loadDocument(local,localVersion);
+            fetchRemoteUi(false); // Future server-published screen changes update the installed app automatically.
+        }catch(Exception e){
             Toast.makeText(this,"V6 화면을 불러오지 못했습니다.",Toast.LENGTH_LONG).show();
         }
+    }
+    private final class NativeUpdateBridge {
+        @JavascriptInterface public void refreshScreen() {
+            runOnUiThread(() -> fetchRemoteUi(true));
+        }
+    }
+    private void fetchRemoteUi(boolean userRequested) {
+        new Thread(() -> {
+            HttpURLConnection connection=null;
+            try {
+                URL url=new URL(HOME);
+                connection=(HttpURLConnection)url.openConnection();
+                connection.setInstanceFollowRedirects(false);
+                connection.setConnectTimeout(6000);
+                connection.setReadTimeout(6000);
+                connection.setRequestProperty("Accept","text/html");
+                connection.setRequestProperty("Cache-Control","no-cache");
+                if(connection.getResponseCode()!=200)throw new IllegalStateException("HTTP "+connection.getResponseCode());
+                String type=connection.getHeaderField("Content-Type");
+                if(type==null||!type.toLowerCase(java.util.Locale.ROOT).contains("text/html"))throw new IllegalStateException("서버가 HTML을 반환하지 않았습니다");
+                String html;
+                try(InputStream data=connection.getInputStream()){
+                    html=new String(readBounded(data),StandardCharsets.UTF_8);
+                }
+                int version=htmlVersion(html);
+                if(version<=0)throw new IllegalStateException("화면 문서 검증 실패");
+                if(version<=displayedUiVersion){
+                    if(userRequested)runOnUiThread(()->Toast.makeText(this,"최신 V6 화면입니다.",Toast.LENGTH_SHORT).show());
+                    return;
+                }
+                File output=new File(getFilesDir(),LOCAL_UI_CACHE);
+                File temp=new File(getFilesDir(),LOCAL_UI_CACHE+".tmp");
+                try(FileOutputStream stream=new FileOutputStream(temp)){
+                    stream.write(html.getBytes(StandardCharsets.UTF_8));
+                    stream.flush();
+                }
+                if(!temp.renameTo(output)){
+                    try(FileOutputStream stream=new FileOutputStream(output)){stream.write(html.getBytes(StandardCharsets.UTF_8));}
+                    temp.delete();
+                }
+                runOnUiThread(()->{
+                    if(web!=null&&version>displayedUiVersion){
+                        loadDocument(html,version);
+                        Toast.makeText(this,"V6 화면 업데이트 완료 · "+version,Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }catch(Exception e) {
+                if(userRequested)runOnUiThread(()->Toast.makeText(this,"화면 업데이트 실패: "+e.getMessage(),Toast.LENGTH_LONG).show());
+            }finally{if(connection!=null)connection.disconnect();}
+        },"V6ScreenUpdater").start();
     }
     @Override protected void onActivityResult(int requestCode,int resultCode,Intent data) {
         super.onActivityResult(requestCode,resultCode,data);
