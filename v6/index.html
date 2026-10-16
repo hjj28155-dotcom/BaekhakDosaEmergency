@@ -73,7 +73,7 @@ var TOKEN='hanghae_v6_device_token_v1',THEME='hanghae_v6_theme';
 var DEFAULT=[['all','전체방'],['analysis','1번방'],['controller','2번방'],['helmsman','3번방'],['freedom','4번방'],['chief','5번방']];
 var rooms=DEFAULT.map(function(r){return {room_key:r[0],display_name:r[1],fixed:true}});
 var active='analysis',screen='home',tab='files',filterRoom='',busy=false,noticeRoom='all';
-var currentFiles=[],currentPurchase=[],currentNotices=[],currentChats=[];
+var currentFiles=[],currentPurchase=[],currentNotices=[],currentChats=[],legacyOffset=0,legacyItems=[];
 function el(id){return document.getElementById(id)}
 function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function token(){try{return localStorage.getItem(TOKEN)||''}catch(e){return ''}}
@@ -98,7 +98,7 @@ function renderDrawer(){
  var d='<div style="font-size:20px;color:#f5d596;font-weight:900;padding:15px 0">⚓ V6 중앙통제실</div>';
  d+=menuBtn('🏠 홈으로','home')+menuBtn('📢 전체방','whole');
  rooms.filter(function(r){return r.room_key!=='all'}).forEach(function(r){d+='<button onclick="V6.room(\''+r.room_key+'\')">⚓ '+esc(r.display_name)+'</button>'});
- d+=menuBtn('📁 앱자료실','appfiles')+menuBtn('🗂 라이브러리','library')+
+ d+=menuBtn('📁 앱자료실','appfiles')+menuBtn('🗂 라이브러리','library')+menuBtn('📚 기존 V5 자료실','legacy')+
  menuBtn('📊 누적DB','db')+menuBtn('🖼 실구매용 5조합','purchase')+
  menuBtn('🔔 공지사항','notices')+menuBtn('⚙ 설정 및 방제 관리','settings');
  el('drawer').innerHTML=d;
@@ -131,7 +131,7 @@ function fileItem(f,showRoom){
 function roomPage(){
  var d=heading('⚓ '+esc(title(active)))+roomTabs();
  if(tab==='files')d+='<div class="card"><h2>📂 '+esc(title(active))+' · 전용 폴더</h2>'+fileInput()+'</div>'+
- '<div class="card"><div class="rows"><h3>등록된 파일</h3><button class="mini" onclick="V6.refresh()">↻ 새로고침</button></div><div id="roomList">조회 중…</div></div>';
+ '<div class="card"><div class="rows"><h3>등록된 파일</h3><button class="mini" onclick="V6.refresh()">↻ 새로고침</button></div><label for="roomViewRound">파일 목록 회차 (비우면 전체)</label><input id="roomViewRound" type="number" min="1" max="9999" placeholder="전체 회차"><div id="roomList">조회 중…</div></div>';
  if(tab==='chat')d+='<div class="card"><h2>V6 서버 대화 기록</h2><p class="serveronly">원본 ChatGPT 대화방은 별도로 유지됩니다. 여기에 작성한 내용은 V6 서버에만 기록됩니다.</p>'+
  '<div id="chatList" style="min-height:140px;max-height:330px;overflow:auto"></div>'+
  '<textarea id="chatText" maxlength="4000" placeholder="V6 내부 대화 메시지"></textarea><button class="primary" onclick="V6.sendChat()">전송</button>'+
@@ -157,10 +157,20 @@ function library(dbMode){
  return heading(dbMode?'📊 V6 누적DB':'🗂 라이브러리')+
  '<div class="tabs"><button class="'+(!dbMode?'active':'')+'" onclick="V6.go(\'library\')">전체 파일</button>'+
  '<button class="'+(dbMode?'active':'')+'" onclick="V6.go(\'db\')">회차별 DB</button>'+
- '<button onclick="V6.go(\'purchase\')">실구매용</button></div>'+
+ '<button onclick="V6.go(\'purchase\')">실구매용</button><button onclick="V6.go(\'legacy\')">기존 V5 자료</button></div>'+
  '<div class="card"><label>자료 회차 (전체는 비움)</label><input id="dbRound" type="number" min="1" max="9999" placeholder="전체 회차">'+
  '<button class="primary" onclick="V6.refresh()">조회</button></div><div class="card"><div id="fileList">자료 조회 중…</div></div>'+
  '<p class="serveronly">이 목록은 V6 서버에 등록된 파일의 누적 색인입니다. V5 휴대전화 내부 DB는 아직 이관되지 않았습니다.</p>';
+}
+function legacyLibrary(){
+ return heading('📚 기존 V5 자료실')+
+ '<div class="tabs"><button class="active">V5 기존 자료</button><button onclick="V6.go(\'library\')">V6 새 자료</button><button onclick="V6.go(\'db\')">V6 누적DB</button></div>'+
+ '<div class="card"><p class="hint">V5 서버 라이브러리 목록을 조회합니다. 원본을 보관하지 않은 자료는 다운로드할 수 없습니다.</p>'+
+ '<label>파일명 검색</label><input id="legacyQuery" maxlength="90" placeholder="파일 이름">'+
+ '<label>원본 상태</label><select id="legacyStatus"><option value="">전체</option><option value="IMPORTED">원본 보관 완료</option><option value="PENDING">원본 이관 필요</option></select>'+
+ '<button class="primary" onclick="V6.legacyRefresh(0)">검색</button></div>'+
+ '<div class="card"><div id="legacyCount" class="hint">조회 중…</div><div id="legacyList"></div><div class="rows"><button class="mini" id="legacyPrev" onclick="V6.legacyRefresh(Math.max(0,legacyOffset-50))">◀ 이전</button><button class="mini" id="legacyNext" onclick="V6.legacyRefresh(legacyOffset+50)">다음 ▶</button></div></div>'+
+ '<p class="serveronly">V5 서버 목록입니다. PENDING 상태는 원본 이관이 필요하며, Drive 또는 ChatGPT 라이브러리 자동 동기화를 뜻하지 않습니다.</p>';
 }
 function purchase(){
  return heading('🖼 실구매용 5조합')+
@@ -196,12 +206,13 @@ function filePage(){
 function view(page){
  screen=page;V6.side(false);
  var render=({home:home,whole:whole,appfiles:appfiles,library:function(){return library(false)},
-  db:function(){return library(true)},purchase:purchase,settings:settings,notices:notices,file:filePage})[page];
+  db:function(){return library(true)},legacy:legacyLibrary,purchase:purchase,settings:settings,notices:notices,file:filePage})[page];
  display(render?render():home());
  if(page==='whole')loadAttach();
  if(page==='library'||page==='db')V6.refresh();
  if(page==='purchase')V6.refresh();
  if(page==='notices')V6.loadNotices();
+ if(page==='legacy')V6.legacyRefresh(0);
 }
 var V6={
  go:view,
@@ -216,7 +227,7 @@ var V6={
  async refresh(){
   if(!hold()){alertMsg('먼저 설정 → 기기 등록을 완료하세요.');return}
   try{
-   if(screen==='room'&&tab==='files'){var rr=Number(el('roundNumber')?.value||1245);var d=await api('/files?room_key='+encodeURIComponent(active)+(rr?'&round_no='+rr:''));
+   if(screen==='room'&&tab==='files'){var rr=String(el('roomViewRound')?.value||'').trim();var d=await api('/files?room_key='+encodeURIComponent(active)+(rr?'&round_no='+encodeURIComponent(rr):''));
     currentFiles=d.files||[];el('roomList').innerHTML=currentFiles.length?currentFiles.map(function(x){return fileItem(x,false)}).join(''):'등록된 파일이 없습니다.'}
    if(screen==='room'&&tab==='chat'){var m=await api('/messages?room_key='+encodeURIComponent(active));
     currentChats=m.messages||[];el('chatList').innerHTML=currentChats.length?currentChats.slice().reverse().map(function(x){return '<div class="rowitem"><p>'+esc(x.body).replace(/\n/g,'<br>')+'</p><small class="small">'+esc(new Date(x.created_at).toLocaleString('ko-KR'))+'</small></div>'}).join(''):'이 방의 서버 대화 기록이 없습니다.'}
