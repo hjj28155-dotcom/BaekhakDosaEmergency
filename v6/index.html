@@ -17,6 +17,10 @@ header.top{display:flex;align-items:center;justify-content:space-between;padding
 header.top button{font-size:20px;border:0;background:none;padding:4px 8px}
 header.top .vtitle{text-align:center;font-size:15px;font-weight:800;color:var(--gold)}
 header.top .vtitle small{display:block;font-size:11px;color:#b5d0e5;font-weight:500}
+#quicknav{position:sticky;top:0;z-index:15;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;padding:8px 11px;background:#07182ef6;border-bottom:1px solid var(--line)}
+#quicknav button{min-height:43px;padding:8px 3px;font-size:13px;font-weight:800;white-space:nowrap;background:#16466b;border:1px solid #3d8dc2;border-radius:9px}
+#quicknav button:disabled{opacity:.4}
+#quicknav button:last-child{background:#16424d;border-color:#51afa2}
 #page{padding:13px 14px 40px;min-height:calc(100vh - 62px)}
 .hero{height:215px;border-radius:13px;background:radial-gradient(ellipse at 50% 100%,#5878b3 0%,#1c3e76 23%,#09234b 63%,#09152f 100%);border:1px solid #3c587b;position:relative;overflow:hidden;text-align:center}
 .hero:before{content:"✦     ·        ✦         ✧";position:absolute;left:8px;right:8px;top:15px;opacity:.6;letter-spacing:10px;color:#d9ecff}
@@ -61,7 +65,7 @@ textarea{min-height:104px;resize:vertical}input[type=file]{font-size:12px;paddin
 .previewimg{width:100%;max-height:50vh;object-fit:contain}.badge{background:#293e56;border:1px solid #71889f;padding:3px 7px;border-radius:6px;font-size:10px}
 .serveronly{color:#eccb93;font-size:11px;line-height:1.6}
 </style></head>
-<body data-theme="sea"><div id="phone"><header class="top"><button onclick="V6.side()">☰</button><div class="vtitle" id="headTitle">⚓ 항행의자유 V6<small>중앙통제실</small></div><button onclick="V6.go('notices')">🔔</button></header><main id="page"></main></div>
+<body data-theme="sea"><div id="phone"><header class="top"><button onclick="V6.side()">☰</button><div class="vtitle" id="headTitle">⚓ 항행의자유 V6<small>중앙통제실</small></div><button onclick="V6.go('notices')">🔔</button></header><nav id="quicknav" aria-label="화면 이동"><button id="backButton" onclick="V6.back()">◀ 이전</button><button onclick="V6.go('home')">⌂ 홈</button><button onclick="V6.go('updates')">⬆ 업데이트</button></nav><main id="page"></main></div>
 <div id="side" onclick="V6.side(false)"><div class="drawer" onclick="event.stopPropagation()" id="drawer"></div></div>
 <div id="status" role="status" aria-live="polite"></div>
 <script>
@@ -72,7 +76,9 @@ var PAIR='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/v4-room-sync/pai
 var TOKEN='hanghae_v6_device_token_v1',THEME='hanghae_v6_theme';
 var DEFAULT=[['all','전체방'],['analysis','1번방'],['controller','2번방'],['helmsman','3번방'],['freedom','4번방'],['chief','5번방']];
 var rooms=DEFAULT.map(function(r){return {room_key:r[0],display_name:r[1],fixed:true}});
-var active='analysis',screen='home',tab='files',filterRoom='',busy=false,noticeRoom='all';
+var active='analysis',screen='home',tab='files',filterRoom='',busy=false,noticeRoom='all',historyStack=[],releaseInfo=null;
+var CURRENT_VERSION_CODE=600003, CURRENT_VERSION_NAME='V6.0.2';
+var UPDATE_SERVICE='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/v6-update-check';
 var currentFiles=[],currentPurchase=[],currentNotices=[],currentChats=[],legacyOffset=0,legacyItems=[];
 function el(id){return document.getElementById(id)}
 function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
@@ -81,6 +87,7 @@ function setToken(s){try{localStorage.setItem(TOKEN,s)}catch(e){}}
 function theme(){try{return localStorage.getItem(THEME)||'sea'}catch(e){return 'sea'}}
 function alertMsg(s){var n=el('status');n.textContent=s;n.style.display='block';clearTimeout(alertMsg.timer);alertMsg.timer=setTimeout(function(){n.style.display='none'},8000)}
 function title(id){var r=rooms.find(function(x){return x.room_key===id});return r?r.display_name:id}
+function validZipUrl(url){try{var u=new URL(String(url||''));return u.protocol==='https:'&&u.hostname==='raw.githubusercontent.com'&&u.pathname.startsWith('/hjj28155-dotcom/BaekhakDosaEmergency/main/V6_AndroidIDE_Project_')&&u.pathname.endsWith('.zip')}catch(e){return false}}
 function currentRound(){return Number((el('roundNumber')&&el('roundNumber').value)||1245)}
 function hold(){return !!(token()&&/^[a-f0-9]{64}$/.test(token()))}
 async function api(path,options){
@@ -92,7 +99,9 @@ async function api(path,options){
  if(!r.ok||j.error)throw Error((j.error||'연결 실패')+(j.message?' · '+j.message:''));
  return j;
 }
-function display(s){el('page').innerHTML=s;el('headTitle').innerHTML='⚓ 항행의자유 V6<small>'+esc(screen==='home'?'중앙통제실':title(active))+'</small>'}
+function display(s){el('page').innerHTML=s;el('headTitle').innerHTML='⚓ 항행의자유 V6<small>'+esc(screen==='home'?'중앙통제실':screen==='updates'?'업데이트':title(active))+'</small>';el('backButton').disabled=(screen==='home'&&historyStack.length===0)}
+function remember(){historyStack.push({screen:screen,active:active,tab:tab,noticeRoom:noticeRoom});if(historyStack.length>40)historyStack.shift()}
+function restore(prev){active=prev.active;tab=prev.tab;noticeRoom=prev.noticeRoom;if(prev.screen==='room'){screen='room';V6.side(false);display(roomPage());V6.refresh()}else view(prev.screen,false)}
 function menuBtn(txt,dest){return '<button onclick="V6.go(\''+dest+'\')">'+txt+'</button>'}
 function renderDrawer(){
  var d='<div style="font-size:20px;color:#f5d596;font-weight:900;padding:15px 0">⚓ V6 중앙통제실</div>';
@@ -100,7 +109,7 @@ function renderDrawer(){
  rooms.filter(function(r){return r.room_key!=='all'}).forEach(function(r){d+='<button onclick="V6.room(\''+r.room_key+'\')">⚓ '+esc(r.display_name)+'</button>'});
  d+=menuBtn('📁 앱자료실','appfiles')+menuBtn('🗂 라이브러리','library')+menuBtn('📚 기존 V5 자료실','legacy')+
  menuBtn('📊 누적DB','db')+menuBtn('🖼 실구매용 5조합','purchase')+
- menuBtn('🔔 공지사항','notices')+menuBtn('⚙ 설정 및 방제 관리','settings');
+ menuBtn('🔔 공지사항','notices')+menuBtn('⚙ 설정 및 방제 관리','settings')+menuBtn('⬆ 업데이트 확인','updates');
  el('drawer').innerHTML=d;
 }
 function heading(h){return '<h1>'+h+'</h1>'}
@@ -200,25 +209,61 @@ function notices(){
  rooms.map(function(r){return '<option value="'+r.room_key+'" '+(noticeRoom===r.room_key?'selected':'')+'>'+esc(r.display_name)+'</option>'}).join('')+
  '</select><div id="allNotices">조회 중…</div></div>';
 }
+function updatePage(){
+ return heading('⬆ V6 업데이트')+
+ '<div class="card"><h2>현재 설치용 프로젝트</h2><p style="font-size:17px;font-weight:900">'+esc(CURRENT_VERSION_NAME)+'</p>'+
+ '<p class="small">버전 코드 '+CURRENT_VERSION_CODE+' · kr.hanghae.v6.centralcontrol</p>'+
+ '<button class="primary" onclick="V6.checkUpdate()">🔄 새 버전 확인</button>'+
+ '<div id="updateInfo" class="hint">서버에서 최신 업데이트 정보를 확인합니다.</div>'+
+ '<button class="primary" id="downloadZip" onclick="V6.downloadUpdate()" disabled>📦 최신 AndroidIDE ZIP 받기</button></div>'+
+ '<div class="card"><h2>기존 앱을 삭제하지 않고 업데이트</h2>'+
+ '<p>새 ZIP 압축 풀기 → AndroidIDE에서 프로젝트 열기 → Build APK → 기존 V6 위에 설치</p>'+
+ '<p class="serveronly">반드시 기존 설치 APK와 동일한 서명키로 빌드해야 합니다. 최초 AndroidIDE 서명키가 다르면 앱을 삭제하지 않고 업데이트할 수 없습니다. 이 버튼은 APK를 자동 설치하지 않으며 빌드용 ZIP을 받습니다.</p></div>';
+}
 function filePage(){
  return heading('📄 파일 보기')+'<div class="card" id="fileInfo">서버 자료를 확인하는 중…</div><button onclick="V6.go(\'library\')">◀ 라이브러리로</button>';
 }
-function view(page){
+function view(page,saveHistory){
+ if(saveHistory!==false&&page!==screen)remember();
  screen=page;V6.side(false);
  var render=({home:home,whole:whole,appfiles:appfiles,library:function(){return library(false)},
-  db:function(){return library(true)},legacy:legacyLibrary,purchase:purchase,settings:settings,notices:notices,file:filePage})[page];
+  db:function(){return library(true)},legacy:legacyLibrary,purchase:purchase,settings:settings,notices:notices,updates:updatePage,file:filePage})[page];
  display(render?render():home());
  if(page==='whole')loadAttach();
  if(page==='library'||page==='db')V6.refresh();
  if(page==='purchase')V6.refresh();
  if(page==='notices')V6.loadNotices();
  if(page==='legacy')V6.legacyRefresh(0);
+ if(page==='updates')V6.checkUpdate();
 }
 var V6={
  go:view,
+ back:function(){if(historyStack.length)restore(historyStack.pop());else if(screen!=='home')view('home',false)},
+ async checkUpdate(){
+   var info=el('updateInfo'),button=el('downloadZip');
+   if(info)info.textContent='최신 업데이트 확인 중…';
+   if(button)button.disabled=true;
+   try{
+     var response=await fetch(UPDATE_SERVICE,{cache:'no-store'});
+     if(!response.ok)throw Error('업데이트 서버 상태 '+response.status);
+     var data=await response.json();
+     if(!data||!Number.isInteger(data.version_code)||!data.version_name)throw Error('업데이트 정보 형식 오류');
+     releaseInfo=data;
+     if(info)info.textContent=data.version_code>CURRENT_VERSION_CODE?
+       '새 버전 '+data.version_name+' ('+data.version_code+') 사용 가능 · AndroidIDE ZIP으로 업데이트하세요.':
+       '현재 설치본 '+CURRENT_VERSION_NAME+' · 최신 공개 버전 '+data.version_name+'입니다.';
+     if(button)button.disabled=!validZipUrl(data.download_zip_url);
+   }catch(e){releaseInfo=null;if(info)info.textContent='업데이트 확인 실패: '+e.message;alertMsg('업데이트 정보 확인 실패')}
+ },
+ downloadUpdate:function(){
+   var url=releaseInfo&&releaseInfo.download_zip_url;
+   if(!validZipUrl(url))return alertMsg('업데이트 파일 주소를 확인하지 못했습니다.');
+   window.location.assign(url);
+ },
+
  side:function(state){var box=el('side');if(typeof state==='boolean'){box.classList.toggle('show',state);if(state)renderDrawer()}else{box.classList.toggle('show');if(box.classList.contains('show'))renderDrawer()}},
- room:function(id){active=id;tab='files';screen='room';display(roomPage());V6.refresh()},
- tab:function(t){tab=t;display(roomPage());V6.refresh()},
+ room:function(id){if(screen!=='room'||active!==id)remember();active=id;tab='files';screen='room';display(roomPage());V6.refresh()},
+ tab:function(t){if(t!==tab)remember();tab=t;display(roomPage());V6.refresh()},
  async loadRooms(){
   if(!hold())return;
   try{var res=await api('/rooms');if(res.rooms&&res.rooms.length>=6){rooms=res.rooms;renderDrawer();if(screen==='home')display(home())}}
@@ -261,7 +306,7 @@ var V6={
  async legacyFile(id){
   var record=legacyItems.find(function(x){return x.id===id});
   if(!record||record.import_status!=='IMPORTED')return alertMsg('해당 파일은 원본 이관 전입니다.');
-  screen='file';display(filePage());
+  remember();screen='file';display(filePage());
   try{
    var out=await api('/legacy-download/'+id);if(!out.url)throw Error('원본 다운로드 주소 없음');
    el('fileInfo').innerHTML='<h2>'+esc(record.display_name)+'</h2>'+
@@ -305,7 +350,7 @@ var V6={
  },
  noticeFilter:function(id){noticeRoom=id;V6.loadNotices()},
  async file(id){
-  screen='file';display(filePage());try{
+  remember();screen='file';display(filePage());try{
    var x=await api('/download/'+id);
    if(!x.url)throw Error('다운로드 주소가 없습니다.');
    var info=currentFiles.find(function(z){return z.asset_id===id})||{filename:'자료 원본'};
