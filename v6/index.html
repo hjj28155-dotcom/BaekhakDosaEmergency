@@ -174,7 +174,7 @@ function settings(){
  '<div class="card"><h2>기기 등록</h2><p class="small">'+(hold()?'기기 토큰이 이 앱에 저장돼 있습니다. 서버 연결 상태는 파일 조회로 확인할 수 있습니다.':'기존 V5 중앙서버에서 발급한 일회용 연결코드가 필요합니다.')+'</p>'+
  '<label for="pairCode">일회용 연결코드</label><input id="pairCode" autocomplete="off" type="password" placeholder="연결코드 입력">'+
  '<button class="primary" onclick="V6.pair()">연결코드로 이 기기 등록</button></div>'+
- '<div class="card"><h2>기본 6개 방 · 방제 수정</h2>';
+ '<div class="card"><h2>방제 수정 · 추가방 포함</h2>';
  rooms.forEach(function(r){d+='<div class="rowitem"><div class="rows"><b>'+esc(r.display_name)+'</b><button class="mini" onclick="V6.rename(\''+r.room_key+'\')">이름 변경</button></div>'+
  (r.room_key==='all'?'':('<button class="mini" style="margin-top:5px" onclick="V6.setOriginal(\''+r.room_key+'\')">↗ 원본 ChatGPT 주소 등록</button>'))+'</div>'});
  d+='</div><div class="card"><h2>➕ 새 방 추가</h2><input id="newRoomName" maxlength="32" placeholder="새 방 이름">'+
@@ -300,7 +300,7 @@ var V6={
  original:function(){
   var url=localStorage.getItem('v6_original_'+active);
   if(!url)return alertMsg('설정에서 '+title(active)+' 원본 ChatGPT 주소를 먼저 등록하세요.');
-  window.open(url,'_blank','noopener,noreferrer');
+  window.location.assign(url); // Android shell opens original chat links externally
  },
  setTheme:function(name){if(!['sea','night','sunrise','sunset','snow'].includes(name))return;localStorage.setItem(THEME,name);document.body.dataset.theme=name;view('settings')}
 };
