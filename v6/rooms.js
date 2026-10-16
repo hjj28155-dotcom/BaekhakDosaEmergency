@@ -5,11 +5,11 @@
 var STORAGE="hanghae_v6_rooms_v1";
 var DEFAULT=[
  {id:"all",name:"전체방",kind:"broadcast",fixed:true},
- {id:"analysis",name:"항해사방",kind:"individual",fixed:true},
- {id:"controller",name:"통제사방",kind:"individual",fixed:true},
- {id:"helmsman",name:"조타수방",kind:"individual",fixed:true},
- {id:"freedom",name:"항행의자유방",kind:"individual",fixed:true},
- {id:"chief",name:"기관장방",kind:"individual",fixed:true}
+ {id:"analysis",name:"1번방",kind:"individual",fixed:true,sourceLabel:"항해사방"},
+ {id:"controller",name:"2번방",kind:"individual",fixed:true,sourceLabel:"통제사방"},
+ {id:"helmsman",name:"3번방",kind:"individual",fixed:true,sourceLabel:"조타수방"},
+ {id:"freedom",name:"4번방",kind:"individual",fixed:true,sourceLabel:"항행의자유방"},
+ {id:"chief",name:"5번방",kind:"individual",fixed:true,sourceLabel:"기관장방"}
 ];
 var core=DEFAULT.map(function(x){return x.id}),inMemory=null;
 function clone(x){return JSON.parse(JSON.stringify(x))}
