@@ -111,7 +111,16 @@ public final class MainActivity extends Activity {
         uploadCallback=null;
     }
     @Override public void onBackPressed() {
-        if(web!=null&&web.canGoBack())web.goBack();else super.onBackPressed();
+        if(web==null){super.onBackPressed();return;}
+        web.evaluateJavascript("Boolean(window.V6 && window.V6.canGoBack && window.V6.canGoBack())", result -> {
+            if("true".equals(result)){
+                if(web!=null)web.evaluateJavascript("window.V6.back()",null);
+            } else if(web!=null && web.canGoBack()){
+                web.goBack();
+            } else {
+                MainActivity.super.onBackPressed();
+            }
+        });
     }
     @Override protected void onDestroy(){
         if(uploadCallback!=null){uploadCallback.onReceiveValue(null);uploadCallback=null;}
