@@ -436,29 +436,83 @@ var V6={
    setToken(j.token);el('pairCode').value='';await V6.loadRooms();alertMsg('기기 연결 완료 · '+(j.device_id||''));
   }catch(e){alertMsg('기기 등록 실패: '+e.message)}
  },
- async rename(id){
-  var old=title(id),name=prompt('방제 변경: '+old,old);if(name===null)return;
-  try{var r=await api('/room-rename',{method:'POST',json:{room_key:id,name:name}});
-   rooms.find(function(x){return x.room_key===id}).display_name=r.room.display_name;
-   view('settings');alertMsg('방제 변경 완료');}catch(e){alertMsg('변경 실패: '+e.message)}
+ saveRoomName:async function(id){
+  var field=el('rn_'+id),name=cleanTitle(field&&field.value);
+  if(!validTitle(name))return alertMsg('방제는 공백을 제외한 1~32자로 입력하세요.');
+  var row=rooms.find(function(r){return r.room_key===id});
+  if(!row)return alertMsg('등록된 방이 없습니다.');
+  prefs.names[id]=name;
+  row.display_name=name;
+  var saved=persistPrefs();
+  if(!saved)return alertMsg('저장 공간이 비활성화됐습니다. 휴대전화 저장 설정을 확인하세요.');
+  display(settings());
+  if(hold()&&!row.pendingServer){
+   try{await api('/room-rename',{method:'POST',json:{room_key:id,name:name}});
+    return alertMsg('방제 저장 완료 · 서버에도 반영됐습니다.');
+   }catch(e){return alertMsg('방제는 이 기기에 저장됨 · 서버에는 미반영: '+e.message)}
+  }
+  alertMsg('방제 저장 완료 · 이 기기에 보관됨'+(row.pendingServer?' (방 서버 등록 필요)':''));
+ },
+ saveRoomLink:function(id){
+  var field=el('rl_'+id),value=String(field&&field.value||'').trim();
+  if(value&&!isOriginalLink(value))return alertMsg('ChatGPT 원본 대화 주소를 입력하세요. 일반 대화 /c/ 또는 프로젝트 대화 /g/…/c/ 형식이 가능합니다.');
+  if(value)prefs.links[id]=value;else delete prefs.links[id];
+  if(!persistPrefs())return alertMsg('링크 저장 실패 · 기기 저장 공간 확인 필요');
+  alertMsg(value?'원본 대화방 링크를 이 기기에 저장했습니다.':'등록한 원본 대화방 링크를 비웠습니다.');
+ },
+ openRoomLink:function(id){
+  var url=prefs.links[id];
+  if(!isOriginalLink(url))return alertMsg('먼저 링크를 입력하고 [링크 저장]을 눌러 주세요.');
+  window.location.assign(url);
  },
  async addRoom(){
-  var name=String(el('newRoomName')?.value||'').trim();if(!name)return alertMsg('추가할 방 이름을 입력하세요.');
-  try{await api('/room-add',{method:'POST',json:{name:name}});await V6.loadRooms();view('settings');alertMsg('새 방 추가 완료')}
-  catch(e){alertMsg('방 추가 실패: '+e.message)}
+  var field=el('newRoomName'),name=cleanTitle(field&&field.value);
+  if(!validTitle(name))return alertMsg('새 방 이름은 1~32자로 입력하세요.');
+  if(rooms.length>=100)return alertMsg('방은 최대 100개까지 등록할 수 있습니다.');
+  var id='extra_'+((window.crypto&&window.crypto.randomUUID)?window.crypto.randomUUID().replace(/-/g,''):
+   Date.now().toString(36)+Math.random().toString(36).slice(2,18));
+  if(rooms.some(function(x){return x.room_key===id}))return alertMsg('방 번호가 겹쳤습니다. 다시 눌러 주세요.');
+  prefs.extras.push({room_key:id,display_name:name,pendingServer:true});
+  prefs.names[id]=name;
+  if(!persistPrefs()){prefs.extras.pop();delete prefs.names[id];return alertMsg('기기 저장 실패')}
+  rooms.push({room_key:id,display_name:name,pendingServer:true,fixed:false});
+  display(settings());
+  alertMsg('새 방 '+name+' 등록 완료 · 기기에 저장됨. 서버 파일함은 기기 인증 후 [서버에 동기화]가 필요합니다.');
  },
- async setOriginal(id){
-  var k='v6_original_'+id,old=localStorage.getItem(k)||'',value=prompt('기존 ChatGPT /c/ 원본 대화 주소',old);
-  if(value===null)return;value=value.trim();
-  try{if(value){var url=new URL(value);if(url.protocol!=='https:'||!['chatgpt.com','chat.openai.com'].includes(url.hostname)||!/^\/c\/[a-z0-9-]+\/?$/i.test(url.pathname))throw Error('ChatGPT /c/ 주소만 등록됩니다.')}
-   localStorage.setItem(k,value);alertMsg('원본방 바로가기 주소를 이 기기에 저장했습니다. 원본 대화 자체는 변경되지 않습니다.');
-  }catch(e){alertMsg('주소가 올바르지 않습니다: '+e.message)}
+ async syncLocalRooms(){
+  if(!hold())return alertMsg('서버 동기화는 1회용 코드로 기기를 등록한 뒤 가능합니다.');
+  var successes=0,failures=0;
+  try{
+   var current=await api('/rooms');
+   var remote=current.rooms||[];
+   for(var i=0;i<prefs.extras.length;i++){
+    var item=prefs.extras[i];
+    if(!item.pendingServer)continue;
+    try{
+     var out=await api('/room-add',{method:'POST',json:{name:prefs.names[item.room_key]||item.display_name}});
+     var old=item.room_key,id=out.room&&out.room.room_key;
+     if(!id)throw Error('ROOM_ID_NOT_RETURNED');
+     item.room_key=id;item.pendingServer=false;
+     prefs.names[id]=prefs.names[old]||item.display_name;
+     if(prefs.links[old])prefs.links[id]=prefs.links[old];
+     delete prefs.names[old];delete prefs.links[old];
+     successes++;
+    }catch(e){failures++}
+   }
+   persistPrefs();
+   for(var k of Object.keys(prefs.names)){
+    try{
+     await api('/room-rename',{method:'POST',json:{room_key:k,name:prefs.names[k]}});
+     successes++;
+    }catch(e){failures++}
+   }
+   await V6.loadRooms();
+   display(settings());
+   alertMsg('서버 동기화: 성공 '+successes+'건'+(failures?' · 실패 '+failures+'건 (기기 설정은 보존됨)':' · 완료'));
+  }catch(e){alertMsg('서버 연결 실패 · 기기 설정은 그대로 보존됩니다: '+e.message)}
  },
- original:function(){
-  var url=localStorage.getItem('v6_original_'+active);
-  if(!url)return alertMsg('설정에서 '+title(active)+' 원본 ChatGPT 주소를 먼저 등록하세요.');
-  window.location.assign(url); // Android shell opens original chat links externally
- },
+ setOriginal:function(id){V6.openRoomLink(id)},
+ original:function(){V6.openRoomLink(active)},
  setTheme:function(name){if(!['sea','night','sunrise','sunset','snow'].includes(name))return;localStorage.setItem(THEME,name);document.body.dataset.theme=name;view('settings')}
 };
 function formatNotices(list){
