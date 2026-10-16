@@ -54,6 +54,7 @@ public final class MainActivity extends Activity {
         s.setMediaPlaybackRequiresUserGesture(true);
         CookieManager.getInstance().setAcceptCookie(true);
         web.addJavascriptInterface(new NativeUpdateBridge(),"V6NativeUpdater");
+        web.addJavascriptInterface(new NativeExitBridge(),"V6NativeApp");
         web.setWebViewClient(new WebViewClient() {
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
@@ -147,6 +148,13 @@ public final class MainActivity extends Activity {
             fetchRemoteUi(false); // Future server-published screen changes update the installed app automatically.
         }catch(Exception e){
             Toast.makeText(this,"V6 화면을 불러오지 못했습니다.",Toast.LENGTH_LONG).show();
+        }
+    }
+    private final class NativeExitBridge {
+        @JavascriptInterface public void exitApp() {
+            runOnUiThread(() -> {
+                if(!isFinishing())finish();
+            });
         }
     }
     private final class NativeUpdateBridge {
