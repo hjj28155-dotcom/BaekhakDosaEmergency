@@ -64,6 +64,32 @@ textarea{min-height:104px;resize:vertical}input[type=file]{font-size:12px;paddin
 #side.show{display:block}
 .previewimg{width:100%;max-height:50vh;object-fit:contain}.badge{background:#293e56;border:1px solid #71889f;padding:3px 7px;border-radius:6px;font-size:10px}
 .serveronly{color:#eccb93;font-size:11px;line-height:1.6}
+
+/* V6.0.8: one-glance home — preserve six-room order and the naval colors. */
+.home-screen .hero{height:120px}
+.home-screen .hero:before{top:5px}
+.home-screen .hero .logo{font-size:20px;padding-top:10px}
+.home-screen .hero .lighthouse{font-size:44px;bottom:11px;left:46%}
+.home-screen .hero .sea{height:62px;bottom:-24px}
+.home-screen .roomgrid{gap:7px;margin-top:8px}
+.home-screen .roomgrid button,.home-screen .home-actions button{
+ height:64px;min-height:64px;max-height:64px;
+ padding:5px 4px;line-height:1.2;font-size:13px;
+ display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+ overflow-wrap:anywhere;
+}
+.home-screen .roomgrid button .icon,.home-screen .home-actions .action-icon{font-size:20px;line-height:23px}
+.home-screen .home-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:8px}
+.home-screen .home-actions button{border-color:#ebca83;background:linear-gradient(135deg,#173e62,#173551);font-weight:800}
+.home-screen .footnav{margin-top:8px;gap:7px}
+.home-screen .footnav button{height:43px;min-height:43px;max-height:43px;padding:3px;font-size:12px}
+.home-screen .home-exit{margin-top:8px;min-height:42px;height:42px;max-height:42px;font-size:13px;padding:4px}
+.home-screen .home-hint{font-size:10px;text-align:center;margin:5px 0 0}
+@media(max-width:360px){
+ .home-screen .roomgrid button,.home-screen .home-actions button{font-size:12px}
+ .home-screen .footnav button{font-size:11px}
+}
+
 </style></head>
 <body data-theme="sea"><div id="phone"><header class="top"><button onclick="V6.side()">☰</button><div class="vtitle" id="headTitle">⚓ 항행의자유 V6<small>중앙통제실</small></div><button onclick="V6.go('notices')">🔔</button></header><nav id="quicknav" aria-label="화면 이동"><button id="backButton" onclick="V6.back()">◀ 이전</button><button onclick="V6.go('home')">⌂ 홈</button><button onclick="V6.go('updates')">⬆ 업데이트</button></nav><main id="page"></main></div>
 <div id="side" onclick="V6.side(false)"><div class="drawer" onclick="event.stopPropagation()" id="drawer"></div></div>
@@ -77,10 +103,11 @@ var TOKEN='hanghae_v6_device_token_v1',THEME='hanghae_v6_theme';
 var DEFAULT=[['all','전체방'],['analysis','1번방'],['controller','2번방'],['helmsman','3번방'],['freedom','4번방'],['chief','5번방']];
 var rooms=DEFAULT.map(function(r){return {room_key:r[0],display_name:r[1],fixed:true}});
 var active='analysis',screen='home',tab='files',filterRoom='',busy=false,pairingNow=false,noticeRoom='all',historyStack=[],releaseInfo=null;
-var CURRENT_VERSION_CODE=600008, CURRENT_VERSION_NAME='V6.0.7';
+var CURRENT_VERSION_CODE=600009, CURRENT_VERSION_NAME='V6.0.8 화면';
 var ROUND_DOCS=[{"round_no":1246,"room_key":"all","title":"1246회차 백학도사 로또비법서 (신서)","source_author":"백학도사","source_text":"백학도사님의 이번회차 로또비법서 입니다\n\n1246 회차 로또비법서\n\n첫번째.대장장이의 망치가 녹이 슬었을때 알수가 있는 징표로구나.\n\n두번째. 개구리는 우물밖으로 나와 검은하늘을 바라보리로다.\n\n세번째. 흰 바둑알과 검은 바둑알의 위치가 바뀌며 승리의 뒤에 숨는구나.\n\n네번째. 종이학 천마리중 한마리만이 불에 타는구나.\n\n다섯째. 나룻배는 안개속에 흘러가며 종소리 나는 쪽으로 항하여 도착하리로다.\n\n여섯째. 돌위에 더 큰돌을 얹어서 탑을 만드리니 소원이 이루어질것이니로다.","status":"UNINTERPRETED","purchase_status":"REFERENCE_ONLY"}];
 var UPDATE_SERVICE='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/v6-update-check';
-var currentFiles=[],currentPurchase=[],currentNotices=[],currentChats=[],legacyOffset=0,legacyItems=[],selectedSinseo=1246;
+var currentFiles=[],currentPurchase=[],currentNotices=[],currentChats=[],legacyOffset=0,legacyItems=[],selectedSinseo=1246,workingRound=1246;
+var V6_ANALYSIS_NOTE_PREFIX='hanghae_v6_round_analysis_note_';
 function el(id){return document.getElementById(id)}
 function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function token(){try{return localStorage.getItem(TOKEN)||''}catch(e){return ''}}
@@ -143,7 +170,7 @@ function mergeRooms(server){
 }
 rooms=mergeRooms(null);
 
-function currentRound(){return Number((el('roundNumber')&&el('roundNumber').value)||1245)}
+function currentRound(){return Number((el('roundNumber')&&el('roundNumber').value)||1246)}
 function hold(){return !!(token()&&/^[a-f0-9]{64}$/.test(token()))}
 async function api(path,options){
  if(!hold())throw Error('기기 등록을 먼저 완료하십시오. 설정 → 기기 연결');
@@ -170,21 +197,24 @@ function renderDrawer(){
 function heading(h){return '<h1>'+h+'</h1>'}
 function home(){
  var icons=['📢','🧭','🟢','🟠','🟣','🔵'];
- var d='<div class="hero"><div class="logo">항행의자유 V6</div><b>중앙통제실</b><small>함께하는 항해, 하나의 바다로</small><div class="lighthouse">🗼</div><div class="sea"></div></div><div class="roomgrid">';
+ var d='<div class="home-screen"><div class="hero"><div class="logo">항행의자유 V6</div><b>중앙통제실</b><small>함께하는 항해, 하나의 바다로</small><div class="lighthouse">🗼</div><div class="sea"></div></div><div class="roomgrid">';
  rooms.slice(0,6).forEach(function(r,i){d+='<button onclick="'+(r.room_key==='all'?"V6.go('whole')":"V6.room('"+r.room_key+"')")+'"><span class="icon">'+icons[i]+'</span>'+esc(r.display_name)+'</button>'});
- d+='</div>';
+ d+='</div><div class="home-actions">'+
+ '<button onclick="V6.go(\'source\')"><span class="action-icon">📜</span>원문 불러오기</button>'+
+ '<button onclick="V6.go(\'analysis\')"><span class="action-icon">🔎</span>현재회차 분석</button>'+
+ '<button onclick="V6.go(\'purchase\')"><span class="action-icon">🎯</span>실전구매 5조합</button></div>';
  if(rooms.length>6){d+='<section class="extra"><h3>새로 추가한 방</h3><div class="extragrid">';
  rooms.slice(6).forEach(function(r){d+='<button onclick="V6.room(\''+r.room_key+'\')">🧭 '+esc(r.display_name)+'</button>'});d+='</div></section>'}
  d+='<div class="footnav">'+menuBtn('📁 앱자료실','appfiles')+menuBtn('🗂 라이브러리','library')+menuBtn('⚙ 설정','settings')+'</div>';
- d+='<button class="primary" style="margin-top:12px;background:#164258;border-color:#6ca8b4" onclick="V6.exitApp()">🚪 앱 종료</button>';
- d+='<div class="hint" style="text-align:center">자료는 각 방에 1회 업로드 · 앱자료실 · V6 누적DB 자동 색인</div>';
+ d+='<button class="primary home-exit" style="background:#164258;border-color:#6ca8b4" onclick="V6.exitApp()">🚪 앱 종료</button>';
+ d+='<div class="hint home-hint">방별 자료 · 앱자료실 · V6 누적DB</div></div>';
  return d;
 }
 function roomTabs(){return '<div class="tabs">'+
  '<button class="'+(tab==='chat'?'active':'')+'" onclick="V6.tab(\'chat\')">대화방</button>'+
  '<button class="'+(tab==='files'?'active':'')+'" onclick="V6.tab(\'files\')">파일함</button>'+
  '<button class="'+(tab==='notices'?'active':'')+'" onclick="V6.tab(\'notices\')">공지</button></div>'}
-function fileInput(){return '<label for="roundNumber">자료 회차</label><input type="number" min="1" max="9999" id="roundNumber" value="1245">'+
+function fileInput(){return '<label for="roundNumber">자료 회차</label><input type="number" min="1" max="9999" id="roundNumber" value="1246">'+
  '<label for="roomPicker">담당방 자료 · 휴대전화 또는 드라이브에서 선택</label>'+
  '<input id="roomPicker" type="file" multiple><p class="small">파일당 최대 10MB · 서버 기기 등록 필요. 원본은 V6 전용 폴더와 기존 앱 라이브러리에 색인됩니다.</p>'+
  '<button class="primary" onclick="V6.upload()">📤 해당 방 폴더에 업로드 및 자동 연동</button><div id="uploadOutput" class="hint"></div>'}
@@ -212,6 +242,47 @@ function whole(){
  '<label for="wholeAttach">첨부 자료 선택 (먼저 해당 방 폴더에 업로드된 파일)</label>'+
  '<div id="attachList">첨부자료 불러오는 중…</div><button class="primary" onclick="V6.broadcast()">➤ 전체방으로 전달하기</button>'+
  '<p class="serveronly">V6 서버 수신함에 저장됩니다. 기존 ChatGPT 원본 대화창에는 자동으로 글이 게시되지 않습니다.</p></div>';
+}
+function savedRoundAnalysis(round){
+ try{return String(localStorage.getItem(V6_ANALYSIS_NOTE_PREFIX+round)||'')}catch(e){return ''}
+}
+function sourcePage(){
+ var docs=ROUND_DOCS.filter(function(x){return x.round_no===workingRound});
+ var out=heading('📜 원문 불러오기')+
+ '<div class="card"><label>회차 선택</label><input id="sourceRound" type="number" min="1" max="9999" value="'+workingRound+'">'+
+ '<button class="primary" onclick="V6.loadOriginal()">등록 원문 불러오기</button></div>'+
+ '<div class="card"><h2>'+workingRound+'회차 등록 원문</h2>'+
+ (docs.length?docs.map(function(x){return '<div class="rowitem"><b>'+esc(x.title)+'</b>'+
+ '<p class="small">작성: '+esc(x.source_author)+' · 원문 보존 · 번호 조합 미확정</p>'+
+ '<div style="white-space:pre-wrap;line-height:1.65">'+esc(x.source_text)+'</div></div>'}).join(''):
+ '<p class="hint">이 회차의 원문이 아직 등록되지 않았습니다. 서버에 등록된 다른 회차 원문을 조회하려면 기기 인증이 필요할 수 있습니다.</p>')+
+ '</div><button class="primary" onclick="V6.go(\'analysis\')">🔎 현재회차 분석으로 이동</button>'+
+ '<button class="primary" onclick="V6.go(\'appfiles\')">📁 앱자료실에서 파일 확인</button>';
+ return out;
+}
+function analysisPage(){
+ var docs=ROUND_DOCS.filter(function(x){return x.round_no===workingRound});
+ var clueItems=[];
+ docs.forEach(function(d){
+  String(d.source_text||'').split(/\n/).forEach(function(line){
+   var v=line.trim();
+   if(/^(첫번째|두번째|세번째|네번째|다섯째|여섯째)[.．]/.test(v))clueItems.push(v);
+  });
+ });
+ var summary=docs.length?
+ '<p class="hint">등록 원문 '+docs.length+'건 · 명시된 단서 '+clueItems.length+'개 · 해석·당첨 예측은 검증 전</p>'+
+ clueItems.map(function(x,i){return '<div class="rowitem"><b>단서 '+(i+1)+'</b><div>'+esc(x)+'</div></div>'}).join(''):
+ '<p class="hint">이 회차의 등록 원문이 없습니다. 아래 원문 버튼에서 회차를 확인하세요.</p>';
+ return heading('🔎 현재회차 분석')+
+ '<div class="card"><label>분석 회차</label><input id="analysisRound" type="number" min="1" max="9999" value="'+workingRound+'">'+
+ '<button class="primary" onclick="V6.loadRoundAnalysis()">회차 원문·단서 확인</button></div>'+
+ '<div class="card"><h2>'+workingRound+'회차 원문 단서</h2>'+summary+'</div>'+
+ '<div class="card"><h2>분석 메모</h2><p class="small">단서별 해석과 검토 사항을 직접 기록하세요. 이 메모는 현재 휴대전화에만 저장되며, 자동 번호 추천이 아닙니다.</p>'+
+ '<textarea id="analysisMemo" maxlength="5000" placeholder="단서 해석 또는 추가 검증 내용을 입력하세요.">'+esc(savedRoundAnalysis(workingRound))+'</textarea>'+
+ '<button class="primary" onclick="V6.saveRoundAnalysis()">💾 이 회차 분석 메모 저장</button></div>'+
+ '<button class="primary" onclick="V6.go(\'source\')">📜 원문 불러오기</button>'+
+ '<button class="primary" onclick="V6.go(\'purchase\')">🎯 실전구매 5조합 확인</button>'+
+ '<p class="serveronly">참고자료는 로또 당첨을 예측하거나 보장하지 않습니다. 실제 실구매 조합은 V6 서버 등록 자료를 별도로 조회합니다.</p>';
 }
 function sinseoCards(roundStr){
  var q=String(roundStr||'').trim();
@@ -257,7 +328,7 @@ function legacyLibrary(){
 }
 function purchase(){
  return heading('🖼 실구매용 5조합')+
- '<div class="card"><label>조회할 회차</label><input id="purchaseRound" type="number" min="1" max="9999" placeholder="전체 회차">'+
+ '<div class="card"><label>조회할 회차</label><input id="purchaseRound" type="number" min="1" max="9999" value="'+workingRound+'" placeholder="전체 회차">'+
  '<button class="primary" onclick="V6.refresh()">실구매 후보 조회</button></div>'+
  '<div class="card"><div id="purchaseList">조회 중…</div></div>'+
  '<div class="card"><h2>📁 실구매용 참조자료 · 각 방 자동연동</h2><div id="purchaseSourceList">등록 파일 조회 중…</div></div>'+
@@ -327,7 +398,7 @@ function view(page,saveHistory){
  if(saveHistory!==false&&page!==screen)remember();
  screen=page;V6.side(false);
  var render=({home:home,whole:whole,appfiles:appfiles,library:function(){return library(false)},
-  db:function(){return library(true)},legacy:legacyLibrary,purchase:purchase,sinseo:sinseoPage,settings:settings,notices:notices,updates:updatePage,file:filePage})[page];
+  db:function(){return library(true)},legacy:legacyLibrary,purchase:purchase,source:sourcePage,analysis:analysisPage,sinseo:sinseoPage,settings:settings,notices:notices,updates:updatePage,file:filePage})[page];
  display(render?render():home());
  if(page==='whole')loadAttach();
  if(page==='library'||page==='db')V6.refresh();
@@ -338,6 +409,39 @@ function view(page,saveHistory){
 }
 var V6={
  go:view,
+ async fetchSourceRound(round){
+  if(!hold())return false;
+  var res=await api('/round-docs?round_no='+encodeURIComponent(round));
+  (res.documents||[]).forEach(function(d){
+   if(!ROUND_DOCS.some(function(old){return old.round_no===d.round_no&&old.source_author===d.source_author&&old.title===d.title})){
+    ROUND_DOCS.push({round_no:d.round_no,title:d.title,source_author:d.source_author,source_text:d.source_text,status:d.status,purchase_status:d.purchase_status});
+   }
+  });
+  return true;
+ },
+ async loadOriginal(){
+  var n=Number(el('sourceRound')&&el('sourceRound').value);
+  if(!Number.isInteger(n)||n<1||n>9999)return alertMsg('회차를 1~9999 범위로 입력하세요.');
+  workingRound=n;
+  try{await V6.fetchSourceRound(n)}catch(e){alertMsg('서버 조회 실패 · 기기 보관 원문을 표시합니다: '+e.message)}
+  if(screen==='source')display(sourcePage());
+ },
+ async loadRoundAnalysis(){
+  var n=Number(el('analysisRound')&&el('analysisRound').value);
+  if(!Number.isInteger(n)||n<1||n>9999)return alertMsg('회차를 1~9999 범위로 입력하세요.');
+  workingRound=n;
+  try{await V6.fetchSourceRound(n)}catch(e){alertMsg('서버 조회 실패 · 보관된 자료로 확인합니다: '+e.message)}
+  if(screen==='analysis')display(analysisPage());
+ },
+ saveRoundAnalysis(){
+  var field=el('analysisMemo'),str=String(field&&field.value||'');
+  if(str.length>5000)return alertMsg('분석 메모는 5000자 이하로 작성해 주세요.');
+  try{
+   localStorage.setItem(V6_ANALYSIS_NOTE_PREFIX+workingRound,str);
+   if(localStorage.getItem(V6_ANALYSIS_NOTE_PREFIX+workingRound)!==str)throw Error('저장 확인 실패');
+   alertMsg(workingRound+'회차 분석 메모를 이 기기에 저장했습니다.');
+  }catch(e){alertMsg('분석 메모 저장 실패 · 기기 저장공간을 확인하세요.')}
+ },
  exitApp:function(){
   if(!confirm('항행의자유 V6 앱을 종료하시겠습니까?'))return;
   if(window.V6NativeApp&&typeof window.V6NativeApp.exitApp==='function'){
