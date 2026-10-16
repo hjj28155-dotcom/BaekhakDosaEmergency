@@ -1,0 +1,77 @@
+name: Package V6 AndroidIDE Project ZIP
+on:
+  push:
+    paths:
+      - 'v6/**'
+      - '.github/workflows/package-v6-androidide.yml'
+permissions:
+  contents: write
+concurrency:
+  group: v6-androidide-project-publish
+  cancel-in-progress: true
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+      - name: Prepare Android SDK
+        run: |
+          set -euo pipefail
+          SDK_ROOT="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          SDKMANAGER=$(find "$SDK_ROOT/cmdline-tools" -path '*/bin/sdkmanager' -type f | sort -V | tail -1)
+          test -x "$SDKMANAGER"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0" >/dev/null
+      - name: Generate Gradle wrapper for AndroidIDE
+        working-directory: v6
+        run: |
+          set -euo pipefail
+          gradle wrapper --gradle-version 8.10.2 --distribution-type bin --no-daemon
+          test -s gradle/wrapper/gradle-wrapper.jar
+          test -s gradle/wrapper/gradle-wrapper.properties
+          test -s gradlew
+          chmod +x gradlew
+      - name: Verify exact extracted-project build
+        working-directory: v6
+        run: |
+          set -euo pipefail
+          ./gradlew :app:assembleDebug --no-daemon --stacktrace
+          test -s app/build/outputs/apk/debug/app-debug.apk
+      - name: Package complete source without caches
+        run: |
+          set -euo pipefail
+          mkdir -p V6_AndroidIDE_Project
+          rsync -a --exclude='.gradle/' --exclude='build/' --exclude='.idea/' --exclude='*.apk' v6/ V6_AndroidIDE_Project/
+          test -s V6_AndroidIDE_Project/settings.gradle
+          test -s V6_AndroidIDE_Project/gradlew
+          test -s V6_AndroidIDE_Project/gradle/wrapper/gradle-wrapper.jar
+          test -s V6_AndroidIDE_Project/app/src/main/AndroidManifest.xml
+          test -s V6_AndroidIDE_Project/app/src/main/java/kr/hanghae/v6/centralcontrol/MainActivity.java
+          test -s V6_AndroidIDE_Project/app/src/main/assets/v6_fallback.html
+          test -s V6_AndroidIDE_Project/ANDROIDIDE_빌드와_V6_업데이트_안내.md
+          zip -q -r V6_AndroidIDE_Project_20261016.zip V6_AndroidIDE_Project
+          test -s V6_AndroidIDE_Project_20261016.zip
+          unzip -t V6_AndroidIDE_Project_20261016.zip | tail -2
+          sha256sum V6_AndroidIDE_Project_20261016.zip > V6_AndroidIDE_Project_20261016.zip.sha256
+          unzip -l V6_AndroidIDE_Project_20261016.zip | grep -E 'gradlew|gradle-wrapper.jar|MainActivity.java|v6_fallback.html'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: V6-AndroidIDE-Project
+          path: V6_AndroidIDE_Project/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Publish reviewed ZIP
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f V6_AndroidIDE_Project_20261016.zip V6_AndroidIDE_Project_20261016.zip.sha256
+          git commit -m 'Publish V6 AndroidIDE project ZIP with Gradle wrapper' || exit 0
+          git push origin HEAD:main
