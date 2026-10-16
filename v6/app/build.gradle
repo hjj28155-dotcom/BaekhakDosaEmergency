@@ -6,8 +6,8 @@ android {
         applicationId 'kr.hanghae.v6.centralcontrol'
         minSdk 24
         targetSdk 34
-        versionCode 600007
-        versionName 'V6.0.6'
+        versionCode 600008
+        versionName 'V6.0.7'
     }
     compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
     buildTypes { release { minifyEnabled false }; debug { minifyEnabled false } }
