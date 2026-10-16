@@ -3,7 +3,7 @@ on:
   push:
     paths:
       - 'v6/**'
-      - '.github/workflows/build-v6.yml'
+      - '.github/workflows/build-v6-centralcontrol.yml'
 permissions:
   contents: write
 concurrency:
@@ -33,7 +33,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.android/debug.keystore
-          key: v6-companion-stable-debug-key-20261016
+          key: v6-central-stable-debug-key-v1
       - name: Ensure signing key
         run: |
           set -euo pipefail
@@ -80,5 +80,5 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -f V6_CENTRAL_CONTROL_20261016.apk V6_CENTRAL_CONTROL_20261016.apk.sha256
-          git commit -m 'Publish V5 whole-room companion APK' || exit 0
+          git commit -m 'Publish V6 central-control APK' || exit 0
           git push origin HEAD:main
