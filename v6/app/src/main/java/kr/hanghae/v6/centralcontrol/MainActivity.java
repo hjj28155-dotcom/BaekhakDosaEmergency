@@ -51,7 +51,7 @@ public final class MainActivity extends Activity {
                 return true;
             }
             @Override public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-                if (request.isForMainFrame() && !fallbackShown) showBundledFallback();
+                if (request.isForMainFrame() && !fallbackShown) loadPackagedV6Home();
             }
         });
         web.setWebChromeClient(new WebChromeClient() {
@@ -88,9 +88,9 @@ public final class MainActivity extends Activity {
                 catch(Exception ignored){Toast.makeText(MainActivity.this,"파일 다운로드 실패",Toast.LENGTH_LONG).show();}
             }
         });
-        web.loadUrl(HOME);
+        loadPackagedV6Home();
     }
-    private void showBundledFallback() {
+    private void loadPackagedV6Home() {
         try (InputStream in=getAssets().open("v6_fallback.html");
              ByteArrayOutputStream out=new ByteArrayOutputStream()) {
             byte[] buffer=new byte[8192];
@@ -99,7 +99,7 @@ public final class MainActivity extends Activity {
             fallbackShown=true;
             String html=new String(out.toByteArray(),StandardCharsets.UTF_8);
             web.loadDataWithBaseURL(HOME,html,"text/html","UTF-8",HOME);
-            Toast.makeText(this,"서버 연결 문제: V6 내장 화면 표시",Toast.LENGTH_LONG).show();
+            // Bundled HTML is loaded as text/html to prevent a raw-source display.
         } catch(Exception e) {
             Toast.makeText(this,"V6 화면을 불러오지 못했습니다.",Toast.LENGTH_LONG).show();
         }
