@@ -238,17 +238,34 @@ function purchase(){
 }
 function settings(){
  var d=heading('⚙ 설정 · 방제 관리')+
- '<div class="card"><h2>기기 등록</h2><p class="small">'+(hold()?'기기 토큰이 이 앱에 저장돼 있습니다. 서버 연결 상태는 파일 조회로 확인할 수 있습니다.':'기존 V5 중앙서버에서 발급한 일회용 연결코드가 필요합니다.')+'</p>'+
- '<label for="pairCode">일회용 연결코드</label><input id="pairCode" autocomplete="off" type="password" placeholder="연결코드 입력">'+
- '<button class="primary" onclick="V6.pair()">연결코드로 이 기기 등록</button></div>'+
- '<div class="card"><h2>방제 수정 · 추가방 포함</h2>';
- rooms.forEach(function(r){d+='<div class="rowitem"><div class="rows"><b>'+esc(r.display_name)+'</b><button class="mini" onclick="V6.rename(\''+r.room_key+'\')">이름 변경</button></div>'+
- (r.room_key==='all'?'':('<button class="mini" style="margin-top:5px" onclick="V6.setOriginal(\''+r.room_key+'\')">↗ 원본 ChatGPT 주소 등록</button>'))+'</div>'});
- d+='</div><div class="card"><h2>➕ 새 방 추가</h2><input id="newRoomName" maxlength="32" placeholder="새 방 이름">'+
- '<button class="primary" onclick="V6.addRoom()">새 담당방 생성</button></div>'+
- '<div class="card"><h2>화면 테마</h2><div class="tabs">'+
- [['sea','바다'],['night','야간'],['sunrise','일출'],['sunset','노을'],['snow','설원']].map(function(p){return '<button class="'+(theme()===p[0]?'active':'')+'" onclick="V6.setTheme(\''+p[0]+'\')">'+p[1]+'</button>'}).join('')+
- '</div></div><p class="serveronly">방제 변경은 V6 서버 표시 이름만 바꿉니다. 기존 ChatGPT 원본방 제목과 대화는 변경되지 않습니다.</p>';
+ '<div class="card"><h2>방 이름 · 링크 (인증 없이 저장)</h2>'+
+ '<p class="hint">아래 칸에 직접 입력하고 저장하세요. 서버 인증 없이 이 기기에 저장됩니다.</p>';
+ rooms.forEach(function(r){
+  var id=r.room_key,link=prefs.links[id]||"";
+  d+='<div class="rowitem"><h3>⚓ '+esc(r.display_name)+(r.pendingServer?' <span class="badge">서버 미등록</span>':'')+'</h3>'+
+  '<label>방 이름</label><input id="rn_'+id+'" maxlength="32" value="'+esc(r.display_name)+'" placeholder="원하는 방 이름 입력">'+
+  '<button class="mini" style="margin-top:7px" onclick="V6.saveRoomName(\''+id+'\')">💾 방제 저장</button>';
+  if(id!=="all"){
+   d+='<label>ChatGPT 원본 대화방 주소</label>'+
+   '<input id="rl_'+id+'" type="url" inputmode="url" value="'+esc(link)+'" placeholder="https://chatgpt.com/c/… 또는 프로젝트 대화방">'+
+   '<div class="rows" style="margin-top:7px"><button class="mini" onclick="V6.saveRoomLink(\''+id+'\')">🔗 링크 저장</button>'+
+   '<button class="mini" onclick="V6.openRoomLink(\''+id+'\')">↗ 등록 링크 열기</button></div>';
+  }
+  d+='</div>';
+ });
+ d+='</div><div class="card"><h2>➕ 새 방 추가</h2>'+
+  '<input id="newRoomName" maxlength="32" placeholder="새 방 이름을 입력하세요">'+
+  '<button class="primary" onclick="V6.addRoom()">새 방 등록</button></div>'+
+  '<div class="card"><h2>서버 기기 인증 · 파일 업로드용</h2>'+
+  '<p class="hint">'+(hold()?'서버 토큰이 이 기기에 저장돼 있습니다.':'파일 업로드·공지 전송·누적DB는 서버 연결이 필요합니다. 방 이름과 링크 저장에는 필요하지 않습니다.')+'</p>'+
+  '<p class="serveronly">1회용 연결코드는 서버 관리자에게 발급받는 최초 기기 등록 코드입니다. 이 앱에서 임의로 만들어 입력하는 비밀번호가 아닙니다. 비밀번호나 토큰을 채팅에 보내지 마세요.</p>'+
+  '<label>1회용 연결코드 (발급받은 경우만)</label><input id="pairCode" type="password" autocomplete="off" placeholder="기기 연결코드">'+
+  '<button class="primary" onclick="V6.pair()">기기 등록</button>'+
+  (hold()?'<button class="primary" onclick="V6.syncLocalRooms()">방제·추가 방을 서버에 동기화</button>':'')+'</div>'+
+  '<div class="card"><h2>화면 테마</h2><div class="tabs">'+
+  [['sea','바다'],['night','야간'],['sunrise','일출'],['sunset','노을'],['snow','설원']].map(function(p){return '<button class="'+(theme()===p[0]?'active':'')+'" onclick="V6.setTheme(\''+p[0]+'\')">'+p[1]+'</button>'}).join('')+
+  '</div></div>'+
+  '<p class="serveronly">기존 ChatGPT 원본방 링크는 바로가기이며 자동 게시 연결이 아닙니다. 인증 전 추가 방은 이 휴대전화에만 저장됩니다.</p>';
  return d;
 }
 function notices(){
