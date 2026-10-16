@@ -77,7 +77,7 @@ var TOKEN='hanghae_v6_device_token_v1',THEME='hanghae_v6_theme';
 var DEFAULT=[['all','전체방'],['analysis','1번방'],['controller','2번방'],['helmsman','3번방'],['freedom','4번방'],['chief','5번방']];
 var rooms=DEFAULT.map(function(r){return {room_key:r[0],display_name:r[1],fixed:true}});
 var active='analysis',screen='home',tab='files',filterRoom='',busy=false,pairingNow=false,noticeRoom='all',historyStack=[],releaseInfo=null;
-var CURRENT_VERSION_CODE=600007, CURRENT_VERSION_NAME='V6.0.6';
+var CURRENT_VERSION_CODE=600008, CURRENT_VERSION_NAME='V6.0.7';
 var ROUND_DOCS=[{"round_no":1246,"room_key":"all","title":"1246회차 백학도사 로또비법서 (신서)","source_author":"백학도사","source_text":"백학도사님의 이번회차 로또비법서 입니다\n\n1246 회차 로또비법서\n\n첫번째.대장장이의 망치가 녹이 슬었을때 알수가 있는 징표로구나.\n\n두번째. 개구리는 우물밖으로 나와 검은하늘을 바라보리로다.\n\n세번째. 흰 바둑알과 검은 바둑알의 위치가 바뀌며 승리의 뒤에 숨는구나.\n\n네번째. 종이학 천마리중 한마리만이 불에 타는구나.\n\n다섯째. 나룻배는 안개속에 흘러가며 종소리 나는 쪽으로 항하여 도착하리로다.\n\n여섯째. 돌위에 더 큰돌을 얹어서 탑을 만드리니 소원이 이루어질것이니로다.","status":"UNINTERPRETED","purchase_status":"REFERENCE_ONLY"}];
 var UPDATE_SERVICE='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/v6-update-check';
 var currentFiles=[],currentPurchase=[],currentNotices=[],currentChats=[],legacyOffset=0,legacyItems=[],selectedSinseo=1246;
@@ -176,6 +176,7 @@ function home(){
  if(rooms.length>6){d+='<section class="extra"><h3>새로 추가한 방</h3><div class="extragrid">';
  rooms.slice(6).forEach(function(r){d+='<button onclick="V6.room(\''+r.room_key+'\')">🧭 '+esc(r.display_name)+'</button>'});d+='</div></section>'}
  d+='<div class="footnav">'+menuBtn('📁 앱자료실','appfiles')+menuBtn('🗂 라이브러리','library')+menuBtn('⚙ 설정','settings')+'</div>';
+ d+='<button class="primary" style="margin-top:12px;background:#164258;border-color:#6ca8b4" onclick="V6.exitApp()">🚪 앱 종료</button>';
  d+='<div class="hint" style="text-align:center">자료는 각 방에 1회 업로드 · 앱자료실 · V6 누적DB 자동 색인</div>';
  return d;
 }
@@ -337,6 +338,14 @@ function view(page,saveHistory){
 }
 var V6={
  go:view,
+ exitApp:function(){
+  if(!confirm('항행의자유 V6 앱을 종료하시겠습니까?'))return;
+  if(window.V6NativeApp&&typeof window.V6NativeApp.exitApp==='function'){
+   try{window.V6NativeApp.exitApp()}catch(e){alertMsg('앱 종료 실패: '+e.message)}
+  }else{
+   alertMsg('이 앱 버전에는 종료 기능이 없습니다. 업데이트 설치 후 사용하세요.');
+  }
+ },
  menuGo:function(dest){V6.side(false);view(dest)},
  menuRoom:function(id){V6.side(false);V6.room(id)},
  openSinseo:function(round){selectedSinseo=Number(round)||1246;view('sinseo')},
