@@ -169,7 +169,7 @@ function legacyLibrary(){
  '<label>파일명 검색</label><input id="legacyQuery" maxlength="90" placeholder="파일 이름">'+
  '<label>원본 상태</label><select id="legacyStatus"><option value="">전체</option><option value="IMPORTED">원본 보관 완료</option><option value="PENDING">원본 이관 필요</option></select>'+
  '<button class="primary" onclick="V6.legacyRefresh(0)">검색</button></div>'+
- '<div class="card"><div id="legacyCount" class="hint">조회 중…</div><div id="legacyList"></div><div class="rows"><button class="mini" id="legacyPrev" onclick="V6.legacyRefresh(Math.max(0,legacyOffset-50))">◀ 이전</button><button class="mini" id="legacyNext" onclick="V6.legacyRefresh(legacyOffset+50)">다음 ▶</button></div></div>'+
+ '<div class="card"><div id="legacyCount" class="hint">조회 중…</div><div id="legacyList"></div><div class="rows"><button class="mini" id="legacyPrev" onclick="V6.legacyPrev()">◀ 이전</button><button class="mini" id="legacyNext" onclick="V6.legacyNext()">다음 ▶</button></div></div>'+
  '<p class="serveronly">V5 서버 목록입니다. PENDING 상태는 원본 이관이 필요하며, Drive 또는 ChatGPT 라이브러리 자동 동기화를 뜻하지 않습니다.</p>';
 }
 function purchase(){
@@ -236,6 +236,38 @@ var V6={
     el('fileList').innerHTML=currentFiles.length?currentFiles.map(function(x){return fileItem(x,true)}).join(''):'V6 서버에 등록된 파일이 없습니다.'}
    if(screen==='purchase'){var pr=String(el('purchaseRound')?.value||'').trim(),q=await api('/purchase'+(pr?'?round_no='+encodeURIComponent(pr):''));currentPurchase=q.combinations||[];el('purchaseList').innerHTML=formatPurchase(currentPurchase);var source=await api('/db'+(pr?'?round_no='+encodeURIComponent(pr):''));var refs=source.files||[];el('purchaseSourceList').innerHTML=refs.length?refs.map(function(x){return fileItem(x,true)}).join(''):'연동된 자료가 없습니다.';}
   }catch(e){alertMsg('조회 실패: '+e.message)}
+ },
+ async legacyRefresh(offset){
+  if(!hold())return alertMsg('설정에서 기기 등록이 필요합니다.');
+  legacyOffset=Math.max(0,Number(offset)||0);
+  var query=String(el('legacyQuery')?.value||'').trim();
+  var status=String(el('legacyStatus')?.value||'');
+  try{
+   var path='/legacy-library?offset='+legacyOffset+'&q='+encodeURIComponent(query)+(status?'&status='+encodeURIComponent(status):'');
+   var out=await api(path);legacyItems=out.files||[];
+   el('legacyCount').textContent='기존 자료 '+Number(out.total||0)+'건 · '+(legacyItems.length?legacyOffset+1:0)+'~'+(legacyOffset+legacyItems.length)+'건';
+   el('legacyList').innerHTML=legacyItems.length?legacyItems.map(function(x){
+    var complete=x.import_status==='IMPORTED';
+    return '<div class="rowitem rows"><div><b>📄 '+esc(x.display_name)+'</b><div class="small">'+esc(x.original_path)+
+      '</div><div class="small">'+(complete?'✓ 원본 보관 완료':'◌ 원본 이관 필요')+'</div></div>'+
+      (complete?'<button class="mini" onclick="V6.legacyFile(\''+x.id+'\')">원본 받기</button>':'<span class="badge">목록만</span>')+'</div>';
+   }).join(''):'해당하는 자료가 없습니다.';
+   el('legacyPrev').disabled=legacyOffset===0;
+   el('legacyNext').disabled=!out.more;
+  }catch(e){alertMsg('기존 V5 라이브러리 조회 실패: '+e.message)}
+ },
+ legacyPrev:function(){V6.legacyRefresh(Math.max(0,legacyOffset-50))},
+ legacyNext:function(){V6.legacyRefresh(legacyOffset+50)},
+ async legacyFile(id){
+  var record=legacyItems.find(function(x){return x.id===id});
+  if(!record||record.import_status!=='IMPORTED')return alertMsg('해당 파일은 원본 이관 전입니다.');
+  screen='file';display(filePage());
+  try{
+   var out=await api('/legacy-download/'+id);if(!out.url)throw Error('원본 다운로드 주소 없음');
+   el('fileInfo').innerHTML='<h2>'+esc(record.display_name)+'</h2>'+
+      '<p class="hint">기존 서버 라이브러리에 보관된 원본입니다. 90초간 유효합니다.</p>'+
+      '<a class="primary" style="display:block;text-align:center;text-decoration:none" href="'+esc(out.url)+'" target="_blank" rel="noopener noreferrer">⬇ 파일 열기 / 다운로드</a>';
+  }catch(e){el('fileInfo').textContent='파일 조회 실패: '+e.message}
  },
  async upload(){
   if(busy)return;var input=el('roomPicker'),list=Array.from(input?.files||[]);
