@@ -84,3 +84,10 @@
 - **최초 한번 이 기능을 포함한 V6 APK로 업그레이드**해야 합니다. 과거 V6에서 화면 버튼만 서버로 고쳐도 앱 내부 파일은 바뀌지 않습니다.
 - GitHub CI APK와 AndroidIDE debug APK는 서명키가 다를 수 있습니다. 기존 V6 설치 APK와 **서명키가 일치하지 않으면** 직접 APK 덮어쓰기는 실패합니다. 기존 앱을 삭제하지 마세요. 최초 AndroidIDE 디버그 서명키를 유지하는 경우 동일한 키로 빌드한 APK를 한 번 설치해야 합니다.
 - 버전: **V6.0.6 / versionCode 600007**. 기존 `kr.hanghae.v6.centralcontrol` 앱 ID는 유지합니다.
+
+## 11. V6.0.7 홈 종료 버튼과 기존 AndroidIDE 폴더 업데이트
+- 홈 화면에서 기존 6개 방 아래에 **🚪 앱 종료** 버튼이 보입니다. 누르면 확인창이 뜨며, 확인할 때만 Android V6 Activity를 종료합니다.
+- 기존 AndroidIDE에서 설치한 APK의 서명키를 보존하려면 기존 프로젝트 폴더를 그대로 사용하세요. 변경 대상은 `app/build.gradle`, `app/src/main/java/kr/hanghae/v6/centralcontrol/MainActivity.java`, `app/src/main/assets/v6_fallback.html`, 프로젝트 루트 `index.html` 4개 파일뿐입니다.
+- `sh v6/update_existing_project.sh`를 프로젝트 루트에서 실행하면 현재 파일을 다른 폴더에 백업하고 네 파일을 HTTPS로 가져옵니다. 성공 후 AndroidIDE에서 Build APK를 실행하세요.
+- 기존 설치된 앱을 삭제하지 말고 **동일한 AndroidIDE 및 기존 서명키**로 생성한 APK를 덮어쓰기 설치해야 앱 데이터와 방제가 보존됩니다. `versionCode`는 `600008`, `versionName`은 `V6.0.7`입니다.
+- 앱 종료 버튼은 브라우저에서 실행되는 미리보기에서는 실제 앱을 종료할 수 없습니다. Android V6 APK에서만 작동합니다.
