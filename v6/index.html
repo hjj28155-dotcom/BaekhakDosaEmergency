@@ -103,7 +103,7 @@ var TOKEN='hanghae_v6_device_token_v1',THEME='hanghae_v6_theme';
 var DEFAULT=[['all','전체방'],['analysis','1번방'],['controller','2번방'],['helmsman','3번방'],['freedom','4번방'],['chief','5번방']];
 var rooms=DEFAULT.map(function(r){return {room_key:r[0],display_name:r[1],fixed:true}});
 var active='analysis',screen='home',tab='files',filterRoom='',busy=false,pairingNow=false,noticeRoom='all',historyStack=[],releaseInfo=null;
-var CURRENT_VERSION_CODE=600010, CURRENT_VERSION_NAME='V6.0.9 화면';
+var CURRENT_VERSION_CODE=600013, CURRENT_VERSION_NAME='V6.0.12 APK 화면';
 var ROUND_DOCS=[{"round_no":1246,"room_key":"all","title":"1246회차 백학도사 로또비법서 (신서)","source_author":"백학도사","source_text":"백학도사님의 이번회차 로또비법서 입니다\n\n1246 회차 로또비법서\n\n첫번째.대장장이의 망치가 녹이 슬었을때 알수가 있는 징표로구나.\n\n두번째. 개구리는 우물밖으로 나와 검은하늘을 바라보리로다.\n\n세번째. 흰 바둑알과 검은 바둑알의 위치가 바뀌며 승리의 뒤에 숨는구나.\n\n네번째. 종이학 천마리중 한마리만이 불에 타는구나.\n\n다섯째. 나룻배는 안개속에 흘러가며 종소리 나는 쪽으로 항하여 도착하리로다.\n\n여섯째. 돌위에 더 큰돌을 얹어서 탑을 만드리니 소원이 이루어질것이니로다.","status":"UNINTERPRETED","purchase_status":"REFERENCE_ONLY"}];
 var UPDATE_SERVICE='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/v6-update-check';
 var currentFiles=[],currentPurchase=[],currentNotices=[],currentChats=[],currentDistribution=null,legacyOffset=0,legacyItems=[],selectedSinseo=1246,workingRound=1246;
@@ -190,7 +190,7 @@ function renderDrawer(){
  d+=menuBtn('🏠 홈으로','home')+menuBtn('📢 전체방','whole');
  rooms.filter(function(r){return r.room_key!=='all'}).forEach(function(r){d+='<button onclick="V6.menuRoom(\''+r.room_key+'\')">⚓ '+esc(r.display_name)+'</button>'});
  d+=menuBtn('📁 앱자료실','appfiles')+menuBtn('🗂 라이브러리','library')+menuBtn('📚 기존 V5 자료실','legacy')+
- menuBtn('📊 누적DB','db')+menuBtn('🖼 실구매용 5조합','purchase')+menuBtn('🔐 배포용 승인','distribution')+
+ menuBtn('📊 누적DB','db')+menuBtn('🖼 실구매용 5조합','purchase')+menuBtn('🎯 당첨 대조 · 각 방 25조합','report')+menuBtn('🔐 배포용 승인','distribution')+
  menuBtn('🔔 공지사항','notices')+menuBtn('⚙ 설정 및 방제 관리','settings')+menuBtn('⬆ 업데이트 확인','updates');
  el('drawer').innerHTML=d;
 }
@@ -273,9 +273,10 @@ function analysisPage(){
  '<p class="hint">등록 원문 '+docs.length+'건 · 명시된 단서 '+clueItems.length+'개 · 해석·당첨 예측은 검증 전</p>'+
  clueItems.map(function(x,i){return '<div class="rowitem"><b>단서 '+(i+1)+'</b><div>'+esc(x)+'</div></div>'}).join(''):
  '<p class="hint">이 회차의 등록 원문이 없습니다. 아래 원문 버튼에서 회차를 확인하세요.</p>';
- return heading('🔎 현재회차 분석')+
+ return heading('🔎 현재회차 분석')+'<button class="primary" onclick="V6.go(\'report\')">🎯 현재회차 자동당첨 대조 · PNG 결과</button>'+ 
  '<div class="card"><label>분석 회차</label><input id="analysisRound" type="number" min="1" max="9999" value="'+workingRound+'">'+
- '<button class="primary" onclick="V6.loadRoundAnalysis()">회차 원문·단서 확인</button></div>'+
+ '<button class="primary" onclick="V6.loadCurrentRoundAnalysis()">현재 등록된 최신 회차 불러오기</button>'+
+ '<button class="primary" onclick="V6.loadRoundAnalysis()">입력한 회차 원문·단서 확인</button><div id="analysisLoadState" class="hint">기기 등록 상태를 확인해 최신 등록 원문을 불러옵니다.</div></div>'+
  '<div class="card"><h2>'+workingRound+'회차 원문 단서</h2>'+summary+'</div>'+
  '<div class="card"><h2>분석 메모</h2><p class="small">단서별 해석과 검토 사항을 직접 기록하세요. 이 메모는 현재 휴대전화에만 저장되며, 자동 번호 추천이 아닙니다.</p>'+
  '<textarea id="analysisMemo" maxlength="5000" placeholder="단서 해석 또는 추가 검증 내용을 입력하세요.">'+esc(savedRoundAnalysis(workingRound))+'</textarea>'+
@@ -336,7 +337,7 @@ function purchase(){
  '<p class="serveronly">정해진 JSON 형식(문서유형 V6_PURCHASE_5, RESULT-BEFORE)의 5개 조합만 자동 추출합니다. 승인 전에는 실구매 확정으로 표시하지 않습니다.</p>';
 }
 function distributionName(t){
- return ({ROUND_RESULT_PNG:'과거회차 당첨 대조 PNG',ROOM_25_PNG:'각 방 25조합 결과 PNG',PURCHASE_5_PNG:'실전구매 5조합 PNG'})[t]||t;
+ return ({ROUND_RESULT_PNG:'회차 당첨 대조 PNG',ROOM_25_PNG:'각 방 25조합 결과 PNG',PURCHASE_5_PNG:'실전구매 5조합 PNG'})[t]||t;
 }
 function distributionStatus(status){
  return status==='APPROVED'?'선장 승인 기록됨 · 외부 배포 전':status==='REJECTED'?'반려':'선장 승인 대기 · 배포 금지';
@@ -365,7 +366,7 @@ function displayDistribution(data){
   if(!/^[0-9a-f-]{36}$/i.test(x.asset_id))return '';
   return '<div class="rowitem"><b>📄 '+esc(x.filename)+'</b><div class="small">'+
    esc(x.round_no)+'회차 · '+esc(title(x.room_key))+' · '+Math.ceil(Number(x.bytes||0)/1024)+'KB · 등록 PNG</div>'+
-   '<label>배포 결과 유형(검토자가 직접 선택)</label><select id="dType_'+x.asset_id+'">'+
+   '<button class="mini" onclick="V6.file(\''+x.asset_id+'\')">PNG 원본 열기 / 받기</button><label>배포 결과 유형(검토자가 직접 선택)</label><select id="dType_'+x.asset_id+'">'+
    ['ROUND_RESULT_PNG','ROOM_25_PNG','PURCHASE_5_PNG'].map(function(k){return '<option value="'+k+'">'+esc(distributionName(k))+'</option>'}).join('')+'</select>'+
    '<button class="mini" onclick="V6.requestDistribution(\''+x.asset_id+'\')">선장 배포 승인 요청</button></div>';
  }).join(''):'선택한 회차에 등록된 PNG 원본이 없습니다. 각 방 파일함에서 실제 PNG를 업로드한 뒤 다시 조회하세요.';
@@ -374,7 +375,7 @@ function displayDistribution(data){
   if(!/^[0-9a-f-]{36}$/i.test(a.id))return '';
   return '<div class="rowitem"><b>'+esc(a.round_no)+'회차 · '+esc(distributionName(a.report_type))+'</b>'+
    '<p class="small">'+esc(title(a.room_key))+' · '+esc(distributionStatus(a.status))+'</p>'+
-   (a.status==='PENDING_CAPTAIN'&&isCaptain?'<button class="mini" onclick="V6.approveDistribution(\''+a.id+'\')">🔐 PNG 검토 후 선장 승인</button>':'')+'</div>';
+   '<button class="mini" onclick="V6.file(\''+a.asset_id+'\')">승인 대상 PNG 열기 / 받기</button>'+ (a.status==='PENDING_CAPTAIN'&&isCaptain?'<button class="mini" onclick="V6.approveDistribution(\''+a.id+'\')">🔐 PNG 검토 후 선장 승인</button>':'')+'</div>';
  }).join(''):'배포용 승인 요청이 없습니다. 승인되지 않은 자료는 배포할 수 없습니다.';
 }
 function settings(){
@@ -440,12 +441,14 @@ function view(page,saveHistory){
  if(saveHistory!==false&&page!==screen)remember();
  screen=page;V6.side(false);
  var render=({home:home,whole:whole,appfiles:appfiles,library:function(){return library(false)},
-  db:function(){return library(true)},legacy:legacyLibrary,purchase:purchase,distribution:distributionPage,source:sourcePage,analysis:analysisPage,sinseo:sinseoPage,settings:settings,notices:notices,updates:updatePage,file:filePage})[page];
+  db:function(){return library(true)},legacy:legacyLibrary,purchase:purchase,distribution:distributionPage,report:reportPage,source:sourcePage,analysis:analysisPage,sinseo:sinseoPage,settings:settings,notices:notices,updates:updatePage,file:filePage})[page];
  display(render?render():home());
  if(page==='whole')loadAttach();
+ if(page==='analysis')V6.loadCurrentRoundAnalysis();
  if(page==='library'||page==='db')V6.refresh();
  if(page==='purchase')V6.refresh();
  if(page==='distribution')V6.refreshDistribution();
+ if(page==='report')V6.loadReport();
  if(page==='notices')V6.loadNotices();
  if(page==='legacy')V6.legacyRefresh(0);
  if(page==='updates')V6.checkUpdate();
@@ -500,12 +503,38 @@ var V6={
  async fetchSourceRound(round){
   if(!hold())return false;
   var res=await api('/round-docs?round_no='+encodeURIComponent(round));
-  (res.documents||[]).forEach(function(d){
-   if(!ROUND_DOCS.some(function(old){return old.round_no===d.round_no&&old.source_author===d.source_author&&old.title===d.title})){
-    ROUND_DOCS.push({round_no:d.round_no,title:d.title,source_author:d.source_author,source_text:d.source_text,status:d.status,purchase_status:d.purchase_status});
-   }
-  });
+  V6.mergeRoundDocuments(res.documents||[]);
   return true;
+ },
+ mergeRoundDocuments(documents){
+  (documents||[]).forEach(function(d){
+   var item={id:d.id,round_no:Number(d.round_no),room_key:d.room_key,title:d.title,source_author:d.source_author,
+    source_text:d.source_text,status:d.status,purchase_status:d.purchase_status};
+   var index=ROUND_DOCS.findIndex(function(old){return (item.id&&old.id===item.id)||
+    (old.round_no===item.round_no&&old.room_key===item.room_key&&old.source_author===item.source_author&&old.title===item.title)});
+   if(index>=0)ROUND_DOCS[index]=item;else ROUND_DOCS.push(item);
+  });
+ },
+ async loadCurrentRoundAnalysis(){
+  var state=el('analysisLoadState');if(state)state.textContent='서버에서 최신 등록 원문을 확인하고 있습니다…';
+  if(!hold()){
+   if(state)state.textContent='기기 연결이 필요합니다. 설정 → 기기 연결을 완료한 뒤 다시 불러오세요. 기기 보관 원문은 아래에 표시됩니다.';
+   return false;
+  }
+  try{
+   var res=await api('/round-docs');var documents=res.documents||[];
+   V6.mergeRoundDocuments(documents);
+   if(documents.length){
+    var latest=Math.max.apply(null,documents.map(function(d){return Number(d.round_no)||0}));
+    if(latest>0)workingRound=latest;
+    if(screen==='analysis')display(analysisPage());
+    var refreshed=el('analysisLoadState');if(refreshed)refreshed.textContent=latest+'회차 · 최신 등록 원문 '+documents.filter(function(d){return Number(d.round_no)===latest}).length+'건을 불러왔습니다.';
+   }else if(state)state.textContent='서버에 등록된 회차 원문이 없습니다. 회차 원문을 등록한 뒤 다시 불러오세요.';
+   return true;
+  }catch(e){
+   if(state)state.textContent='최신 회차 조회 실패: '+e.message+' · 기기 보관 원문을 표시합니다.';
+   return false;
+  }
  },
  async loadOriginal(){
   var n=Number(el('sourceRound')&&el('sourceRound').value);
@@ -518,8 +547,18 @@ var V6={
   var n=Number(el('analysisRound')&&el('analysisRound').value);
   if(!Number.isInteger(n)||n<1||n>9999)return alertMsg('회차를 1~9999 범위로 입력하세요.');
   workingRound=n;
-  try{await V6.fetchSourceRound(n)}catch(e){alertMsg('서버 조회 실패 · 보관된 자료로 확인합니다: '+e.message)}
+  if(!hold()){
+   if(screen==='analysis')display(analysisPage());
+   if(el('analysisLoadState'))el('analysisLoadState').textContent='기기 연결이 필요합니다. 설정 → 기기 연결을 완료한 뒤 다시 조회하세요. 기기 보관 원문을 표시합니다.';
+   return false;
+  }
+  if(el('analysisLoadState'))el('analysisLoadState').textContent=n+'회차 원문을 조회하고 있습니다…';
+  try{
+   await V6.fetchSourceRound(n);
+   var message=n+'회차 원문 조회가 완료됐습니다.';
+  }catch(e){var message='서버 조회 실패: '+e.message+' · 기기 보관 원문을 표시합니다.'}
   if(screen==='analysis')display(analysisPage());
+  if(el('analysisLoadState'))el('analysisLoadState').textContent=message;
  },
  saveRoundAnalysis(){
   var field=el('analysisMemo'),str=String(field&&field.value||'');
@@ -876,6 +915,73 @@ async function loadAttach(){
   el('attachList').innerHTML=files.length?files.slice(0,30).map(function(f){return '<label style="display:flex;gap:8px;align-items:center"><input data-attach type="checkbox" style="width:auto" value="'+f.asset_id+'">'+esc(f.filename)+'</label>'}).join(''):'등록된 V6 파일 없음 · 담당방 파일함에서 먼저 업로드해 주세요.';
  }catch(e){el('attachList').textContent='첨부 목록 조회 실패: '+e.message}
 }
+var currentReport=null,reportPNG=null,reportSequence=0,reportUploading=false;
+function reportPage(){
+ return heading('🎯 현재회차 당첨 대조 · 25조합')+
+ '<div class="card"><label for="reportRound">대조할 회차</label><input id="reportRound" type="number" min="1" max="9999" value="'+workingRound+'">'+
+ '<button class="primary" onclick="V6.loadReport()">공식 결과 조회 · 자동 대조</button><div id="reportState" class="hint">공식 당첨번호와 각 방의 등록된 25조합을 대조합니다.</div></div>'+
+ '<div id="reportOutput"></div><div class="card"><h2>PNG 결과 만들기</h2><label for="reportRoom">결과 범위</label><select id="reportRoom" onchange="V6.clearReportPNG()"><option value="all">전체방 집계</option>'+rooms.filter(function(r){return r.room_key!=="all"}).map(function(r){return '<option value="'+esc(r.room_key)+'">'+esc(r.display_name)+' 25조합</option>'}).join('')+'</select>'+
+ '<button class="primary" onclick="V6.makeReportPNG()">🖼 PNG 미리보기</button><div id="reportPreview"></div><button id="reportRegister" class="primary" disabled onclick="V6.registerReportPNG()">PNG 원본 등록 · 승인 메뉴로</button></div>'+
+ '<details class="card"><summary>25조합 자료 등록 형식</summary><p class="small">각 방 파일함에서 JSON 원본을 업로드하세요. document_type: V6_ROOM_25, stage: RESULT-BEFORE, round_no: 회차 숫자, room_key: 해당 방 식별자, combinations: 6개 번호 배열 25개. 번호는 1~45의 중복 없는 정수 6개입니다. 방당 원본이 여러 개면 버전 충돌로 표시합니다. 기존 5조합은 실구매 화면에서 따로 유지됩니다.</p></details>'+
+ '<button class="primary" onclick="V6.go(\'distribution\')">🔐 선장 배포용 승인 메뉴</button>';
+}
+function reportStatus(s){return ({CONFIRMED:'공식 결과 확인',NOT_DRAWN:'추첨 전 · 대조 대기',NOT_PUBLISHED:'공식 결과 미게시 · 대조 대기',SOURCE_UNAVAILABLE:'공식 결과 조회 실패 · 대조 미실시'})[s]||s}
+function resultLabel(row){return row.rank===undefined?'대조 대기':(row.rank?row.rank+'등':'낙첨')+' · 본번호 '+row.hits+'/6'+(row.bonus?' + 보너스':'')}
+function reportRoomStatus(r){return r.status==='VERSION_CONFLICT'?'원본 버전 충돌 · 집계 제외':r.status==='MISSING'?'25조합 미등록':r.timing==='RECEIVED_AFTER_DRAW'?'추첨 후 서버 등록 · 사전확정 증빙 없음':'추첨 전 서버 등록'}
+function reportLines(r){
+ var counts=r.rank_counts;
+ return r.display_name+' · '+r.count+'/25 · '+reportRoomStatus(r)+(counts?' · 당첨 '+counts.slice(1).reduce(function(a,b){return a+b},0)+'개':'');
+}
+function paintReport(data){
+ var draw=data.official.draw;
+ el('reportState').textContent=reportStatus(data.official.status)+' · 등록 '+data.total_combinations+'조합';
+ el('reportOutput').innerHTML='<div class="card"><h2>'+data.round_no+'회차 결과</h2><p>'+(draw?esc(draw.numbers.join(' · '))+' + 보너스 '+draw.bonus:esc(reportStatus(data.official.status)))+'</p><p class="small">동행복권 공식 조회 · '+esc(data.generated_at)+'</p><p class="serveronly">참고용 대조 결과 · 실제 구매 여부와 당첨금 지급을 확인하는 자료는 아닙니다.</p></div>'+
+ data.rooms.map(function(r){return '<details class="card"><summary>'+esc(reportLines(r))+'</summary>'+(r.sources||[]).map(function(s){return '<div class="small">원본: '+esc(s.filename)+' · '+esc(s.sha256)+'</div>'}).join('')+
+ (r.rank_counts?'<p>1등 '+r.rank_counts[1]+' · 2등 '+r.rank_counts[2]+' · 3등 '+r.rank_counts[3]+' · 4등 '+r.rank_counts[4]+' · 5등 '+r.rank_counts[5]+'</p>':'')+
+ r.rows.map(function(row){return '<div class="rowitem">'+row.set_index+'. '+esc(row.numbers.join(' · '))+'<br><b>'+esc(resultLabel(row))+'</b></div>'}).join('')+'</details>'}).join('')+
+ (data.warnings.length?'<p class="serveronly">읽기·형식 확인이 필요한 원본 '+data.warnings.length+'건이 있습니다. 해당 자료는 집계에서 제외했습니다.</p>':'');
+}
+V6.loadReport=async function(){
+ var round=Number(el('reportRound').value);if(!Number.isInteger(round)||round<1||round>9999)return alertMsg('회차를 확인하세요.');
+ var seq=++reportSequence;currentReport=null;V6.clearReportPNG();el('reportOutput').innerHTML='';el('reportState').textContent='공식 결과와 방별 원본을 조회하고 있습니다…';
+ try{var data=await api('/round-report?round_no='+round);if(screen!=='report'||seq!==reportSequence)return;currentReport=data;workingRound=round;paintReport(data)}
+ catch(e){if(screen==='report'&&seq===reportSequence)el('reportState').textContent='조회 실패: '+e.message}
+};
+V6.clearReportPNG=function(){reportPNG=null;if(el('reportPreview'))el('reportPreview').innerHTML='';if(el('reportRegister'))el('reportRegister').disabled=true};
+V6.makeReportPNG=async function(){
+ if(!currentReport)return alertMsg('회차 자료를 먼저 조회하세요.');
+ if(Number(el('reportRound').value)!==currentReport.round_no)return alertMsg('회차를 변경했습니다. 다시 조회하세요.');
+ var data=currentReport,key=el('reportRoom').value,selected=key==='all'?data.rooms:data.rooms.filter(function(r){return r.room_key===key});
+ if(!selected.length)return alertMsg('결과 범위를 확인하세요.');
+ var lines=['항행의자유 V6 · '+data.round_no+'회차 결과','선장 승인 전 · 배포 미승인',reportStatus(data.official.status)];
+ var draw=data.official.draw;if(draw)lines.push('본번호 '+draw.numbers.join(' · ')+' / 보너스 '+draw.bonus);
+ lines.push('참고용 대조 · 구매 및 당첨금 지급 증명 아님','');
+ selected.forEach(function(r){lines.push(r.display_name+' · '+r.count+'/25',reportRoomStatus(r));
+  if(r.rank_counts)lines.push('1등 '+r.rank_counts[1]+' / 2등 '+r.rank_counts[2]+' / 3등 '+r.rank_counts[3]+' / 4등 '+r.rank_counts[4]+' / 5등 '+r.rank_counts[5]);
+  if(key!=='all')r.rows.forEach(function(row){lines.push(String(row.set_index).padStart(2,'0')+'. '+row.numbers.join(' · ')+'  '+resultLabel(row))});
+  r.sources.forEach(function(s){lines.push('원본 '+s.asset_id,'SHA256 '+s.sha256.slice(0,32),s.sha256.slice(32))});lines.push('');
+ });
+ lines.push('생성 '+data.generated_at,'공식 출처: www.dhlottery.co.kr','확인 제외 원본 '+data.warnings.length+'건 · 누락/충돌 자료는 점수 미산출');
+ var canvas=document.createElement('canvas');canvas.width=1080;canvas.height=100+lines.length*40;
+ var ctx=canvas.getContext('2d');ctx.fillStyle='#06172c';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.font='25px sans-serif';
+ lines.forEach(function(line,i){ctx.fillStyle=i===0?'#f6d390':i===1?'#ffcc88':'#edf6ff';ctx.fillText(line,32,55+i*40,1016)});
+ var url=canvas.toDataURL('image/png');
+ reportPNG={url:url,round_no:data.round_no,room_key:key,filename:'V6_'+data.round_no+'_'+key+'_25_RESULT.png',report_type:key==='all'?'ROUND_RESULT_PNG':'ROOM_25_PNG'};
+ el('reportPreview').innerHTML='<p class="hint">PNG 원본 확인 후 등록하세요. 등록은 선장 승인을 대신하지 않습니다.</p><img class="previewimg" alt="회차 결과 PNG 미리보기" src="'+url+'">';el('reportRegister').disabled=false;
+};
+V6.registerReportPNG=async function(){
+ if(reportUploading||!reportPNG)return;
+ var png=reportPNG;if(!currentReport||Number(el('reportRound').value)!==png.round_no)return alertMsg('회차를 다시 조회하고 PNG를 만드세요.');
+ reportUploading=true;el('reportRegister').disabled=true;
+ try{
+  var bytes=atob(png.url.split(',')[1]),arr=new Uint8Array(bytes.length);for(var i=0;i<bytes.length;i++)arr[i]=bytes.charCodeAt(i);
+  var form=new FormData();form.append('file',new Blob([arr],{type:'image/png'}),png.filename);form.append('room_key',png.room_key);form.append('round_no',String(png.round_no));
+  var uploaded=await api('/upload',{method:'POST',body:form});
+  alertMsg('PNG 원본 등록 완료 · 승인 메뉴에서 원본을 확인하고 검토 요청하세요.');workingRound=png.round_no;view('distribution');
+ }catch(e){alertMsg('PNG 등록 실패: '+e.message);if(el('reportRegister'))el('reportRegister').disabled=false}
+ finally{reportUploading=false}
+};
+
 window.V6=V6;document.body.dataset.theme=theme();view('home');V6.loadRooms();
 })();
 </script></body></html>
