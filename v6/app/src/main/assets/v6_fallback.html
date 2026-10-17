@@ -103,7 +103,7 @@ var TOKEN='hanghae_v6_device_token_v1',THEME='hanghae_v6_theme';
 var DEFAULT=[['all','전체방'],['analysis','1번방'],['controller','2번방'],['helmsman','3번방'],['freedom','4번방'],['chief','5번방']];
 var rooms=DEFAULT.map(function(r){return {room_key:r[0],display_name:r[1],fixed:true}});
 var active='analysis',screen='home',tab='files',filterRoom='',busy=false,pairingNow=false,noticeRoom='all',historyStack=[],releaseInfo=null;
-var CURRENT_VERSION_CODE=600013, CURRENT_VERSION_NAME='V6.0.12 APK 화면';
+var CURRENT_VERSION_CODE=600014, CURRENT_VERSION_NAME='V6.0.13 APK 업데이트';
 var ROUND_DOCS=[{"round_no":1246,"room_key":"all","title":"1246회차 백학도사 로또비법서 (신서)","source_author":"백학도사","source_text":"백학도사님의 이번회차 로또비법서 입니다\n\n1246 회차 로또비법서\n\n첫번째.대장장이의 망치가 녹이 슬었을때 알수가 있는 징표로구나.\n\n두번째. 개구리는 우물밖으로 나와 검은하늘을 바라보리로다.\n\n세번째. 흰 바둑알과 검은 바둑알의 위치가 바뀌며 승리의 뒤에 숨는구나.\n\n네번째. 종이학 천마리중 한마리만이 불에 타는구나.\n\n다섯째. 나룻배는 안개속에 흘러가며 종소리 나는 쪽으로 항하여 도착하리로다.\n\n여섯째. 돌위에 더 큰돌을 얹어서 탑을 만드리니 소원이 이루어질것이니로다.","status":"UNINTERPRETED","purchase_status":"REFERENCE_ONLY"}];
 var UPDATE_SERVICE='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/v6-update-check';
 var currentFiles=[],currentPurchase=[],currentNotices=[],currentChats=[],currentDistribution=null,legacyOffset=0,legacyItems=[],selectedSinseo=1246,workingRound=1246;
@@ -418,21 +418,15 @@ function notices(){
  '</select><div id="allNotices">조회 중…</div></div>';
 }
 function updatePage(){
- var nativeUpdater=!!(window.V6NativeUpdater&&typeof window.V6NativeUpdater.refreshScreen==='function');
  return heading('⬆ V6 업데이트')+
  '<div class="card"><h2>현재 V6 화면 버전</h2><p style="font-size:17px;font-weight:900">'+esc(CURRENT_VERSION_NAME)+'</p>'+
  '<p class="small">앱 식별자 kr.hanghae.v6.centralcontrol · 화면 버전 코드 '+CURRENT_VERSION_CODE+'</p>'+
- '<p class="hint">V6.0.6부터는 메뉴·화면 등 웹 화면 변경을 AndroidIDE ZIP이나 APK 설치 없이 적용할 수 있습니다.</p>'+
- '<button class="primary" onclick="V6.applyScreenUpdate()">⚡ 지금 앱 안에서 화면 업데이트</button>'+
- '<div id="nativeUpdateState" class="hint">'+(nativeUpdater?
- '화면 업데이트 기능이 활성화돼 있습니다. 새 화면이 있으면 자동으로 교체합니다.':
- '현재 실행 앱에는 직접 화면 업데이트 기능이 없습니다. 한 번의 호환되는 APK 업데이트가 필요합니다.')+'</div>'+
+ '<p class="hint">V6의 기능과 화면은 APK로 업데이트합니다. 이 화면에서 최신 APK를 확인하고 바로 내려받으세요.</p>'+
  '<button class="primary" onclick="V6.checkUpdate()">🔄 최신 APK 버전 확인</button>'+
  '<div id="updateInfo" class="hint">새 Android 앱 기능은 별도로 APK 업데이트가 필요합니다.</div>'+
- '<button class="primary" id="downloadApk" onclick="V6.downloadApk()" disabled>⬇ 새 APK 직접 받기 (ZIP 불필요)</button></div>'+
+ '<button class="primary" id="downloadApk" onclick="V6.downloadApk()" disabled>⬇ APK 직접 받기</button></div>'+
  '<div class="card"><h2>중요: 기존 앱 보존</h2>'+
- '<p class="hint">화면 업데이트는 설치된 앱을 삭제하지 않고 동작합니다. Android 권한·네이티브 기능 변경은 APK 설치가 필요하며, 기존 APK와 서명키가 같아야 덮어쓸 수 있습니다.</p>'+
- '<p class="serveronly">처음 설치한 APK가 AndroidIDE 자체 서명본이라면 GitHub에서 서명한 APK는 바로 덮어쓰기 되지 않을 수 있습니다. 이 경우 앱을 삭제하지 말고 기존 AndroidIDE 서명키로 새 APK를 1회 빌드해야 합니다.</p></div>';
+ '<p class="hint">기존 앱을 삭제하지 마세요. 업데이트 APK는 설치된 앱과 같은 서명키로 서명돼야 덮어쓸 수 있습니다.</p></div>';
 }
 function filePage(){
  return heading('📄 파일 보기')+'<div class="card" id="fileInfo">서버 자료를 확인하는 중…</div><button onclick="V6.go(\'library\')">◀ 라이브러리로</button>';
@@ -603,8 +597,8 @@ var V6={
      releaseInfo=data;
      if(info)info.textContent=data.version_code>CURRENT_VERSION_CODE?
        '새 APK 버전 '+data.version_name+' ('+data.version_code+') 공개 · 동일한 서명키일 때만 덮어쓰기 가능합니다.':
-       '공개 버전 '+data.version_name+' · 화면 업데이트는 위 [지금 앱 안에서 화면 업데이트]로 확인하세요.';
-     if(button)button.disabled=!validApkUrl(data.download_apk_url);
+       '현재 APK가 최신입니다 · 공개 버전 '+data.version_name+' ('+data.version_code+')';
+     if(button)button.disabled=!(data.version_code>CURRENT_VERSION_CODE&&validApkUrl(data.download_apk_url));
    }catch(e){releaseInfo=null;if(info)info.textContent='APK 확인 실패: '+e.message;alertMsg('새 APK 확인 실패')}
  },
  downloadApk:function(){
