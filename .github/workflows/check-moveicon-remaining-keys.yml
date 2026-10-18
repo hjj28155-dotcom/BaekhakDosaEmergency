@@ -1,0 +1,44 @@
+name: Check Remaining MoveIcon-Compatible Signing Keys
+on:
+  push:
+    paths:
+      - '.github/workflows/check-moveicon-remaining-keys.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore V5 signing cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: v5-whole-room-companion-stable-debug-key-20261016
+      - name: Verify V5 key fingerprint match privately
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECT='516e86712299818f4afcd12d6e13b48e788dcdad7b1d3e2edb88512653af8210'
+          K="$HOME/.android/debug.keystore"
+          if test -s "$K"; then
+            GOT=$(keytool -list -v -keystore "$K" -storepass android 2>/dev/null | grep -m1 'SHA256:' | sed 's/.*SHA256: //' | tr -d ':' | tr '[:upper:]' '[:lower:]' || true)
+            if test "$GOT" = "$EXPECT"; then echo V5_KEY_MATCH=YES; else echo V5_KEY_MATCH=NO; fi
+            rm -f "$K"
+          else echo V5_KEY_AVAILABLE=NO; fi
+      - name: Restore V6 signing cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: v6-central-stable-debug-key-v1
+      - name: Verify V6 key fingerprint match privately
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECT='516e86712299818f4afcd12d6e13b48e788dcdad7b1d3e2edb88512653af8210'
+          K="$HOME/.android/debug.keystore"
+          if test -s "$K"; then
+            GOT=$(keytool -list -v -keystore "$K" -storepass android 2>/dev/null | grep -m1 'SHA256:' | sed 's/.*SHA256: //' | tr -d ':' | tr '[:upper:]' '[:lower:]' || true)
+            if test "$GOT" = "$EXPECT"; then echo V6_KEY_MATCH=YES; else echo V6_KEY_MATCH=NO; fi
+          else echo V6_KEY_AVAILABLE=NO; fi
