@@ -1,0 +1,48 @@
+name: Audit MoveIcon Legacy Signing Material
+on:
+  push:
+    paths:
+      - '.github/workflows/audit-moveicon-legacy-signing.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Locate usable legacy signing credentials without exposing keys
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          EXPECTED='516e86712299818f4afcd12d6e13b48e788dcdad7b1d3e2edb88512653af8210'
+          echo '=== Search history for signing files (counts only) ==='
+          git rev-list --objects --all | grep -Ei '(debug\.keystore|\.jks|\.p12|\.pfx)' > /tmp/signing-candidates.txt || true
+          echo "HISTORICAL_SIGNING_OBJECT_COUNT=$(wc -l < /tmp/signing-candidates.txt)"
+          found=0
+          while read -r oid rest; do
+            test -n "$oid" || continue
+            tmp=$(mktemp)
+            git cat-file blob "$oid" > "$tmp" 2>/dev/null || { rm -f "$tmp"; continue; }
+            for pw in android changeit ''; do
+              cert=$(keytool -list -v -keystore "$tmp" -storepass "$pw" 2>/dev/null | grep -m1 'SHA256:' | sed 's/.*SHA256: //' | tr -d ':' | tr '[:upper:]' '[:lower:]' || true)
+              if test "$cert" = "$EXPECTED"; then
+                echo 'MATCHING_SIGNING_KEY_FOUND_IN_REPOSITORY_HISTORY'
+                found=1
+                break
+              fi
+            done
+            rm -f "$tmp"
+            if test "$found" = 1; then break; fi
+          done < /tmp/signing-candidates.txt
+          echo "MATCHING_LEGACY_SIGNING_KEY=$found"
+          echo '=== List cached key names for availability analysis ==='
+          gh api --paginate -H 'Accept: application/vnd.github+json' "/repos/$GITHUB_REPOSITORY/actions/caches?per_page=100" --jq '.actions_caches[]?.key' 2>/dev/null | grep -E 'hanghae|sign|debug|test1080' | sort -u || echo 'NO_MATCHING_ACCESSIBLE_CACHE'
+          echo '=== Verify source project availability ==='
+          if unzip -Z1 source.zip | grep -E '/app/build.gradle$' | grep -q 'OVERLAY_ICON'; then echo 'REPO_MOVEICON_SOURCE_PRESENT=YES'; else echo 'REPO_MOVEICON_SOURCE_PRESENT=NO'; fi
+          if test "$found" != 1; then echo 'RESULT=SAFE_OVERWRITE_BUILD_BLOCKED: ORIGINAL SIGNING_KEY_NOT_RECOVERED'; fi
