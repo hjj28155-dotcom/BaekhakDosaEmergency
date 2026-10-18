@@ -1,0 +1,58 @@
+name: MoveIcon Update Prerequisite Diagnostics
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/moveicon-recover-update-prereqs.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Identify official APK identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK='OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE_STABLE_v1.0.79.apk'
+          AAPT=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
+          "$AAPT" dump badging "$APK" | head -1
+          "$APKSIGNER" verify --print-certs "$APK" | grep -m1 'certificate SHA-256 digest:'
+      - name: Locate historical Actions caches (names and sizes only)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh cache list -R "${GITHUB_REPOSITORY}" --limit 100 --json key,sizeInBytes,ref,createdAt 2>/dev/null || true
+      - name: Attempt stable key recovery from original Actions cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: hanghae-mini-stable-debug-keystore-v1
+      - name: Check recovered signing identity without disclosing private material
+        shell: bash
+        run: |
+          set -euo pipefail
+          if test -s "$HOME/.android/debug.keystore"; then
+            old=$(keytool -list -v -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey 2>/dev/null | awk '/SHA256:/ {gsub(":","", $2);print tolower($2);exit}')
+            apk='OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE_STABLE_v1.0.79.apk'
+            signer=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
+            new=$("$signer" verify --print-certs "$apk" | grep -m1 'certificate SHA-256 digest:' | awk '{print tolower($NF)}')
+            if test "$old" = "$new" && test -n "$old"; then echo 'EXISTING_INSTALL_UPDATE_SIGNING_READY=YES'; else echo 'EXISTING_INSTALL_UPDATE_SIGNING_READY=NO'; fi
+          else
+            echo 'EXISTING_INSTALL_UPDATE_SIGNING_READY=NO (original signing cache unavailable)'
+          fi
+      - name: Probe previously used source download (do not expose project contents)
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fLsS --connect-timeout 15 --max-time 65 --retry 1 'https://drive.usercontent.google.com/download?export=download&confirm=t&id=1WUyZKGiYVBNvX3N9xfSSsc7GUczpKb5u' -o /tmp/moveicon-source.zip || true
+          if test -s /tmp/moveicon-source.zip && unzip -tq /tmp/moveicon-source.zip >/dev/null 2>&1; then
+            echo 'EXISTING_SOURCE_DOWNLOAD=OK'
+          else
+            echo 'EXISTING_SOURCE_DOWNLOAD=BLOCKED (not a public downloadable source archive)'
+          fi
