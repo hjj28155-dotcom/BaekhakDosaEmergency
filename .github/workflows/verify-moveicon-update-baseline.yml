@@ -1,0 +1,45 @@
+name: Verify MoveIcon Official Update Baseline
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/verify-moveicon-update-baseline.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify official stable APK metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK='OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE_STABLE_v1.0.79.apk'
+          test -s "$APK"
+          AAPT=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
+          "$AAPT" dump badging "$APK" | head -4
+          "$APKSIGNER" verify --print-certs "$APK" | grep -E 'certificate SHA-256 digest:|Signer #1 certificate DN:'
+          sha256sum "$APK"
+      - name: Verify source archive layout
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s source.zip
+          unzip -tq source.zip | tail -1
+          unzip -Z1 source.zip | grep -E '(app/build.gradle|OverlayLauncherActivity.java|OverlayUpdateActivity.java|OverlayControlService.java)$' | head -15
+      - name: Check previously used stable signing-key cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: hanghae-mini-stable-debug-keystore-v1
+      - name: Compare available stable key to official APK signer
+        shell: bash
+        run: |
+          set -euo pipefail
+          if test -s "$HOME/.android/debug.keystore"; then
+            keytool -list -v -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey | grep 'SHA256:'
+          else
+            echo 'STABLE_SIGNING_KEY_UNAVAILABLE - DO NOT PUBLISH AN UPDATE'
+          fi
