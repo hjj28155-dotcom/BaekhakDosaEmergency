@@ -131,16 +131,30 @@ MP3·MP4는 자동검색이 아니라 <b>이동아이콘 내부 앱폴더 2개</
     tag.textContent="공식 배포 버전: "+data.versionName;
     status.appendChild(tag);
     const rest=document.createElement("div");
-    rest.textContent=installed ? (newer(data.versionName,installed) ? "새로운 정식 업데이트가 확인됐습니다." : "현재 설치된 버전보다 최신 정식 배포판은 없습니다.") : "기존 설치 버전이 전달되지 않아 자동으로 비교하지 않습니다. 새 APK 배포 시 앱의 업데이트 확인 기능에서 안내합니다.";
+    rest.textContent=installed ? (newer(data.versionName,installed) ? "새 정식 업데이트가 있습니다. 아래 버튼으로 확인하세요." : "현재 설치된 버전보다 최신 정식판이 없습니다.") : "공식 배포 최신판 v"+data.versionName+" · 새 정식 APK 미배포 (휴대전화의 설치 버전은 자동 감지할 수 없습니다).";
     status.appendChild(rest);
     if(installed && newer(data.versionName,installed))showUpdate();
   }
-  document.getElementById("moveicon-check-update").addEventListener("click",()=>{if(installed&&newer(data.versionName,installed)){showUpdate()}else{status.focus();status.scrollIntoView({behavior:"smooth",block:"center"})}});
+  const checkBtn=document.getElementById("moveicon-check-update");
   document.getElementById("moveicon-update-close").addEventListener("click",()=>dialog.classList.remove("visible"));
-  fetch(base+"?t="+Date.now(),{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("HTTP "+r.status);return r.json()}).then(x=>{
-    if(x&&x.channel==="stable"&&x.available===true&&/^\d+\.\d+\.\d+$/.test(x.versionName)&&safeUrl(x.apkUrl)&&!/test|debug/i.test(x.apkUrl)){data=x;}
-    render();
-  }).catch(()=>{render(); const info=document.createElement("small");info.textContent=" · 버전 조회 오류로 기존 공식 배포판 주소를 표시했습니다.";status.appendChild(info)});
+  function fetchStable(interactive){
+    if(interactive){checkBtn.disabled=true;checkBtn.textContent="정식 배포 버전 다시 확인 중…";}
+    return fetch(base+"?t="+Date.now(),{cache:"no-store"})
+      .then(r=>{if(!r.ok)throw Error("HTTP "+r.status);return r.json()})
+      .then(x=>{
+        if(!x||x.channel!=="stable"||x.available!==true||!/^\d+\.\d+\.\d+$/.test(x.versionName)||!safeUrl(x.apkUrl)||/test|debug/i.test(x.apkUrl))throw Error("Invalid stable release");
+        data=x;render();
+        if(interactive){const info=document.createElement("div");info.textContent="정식 배포 서버 조회 완료 · "+new Date().toLocaleString("ko-KR");status.appendChild(info);}
+      })
+      .catch(()=>{
+        render();const info=document.createElement("div");
+        info.textContent="서버 조회에 실패했습니다. 이전에 확인된 정식 배포 정보만 표시 중입니다.";
+        status.appendChild(info);
+      })
+      .finally(()=>{checkBtn.disabled=false;checkBtn.textContent="🔄 업데이트 다시 확인";});
+  }
+  checkBtn.addEventListener("click",()=>fetchStable(true));
+  fetchStable(false);
 })();
 </script>
 </body>
