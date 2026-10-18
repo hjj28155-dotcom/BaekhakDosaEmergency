@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>이동아이콘 v1.0.79 설치</title>
+<title>이동아이콘 공식 다운로드 · 업데이트</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#071827;color:#fff;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif}
@@ -26,11 +26,11 @@ p{font-size:17px;line-height:1.6;color:#d9e8f1}
 </head>
 <body>
 <div class="wrap"><div class="card">
-<h1>⚓ 이동아이콘 v1.0.79</h1>
-<p>아래 버튼을 누르면 브라우저의 파일 다운로드가 시작됩니다. 검은 빈 화면으로 열리지 않도록 Release 다운로드 방식으로 변경했습니다.</p>
-<a class="btn" href="https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/v1.0.79/Hanghae_MoveIcon_v1.0.79.apk">⬇ 다운로드 시작</a>
+<h1 id="moveicon-title">⚓ 이동아이콘 공식 배포</h1>
+<p>기존 설치 앱은 삭제하지 마세요. 검증된 공식 APK만 제공하며, 새 버전이 확인되면 업데이트를 안내합니다.</p>
+<a id="moveicon-apk" class="btn" href="https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/v1.0.79/Hanghae_MoveIcon_v1.0.79.apk">⬇ APK 다운로드 시작</a>
 <div class="note">
-현재 정상본을 기준으로 기능은 그대로 두고 설치 호환성을 다시 확인해 재빌드했습니다.<br>
+현재 공식 공개판의 기능 안내입니다. 승인된 신규 수정본의 배포 여부는 아래 공지를 확인하세요.<br>
 ① 긴 메뉴 세로 스크롤<br>
 ② ⚓ 위치 이동·저장 + 메뉴 밖 화면 터치 시 메뉴 접기<br>
 ③ MP3 <b>전체곡 재생</b> 추가<br>
@@ -62,8 +62,85 @@ MP3·MP4는 자동검색이 아니라 <b>이동아이콘 내부 앱폴더 2개</
 <script>
 (function(){
   function show(){document.getElementById('v4DownloadDialog')?.classList.add('visible');}
-  document.addEventListener('DOMContentLoaded',show);
+  // 분석방 V4 안내는 해당 버튼을 눌렀을 때에만 표시합니다. 이동아이콘 배포 화면을 가리지 않습니다.
   window.v4ShowDownloadDialog=show;
+})();
+</script>
+<style id="moveicon-release-style">
+#moveicon-release-status{margin:16px 0 0;padding:14px;border:1px solid #34617f;border-radius:13px;background:#0b3048;font-size:16px;line-height:1.6;color:#e4f1f8}
+#moveicon-release-status strong{color:#ffe39a}
+#moveicon-release-extra{margin-top:16px;padding:12px 16px;border:1px solid #21445d;border-radius:12px;text-align:left;font-size:15px;line-height:1.7}
+#moveicon-release-extra a{color:#9adfff}
+#moveicon-check-update{display:block;width:100%;margin-top:14px;background:#145d72;color:white;padding:15px;font-size:18px;font-weight:800;border:1px solid #72bcd0;border-radius:12px;cursor:pointer}
+#moveicon-update-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:#000c;z-index:250;padding:18px}
+#moveicon-update-modal.visible{display:flex}
+#moveicon-update-modal .update-box{width:min(100%,450px);background:#09273e;border:2px solid #e3be67;border-radius:19px;padding:22px;text-align:center}
+#moveicon-update-modal h2{color:#ffe39a;font-size:23px}
+#moveicon-update-modal a{display:block;background:#19739e;color:white;text-decoration:none;padding:15px;margin:16px 0 9px;border-radius:12px;font-size:18px;font-weight:800}
+#moveicon-update-modal button{padding:12px;width:100%;border:1px solid #648398;border-radius:12px;background:#102a3d;color:#fff;font-size:16px;cursor:pointer}
+</style>
+<div class="wrap" style="padding-top:0">
+  <div id="moveicon-release-status" role="status" aria-live="polite">공식 배포 버전을 확인하는 중입니다…</div>
+  <button type="button" id="moveicon-check-update">🔄 업데이트 확인</button>
+  <div id="moveicon-release-extra">
+    <strong>기존 공식 배포 주소 유지</strong><br>
+    이동아이콘 배포용과 항해사 전용은 별도 앱입니다. 서로의 APK를 덮어쓰지 마세요.<br>
+    🧭 <a href="./navigator-moveicon.html">항해사 전용 배포 페이지 열기</a><br>
+    <small>신규 업데이트는 정식 APK 서명·버전 검증 후 배포합니다. 이미 설치된 앱과 음악·영상 자료를 삭제하지 마세요.</small>
+  </div>
+</div>
+<div id="moveicon-update-modal" role="dialog" aria-modal="true" aria-labelledby="moveicon-update-title">
+  <div class="update-box">
+    <h2 id="moveicon-update-title">⚓ 이동아이콘 업데이트 안내</h2>
+    <p id="moveicon-update-info">새 공식 버전이 있습니다.</p>
+    <a id="moveicon-update-download" href="https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/v1.0.79/Hanghae_MoveIcon_v1.0.79.apk">⬇ APK 다운로드 시작</a>
+    <button type="button" id="moveicon-update-close">나중에 업데이트</button>
+  </div>
+</div>
+<script>
+(function(){
+  "use strict";
+  const base="./moveicon-release.json";
+  const trustedHost="github.com";
+  const old="https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/v1.0.79/Hanghae_MoveIcon_v1.0.79.apk";
+  const params=new URLSearchParams(location.search);
+  const installed=params.get("installed") || params.get("installedVersion") || "";
+  let data={versionName:"1.0.79",apkUrl:old,available:true};
+  const status=document.getElementById("moveicon-release-status");
+  const download=document.getElementById("moveicon-apk");
+  const dialog=document.getElementById("moveicon-update-modal");
+  const dialogLink=document.getElementById("moveicon-update-download");
+  function parts(v){return String(v||"").replace(/^v/i,"").split(/[.+\-]/).slice(0,3).map(n=>/^\d+$/.test(n)?Number(n):0)}
+  function newer(a,b){const x=parts(a),y=parts(b);for(let i=0;i<3;i++){if((x[i]||0)!==(y[i]||0))return (x[i]||0)>(y[i]||0)}return false}
+  function safeUrl(v){
+    try{const u=new URL(v);return u.protocol==="https:"&&u.hostname===trustedHost&&u.pathname.startsWith("/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/")&&u.pathname.toLowerCase().endsWith(".apk") ?u.href:null}
+    catch(_){return null}
+  }
+  function showUpdate(){
+    const url=safeUrl(data.apkUrl);if(!url)return;
+    document.getElementById("moveicon-update-info").textContent="검증된 공식 이동아이콘 "+data.versionName+" 버전이 있습니다. 기존 앱을 삭제하지 말고 업데이트 설치하세요.";
+    dialogLink.href=url;
+    dialog.classList.add("visible");
+  }
+  function render(){
+    const url=safeUrl(data.apkUrl)||old;
+    document.getElementById("moveicon-title").textContent="⚓ 이동아이콘 공식 배포 "+data.versionName;
+    download.href=url;
+    status.innerHTML="";
+    const tag=document.createElement("strong");
+    tag.textContent="공식 배포 버전: "+data.versionName;
+    status.appendChild(tag);
+    const rest=document.createElement("div");
+    rest.textContent=installed ? (newer(data.versionName,installed) ? "새로운 정식 업데이트가 확인됐습니다." : "현재 설치된 버전보다 최신 정식 배포판은 없습니다.") : "기존 설치 버전이 전달되지 않아 자동으로 비교하지 않습니다. 새 APK 배포 시 앱의 업데이트 확인 기능에서 안내합니다.";
+    status.appendChild(rest);
+    if(installed && newer(data.versionName,installed))showUpdate();
+  }
+  document.getElementById("moveicon-check-update").addEventListener("click",()=>{if(installed&&newer(data.versionName,installed)){showUpdate()}else{status.focus();status.scrollIntoView({behavior:"smooth",block:"center"})}});
+  document.getElementById("moveicon-update-close").addEventListener("click",()=>dialog.classList.remove("visible"));
+  fetch(base+"?t="+Date.now(),{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("HTTP "+r.status);return r.json()}).then(x=>{
+    if(x&&x.channel==="stable"&&x.available===true&&/^\d+\.\d+\.\d+$/.test(x.versionName)&&safeUrl(x.apkUrl)&&!/test|debug/i.test(x.apkUrl)){data=x;}
+    render();
+  }).catch(()=>{render(); const info=document.createElement("small");info.textContent=" · 버전 조회 오류로 기존 공식 배포판 주소를 표시했습니다.";status.appendChild(info)});
 })();
 </script>
 </body>
