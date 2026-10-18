@@ -1,0 +1,33 @@
+name: Verify MoveIcon Release Update Compatibility
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/verify-moveicon-test-upgrade.yml'
+permissions:
+  contents: read
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compare official and test APK metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          OLD='OVERLAY_ICON_V1062_MP3_MP4_APPFOLDERS_TV_LIVE_STABLE_v1.0.79.apk'
+          curl -fL --retry 3 --connect-timeout 25 \
+            'https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/v1.0.82-test/Hanghae_MoveIcon_v1.0.82_TEST.apk' -o /tmp/test82.apk
+          AAPT=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
+          SIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
+          for APK in "$OLD" /tmp/test82.apk; do
+            "$AAPT" dump badging "$APK" | head -1
+            "$SIGNER" verify --print-certs "$APK" | grep 'certificate SHA-256 digest:'
+          done
+          old_cert=$("$SIGNER" verify --print-certs "$OLD" | grep -m1 'certificate SHA-256 digest:' | awk '{print $NF}')
+          new_cert=$("$SIGNER" verify --print-certs /tmp/test82.apk | grep -m1 'certificate SHA-256 digest:' | awk '{print $NF}')
+          if test "$old_cert" = "$new_cert"; then
+            echo 'CERT_MATCH=YES: still verify features and version before distribution'
+          else
+            echo 'CERT_MATCH=NO: CANNOT REPLACE OFFICIAL APK; KEEP EXISTING RELEASE'
+          fi
