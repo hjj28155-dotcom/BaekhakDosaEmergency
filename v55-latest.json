@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "status": "awaiting_signed_apk",
+  "packageName": "com.navigator.analysis.v5",
+  "requiredSignerSha256": "3fe57967c15f81ee39ea2b9b88dd96a7506c1b5b9032606ecbea04bbdb15ee3c",
+  "targetVersionName": "5.5.4",
+  "targetVersionCode": 55004,
+  "versionName": null,
+  "versionCode": null,
+  "apkUrl": null,
+  "apkSha256": null,
+  "apkSizeBytes": null,
+  "message": "최신 수정 APK의 동일 서명 빌드가 아직 등록되지 않았습니다. 기존 앱을 유지하세요.",
+  "updatedAt": "2026-10-19T12:04:56+09:00"
+}
