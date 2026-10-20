@@ -121,7 +121,7 @@ public class MainActivity extends Activity {
   Window w=getWindow();w.setBackgroundDrawableResource(android.R.color.transparent);w.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
   WindowManager.LayoutParams attrs=w.getAttributes();attrs.dimAmount=.16f;w.setAttributes(attrs);
   android.widget.ScrollView scroll=new android.widget.ScrollView(this);
-  scroll.setBackground(panel());
+  scroll.setBackground(new NightSeaDrawable());
   body=new LinearLayout(this);body.setOrientation(LinearLayout.VERTICAL);body.setPadding(dp(15),dp(15),dp(15),dp(15));
   scroll.addView(body);setContentView(scroll);
   String op=getIntent().getStringExtra("open");
