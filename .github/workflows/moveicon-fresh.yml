@@ -14,7 +14,10 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - uses: android-actions/setup-android@v3
+      - name: Configure available Android SDK
+        run: |
+          echo "ANDROID_HOME=${ANDROID_HOME:-/usr/local/lib/android/sdk}" >> "$GITHUB_ENV"
+          echo "sdk.dir=${ANDROID_HOME:-/usr/local/lib/android/sdk}" > MoveIconFresh/local.properties
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.10.2'
