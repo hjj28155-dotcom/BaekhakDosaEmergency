@@ -1,186 +1,161 @@
 package kr.hanghae.moveicon.fresh;
-
-import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.LinearGradient;
-import android.graphics.Paint;
-import android.graphics.Shader;
-import android.graphics.Typeface;
-import android.graphics.drawable.GradientDrawable;
+import android.Manifest;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
+import android.provider.DocumentsContract;
 import android.provider.Settings;
+import android.database.Cursor;
 import android.view.Gravity;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 
+/** Compact utility dialog. The main menu lives in OverlayService, never as a fullscreen activity. */
 public class MainActivity extends Activity {
-  private static final int AUDIO=401, VIDEO=402;
-  private LinearLayout content;
-  private int dp(float n){ return (int)(getResources().getDisplayMetrics().density*n+.5f); }
-  private void toast(String s){ Toast.makeText(this,s,Toast.LENGTH_LONG).show(); }
-  private GradientDrawable bg(int color,int stroke,int radius){
-    GradientDrawable d=new GradientDrawable();d.setColor(color);d.setCornerRadius(dp(radius));
-    d.setStroke(dp(1),stroke);return d;
+ public static final int MP3_FOLDER=401,MP4_FOLDER=402;
+ private LinearLayout body;
+ private int dp(int n){return (int)(getResources().getDisplayMetrics().density*n+.5f);}
+ private GradientDrawable panel(){GradientDrawable d=new GradientDrawable();d.setColor(0xff081e37);d.setCornerRadius(dp(20));d.setStroke(dp(2),0xffc49e59);return d;}
+ private Button add(String label,Runnable action){
+  Button b=new Button(this);b.setText(label);b.setAllCaps(false);b.setTextSize(15);
+  b.setTextColor(0xffffdb9b);b.setBackground(panel());b.setOnClickListener(v->action.run());
+  LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,dp(49));lp.bottomMargin=dp(7);body.addView(b,lp);return b;
+ }
+ private void toast(String s){Toast.makeText(this,s,Toast.LENGTH_LONG).show();}
+ private void folder(int request){
+  Intent pick=new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+  pick.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION|Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+  startActivityForResult(pick,request);
+ }
+ private void overlay(){
+  if(Build.VERSION.SDK_INT>=23&&!Settings.canDrawOverlays(this)){
+   toast("다른 앱 위에 표시 권한을 허용하십시오.");
+   startActivity(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,Uri.parse("package:"+getPackageName())));
+   return;
   }
-  private TextView label(String s,int size,int color,boolean bold){
-    TextView t=new TextView(this);t.setText(s);t.setTextSize(size);t.setTextColor(color);
-    if(bold)t.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
-    t.setGravity(Gravity.CENTER);return t;
+  if(Build.VERSION.SDK_INT>=33&&checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)!=PackageManager.PERMISSION_GRANTED)
+   requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS},50);
+  Intent i=new Intent(this,OverlayService.class);
+  if(Build.VERSION.SDK_INT>=26)startForegroundService(i);else startService(i);
+  finish();
+ }
+ private void shortcutEdit(){
+  body.removeAllViews();
+  ShortcutBoard.show(this,body,this::showCompact);
+  Window w=getWindow();w.setLayout(dp(340),dp(560));
+ }
+ private void showCompact(){
+  body.removeAllViews();
+  TextView title=new TextView(this);title.setText("⚓ 이동아이콘");title.setTextColor(0xffffd58a);
+  title.setTextSize(22);title.setGravity(Gravity.CENTER);
+  body.addView(title,new LinearLayout.LayoutParams(-1,dp(52)));
+  add("⚓ 동그란 이동아이콘 표시",this::overlay);
+  add("🎵 내 음악 폴더에서 MP3 가져오기",()->folder(MP3_FOLDER));
+  add("🎬 내 뮤비 폴더에서 MP4 가져오기",()->folder(MP4_FOLDER));
+  add("📁 앱 보관함 MP3 / MP4",()->{showLibrary("MP3");});
+  add("＋ 아이콘 추가 · 이동 · 편집",this::shortcutEdit);
+  add("닫기",this::finish);
+  getWindow().setLayout(dp(340),WindowManager.LayoutParams.WRAP_CONTENT);
+ }
+ private void showLibrary(String type){
+  body.removeAllViews();
+  TextView heading=new TextView(this);heading.setText("앱 보관함 / "+type);heading.setTextSize(18);
+  heading.setTextColor(Color.WHITE);body.addView(heading);
+  File dir=new File(getFilesDir(),"보관함/"+type);File[] files=dir.listFiles();
+  if(files!=null)for(File f:files)if(f.isFile()){
+   add("▶ "+f.getName(),()->playFile(f,type));
   }
-  private Button button(String s,Runnable action){
-    Button b=new Button(this);b.setAllCaps(false);b.setText(s);b.setTextSize(16);
-    b.setTextColor(Color.WHITE);b.setBackground(bg(0xff102c49,0xff977646,16));
-    b.setOnClickListener(v->action.run());return b;
+  add("MP3 보기",()->showLibrary("MP3"));
+  add("MP4 보기",()->showLibrary("MP4"));
+  add("← 돌아가기",this::showCompact);
+  getWindow().setLayout(dp(340),WindowManager.LayoutParams.WRAP_CONTENT);
+ }
+ private android.media.MediaPlayer player;
+ private void playFile(File f,String type){
+  if(type.equals("MP3")){
+   try{if(player!=null)player.release();player=new android.media.MediaPlayer();
+    player.setDataSource(f.getAbsolutePath());player.prepare();player.start();toast("재생: "+f.getName());
+   }catch(Exception e){toast("재생 실패: "+e.getMessage());}
+  } else {
+   body.removeAllViews();
+   android.widget.VideoView video=new android.widget.VideoView(this);
+   body.addView(video,new LinearLayout.LayoutParams(-1,dp(230)));
+   video.setVideoPath(f.getAbsolutePath());video.setMediaController(new android.widget.MediaController(this));video.start();
+   add("← MP4 보관함",()->{video.stopPlayback();showLibrary("MP4");});
+   getWindow().setLayout(dp(340),WindowManager.LayoutParams.WRAP_CONTENT);
   }
-  private void open(String url){
-    try{startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(url)));}
-    catch(Exception e){toast("연결 가능한 앱이 없습니다.");}
-  }
-  private void select(int type){
-    Intent i=new Intent(Intent.ACTION_OPEN_DOCUMENT);
-    i.addCategory(Intent.CATEGORY_OPENABLE);
-    i.setType(type==AUDIO?"audio/*":"video/*");
-    startActivityForResult(i,type);
-  }
-  @Override protected void onActivityResult(int request,int result,Intent data){
-    super.onActivityResult(request,result,data);
-    if(result!=RESULT_OK||data==null||data.getData()==null)return;
-    if(request!=AUDIO&&request!=VIDEO)return;
-    Uri uri=data.getData();
-    String directory=request==AUDIO?"MP3":"MP4";
-    File dir=new File(getExternalFilesDir(null),directory);
-    if(!dir.exists()&&!dir.mkdirs()){toast("보관 폴더를 만들지 못했습니다.");return;}
-    String filename=System.currentTimeMillis()+(request==AUDIO?".mp3":".mp4");
-    File dest=new File(dir,filename);
-    try(InputStream in=getContentResolver().openInputStream(uri);FileOutputStream out=new FileOutputStream(dest)){
-      if(in==null)throw new Exception("파일을 읽을 수 없습니다.");
-      byte[] buf=new byte[8192];int n;while((n=in.read(buf))!=-1)out.write(buf,0,n);
-      toast(directory+" 보관 완료: "+filename);
-    }catch(Exception ex){dest.delete();toast("저장 실패: "+ex.getMessage());}
-  }
-  private void showMedia(String kind){
-    File dir=new File(getExternalFilesDir(null),kind);File[] files=dir.listFiles();
-    content.removeAllViews();
-    title(kind+" 보관함");
-    Button add=button("+ "+kind+" 파일 추가",()->select(kind.equals("MP3")?AUDIO:VIDEO));
-    content.addView(add,new LinearLayout.LayoutParams(-1,dp(57)));
-    if(files==null||files.length==0){content.addView(label("보관한 파일이 없습니다.",16,0xffc5d9ee,false));return;}
-    for(File f:files){
-      Button play=button("▶ "+f.getName(),()->{
-        try {
-          // App-owned file plays in the built-in player screen.
-          showPlayer(f,kind.equals("MP4"));
-        }catch(Exception ex){toast("재생 실패: "+ex.getMessage());}
-      });
-      LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,dp(55));p.topMargin=dp(8);
-      content.addView(play,p);
-    }
-    Button back=button("← 홈",this::home);content.addView(back,new LinearLayout.LayoutParams(-1,dp(54)));
-  }
-  private android.media.MediaPlayer audioPlayer;
-  private void showPlayer(File file,boolean video){
-    content.removeAllViews();title(file.getName());
-    if(video){
-      android.widget.VideoView vv=new android.widget.VideoView(this);
-      content.addView(vv,new LinearLayout.LayoutParams(-1,dp(270)));
-      vv.setVideoPath(file.getAbsolutePath());
-      vv.setMediaController(new android.widget.MediaController(this));
-      vv.start();
+ }
+ @Override public void onCreate(Bundle state){
+  super.onCreate(state);
+  Window w=getWindow();w.setBackgroundDrawableResource(android.R.color.transparent);w.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+  WindowManager.LayoutParams attrs=w.getAttributes();attrs.dimAmount=.16f;w.setAttributes(attrs);
+  android.widget.ScrollView scroll=new android.widget.ScrollView(this);
+  scroll.setBackground(panel());
+  body=new LinearLayout(this);body.setOrientation(LinearLayout.VERTICAL);body.setPadding(dp(15),dp(15),dp(15),dp(15));
+  scroll.addView(body);setContentView(scroll);showCompact();
+  String op=getIntent().getStringExtra("open");
+  if("MP3".equals(op))showLibrary("MP3");else if("MP4".equals(op))showLibrary("MP4");
+ }
+ @Override protected void onActivityResult(int request,int result,Intent data){
+  super.onActivityResult(request,result,data);
+  if(result!=RESULT_OK||data==null||data.getData()==null)return;
+  if(request!=MP3_FOLDER&&request!=MP4_FOLDER)return;
+  String group=request==MP3_FOLDER?"MP3":"MP4";
+  Uri tree=data.getData();
+  try{
+   getContentResolver().takePersistableUriPermission(tree,Intent.FLAG_GRANT_READ_URI_PERMISSION);
+   int count=copyFolder(tree,group);
+   toast("내 "+(request==MP3_FOLDER?"음악":"뮤비")+" 폴더에서 "+count+"개를 앱의 "+group+" 보관함에 저장했습니다.");
+  }catch(Exception e){toast("가져오기 실패: "+e.getMessage());}
+ }
+ private int copyFolder(Uri tree,String group)throws Exception{
+  Uri children=DocumentsContract.buildChildDocumentsUriUsingTree(tree,DocumentsContract.getTreeDocumentId(tree));
+  return copyChildren(tree,children,new File(getFilesDir(),"보관함/"+group),group,0);
+ }
+ private int copyChildren(Uri tree,Uri children,File folder,String group,int depth)throws Exception{
+  if(depth>8)throw new Exception("하위 폴더 단계가 너무 깊습니다.");
+  if(!folder.exists()&&!folder.mkdirs())throw new Exception("앱 보관함 폴더 생성 실패");
+  int total=0;String[] cols={DocumentsContract.Document.COLUMN_DOCUMENT_ID,DocumentsContract.Document.COLUMN_DISPLAY_NAME,DocumentsContract.Document.COLUMN_MIME_TYPE};
+  try(Cursor c=getContentResolver().query(children,cols,null,null,null)){
+   if(c==null)throw new Exception("폴더를 읽을 수 없습니다.");
+   while(c.moveToNext()){
+    String id=c.getString(0),name=c.getString(1),mime=c.getString(2);
+    if(name==null)continue;
+    name=name.replaceAll("[/\\\\\\x00-\\x1f]","_");
+    Uri doc=DocumentsContract.buildDocumentUriUsingTree(tree,id);
+    if(DocumentsContract.Document.MIME_TYPE_DIR.equals(mime)){
+      Uri sub=DocumentsContract.buildChildDocumentsUriUsingTree(tree,id);
+      total+=copyChildren(tree,sub,new File(folder,name),group,depth+1);
     }else{
-      try{
-        if(audioPlayer!=null){audioPlayer.release();audioPlayer=null;}
-        audioPlayer=new android.media.MediaPlayer();
-        audioPlayer.setDataSource(file.getAbsolutePath());audioPlayer.prepare();audioPlayer.start();
-        content.addView(label("♪ 재생 중",22,0xffffd789,true),new LinearLayout.LayoutParams(-1,dp(140)));
-        Button pause=button("재생 / 일시정지",()->{if(audioPlayer!=null){if(audioPlayer.isPlaying())audioPlayer.pause();else audioPlayer.start();}});
-        content.addView(pause,new LinearLayout.LayoutParams(-1,dp(55)));
-      }catch(Exception ex){toast("오디오 재생 실패");}
-    }
-    Button back=button("← 보관함",()->{if(audioPlayer!=null){audioPlayer.release();audioPlayer=null;}showMedia(video?"MP4":"MP3");});
-    LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,dp(55));p.topMargin=dp(18);content.addView(back,p);
-  }
-  private void title(String t){
-    TextView h=label("⚓ "+t,25,0xffffd789,true);h.setPadding(0,dp(12),0,dp(18));
-    content.addView(h,new LinearLayout.LayoutParams(-1,dp(85)));
-  }
-  private void launchOverlay(){
-    if(Build.VERSION.SDK_INT>=23&&!Settings.canDrawOverlays(this)){
-      toast("다른 앱 위에 표시 권한을 허용하세요.");
-      startActivity(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,Uri.parse("package:"+getPackageName())));
-      return;
-    }
-    if(Build.VERSION.SDK_INT>=33&&checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)!=PackageManager.PERMISSION_GRANTED)
-      requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS},50);
-    try{
-      Intent intent=new Intent(this,OverlayService.class);
-      if(Build.VERSION.SDK_INT>=26)startForegroundService(intent);else startService(intent);
-      toast("닻 이동아이콘을 표시했습니다.");
-    }catch(Exception e){toast("닻 표시 실패: "+e.getMessage());}
-  }
-  private void home(){
-    if(audioPlayer!=null){audioPlayer.release();audioPlayer=null;}
-    content.removeAllViews();title("항행의자유 이동아이콘");
-    content.addView(label("별빛이 머무는 밤바다 · V1.0.84",15,0xffd3e4f5,false),
-      new LinearLayout.LayoutParams(-1,dp(46)));
-    String[] names={"항행의자유","MP3","MP4","FM","AM","유튜브","실시간TV","설정"};
-    for(int i=0;i<4;i++){
-      LinearLayout row=new LinearLayout(this);row.setOrientation(LinearLayout.HORIZONTAL);
-      for(int j=0;j<2;j++){
-        final int index=i*2+j;
-        Button b=button(names[index],()->{
-          switch(index){
-            case 0:open("https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/");break;
-            case 1:showMedia("MP3");break;
-            case 2:showMedia("MP4");break;
-            case 3:open("https://radio.kbs.co.kr/");break;
-            case 4:open("https://www.mbc.co.kr/");break;
-            case 5:open("https://www.youtube.com/");break;
-            case 6:open("https://www.kbs.co.kr/");break;
-            case 7:settingsPage();break;
-          }
-        });
-        LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(72),1);p.setMargins(dp(4),dp(4),dp(4),dp(4));row.addView(b,p);
+      String lower=name.toLowerCase(java.util.Locale.ROOT);
+      if(!(group.equals("MP3")?(lower.endsWith(".mp3")||lower.endsWith(".m4a")||lower.endsWith(".wav")||lower.endsWith(".flac")):
+        (lower.endsWith(".mp4")||lower.endsWith(".mkv")||lower.endsWith(".webm"))))continue;
+      File dest=new File(folder,name);
+      if(dest.exists()){String stem=name.contains(".")?name.substring(0,name.lastIndexOf('.')):name;
+       String ext=name.contains(".")?name.substring(name.lastIndexOf('.')):"";
+       dest=new File(folder,stem+"_"+System.currentTimeMillis()+ext);
       }
-      content.addView(row,new LinearLayout.LayoutParams(-1,dp(80)));
+      try(InputStream in=getContentResolver().openInputStream(doc);FileOutputStream out=new FileOutputStream(dest)){
+       if(in==null)throw new Exception("파일을 열 수 없습니다");
+       byte[] buf=new byte[8192];int n;while((n=in.read(buf))!=-1)out.write(buf,0,n);
+       total++;
+      }catch(Exception e){dest.delete();throw e;}
     }
-    Button custom=button("＋ 아이콘 추가 · 이동 · 편집 · 삭제",()->ShortcutBoard.show(this,content,this::home));
-    LinearLayout.LayoutParams cp=new LinearLayout.LayoutParams(-1,dp(56));cp.topMargin=dp(12);content.addView(custom,cp);
-    Button anchor=button("⚓ 화면 위 닻 아이콘 켜기",this::launchOverlay);
-    LinearLayout.LayoutParams a=new LinearLayout.LayoutParams(-1,dp(56));a.topMargin=dp(15);content.addView(anchor,a);
-    Button update=button("업데이트",()->open("https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/actions"));
-    LinearLayout.LayoutParams u=new LinearLayout.LayoutParams(-1,dp(55));u.topMargin=dp(9);content.addView(update,u);
-    Button end=button("종료",this::finish);LinearLayout.LayoutParams e=new LinearLayout.LayoutParams(-1,dp(55));e.topMargin=dp(8);content.addView(end,e);
+   }
   }
-  private void settingsPage(){
-    content.removeAllViews();title("설정");
-    Button floatButton=button("닻 이동아이콘 켜기",this::launchOverlay);
-    content.addView(floatButton,new LinearLayout.LayoutParams(-1,dp(60)));
-    Button stop=button("닻 이동아이콘 끄기",()->{stopService(new Intent(this,OverlayService.class));toast("닻 아이콘을 닫았습니다.");});
-    content.addView(stop,new LinearLayout.LayoutParams(-1,dp(60)));
-    Button back=button("← 홈",this::home);content.addView(back,new LinearLayout.LayoutParams(-1,dp(60)));
-  }
-  @Override protected void onCreate(Bundle state){
-    super.onCreate(state);
-    LinearLayout root=new LinearLayout(this);root.setOrientation(LinearLayout.VERTICAL);
-    root.setBackground(new NightSeaDrawable());
-    ScrollView scroll=new ScrollView(this);root.addView(scroll,new LinearLayout.LayoutParams(-1,-1));
-    content=new LinearLayout(this);content.setPadding(dp(18),dp(20),dp(18),dp(30));
-    content.setOrientation(LinearLayout.VERTICAL);scroll.addView(content);setContentView(root);home();
-  }
-  @Override protected void onDestroy(){if(audioPlayer!=null){audioPlayer.release();audioPlayer=null;}super.onDestroy();}
+  return total;
+ }
+ @Override protected void onDestroy(){if(player!=null){player.release();player=null;}super.onDestroy();}
 }
