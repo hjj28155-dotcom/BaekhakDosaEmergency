@@ -26,6 +26,7 @@ import java.io.InputStream;
 public class MainActivity extends Activity {
  public static final int MP3_FOLDER=401,MP4_FOLDER=402;
  private LinearLayout body;
+ private boolean launchAnchorOnResume=false;
  private int dp(int n){return (int)(getResources().getDisplayMetrics().density*n+.5f);}
  private GradientDrawable panel(){GradientDrawable d=new GradientDrawable();d.setColor(0xff081e37);d.setCornerRadius(dp(20));d.setStroke(dp(2),0xffc49e59);return d;}
  private Button add(String label,Runnable action){
@@ -73,14 +74,32 @@ public class MainActivity extends Activity {
   body.removeAllViews();
   TextView heading=new TextView(this);heading.setText("앱 보관함 / "+type);heading.setTextSize(18);
   heading.setTextColor(Color.WHITE);body.addView(heading);
-  File dir=new File(getFilesDir(),"보관함/"+type);File[] files=dir.listFiles();
-  if(files!=null)for(File f:files)if(f.isFile()){
-   add("▶ "+f.getName(),()->playFile(f,type));
-  }
+  File dir=new File(getFilesDir(),"보관함/"+type);
+  browseLibrary(dir,type,true);
+
   add("MP3 보기",()->showLibrary("MP3"));
   add("MP4 보기",()->showLibrary("MP4"));
   add("← 돌아가기",this::showCompact);
   getWindow().setLayout(dp(340),WindowManager.LayoutParams.WRAP_CONTENT);
+ }
+ private void browseLibrary(File folder,String type,boolean root){
+  File[] files=folder.listFiles();
+  if(files!=null){
+   java.util.Arrays.sort(files,(a,b)->{
+    if(a.isDirectory()!=b.isDirectory())return a.isDirectory()?-1:1;
+    return a.getName().compareToIgnoreCase(b.getName());
+   });
+   for(File file:files){
+    if(file.isDirectory())add("📁 "+file.getName(),()->{
+     body.removeAllViews();
+     TextView title=new TextView(this);title.setText(type+" / "+file.getName());
+     title.setTextColor(Color.WHITE);title.setTextSize(18);body.addView(title);
+     browseLibrary(file,type,false);
+     add("← 상위 폴더",()->showLibrary(type));
+    });
+    else if(file.isFile())add("▶ "+file.getName(),()->playFile(file,type));
+   }
+  }
  }
  private android.media.MediaPlayer player;
  private void playFile(File f,String type){
@@ -104,9 +123,14 @@ public class MainActivity extends Activity {
   android.widget.ScrollView scroll=new android.widget.ScrollView(this);
   scroll.setBackground(panel());
   body=new LinearLayout(this);body.setOrientation(LinearLayout.VERTICAL);body.setPadding(dp(15),dp(15),dp(15),dp(15));
-  scroll.addView(body);setContentView(scroll);showCompact();
+  scroll.addView(body);setContentView(scroll);
   String op=getIntent().getStringExtra("open");
-  if("MP3".equals(op))showLibrary("MP3");else if("MP4".equals(op))showLibrary("MP4");
+  if("MP3".equals(op))showLibrary("MP3");
+  else if("MP4".equals(op))showLibrary("MP4");
+  else if("settings".equals(op))showCompact();
+  else if(Build.VERSION.SDK_INT>=23&&!Settings.canDrawOverlays(this)){showCompact();launchAnchorOnResume=true;overlay();}
+  else {launchAnchorOnResume=true;overlay();}
+
  }
  @Override protected void onActivityResult(int request,int result,Intent data){
   super.onActivityResult(request,result,data);
@@ -156,6 +180,13 @@ public class MainActivity extends Activity {
    }
   }
   return total;
+ }
+ @Override protected void onResume(){
+  super.onResume();
+  if(launchAnchorOnResume&&Build.VERSION.SDK_INT>=23&&Settings.canDrawOverlays(this)) {
+   launchAnchorOnResume=false;
+   overlay();
+  }
  }
  @Override protected void onDestroy(){if(player!=null){player.release();player=null;}super.onDestroy();}
 }
