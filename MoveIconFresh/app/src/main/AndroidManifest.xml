@@ -7,6 +7,7 @@
  <queries><intent><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent></queries>
  <application android:allowBackup="false" android:label="항행의자유 이동아이콘" android:theme="@android:style/Theme.Material.Light.NoActionBar" android:usesCleartextTraffic="false">
   <activity android:name=".MainActivity" android:exported="true"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity>
+  <activity android:name=".VideoPlayerActivity" android:exported="false" android:configChanges="orientation|screenSize|keyboardHidden"/>
   <service android:name=".OverlayService" android:exported="false" android:foregroundServiceType="specialUse"><property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="user-triggered floating navigation button"/></service>
  </application>
 </manifest>
