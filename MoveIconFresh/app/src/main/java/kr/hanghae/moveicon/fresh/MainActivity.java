@@ -133,7 +133,7 @@ public class MainActivity extends Activity {
    while(c.moveToNext()){
     String id=c.getString(0),name=c.getString(1),mime=c.getString(2);
     if(name==null)continue;
-    name=name.replaceAll("[/\\\\\\x00-\\x1f]","_");
+    name=name.replace('/', '_');
     Uri doc=DocumentsContract.buildDocumentUriUsingTree(tree,id);
     if(DocumentsContract.Document.MIME_TYPE_DIR.equals(mime)){
       Uri sub=DocumentsContract.buildChildDocumentsUriUsingTree(tree,id);
