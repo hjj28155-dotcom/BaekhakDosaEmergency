@@ -177,7 +177,7 @@ public class MainActivity extends Activity {
   @Override protected void onCreate(Bundle state){
     super.onCreate(state);
     LinearLayout root=new LinearLayout(this);root.setOrientation(LinearLayout.VERTICAL);
-    root.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{0xff031329,0xff0a3456,0xff02101e}));
+    root.setBackground(new NightSeaDrawable());
     ScrollView scroll=new ScrollView(this);root.addView(scroll,new LinearLayout.LayoutParams(-1,-1));
     content=new LinearLayout(this);content.setPadding(dp(18),dp(20),dp(18),dp(30));
     content.setOrientation(LinearLayout.VERTICAL);scroll.addView(content);setContentView(root);home();
