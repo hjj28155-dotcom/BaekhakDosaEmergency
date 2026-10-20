@@ -158,6 +158,8 @@ public class MainActivity extends Activity {
       }
       content.addView(row,new LinearLayout.LayoutParams(-1,dp(80)));
     }
+    Button custom=button("＋ 아이콘 추가 · 이동 · 편집 · 삭제",()->ShortcutBoard.show(this,content,this::home));
+    LinearLayout.LayoutParams cp=new LinearLayout.LayoutParams(-1,dp(56));cp.topMargin=dp(12);content.addView(custom,cp);
     Button anchor=button("⚓ 화면 위 닻 아이콘 켜기",this::launchOverlay);
     LinearLayout.LayoutParams a=new LinearLayout.LayoutParams(-1,dp(56));a.topMargin=dp(15);content.addView(anchor,a);
     Button update=button("업데이트",()->open("https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/actions"));
