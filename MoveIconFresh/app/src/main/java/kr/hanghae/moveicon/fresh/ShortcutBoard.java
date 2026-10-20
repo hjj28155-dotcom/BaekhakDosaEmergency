@@ -164,6 +164,7 @@ public final class ShortcutBoard {
   final Item item=old==null?new Item():old;
   if(old==null){item.id=System.currentTimeMillis();item.name="새 아이콘";
    int n=items.size();item.x=(n%2)*(width/2);item.y=Math.min(height-dp(68),(n/2)*dp(78));}
+  final String[] draftPkg={item.pkg};
   LinearLayout form=new LinearLayout(a);form.setPadding(dp(20),dp(8),dp(20),0);
   form.setOrientation(LinearLayout.VERTICAL);
   EditText name=new EditText(a);name.setSingleLine(true);name.setHint("아이콘 이름");name.setText(item.name);form.addView(name);
@@ -173,8 +174,11 @@ public final class ShortcutBoard {
   pkg.setText(item.pkg.isEmpty()?"연결 앱: 선택 안 됨":"연결 앱: "+item.pkg);
   form.addView(pkg);
   Button choose=new Button(a);choose.setText("휴대전화 앱 선택");
-  choose.setOnClickListener(v->chooseInstalledApp(item,pkg));
+  choose.setOnClickListener(v->chooseInstalledApp(draftPkg,pkg));
   form.addView(choose);
+  Button unlink=new Button(a);unlink.setText("앱 연결 해제 · 웹 주소 사용");
+  unlink.setOnClickListener(v->{draftPkg[0]="";pkg.setText("연결 앱: 선택 안 됨");});
+  form.addView(unlink);
   AlertDialog.Builder b=new AlertDialog.Builder(a).setTitle(old==null?"아이콘 추가":"아이콘 편집")
    .setView(form).setPositiveButton("저장",(d,w)->{
     String t=name.getText().toString().trim(),u=url.getText().toString().trim();
@@ -182,7 +186,7 @@ public final class ShortcutBoard {
     if(!u.isEmpty()&&!u.startsWith("https://")&&!u.startsWith("http://")){
      notifyUser("http:// 또는 https:// 주소만 사용합니다.");return;
     }
-    item.name=t;item.url=u;if(old==null)items.add(item);save();render();
+    item.name=t;item.url=u;item.pkg=draftPkg[0];if(old==null)items.add(item);save();render();
    }).setNegativeButton("취소",null);
   if(old!=null)b.setNeutralButton("삭제",(d,w)->new AlertDialog.Builder(a)
    .setTitle("아이콘 삭제").setMessage("이 바로가기만 삭제합니다. 원래 앱이나 파일은 삭제하지 않습니다.")
@@ -190,7 +194,7 @@ public final class ShortcutBoard {
    .setNegativeButton("취소",null).show());
   b.show();
  }
- private void chooseInstalledApp(Item item,TextView chosen){
+ private void chooseInstalledApp(String[] selectedPkg,TextView chosen){
   PackageManager pm=a.getPackageManager();
   Intent intent=new Intent(Intent.ACTION_MAIN);intent.addCategory(Intent.CATEGORY_LAUNCHER);
   List<ResolveInfo> apps=pm.queryIntentActivities(intent,0);
@@ -199,7 +203,7 @@ public final class ShortcutBoard {
   String[] labels=new String[apps.size()];
   for(int i=0;i<apps.size();i++)labels[i]=String.valueOf(apps.get(i).loadLabel(pm));
   new AlertDialog.Builder(a).setTitle("연결할 앱 선택").setItems(labels,(d,which)->{
-   item.pkg=apps.get(which).activityInfo.packageName;
+   selectedPkg[0]=apps.get(which).activityInfo.packageName;
    chosen.setText("연결 앱: "+labels[which]);
   }).setNegativeButton("취소",null).show();
  }
