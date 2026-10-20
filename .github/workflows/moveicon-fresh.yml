@@ -1,0 +1,38 @@
+name: MoveIcon Fresh v1.0.84 APK and ZIP
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'MoveIconFresh/**'
+      - '.github/workflows/moveicon-fresh.yml'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+      - name: Android SDK
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Build new MoveIcon APK
+        working-directory: MoveIconFresh
+        run: gradle --no-daemon --max-workers=2 assembleDebug
+      - name: Create fresh source ZIP
+        run: zip -r MoveIconFresh_v1.0.84_SOURCE.zip MoveIconFresh -x '**/build/**' '**/.gradle/**'
+      - name: Package APK
+        run: cp MoveIconFresh/app/build/outputs/apk/debug/app-debug.apk MoveIconFresh_v1.0.84_debug.apk
+      - name: Output checksums
+        run: sha256sum MoveIconFresh_v1.0.84_debug.apk MoveIconFresh_v1.0.84_SOURCE.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MoveIconFresh-v1.0.84-APK-and-source
+          path: |
+            MoveIconFresh_v1.0.84_debug.apk
+            MoveIconFresh_v1.0.84_SOURCE.zip
+          retention-days: 90
