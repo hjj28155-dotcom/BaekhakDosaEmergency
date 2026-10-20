@@ -1,0 +1,5 @@
+plugins { id 'com.android.application' }
+android { namespace 'kr.hanghae.moveicon.fresh'; compileSdk 35
+  defaultConfig { applicationId 'kr.hanghae.moveicon.fresh'; minSdk 26; targetSdk 34; versionCode 1084001; versionName '1.0.84' }
+  compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+}
