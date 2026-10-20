@@ -108,12 +108,10 @@ public class MainActivity extends Activity {
     player.setDataSource(f.getAbsolutePath());player.prepare();player.start();toast("재생: "+f.getName());
    }catch(Exception e){toast("재생 실패: "+e.getMessage());}
   } else {
-   body.removeAllViews();
-   android.widget.VideoView video=new android.widget.VideoView(this);
-   body.addView(video,new LinearLayout.LayoutParams(-1,dp(230)));
-   video.setVideoPath(f.getAbsolutePath());video.setMediaController(new android.widget.MediaController(this));video.start();
-   add("← MP4 보관함",()->{video.stopPlayback();showLibrary("MP4");});
-   getWindow().setLayout(dp(340),WindowManager.LayoutParams.WRAP_CONTENT);
+   Intent intent=new Intent(this,VideoPlayerActivity.class);
+   intent.putExtra("file",f.getAbsolutePath());
+   intent.putExtra("folder",f.getParent());
+   startActivity(intent);
   }
  }
  @Override public void onCreate(Bundle state){
