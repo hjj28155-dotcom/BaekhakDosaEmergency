@@ -1,0 +1,41 @@
+name: Build MoveIcon Captain APK
+on:
+  push:
+    branches:
+      - moveicon-captain-build
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .github/workflows
+            MoveIcon_Captain_V1.1.0_SOURCE.zip
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: Install Android platform
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Extract new standalone Android app
+        run: |
+          mkdir -p build_workspace
+          unzip -q MoveIcon_Captain_V1.1.0_SOURCE.zip -d build_workspace
+      - name: Build standalone debug APK
+        working-directory: build_workspace
+        run: gradle --no-daemon --stacktrace :app:assembleDebug
+      - name: Upload installable APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: MoveIconCaptain-V110-APK
+          path: build_workspace/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
