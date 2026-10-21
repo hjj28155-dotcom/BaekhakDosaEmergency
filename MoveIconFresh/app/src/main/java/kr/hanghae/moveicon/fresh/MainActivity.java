@@ -36,8 +36,12 @@ public class MainActivity extends Activity {
  }
  private void toast(String s){Toast.makeText(this,s,Toast.LENGTH_LONG).show();}
  private void folder(int request){
-  Intent pick=new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-  pick.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION|Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+  // Pick individual media files instead of a storage root, which Android 11+ blocks.
+  Intent pick=new Intent(Intent.ACTION_OPEN_DOCUMENT);
+  pick.addCategory(Intent.CATEGORY_OPENABLE);
+  pick.setType(request==MP3_FOLDER?"audio/*":"video/*");
+  pick.putExtra(Intent.EXTRA_ALLOW_MULTIPLE,true);
+  pick.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
   startActivityForResult(pick,request);
  }
  private void overlay(){
@@ -132,15 +136,39 @@ public class MainActivity extends Activity {
  }
  @Override protected void onActivityResult(int request,int result,Intent data){
   super.onActivityResult(request,result,data);
-  if(result!=RESULT_OK||data==null||data.getData()==null)return;
+  if(result!=RESULT_OK||data==null)return;
   if(request!=MP3_FOLDER&&request!=MP4_FOLDER)return;
   String group=request==MP3_FOLDER?"MP3":"MP4";
-  Uri tree=data.getData();
-  try{
-   getContentResolver().takePersistableUriPermission(tree,Intent.FLAG_GRANT_READ_URI_PERMISSION);
-   int count=copyFolder(tree,group);
-   toast("내 "+(request==MP3_FOLDER?"음악":"뮤비")+" 폴더에서 "+count+"개를 앱의 "+group+" 보관함에 저장했습니다.");
-  }catch(Exception e){toast("가져오기 실패: "+e.getMessage());}
+  java.util.ArrayList<Uri> selected=new java.util.ArrayList<>();
+  if(data.getClipData()!=null)for(int i=0;i<data.getClipData().getItemCount();i++)
+   selected.add(data.getClipData().getItemAt(i).getUri());
+  else if(data.getData()!=null)selected.add(data.getData());
+  if(selected.isEmpty())return;
+  int count=0;
+  File destDir=new File(getFilesDir(),"보관함/"+group);
+  if(!destDir.exists()&&!destDir.mkdirs()){toast("앱 보관함 생성 실패");return;}
+  for(Uri uri:selected){
+   File output=null;
+   try{
+    String name="media_"+System.currentTimeMillis()+"_"+count+(group.equals("MP3")?".mp3":".mp4");
+    try(Cursor c=getContentResolver().query(uri,new String[]{android.provider.OpenableColumns.DISPLAY_NAME},null,null,null)){
+     if(c!=null&&c.moveToFirst()&&c.getString(0)!=null)name=c.getString(0);
+    }
+    name=name.replace('/','_').replace('\\\\','_');
+    String lower=name.toLowerCase(java.util.Locale.ROOT);
+    if(group.equals("MP3")&&!(lower.endsWith(".mp3")||lower.endsWith(".m4a")||lower.endsWith(".wav")||lower.endsWith(".flac")))continue;
+    if(group.equals("MP4")&&!(lower.endsWith(".mp4")||lower.endsWith(".mkv")||lower.endsWith(".webm")))continue;
+    output=new File(destDir,name);
+    if(output.exists())output=new File(destDir,System.currentTimeMillis()+"_"+count+"_"+name);
+    try(InputStream in=getContentResolver().openInputStream(uri);FileOutputStream out=new FileOutputStream(output)){
+     if(in==null)throw new Exception("파일을 읽을 수 없습니다");
+     byte[] buffer=new byte[8192];int n;while((n=in.read(buffer))!=-1)out.write(buffer,0,n);
+    }
+    count++;
+   }catch(Exception ex){if(output!=null)output.delete();toast("일부 파일 가져오기 실패: "+ex.getMessage());}
+  }
+  toast(count+"개 파일을 앱 내부 "+group+" 보관함에 복사했습니다.");
+  showLibrary(group);
  }
  private int copyFolder(Uri tree,String group)throws Exception{
   Uri children=DocumentsContract.buildChildDocumentsUriUsingTree(tree,DocumentsContract.getTreeDocumentId(tree));
