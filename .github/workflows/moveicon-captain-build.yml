@@ -8,7 +8,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -41,3 +41,11 @@ jobs:
           name: MoveIconCaptain-V110-APK
           path: build_workspace/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+      - name: Publish test APK to isolated branch
+        run: |
+          cp build_workspace/app/build/outputs/apk/debug/app-debug.apk MoveIcon_Captain_V1.1.0-NEW_debug.apk
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f MoveIcon_Captain_V1.1.0-NEW_debug.apk
+          git commit -m "Publish isolated MoveIcon Captain V1.1.0 debug APK [skip ci]"
+          git push origin HEAD:moveicon-captain-build
