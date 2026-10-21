@@ -962,7 +962,7 @@ function save(){localStorage.setItem(K,JSON.stringify(D));refreshHomeUI()} funct
 function approvalCounts(){let a=D.approvalLog||[];return {pending:a.filter(x=>x.status==='승인대기').length,approved:a.filter(x=>x.status==='승인완료').length,history:a.filter(x=>x.status==='승인완료'||x.status==='승인보류'||x.status==='배포완료'||x.status==='거절').length}}
 function refreshHomeUI(){try{let h=document.getElementById('homeRoundLabel');if(h)h.innerHTML='<b>제'+esc(cur())+'회</b><span>현재 작업 회차</span>';let st=document.getElementById('specialStateHome');if(st)st.textContent=SPECIAL_APPROVED?'완료':'대기';let am=document.getElementById('approvalMessage');if(am)am.textContent=SPECIAL_APPROVED?'특별승인 완료 · 1243회차 이후 이용 가능':'제1242회차까지 정상 이용 · 이후 특별승인';}catch(e){}}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-function cur(){let n=Number(D.currentRound||1244);if(n<1)n=1;if(n>1247)n=1247;D.currentRound=n;return String(n)} function R(){let r=cur();D.rounds[r]=D.rounds[r]||{};return D.rounds[r]}
+function cur(){let n=Number(D.currentRound||1247);if(n<1)n=1;if(n>1247)n=1247;D.currentRound=n;return String(n)} function R(){let r=cur();D.rounds[r]=D.rounds[r]||{};return D.rounds[r]}
 
 function v116RestoreDocumentedRoundData(){
   try{
@@ -1016,7 +1016,7 @@ function changeRawRound(delta){let rr=[1246,1247],n=Number(cur()),i=rr.indexOf(n
 function restoreEmbeddedRaw(){let b=rawBank(cur());if(!b){alert('이 회차의 내장 원문이 없습니다.');return}rawText.value=b.text||'';giText.value=b.gi||'';rawSource.value=b.source||'내장 원문은행';alert('제'+cur()+'회 내장 원문을 화면에 다시 불러왔습니다.')}
 function setRound(v){
  let n=parseInt(v,10);
- if(!Number.isFinite(n)||n<1)n=1244;
+ if(!Number.isFinite(n)||n<1)n=1247;
  if(n>1247)n=1247;
  if(n>=SPECIAL_APPROVAL_START_ROUND&&!SPECIAL_APPROVED){
    D.pendingSpecialRound=n;
@@ -1569,7 +1569,7 @@ function v330PurchasePage(round){
  if(games.length!==20){V330_AFTER='purchase';runAnalysisFromHome();return}
  modal(`제${round}회 · 이번주 구매번호`,`<div class="analysisCompact v330print"><div class="scoreHero success"><strong>자동분석 20조합</strong><span>비상용 분석엔진 · 후보우주 기반 · 외부번호 자동추가 없음</span></div><div class="r5grid">${v330GroupsPurchase(games)}</div><div class="r5actions"><button class="b gold" onclick="v330Print()">🖨 인쇄</button><button class="b" onclick="rawPage()">회차선택</button><button class="b" onclick="closeM()">닫기</button></div></div>`);
 }
-function v330OpenRound(n){n=Number(n);if(!V330_RECENT.includes(n))n=1244;if(!setRound(n))return;if(V330_WIN[n])v330ResultPage(n);else v330PurchasePage(n)}
+function v330OpenRound(n){n=Number(n);if(!V330_RECENT.includes(n))n=1247;if(!setRound(n))return;if(n===1247){let b=rawBank(1247);modal('제1247회 · 백학도사 비법신서 원문',`<div class="panel goldline"><h3>원문 보관 자료 · 공식 당첨결과 아님</h3><div style="white-space:pre-wrap;line-height:1.9;text-align:left">${esc(b&&b.text||'원문 없음')}</div><p class="small">${esc(b&&b.source||'')}</p><button class="b" onclick="rawPage()">회차선택</button></div>`);return}if(V330_WIN[n])v330ResultPage(n);else if(n===1245||n===1246){modal('제'+n+'회 · 결과 자료', '<div class="panel warn">공식 당첨결과와 기존 분석 기록의 대조 검증이 필요합니다. 임의 결과를 생성하지 않습니다.</div>');}else v330PurchasePage(n)}
 
 function v124Round1243ResultPage(){
   if(!v126Ensure1243Auto20()){
