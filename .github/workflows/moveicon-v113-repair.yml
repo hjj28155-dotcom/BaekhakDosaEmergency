@@ -1,0 +1,51 @@
+name: Build MoveIcon V1.1.3 Media and Tiles Repair APK
+on:
+  push:
+    branches:
+      - moveicon-v113-repair
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .github/workflows
+            MoveIcon_V1.1.3_REPAIR_SOURCE.zip
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Android platform
+        run: |
+          echo "ANDROID_HOME=${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          yes | "$(find "${ANDROID_HOME:-/usr/local/lib/android/sdk}/cmdline-tools" -type f -name sdkmanager | sort -V | tail -1)" --licenses >/dev/null || true
+          "$(find "${ANDROID_HOME:-/usr/local/lib/android/sdk}/cmdline-tools" -type f -name sdkmanager | sort -V | tail -1)" --install 'platforms;android-35' 'build-tools;35.0.0'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Extract new standalone Android app
+        run: |
+          mkdir -p build_workspace
+          unzip -q MoveIcon_V1.1.3_REPAIR_SOURCE.zip -d build_workspace
+      - name: Build standalone debug APK
+        working-directory: build_workspace
+        run: gradle --no-daemon --stacktrace :app:assembleDebug
+      - name: Upload installable APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: MoveIconCaptain-V113-REPAIR-APK
+          path: build_workspace/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+      - name: Publish test APK to isolated branch
+        run: |
+          cp build_workspace/app/build/outputs/apk/debug/app-debug.apk MoveIcon_V1.1.3_REPAIR_debug.apk
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add --sparse -f MoveIcon_V1.1.3_REPAIR_debug.apk
+          git commit -m "Publish isolated MoveIcon Captain V1.1.3 REPAIR debug APK [skip ci]"
+          git push origin HEAD:moveicon-v113-repair
