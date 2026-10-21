@@ -24,7 +24,7 @@ import java.io.InputStream;
 
 /** Compact utility dialog. The main menu lives in OverlayService, never as a fullscreen activity. */
 public class MainActivity extends Activity {
- public static final int MP3_FOLDER=401,MP4_FOLDER=402;
+ public static final int MP3_FOLDER=401,MP4_FOLDER=402,MP3_TREE=403,MP4_TREE=404;
  private LinearLayout body;
  private boolean launchAnchorOnResume=false;
  private int dp(int n){return (int)(getResources().getDisplayMetrics().density*n+.5f);}
@@ -41,6 +41,12 @@ public class MainActivity extends Activity {
   pick.addCategory(Intent.CATEGORY_OPENABLE);
   pick.setType(request==MP3_FOLDER?"audio/*":"video/*");
   pick.putExtra(Intent.EXTRA_ALLOW_MULTIPLE,true);
+  pick.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+  startActivityForResult(pick,request);
+ }
+ private void chooseOwnFolder(int request){
+  // User must choose their Music/MV subfolder, never storage root.
+  Intent pick=new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
   pick.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
   startActivityForResult(pick,request);
  }
@@ -67,8 +73,10 @@ public class MainActivity extends Activity {
   title.setTextSize(22);title.setGravity(Gravity.CENTER);
   body.addView(title,new LinearLayout.LayoutParams(-1,dp(52)));
   add("⚓ 동그란 이동아이콘 표시",this::overlay);
-  add("🎵 내 음악 폴더에서 MP3 가져오기",()->folder(MP3_FOLDER));
-  add("🎬 내 뮤비 폴더에서 MP4 가져오기",()->folder(MP4_FOLDER));
+  add("🎵 내 음악 폴더 통째로 불러오기",()->chooseOwnFolder(MP3_TREE));
+  add("🎵 내 음악 파일 골라 불러오기",()->folder(MP3_FOLDER));
+  add("🎬 내 뮤비 폴더 통째로 불러오기",()->chooseOwnFolder(MP4_TREE));
+  add("🎬 내 뮤비 파일 골라 불러오기",()->folder(MP4_FOLDER));
   add("📁 앱 보관함 MP3 / MP4",()->{showLibrary("MP3");});
   add("＋ 아이콘 추가 · 이동 · 편집",this::shortcutEdit);
   add("닫기",this::finish);
@@ -137,6 +145,15 @@ public class MainActivity extends Activity {
  @Override protected void onActivityResult(int request,int result,Intent data){
   super.onActivityResult(request,result,data);
   if(result!=RESULT_OK||data==null)return;
+  if(request==MP3_TREE||request==MP4_TREE){
+   String group=request==MP3_TREE?"MP3":"MP4";
+   Uri tree=data.getData();if(tree==null)return;
+   toast("내 "+group+" 폴더에서 파일을 복사하고 있습니다.");
+   new Thread(()->{
+    try{int count=copyFolder(tree,group);runOnUiThread(()->{toast(count+"개 파일을 앱 내부 보관함에 복사했습니다.");showLibrary(group);});}
+    catch(Exception ex){runOnUiThread(()->toast("폴더 불러오기 실패: "+ex.getMessage()));}
+   }).start();return;
+  }
   if(request!=MP3_FOLDER&&request!=MP4_FOLDER)return;
   String group=request==MP3_FOLDER?"MP3":"MP4";
   java.util.ArrayList<Uri> selected=new java.util.ArrayList<>();
