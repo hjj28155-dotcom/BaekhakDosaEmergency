@@ -154,7 +154,7 @@ public class MainActivity extends Activity {
     try(Cursor c=getContentResolver().query(uri,new String[]{android.provider.OpenableColumns.DISPLAY_NAME},null,null,null)){
      if(c!=null&&c.moveToFirst()&&c.getString(0)!=null)name=c.getString(0);
     }
-    name=name.replace('/','_').replace('\\\\','_');
+    name=name.replace('/','_').replace((char)92,'_');
     String lower=name.toLowerCase(java.util.Locale.ROOT);
     if(group.equals("MP3")&&!(lower.endsWith(".mp3")||lower.endsWith(".m4a")||lower.endsWith(".wav")||lower.endsWith(".flac")))continue;
     if(group.equals("MP4")&&!(lower.endsWith(".mp4")||lower.endsWith(".mkv")||lower.endsWith(".webm")))continue;
