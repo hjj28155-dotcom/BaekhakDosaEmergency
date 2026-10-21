@@ -30,6 +30,22 @@ jobs:
       - name: Build new MoveIcon APK
         working-directory: MoveIconFresh
         run: gradle --no-daemon --max-workers=2 assembleDebug
+      - name: Verify APK structure and media import integration
+        run: |
+          set -euo pipefail
+          APK="MoveIconFresh/app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$APK"
+          unzip -t "$APK" | tail -n 1
+          AAPT="${ANDROID_HOME:-/usr/local/lib/android/sdk}/build-tools/35.0.0/aapt"
+          "$AAPT" dump badging "$APK" | grep "package: name='kr.hanghae.moveicon.fresh'"
+          "$AAPT" dump badging "$APK" | grep "sdkVersion:"
+          "$AAPT" dump badging "$APK" | grep "targetSdkVersion:"
+          test -s MoveIconFresh/app/src/main/java/kr/hanghae/moveicon/fresh/VideoPlayerActivity.java
+          grep -q 'ACTION_OPEN_DOCUMENT_TREE' MoveIconFresh/app/src/main/java/kr/hanghae/moveicon/fresh/MainActivity.java
+          grep -q 'ACTION_OPEN_DOCUMENT' MoveIconFresh/app/src/main/java/kr/hanghae/moveicon/fresh/MainActivity.java
+          grep -q 'copyChildren' MoveIconFresh/app/src/main/java/kr/hanghae/moveicon/fresh/MainActivity.java
+          grep -q 'overlay_control' MoveIconFresh/app/src/main/java/kr/hanghae/moveicon/fresh/OverlayService.java
+          sha256sum "$APK" > MoveIconFresh_v1.0.84_debug.apk.sha256
       - name: Create fresh source ZIP
         run: zip -r MoveIconFresh_v1.0.84_SOURCE.zip MoveIconFresh -x '**/build/**' '**/.gradle/**'
       - name: Package APK
@@ -42,4 +58,5 @@ jobs:
           path: |
             MoveIconFresh_v1.0.84_debug.apk
             MoveIconFresh_v1.0.84_SOURCE.zip
+            MoveIconFresh_v1.0.84_debug.apk.sha256
           retention-days: 90
