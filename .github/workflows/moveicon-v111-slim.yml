@@ -46,6 +46,6 @@ jobs:
           cp build_workspace/app/build/outputs/apk/debug/app-debug.apk MoveIcon_Captain_V1.1.1-SLIM_debug.apk
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f MoveIcon_Captain_V1.1.1-SLIM_debug.apk
+          git add --sparse -f MoveIcon_Captain_V1.1.1-SLIM_debug.apk
           git commit -m "Publish isolated MoveIcon Captain V1.1.1 SLIM debug APK [skip ci]"
-          git push origin HEAD:moveicon-captain-build
+          git push origin HEAD:moveicon-v111-slim
