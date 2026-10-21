@@ -1,0 +1,52 @@
+name: Build V3 Round 1247 Update APK
+on:
+  push:
+    paths:
+      - '.github/workflows/build-v3-round1247.yml'
+      - 'build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/index.html'
+      - 'build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/v3_round1247.js'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: Validate V3 1247 source and preserve existing data
+        run: |
+          set -euo pipefail
+          BASE=build407/FREEDOM_V402_BUILD_THIS
+          test -s "$BASE/app/src/freedom/assets/index.html"
+          test -s "$BASE/app/src/freedom/assets/raw_bank.js"
+          test -s "$BASE/app/src/freedom/assets/v3_round1247.js"
+          grep -q 'v3_round1247.js' "$BASE/app/src/freedom/assets/index.html"
+          grep -q '제1247회' "$BASE/app/src/freedom/assets/v3_round1247.js"
+          grep -q 'const V330_RECENT=\[1243,1244,1245,1246,1247\]' "$BASE/app/src/freedom/assets/index.html"
+      - name: Build V3 APK from checked-in sources only
+        working-directory: build407/FREEDOM_V402_BUILD_THIS
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+      - name: Verify and stage APK
+        run: |
+          set -euo pipefail
+          APK=build407/FREEDOM_V402_BUILD_THIS/app/build/outputs/apk/debug/FREEDOM_V3_FINAL_407-debug.apk
+          test -s "$APK"
+          unzip -t "$APK" | tail -n 1
+          unzip -p "$APK" assets/v3_round1247.js | grep -q '제1247회'
+          unzip -p "$APK" assets/index.html | grep -q 'v3_round1247.js'
+          cp "$APK" V3_ROUND1247_UPDATE-debug.apk
+          sha256sum V3_ROUND1247_UPDATE-debug.apk > V3_ROUND1247_UPDATE-debug.apk.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: V3_ROUND1247_UPDATE_APK
+          path: |
+            V3_ROUND1247_UPDATE-debug.apk
+            V3_ROUND1247_UPDATE-debug.apk.sha256
+          if-no-files-found: error
