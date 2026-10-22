@@ -10,8 +10,8 @@ android {
         applicationId 'com.navigator.freedom.v3final'
         minSdk 23
         targetSdk 35
-        versionCode 40036
-        versionName "4.0.36-DB1-1247-FINAL"
+        versionCode 40037
+        versionName "4.0.37-ONBOARDING-R14"
     }
 
     buildFeatures {
@@ -61,7 +61,7 @@ android {
 
     applicationVariants.all { variant ->
         variant.outputs.all {
-            outputFileName = "HANGHAE_FREEDOM_V4_0_36_FINAL.apk"
+            outputFileName = "HANGHAE_FREEDOM_V4_0_37_FINAL.apk"
         }
     }
 }
