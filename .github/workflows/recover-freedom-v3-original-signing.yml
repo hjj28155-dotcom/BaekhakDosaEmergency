@@ -1,0 +1,75 @@
+name: Recover matching Freedom V3 signer without key exposure
+on:
+  push:
+    branches:
+      - fix-freedom-v3-screen-1244-20261022
+    paths:
+      - '.github/workflows/recover-freedom-v3-original-signing.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Search repository history for original signing key (no key upload)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          EXPECTED=d0e743d72659d129ab59d888e76e155b55b39a8cdfec8c6b78e5fc62bc13f76f
+          mkdir -p /tmp/safe-signing
+          git rev-list --objects --all | grep -Ei '([.]keystore|[.]jks|[.]p12|[.]pfx)( |$)' > /tmp/safe-signing/list.txt || true
+          echo "HISTORY_KEY_FILENAME_CANDIDATES=$(wc -l < /tmp/safe-signing/list.txt)"
+          echo 'Checking candidate fingerprints without disclosing key material'
+          MATCHED=0
+          while read -r oid rest; do
+            test -n "$oid" || continue
+            candidate=/tmp/safe-signing/candidate
+            git cat-file blob "$oid" > "$candidate" 2>/dev/null || continue
+            for pass in android changeit; do
+              ACTUAL=$(keytool -list -v -keystore "$candidate" -storepass "$pass" 2>/dev/null | grep -m1 'SHA256:' | sed 's/.*SHA256: //' | tr -d ':' | tr '[:upper:]' '[:lower:]' || true)
+              if test "$ACTUAL" = "$EXPECTED"; then
+                echo 'MATCHED_REPOSITORY_HISTORY_KEY=YES'
+                printf '%s' "$pass" > /tmp/safe-signing/matched_password
+                cp "$candidate" /tmp/safe-signing/matched_keystore
+                MATCHED=1
+                break
+              fi
+            done
+            if test "$MATCHED" = 1; then break; fi
+          done < /tmp/safe-signing/list.txt
+          echo "MATCHED_IN_REPO_HISTORY=$MATCHED"
+          echo 'AVAILABLE_RELEVANT_ACTION_CACHE_NAMES:'
+          gh api --paginate -H 'Accept: application/vnd.github+json' "/repos/$GITHUB_REPOSITORY/actions/caches?per_page=100" --jq '.actions_caches[]?.key' 2>/dev/null | grep -Ei '(keystore|sign|stable-debug|android-key)' | sort -u || echo 'CACHE_ENUMERATION_EMPTY_OR_DENIED'
+          if test "$MATCHED" != 1; then echo 'HOLD: matching private signing key not located in Git history.'; fi
+      - name: Attempt historical Actions cached debug key
+        uses: actions/cache/restore@v4
+        with:
+          path: /tmp/restore-android-key/debug.keystore
+          key: hanghae-mini-stable-debug-keystore-v1
+          lookup-only: false
+      - name: Inspect known cache signer without publishing or reusing wrong key
+        run: |
+          set -euo pipefail
+          EXPECTED=d0e743d72659d129ab59d888e76e155b55b39a8cdfec8c6b78e5fc62bc13f76f
+          test -s /tmp/restore-android-key/debug.keystore || { echo 'KNOWN_CACHE_RESTORE=ABSENT'; exit 0; }
+          ACTUAL=$(keytool -list -v -keystore /tmp/restore-android-key/debug.keystore -storepass android 2>/dev/null | grep -m1 'SHA256:' | sed 's/.*SHA256: //' | tr -d ':' | tr '[:upper:]' '[:lower:]' || true)
+          if test "$ACTUAL" = "$EXPECTED"; then
+            echo 'KNOWN_CACHE_MATCH=YES'
+            cp /tmp/restore-android-key/debug.keystore /tmp/safe-signing/matched_keystore
+            printf android > /tmp/safe-signing/matched_password
+          else echo 'KNOWN_CACHE_MATCH=NO'; fi
+      - name: Block unsafe update when original signer is not recovered
+        run: |
+          if test -s /tmp/safe-signing/matched_keystore; then
+            echo 'READY_FOR_RE_SIGN_WITH_MATCHING_KEY=YES'
+          else
+            echo 'READY_FOR_RE_SIGN_WITH_MATCHING_KEY=NO'
+            echo 'HOLD: no matching private key. Original installed app must remain untouched.'
+            exit 9
+          fi
