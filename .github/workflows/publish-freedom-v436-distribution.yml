@@ -58,7 +58,7 @@ jobs:
           const games=Array.from({length:20},(_,i)=>[1,8,13,22,34,40]);
           const rendered=fx(games,[1,13,18,26,34,38]);
           assert.equal((rendered.match(/class="r5row"/g)||[]).length,20);
-          assert.equal((rendered.match(/3\\/6/g)||[]).length,20);
+          assert.equal(rendered.split('3/6').length-1,20);
           console.log('PASS: V4.0.35 latest features retained + DB1 1-1247 + 1244 score + 20 result rows');
           NODE
       - name: Build latest app with stable signing certificate
