@@ -1572,18 +1572,9 @@ function v330PurchasePage(round){
 function v330OpenRound(n){
  n=Number(n);if(!V330_RECENT.includes(n))n=1247;
  if(!setRound(n))return;
- if(V330_WIN[n]){v330ResultPage(n);return;}
- const b=rawBank(n),r=R(),a=r.analysis||{},saved=r.raw||{};
- const raw=String(saved.text||b&&b.text||'').trim();
- const source=String(saved.source||b&&b.source||'');
- const games=Array.isArray(a.auto20)?a.auto20.filter(g=>Array.isArray(g)&&g.length===6):[];
- const buy=Array.isArray(r.buy&&r.buy.combos)?r.buy.combos.filter(x=>String(x||'').trim()):[];
- let sections='';
- if(raw)sections+='<div class="panel goldline"><h3>제'+n+'회 보존 원문</h3><div style="white-space:pre-wrap;line-height:1.9;text-align:left">'+esc(raw)+'</div><p class="small">'+esc(source)+'</p></div>';
- if(games.length)sections+='<div class="panel"><h3>저장된 분석 '+games.length+'조합</h3>'+games.map((g,i)=>'<div class="r5row purchase"><b>'+(i+1)+'</b><div class="r5balls">'+g.map(x=>'<span class="r5ball">'+esc(x)+'</span>').join('')+'</div></div>').join('')+'</div>';
- if(buy.length)sections+='<div class="panel"><h3>저장된 구매 '+buy.length+'조합</h3>'+buy.map((x,i)=>'<p>'+(i+1)+'. '+esc(x)+'</p>').join('')+'</div>';
- if(!sections)sections='<div class="panel warn">제'+n+'회에 저장된 원문·분석·구매 자료를 찾지 못했습니다. 임의 내용을 만들지 않습니다.</div>';
- modal('제'+n+'회 · 보존 자료',sections+'<div class="row"><button class="b" onclick="rawPage()">회차선택</button><button class="b" onclick="closeM()">닫기</button></div>');
+ const a=R().analysis||{},games=Array.isArray(a.auto20)?a.auto20:[];
+ if(games.length!==20){V330_AFTER=V330_WIN[n]?'result':'purchase';runAnalysisFromHome();return;}
+ if(V330_WIN[n])v330ResultPage(n);else v330PurchasePage(n);
 }
 
 function v124Round1243ResultPage(){
@@ -1688,7 +1679,7 @@ function analysisGroups(pool,original){let g0=cleanGames(original);if(g0.length!
 ]}
 function runAnalysisFromHome(){
  let r=cur(),saved=R().raw||{},raw=(saved.text||embeddedRaw(r)||'').trim();
- if(!raw){rawPage();setTimeout(()=>alert('이 회차의 보존 원문이 없습니다.'),120);return}
+ // Missing round-specific raw does not block the automatic engine; engine uses its existing historical bank.
  let before=String((R().analysis||{}).analyzedAt||'');
  sendAnalysisToEngine(r,raw);
  setTimeout(()=>{try{
