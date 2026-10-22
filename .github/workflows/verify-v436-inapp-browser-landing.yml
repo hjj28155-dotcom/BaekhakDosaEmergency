@@ -15,6 +15,9 @@ jobs:
           BASE='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/latest-apk'
           LANDING='https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/update.html?v=4.0.36'
           curl -sS -D /tmp/browser.headers -o /dev/null --max-time 35 -H 'Accept: text/html,application/xhtml+xml' -H 'User-Agent: Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 Mobile Safari/537.36' "$BASE"
+          echo '=== Browser response headers ==='
+          cat /tmp/browser.headers
+          echo '=== End headers ==='
           grep -q '^HTTP/.* 302' /tmp/browser.headers
           grep -qi '^location: https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/update.html' /tmp/browser.headers
           curl -fsSL --retry 3 --max-time 60 "$LANDING" -o /tmp/landing.html
