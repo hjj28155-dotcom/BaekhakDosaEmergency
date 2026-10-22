@@ -35,6 +35,7 @@ jobs:
             constructor(id){this.id=id;this.hidden=id!=='scrollStage';this.listeners={};this.textContent='';this.attrs={};this.classList={toggle(){}};}
             addEventListener(k,fn){this.listeners[k]=fn}
             dispatch(k){if(this.listeners[k])this.listeners[k]()}
+            getAttribute(k){return this.attrs[k]}
             setAttribute(k,v){this.attrs[k]=v}
           }
           const nodes=new Map(['scrollStage','videoStage','installStage','installVideo','videoStatus','startInstallVideo','replayVideo'].map(id=>[id,new E(id)]));
