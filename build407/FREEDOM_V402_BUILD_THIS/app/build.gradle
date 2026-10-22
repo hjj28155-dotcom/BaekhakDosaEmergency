@@ -10,8 +10,8 @@ android {
         applicationId 'com.navigator.freedom.v3final'
         minSdk 23
         targetSdk 35
-        versionCode 30407
-        versionName "4.0.7-NO-FLOATING-ICON"
+        versionCode 40036
+        versionName "4.0.36-DB1-1247-UI-SCORE"
     }
 
     buildFeatures {
@@ -50,7 +50,7 @@ android {
 
     applicationVariants.all { variant ->
         variant.outputs.all {
-            outputFileName = "FREEDOM_V3_FINAL_407-debug.apk"
+            outputFileName = "FREEDOM_V4_0_36_SCORE_FIX-debug.apk"
         }
     }
 }
