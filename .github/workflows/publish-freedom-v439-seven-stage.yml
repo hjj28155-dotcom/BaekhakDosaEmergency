@@ -5,6 +5,9 @@ on:
       - fix-freedom-v3-screen-1244-20261022
     paths:
       - '.github/workflows/publish-freedom-v439-seven-stage.yml'
+      - 'build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/freedom_onboarding_r14.js'
+      - 'build405/FREEDOM_V402_BUILD_THIS/app/src/main/java/com/baekhak/centralcontrol/MainActivity.java'
+      - '.github/scripts/validate_freedom_r14.cjs'
   workflow_dispatch:
 permissions:
   contents: write
