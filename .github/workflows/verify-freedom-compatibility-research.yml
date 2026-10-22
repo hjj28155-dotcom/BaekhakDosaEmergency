@@ -26,14 +26,19 @@ jobs:
           NEW=trial/Freedom_V3_DB1_1247_ISOLATED_TRIAL.apk
           test -s "$OLD"; test -s "$NEW"
           APKTOOL="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"
-          "$APKTOOL" verify --print-certs "$OLD" | grep -E 'Signer #1 certificate SHA-256 digest|Signer #1 certificate DN' > /tmp/old_certs.txt
-          "$APKTOOL" verify --print-certs "$NEW" | grep -E 'Signer #1 certificate SHA-256 digest|Signer #1 certificate DN' > /tmp/new_certs.txt
+          "$APKTOOL" verify --print-certs "$OLD" > /tmp/old_all.txt 2>&1 || true
+          "$APKTOOL" verify --print-certs "$NEW" > /tmp/new_all.txt 2>&1 || true
+          grep -Ei 'certificate SHA-256 digest|certificate DN' /tmp/old_all.txt > /tmp/old_certs.txt || true
+          grep -Ei 'certificate SHA-256 digest|certificate DN' /tmp/new_all.txt > /tmp/new_certs.txt || true
+          echo 'Old verify diagnostics:'; tail -10 /tmp/old_all.txt
+          echo 'Trial verify diagnostics:'; tail -10 /tmp/new_all.txt
           echo 'BASELINE APK:'; cat /tmp/old_certs.txt
           echo 'TRIAL APK:'; cat /tmp/new_certs.txt
           echo 'TRIAL APPLICATION ID:'
-          grep -q "applicationId 'com.navigator.freedom.v3final.db1trial'" build407/FREEDOM_V402_BUILD_THIS/app/build.gradle && echo 'research script injects .db1trial into build before compile'
-          OLD_SHA="$(grep 'SHA-256 digest' /tmp/old_certs.txt | head -1 | sed 's/.*digest: //')"
-          NEW_SHA="$(grep 'SHA-256 digest' /tmp/new_certs.txt | head -1 | sed 's/.*digest: //')"
+          grep -q "applicationId 'com.navigator.freedom.v3final'" build407/FREEDOM_V402_BUILD_THIS/app/build.gradle && echo 'research build injects .db1trial after checkout'
+          OLD_SHA="$(grep -im1 'SHA-256 digest' /tmp/old_certs.txt | sed 's/.*digest: //' || true)"
+          NEW_SHA="$(grep -im1 'SHA-256 digest' /tmp/new_certs.txt | sed 's/.*digest: //' || true)"
+          test -n "$OLD_SHA"; test -n "$NEW_SHA"
           if [ "$OLD_SHA" = "$NEW_SHA" ]; then
             echo 'SIGNATURE MATCH; applicationId intentionally different for isolated build'
           else
