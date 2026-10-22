@@ -1,0 +1,37 @@
+name: Repair orphaned github-pages deployment lock
+on:
+  workflow_dispatch:
+  push:
+    branches: [fix-freedom-v3-screen-1244-20261022]
+    paths: ['.github/workflows/repair-stale-pages-deployment.yml']
+permissions:
+  contents: read
+  deployments: write
+  pages: write
+  actions: read
+jobs:
+  unlock:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspect and deactivate only the orphaned old Pages deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          REPO="$GITHUB_REPOSITORY"
+          ID=7255363120
+          EXPECTED_SHA=815d4e64995093f61eb6d8f6c1a56a2a34e54725
+          SHA=$(gh api repos/$REPO/deployments/$ID --jq .sha)
+          test "$SHA" = "$EXPECTED_SHA"
+          echo "Target old unfinished deployment $ID sha=$SHA"
+          echo "Recent statuses"
+          gh api repos/$REPO/deployments/$ID/statuses --jq '[.[] | {state,created_at,description}] | .[0:8]'
+          CURRENT=$(gh api repos/$REPO/deployments/$ID/statuses --jq '.[0].state // "unknown"')
+          if [ "$CURRENT" = "success" ]; then
+            echo "Target already successful - no changes needed"
+            exit 0
+          fi
+          echo 'Attempt to release stale Pages environment lock'
+          gh api -X POST repos/$REPO/deployments/$ID/statuses -f state=inactive -f description='Release orphaned Pages deployment from canceled run 39798823273' --jq '{state,created_at,description}'
+          echo 'Updated statuses'
+          gh api repos/$REPO/deployments/$ID/statuses --jq '[.[] | {state,created_at}] | .[0:3]'
