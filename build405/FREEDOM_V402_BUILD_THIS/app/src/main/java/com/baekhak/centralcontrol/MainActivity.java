@@ -623,6 +623,16 @@ public class MainActivity extends Activity {
     }
 
     private void requestSpecialApprovalAsync(final int requestedRound, final String applicantRaw, final String referrerRaw) {
+        // 이미 승인된 기기는 업데이트 후에도 기존 승인 상태를 그대로 사용하며 재요청하지 않는다.
+        if (isSpecialApprovedLocal()) {
+            sendSpecialApprovalState(specialApprovalSummaryJson());
+            return;
+        }
+        // 기존 승인요청 토큰이 남아 있으면 중복 요청 대신 서버에서 현 상태를 조회한다.
+        if (!specialApprovalPrefs().getString("request_token", "").isEmpty()) {
+            checkSpecialApprovalAsync();
+            return;
+        }
         if (requestedRound < SPECIAL_APPROVAL_START_ROUND) {
             sendSpecialApprovalState("{\"ok\":true,\"status\":\"approved\",\"round_policy_free\":true}");
             return;
