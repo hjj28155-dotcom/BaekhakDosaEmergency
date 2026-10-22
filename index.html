@@ -25,5 +25,5 @@ const btn=document.getElementById('scrollNext');
 const v=document.getElementById('video');
 const status=document.getElementById('status');
 btn.addEventListener('click',()=>{scrollStage.style.display='none';videoStage.style.display='block';try{v.load();const p=v.play();if(p&&p.catch)p.catch(()=>{});}catch(e){}});
-v.addEventListener('ended',()=>{status.textContent='✅ 설치동영상 완료 · 항행의자유 설치/업데이트로 진행합니다.';window.location.href='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/latest-apk';});
+v.addEventListener('ended',()=>{status.textContent='✅ 설치동영상 완료 · 항행의자유 설치/업데이트로 진행합니다.';window.location.href='./update.html?v=4.0.36';});
 </script></body></html>
