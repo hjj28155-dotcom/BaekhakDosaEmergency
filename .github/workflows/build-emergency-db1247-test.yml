@@ -19,7 +19,6 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - uses: android-actions/setup-android@v3
       - name: Check original six-sentence bank and additive blind source
         run: |
           set -euo pipefail
