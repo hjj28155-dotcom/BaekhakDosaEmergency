@@ -783,6 +783,31 @@ body:has(#modal[style*="display:block"]) .simpleHot{
 .r5actions{display:grid!important;grid-template-columns:1fr 1fr 1fr!important;gap:8px!important;margin-top:10px!important}
 @media(max-width:430px){.r5selector{grid-template-columns:repeat(3,1fr)!important}.r5selector .b{height:52px!important;font-size:15px!important}.r5grid{gap:4px!important}.r5group{padding:4px!important}.r5group h4{font-size:9px!important}.r5row{grid-template-columns:17px 1fr 28px!important;min-height:25px!important}.r5row.purchase{grid-template-columns:17px 1fr!important}.r5ball{width:17px!important;height:17px!important;flex-basis:17px!important;font-size:7px!important}.r5no,.r5hit{font-size:7px!important}.r5winning{gap:5px!important}.r5winning .r5ball{width:29px!important;height:29px!important;flex-basis:29px!important;font-size:11px!important}}
 </style>
+
+<style id="v340ResponsiveResultRepair">
+/* V340: 기기 화면 폭에 적응하는 4묶음 결과와 원형 적중배지 */
+#modal.v340BackLabel .card{box-sizing:border-box!important;width:min(980px,calc(100vw - 8px))!important;max-width:calc(100vw - 8px)!important;padding:12px 10px 14px!important;overflow-x:hidden!important}
+#modal.v340BackLabel #mc,#modal.v340BackLabel .analysisCompact{box-sizing:border-box!important;width:100%!important;max-width:100%!important;min-width:0!important;overflow-x:hidden!important}
+#modal.v340BackLabel .r5grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;width:100%!important;min-width:0!important;gap:8px!important;align-items:start!important}
+#modal.v340BackLabel .r5group{box-sizing:border-box!important;width:100%!important;max-width:100%!important;min-width:0!important;padding:6px!important;overflow:hidden!important}
+#modal.v340BackLabel .r5row{display:grid!important;grid-template-columns:clamp(13px,2vw,22px) minmax(0,1fr) clamp(24px,3.5vw,34px)!important;gap:2px!important;width:100%!important;min-width:0!important;box-sizing:border-box!important;align-items:center!important}
+#modal.v340BackLabel .r5row.purchase{grid-template-columns:clamp(13px,2vw,22px) minmax(0,1fr)!important}
+#modal.v340BackLabel .r5balls{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;width:100%!important;min-width:0!important;gap:2px!important;align-items:center!important}
+#modal.v340BackLabel .r5row .r5ball{box-sizing:border-box!important;display:flex!important;width:100%!important;max-width:24px!important;height:auto!important;min-width:0!important;aspect-ratio:1 / 1!important;flex:none!important;justify-self:center!important;padding:0!important;font-size:clamp(7px,1.3vw,11px)!important;line-height:1!important}
+#modal.v340BackLabel .r5hit{box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;max-width:34px!important;min-width:0!important;aspect-ratio:1 / 1!important;border:1px solid #81a9c5!important;border-radius:50%!important;background:linear-gradient(#17496b,#08263e)!important;color:#eaf5ff!important;font-size:clamp(7px,1.1vw,10px)!important;font-weight:900!important;white-space:nowrap!important}
+#modal.v340BackLabel .card>h2{font-size:clamp(16px,3.7vw,28px)!important}
+@media(max-width:450px){
+ #modal.v340BackLabel .card{padding:10px 6px 12px!important}
+ #modal.v340BackLabel .r5grid{gap:4px!important}
+ #modal.v340BackLabel .r5group{padding:3px!important}
+ #modal.v340BackLabel .r5row{grid-template-columns:13px minmax(0,1fr) 25px!important;gap:1px!important;min-height:26px!important}
+ #modal.v340BackLabel .r5row.purchase{grid-template-columns:13px minmax(0,1fr)!important}
+ #modal.v340BackLabel .r5balls{gap:1px!important}
+ #modal.v340BackLabel .r5row .r5ball{font-size:clamp(7px,1.8vw,9px)!important}
+ #modal.v340BackLabel .r5hit{font-size:8px!important}
+ #modal.v340BackLabel .r5no{font-size:9px!important}
+}
+</style>
 <style id="v335ApprovalHardLockStyle">
 #approvalHardLock{position:fixed;inset:0;z-index:2147483646;background:rgba(0,8,18,.38);color:#fff;display:flex;align-items:flex-end;justify-content:center;padding:18px 14px 26px;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif}
 #approvalHardLock .box{width:min(94vw,520px);background:rgba(7,35,57,.96);border:2px solid #d8b950;border-radius:18px;padding:17px 15px;text-align:center;box-shadow:0 16px 60px rgba(0,0,0,.72)}
@@ -958,7 +983,7 @@ const PINNED_NOTICE={title:'',body:''};
 D.currentRound=1247;save();setTimeout(()=>{let q=document.getElementById('roundQuick');if(q)q.value=1244;let d=document.getElementById('homeRoundDirect');if(d)d.value=1244;refreshHomeUI()},0);
 // 구버전 단일 메모가 있으면 현재 회차 데이터로 보존
 if(D.raw||D.buy||D.merge||D.score||D.compare){let r=String(D.currentRound);D.rounds[r]=D.rounds[r]||{};['raw','buy','merge','score','compare'].forEach(k=>{if(D[k]&&!D.rounds[r][k])D.rounds[r][k]=D[k]})}
-function save(){localStorage.setItem(K,JSON.stringify(D));refreshHomeUI()} function closeM(){let m=document.getElementById('modal');m.style.display='none';m.classList.remove('scoreOneScreen','musicOneScreen');document.querySelectorAll('.simpleHot').forEach(b=>b.style.pointerEvents='auto');document.body.style.overflowY='auto'}
+function save(){localStorage.setItem(K,JSON.stringify(D));refreshHomeUI()} function closeM(){let m=document.getElementById('modal');m.style.display='none';m.classList.remove('scoreOneScreen','musicOneScreen','v340BackLabel');document.querySelectorAll('.simpleHot').forEach(b=>b.style.pointerEvents='auto');document.body.style.overflowY='auto'}
 function approvalCounts(){let a=D.approvalLog||[];return {pending:a.filter(x=>x.status==='승인대기').length,approved:a.filter(x=>x.status==='승인완료').length,history:a.filter(x=>x.status==='승인완료'||x.status==='승인보류'||x.status==='배포완료'||x.status==='거절').length}}
 function refreshHomeUI(){try{let h=document.getElementById('homeRoundLabel');if(h)h.innerHTML='<b>제'+esc(cur())+'회</b><span>현재 작업 회차</span>';let st=document.getElementById('specialStateHome');if(st)st.textContent=SPECIAL_APPROVED?'완료':'대기';let am=document.getElementById('approvalMessage');if(am)am.textContent=SPECIAL_APPROVED?'특별승인 완료 · 1243회차 이후 이용 가능':'제1242회차까지 정상 이용 · 이후 특별승인';}catch(e){}}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
@@ -1149,7 +1174,7 @@ function onSpecialApprovalState(p){
   if(x)x.textContent='승인 상태 응답을 읽지 못했습니다. 확인을 다시 눌러 주세요.';
  }
 }
-function modal(title,html){let m=document.getElementById('modal');m.classList.remove('scoreOneScreen','musicOneScreen');document.getElementById('mt').textContent=title;document.getElementById('mc').innerHTML=html;document.querySelectorAll('.simpleHot').forEach(b=>b.style.pointerEvents='none');m.style.display='block';m.style.zIndex='2147483646';m.style.overflowY='auto';document.getElementById('mc').style.overflowY='auto'}
+function modal(title,html){let m=document.getElementById('modal');m.classList.remove('scoreOneScreen','musicOneScreen','v340BackLabel');if(String(html).includes('class="analysisCompact v330print"'))m.classList.add('v340BackLabel');let bb=m.querySelector('.close');if(bb)bb.textContent=m.classList.contains('v340BackLabel')?'이전':'닫기';document.getElementById('mt').textContent=title;document.getElementById('mc').innerHTML=html;document.querySelectorAll('.simpleHot').forEach(b=>b.style.pointerEvents='none');m.style.display='block';m.style.zIndex='2147483646';m.style.overflowY='auto';document.getElementById('mc').style.overflowY='auto'}
 function roundHead(sub){return `<div class="panel goldline"><div class="grid2"><div><div class="label">작업 회차</div><input id="roundInput" type="number" min="1240" max="1247" value="${esc(cur())}" onchange="setRound(this.value);openM('${sub}')"></div><div><div class="label">현재 저장 상태</div><div class="stat"><strong>${Object.keys(R()).length?'저장됨':'신규'}</strong><span class="small">제${esc(cur())}회</span></div></div></div></div>`}
 function openM(k){if(k!=='approve'&&['buy','score','merge','db','compare'].includes(k)&&requireSpecialApprovalV117(cur()))return;if(k==='raw')return rawPage();if(k==='buy')return buyPage();if(k==='merge')return mergePage();if(k==='db')return dbPage();if(k==='approve')return specialApprovalPage();if(k==='score')return scorePage();if(k==='compare')return comparePage();if(k==='guide')return guidePage();if(k==='notice')return noticePage();if(k==='settings')return settingsPage();if(k==='total')return totalAnalysisPage();if(k==='history')return historyPage();if(k==='suggest')return suggestPage();if(k==='music')return musicPage();if(k==='update')return updatePage();if(k==='roundctl')return roundControlPage();if(k==='import')return legacyImportPage();}
 function isFilled(v){return String(v??'').trim()!==''}
@@ -1524,7 +1549,8 @@ const V330_WIN={
 1240:{nums:[11,13,19,20,31,44],bonus:27},
 1241:{nums:[7,13,16,23,24,43],bonus:9},
 1242:{nums:[2,4,10,16,31,41],bonus:9},
-1243:{nums:[9,18,24,38,43,44],bonus:35}
+1243:{nums:[9,18,24,38,43,44],bonus:35},
+1244:{nums:[1,13,18,26,34,38],bonus:25} // 당첨 결과는 채점용으로만 사용
 };
 let V330_AFTER='';
 function v330GroupsResult(games,result){
@@ -1553,10 +1579,10 @@ function v330Print(){
 }
 function v330ResultPage(round){
  const w=V330_WIN[round],a=R().analysis||{},games=(a.auto20||[]).slice(0,20);
- if(games.length!==20){V330_AFTER='result';runAnalysisFromHome();return}
+ if(games.length!==20){modal(`제${round}회 · 채점 자료 확인`,`<div class="panel warn"><strong>해당 회차의 결과 이전에 저장된 자동분석 20조합 원본이 없습니다.</strong><p>이미 발표된 회차를 당첨번호에 맞춰 새로 분석하거나 결과를 바꾸지 않습니다. 백업의 원본 분석 기록을 복원한 뒤 채점할 수 있습니다.</p><button class="b" onclick="rawPage()">회차선택</button></div>`);return}
  const set=new Set(w.nums),scores=games.map(g=>g.filter(n=>set.has(Number(n))).length),best=Math.max(...scores),wins=scores.filter(x=>x>=3).length;
  const banner=best>=3?`<div class="scoreHero success"><strong>🎉 축하합니다!</strong><span>최고 ${best}/6 적중 · 3/6 이상 ${wins}조합</span></div>`:`<div class="scoreHero fail"><strong>이번 회차는 아쉽게 지나갔습니다.</strong><span>제${round}회 최고 ${best}/6 적중 · 다음 분석에 이어갑니다.</span></div>`;
- modal(`제${round}회 · 자동분석 20조합 결과`,`<div class="analysisCompact v330print">${banner}<div class="panel goldline centerTitle"><h3>당첨번호</h3><div class="r5winning">${w.nums.map(n=>`<span class="r5ball hit">${n}</span>`).join('')}</div><div style="font-weight:950;color:#ffe58a;font-size:19px">보너스 ${w.bonus}</div></div><div class="r5grid">${v330GroupsResult(games,w.nums)}</div><div class="r5actions"><button class="b gold" onclick="v330Print()">🖨 인쇄</button><button class="b" onclick="rawPage()">회차선택</button><button class="b" onclick="closeM()">닫기</button></div></div>`);
+ modal(`제${round}회 · 자동분석 20조합 결과`,`<div class="analysisCompact v330print">${banner}<div class="panel goldline centerTitle"><h3>당첨번호</h3><div class="r5winning">${w.nums.map(n=>`<span class="r5ball hit">${n}</span>`).join('')}</div><div style="font-weight:950;color:#ffe58a;font-size:19px">보너스 ${w.bonus}</div></div><div class="r5grid">${v330GroupsResult(games,w.nums)}</div><div class="r5actions"><button class="b gold" onclick="v330Print()">🖨 인쇄</button><button class="b" onclick="rawPage()">회차선택</button><button class="b" onclick="closeM()">이전</button></div></div>`);
  setTimeout(()=>{
    try{
      if(best>=3)showFanfare(round,best,wins);
@@ -1567,7 +1593,7 @@ function v330ResultPage(round){
 function v330PurchasePage(round){
  const a=R().analysis||{},games=(a.auto20||[]).slice(0,20);
  if(games.length!==20){V330_AFTER='purchase';runAnalysisFromHome();return}
- modal(`제${round}회 · 이번주 구매번호`,`<div class="analysisCompact v330print"><div class="scoreHero success"><strong>자동분석 20조합</strong><span>비상용 분석엔진 · 후보우주 기반 · 외부번호 자동추가 없음</span></div><div class="r5grid">${v330GroupsPurchase(games)}</div><div class="r5actions"><button class="b gold" onclick="v330Print()">🖨 인쇄</button><button class="b" onclick="rawPage()">회차선택</button><button class="b" onclick="closeM()">닫기</button></div></div>`);
+ modal(`제${round}회 · 이번주 구매번호`,`<div class="analysisCompact v330print"><div class="scoreHero success"><strong>자동분석 20조합</strong><span>비상용 분석엔진 · 후보우주 기반 · 외부번호 자동추가 없음</span></div><div class="r5grid">${v330GroupsPurchase(games)}</div><div class="r5actions"><button class="b gold" onclick="v330Print()">🖨 인쇄</button><button class="b" onclick="rawPage()">회차선택</button><button class="b" onclick="closeM()">이전</button></div></div>`);
 }
 function v330OpenRound(n){n=Number(n);if(!V330_RECENT.includes(n))n=1247;if(!setRound(n))return;if(n===1247){let b=rawBank(1247);modal('제1247회 · 백학도사 비법신서 원문',`<div class="panel goldline"><h3>원문 보관 자료 · 공식 당첨결과 아님</h3><div style="white-space:pre-wrap;line-height:1.9;text-align:left">${esc(b&&b.text||'원문 없음')}</div><p class="small">${esc(b&&b.source||'')}</p><button class="b" onclick="rawPage()">회차선택</button></div>`);return}if(V330_WIN[n])v330ResultPage(n);else if(n===1245||n===1246){modal('제'+n+'회 · 결과 자료', '<div class="panel warn">공식 당첨결과와 기존 분석 기록의 대조 검증이 필요합니다. 임의 결과를 생성하지 않습니다.</div>');}else v330PurchasePage(n)}
 
