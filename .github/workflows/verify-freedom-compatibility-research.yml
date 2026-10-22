@@ -1,0 +1,41 @@
+name: Verify Freedom V3 upgrade signature compatibility (read only)
+on:
+  push:
+    branches: [research-emergency-db1-1247-20261022]
+    paths: ['.github/workflows/verify-freedom-compatibility-research.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: Freedom_V3_DB1_1247_IsolatedTrial
+          run-id: 39715638756
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: trial
+      - name: Compare previous APK and trial signing certificates
+        shell: bash
+        run: |
+          set -euo pipefail
+          OLD=FREEDOM_V3_FINAL_407-debug.apk
+          NEW=trial/Freedom_V3_DB1_1247_ISOLATED_TRIAL.apk
+          test -s "$OLD"; test -s "$NEW"
+          APKTOOL="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"
+          "$APKTOOL" verify --print-certs "$OLD" | grep -E 'Signer #1 certificate SHA-256 digest|Signer #1 certificate DN' > /tmp/old_certs.txt
+          "$APKTOOL" verify --print-certs "$NEW" | grep -E 'Signer #1 certificate SHA-256 digest|Signer #1 certificate DN' > /tmp/new_certs.txt
+          echo 'BASELINE APK:'; cat /tmp/old_certs.txt
+          echo 'TRIAL APK:'; cat /tmp/new_certs.txt
+          echo 'TRIAL APPLICATION ID:'
+          grep -q "applicationId 'com.navigator.freedom.v3final.db1trial'" build407/FREEDOM_V402_BUILD_THIS/app/build.gradle && echo 'research script injects .db1trial into build before compile'
+          OLD_SHA="$(grep 'SHA-256 digest' /tmp/old_certs.txt | head -1 | sed 's/.*digest: //')"
+          NEW_SHA="$(grep 'SHA-256 digest' /tmp/new_certs.txt | head -1 | sed 's/.*digest: //')"
+          if [ "$OLD_SHA" = "$NEW_SHA" ]; then
+            echo 'SIGNATURE MATCH; applicationId intentionally different for isolated build'
+          else
+            echo 'SIGNATURE MISMATCH; DO NOT DIRECT UPDATE EXISTING APP'
+          fi
