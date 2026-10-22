@@ -48,7 +48,9 @@ jobs:
           assert.match(html,/발표 후 당첨번호로 과거 조합을 새로 생성/);
           assert.ok(!html.includes("V330_AFTER='result';runAnalysisFromHome();return"));
           assert.match(html,/function v330OpenRound/);
-          assert.ok(html.includes("AndroidHost.openOfficialUpdateLink()"),'update must open official URL');
+          const onboardingJS=fs.readFileSync(p+'freedom_onboarding_r14.js','utf8');
+          assert.ok(onboardingJS.includes('openRadioPage(HUB)'),'update must open approved MoveIcon joint distribution page');
+          assert.ok(onboardingJS.includes('BaekhakDosaEmergency/moveicon.html'),'do not show unrelated update pages');
           const java=fs.readFileSync('build405/FREEDOM_V402_BUILD_THIS/app/src/main/java/com/baekhak/centralcontrol/MainActivity.java','utf8');
           assert.ok(java.includes('private void chooseApkUpdateFile() { openOfficialUpdateLink(); }'),'all Android update paths must open link');
           assert.ok(java.includes('Intent.ACTION_VIEW,uri'),'use browser for update');
