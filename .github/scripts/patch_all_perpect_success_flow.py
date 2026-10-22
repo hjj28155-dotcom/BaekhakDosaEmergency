@@ -70,7 +70,7 @@ js=r'''
   function boot(){
     const q=summary();
     let done=false;try{done=localStorage.getItem(FLOW_KEY)==='1'}catch(e){}
-    if(q.approved===true&&done){remove('startupVideoGate');remove('approvalHardLock');document.body.style.overflow='';try{if(window.unlockApprovedApp)window.unlockApprovedApp();}catch(e){};return;}
+    if(q.approved===true){remove('startupVideoGate');remove('approvalHardLock');document.body.style.overflow='';try{if(window.unlockApprovedApp)window.unlockApprovedApp();}catch(e){};return;}
     scroll();
   }
   window.__ALL_PERPECT_SUCCESS_FLOW__={boot,scroll,installVideo,approval,pending,finish};
