@@ -135,7 +135,7 @@ function boot(){
   showApproval();
   try{const h=native();if(h&&h.checkSpecialApproval)h.checkSpecialApproval()}catch(e){}
  }else {
-  // ①두루마리 ②설치동영상 ③APK 설치는 공식 moveicon.html에서 이미 수행됨.
+  // ①두루마리 ②설치동영상 ③APK 설치는 공식 웹 설치 안내 1~3단계에서 이미 수행됨.
   // Android 앱 실행은 반드시 ④승인요청·⑤승인확인부터 시작한다.
   showApproval();
  }
