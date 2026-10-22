@@ -1,14 +1,14 @@
-/* 항행의자유 배포용: 두루마리 -> 설치동영상 -> 승인요청 -> 안내동영상 -> 홈화면 */
+/* V439: Web ①두루마리 ②설치동영상 ③설치링크, App ④승인요청 ⑤승인확인 ⑥안내동영상 ⑦홈화면. */
 (function(){
 'use strict';
 const SCROLL='scroll',INSTALL='installVideo',APPROVAL='approval',GUIDE='guideVideo',HOME='home';
-const DONE='freedom_r14_guide_video_finished_40037';
+const DONE='freedom_v439_guide_video_finished';
 const INSTALL_DONE='freedom_r14_install_video_finished';
 const INTRO_INSTALL='install_guide_final.mp4';
 const INTRO_GUIDE='freedom_onboarding_postscroll_20260928.mp4';
 const HUB='https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/update.html';
 const GATE='freedomR14FullScreen';
-let stage='init',approvedOnce=false;
+let stage='init',approvedOnce=false,approvalCheckRequested=false;
 const native=()=>{try{return window.AndroidHost||window.BaekhakNative||null}catch(e){return null}};
 function approvalState(){
  try{
@@ -88,6 +88,7 @@ function showApproval(){
  const q=approvalState();
  if(isApproved(q)){approvedOnce=true;showVideo(GUIDE);return}
  stage=APPROVAL;
+ approvalCheckRequested=false;
  const pending=q.status==='pending'||q.has_request===true;
  const g=panel();
  g.innerHTML='<div style="max-width:620px;margin:8vh auto;padding:20px"><div style="border:1px solid #d9bc65;border-radius:18px;background:#082b45;padding:20px"><h2 style="text-align:center;color:#ffe29a">⚓ 항행의자유 설치 승인</h2><p style="line-height:1.6">설치승인을 받으면 안내동영상이 나오고, 동영상이 끝나면 홈화면으로 이동합니다.</p><input id="freedomR14Name" placeholder="본인 실명" style="width:100%;padding:13px;margin:8px 0;color:white;background:#051b2c;border:1px solid #6599b7;border-radius:10px"><input id="freedomR14Ref" placeholder="누구의 지인인지" style="width:100%;padding:13px;margin:8px 0;color:white;background:#051b2c;border:1px solid #6599b7;border-radius:10px"><div style="display:flex;gap:8px"><button id="freedomR14Request" style="flex:1;padding:14px;border-radius:11px;background:#765713;color:#fff;border:1px solid #d6b75e">승인요청</button><button id="freedomR14Check" style="flex:1;padding:14px;border-radius:11px;background:#115175;color:#fff;border:1px solid #84bdda">승인 확인</button></div><p id="freedomR14Status" style="text-align:center;color:#91ecc9">'+(pending?'승인대기 · 승인완료 후 승인 확인을 눌러주세요.':'승인요청을 진행해 주세요.')+'</p></div></div>';
@@ -118,6 +119,7 @@ function showApproval(){
  g.querySelector('#freedomR14Check').onclick=()=>{
   const q=approvalState();
   if(isApproved(q)){approvedOnce=true;showVideo(GUIDE);return}
+  approvalCheckRequested=true;
   const h=native();
   message.textContent='승인 상태를 확인하는 중입니다.';
   try{if(h&&h.checkSpecialApproval)h.checkSpecialApproval()}catch(e){message.textContent='승인 상태 확인에 실패했습니다.'}
@@ -132,17 +134,26 @@ function boot(){
  }else if(q.has_request===true||q.status==='pending'){
   showApproval();
   try{const h=native();if(h&&h.checkSpecialApproval)h.checkSpecialApproval()}catch(e){}
- }else if(marked(INSTALL_DONE))showApproval();
- else showScroll();
+ }else {
+  // ①두루마리 ②설치동영상 ③APK 설치는 공식 moveicon.html에서 이미 수행됨.
+  // Android 앱 실행은 반드시 ④승인요청·⑤승인확인부터 시작한다.
+  showApproval();
+ }
 }
 window.startFreedomIntroVideo=function(){};
 window.beginApprovedOnboardingSequence=function(){};
 window.showApprovalHardLock=showApproval;
-window.showFinalScroll=showScroll;
+window.showFinalScroll=function(){if(stage==='init')boot();};
 window.onSpecialApprovalState=function(payload){
  let q={};
  try{q=typeof payload==='string'?JSON.parse(payload||'{}'):(payload||{})}catch(e){}
  if(isApproved(q)||isApproved(approvalState())){
+  // 신규 설치는 승인확인 버튼을 거친 후 영상으로 진행한다.
+  if(stage===APPROVAL&&!approvalCheckRequested){
+   const msg=document.getElementById('freedomR14Status');
+   if(msg)msg.textContent='승인이 완료됐습니다. 승인 확인 버튼을 눌러주세요.';
+   return;
+  }
   approvedOnce=true;
   try{SPECIAL_APPROVED=true;D.specialApprovalUnlocked=true;save()}catch(e){}
   if(marked(DONE))goHome();else showVideo(GUIDE);
