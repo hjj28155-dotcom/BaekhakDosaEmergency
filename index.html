@@ -25,5 +25,5 @@ const btn=document.getElementById('scrollNext');
 const v=document.getElementById('video');
 const status=document.getElementById('status');
 btn.addEventListener('click',()=>{scrollStage.style.display='none';videoStage.style.display='block';try{v.load();const p=v.play();if(p&&p.catch)p.catch(()=>{});}catch(e){}});
-v.addEventListener('ended',()=>{status.textContent='✅ 설치설명서 완료 · 항행의자유 APK 설치로 진행합니다.';window.location.href='./update.html?v=4.0.38';});
+v.addEventListener('ended',()=>{status.textContent='✅ 설치설명서 완료 · 항행의자유 APK 설치로 진행합니다.';window.location.href='./update.html?v=4.0.37';});
 </script></body></html>
