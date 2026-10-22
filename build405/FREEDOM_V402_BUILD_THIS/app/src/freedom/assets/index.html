@@ -1894,31 +1894,27 @@ function v330Print(){
       '</div>'+
       '<div class="panel">'+
         '<button id="v430DirectUpdateBtn" class="b gold" type="button" style="width:100%;padding:16px 12px;font-size:18px">⬇ 최신버전 바로 업데이트</button>'+
-        '<div id="v430UpdateStatus" class="small status" style="margin-top:10px;text-align:center">버튼을 누르면 앱 안에서 최신 APK를 내려받고 설치 화면으로 바로 연결합니다.</div>'+
+        '<div id="v430UpdateStatus" class="small status" style="margin-top:10px;text-align:center">버튼을 누르면 공식 설치 및 업데이트 다운로드 링크가 열립니다. 휴대폰 폴더 선택은 하지 않습니다.</div>'+
       '</div>'
     );
     const b=document.getElementById('v430DirectUpdateBtn');
     if(b){
-      const go=function(ev){
+      b.onclick=function(ev){
         if(ev){ev.preventDefault();ev.stopPropagation();}
         const s=document.getElementById('v430UpdateStatus');
-        if(s)s.textContent='최신 APK를 내려받는 중입니다. 잠시만 기다려 주세요.';
+        if(s)s.textContent='공식 설치 및 업데이트 페이지를 엽니다.';
         try{
+          if(window.AndroidHost&&typeof AndroidHost.openOfficialUpdateLink==='function'){
+            AndroidHost.openOfficialUpdateLink();return;
+          }
           if(window.AndroidHost&&typeof AndroidHost.chooseApkUpdate==='function'){
-            AndroidHost.chooseApkUpdate();
-            return;
+            AndroidHost.chooseApkUpdate();return;
           }
-          if(window.BaekhakNative&&typeof BaekhakNative.chooseApkUpdate==='function'){
-            BaekhakNative.chooseApkUpdate();
-            return;
-          }
-          if(s)s.textContent='업데이트 기능 연결을 찾지 못했습니다.';
+          window.location.href='https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/update.html';
         }catch(e){
-          if(s)s.textContent='업데이트 시작 중 오류가 발생했습니다.';
+          if(s)s.textContent='공식 링크를 열 수 없습니다. 인터넷 연결을 확인해 주세요.';
         }
       };
-      b.onclick=go;
-      b.addEventListener('pointerup',go,{passive:false});
     }
     fetch(INFO_URL,{cache:'no-store'}).then(r=>r.json()).then(p=>{
       const q=document.getElementById('v430LatestInfo');
