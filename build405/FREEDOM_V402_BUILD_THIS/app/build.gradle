@@ -18,8 +18,19 @@ android {
         buildConfig true
     }
 
+    // 배포 APK의 서명키를 빌드마다 바꾸지 않도록 CI 보관키를 명시적으로 사용
+    signingConfigs {
+        distribution {
+            storeFile file(System.getenv('HOME') + '/.android/debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+    }
+
     buildTypes {
         debug {
+            signingConfig signingConfigs.distribution
             debuggable false
             minifyEnabled false
         }
