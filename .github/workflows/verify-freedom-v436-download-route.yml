@@ -1,0 +1,42 @@
+name: Verify published Freedom V4.0.36 download route
+on:
+  push:
+    branches:
+      - fix-freedom-v3-screen-1244-20261022
+    paths:
+      - '.github/workflows/verify-freedom-v436-download-route.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Confirm public download endpoint headers
+        run: |
+          set -euo pipefail
+          URL='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/latest-apk'
+          curl --fail --show-error -L -I --max-time 40 "$URL" | tee /tmp/headers.txt
+          grep -qi '^content-type: application/vnd.android.package-archive' /tmp/headers.txt
+          grep -qi 'HanghaeFreedom_V4.0.36_DB1_1247_FINAL.apk' /tmp/headers.txt
+          echo 'PASS_PUBLIC_ENDPOINT_HEAD'
+      - name: Download via official app URL and compare to immutable release checksum
+        run: |
+          set -euo pipefail
+          URL='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/latest-apk'
+          RELEASE='https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/v4.0.36-db1-1247-final'
+          curl --fail --show-error -L --retry 2 --max-time 180 "$URL" -o /tmp/v436-downloaded.apk
+          curl --fail --show-error -L --retry 2 "$RELEASE/HanghaeFreedom_V4.0.36_DB1_1247_FINAL.apk.sha256" -o /tmp/release.sha256
+          test "$(stat -c%s /tmp/v436-downloaded.apk)" -eq 46891111
+          SHA_EXPECTED=$(cut -d' ' -f1 /tmp/release.sha256)
+          SHA_ACTUAL=$(sha256sum /tmp/v436-downloaded.apk | cut -d' ' -f1)
+          test "$SHA_EXPECTED" = "$SHA_ACTUAL"
+          unzip -t /tmp/v436-downloaded.apk | tail -1
+          echo "PASS_PUBLIC_DOWNLOAD_SHA256=$SHA_ACTUAL"
+      - name: Verify official update landing page links to corrected download
+        run: |
+          set -euo pipefail
+          curl --fail --show-error -L --retry 2 'https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/update.html' -o /tmp/page.html
+          grep -q 'V4.0.36' /tmp/page.html
+          grep -q 'functions/v1/latest-apk' /tmp/page.html
+          echo PASS_MOVEICON_UPDATE_PAGE
