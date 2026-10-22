@@ -1,0 +1,44 @@
+name: Verify archived signing cache fingerprints for Freedom V3
+on:
+  push:
+    branches:
+      - fix-freedom-v3-screen-1244-20261022
+    paths:
+      - '.github/workflows/verify-freedom-original-signing-caches.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Restore V5 stable key
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: v5-whole-room-companion-stable-debug-key-20261016
+          fail-on-cache-miss: false
+      - name: Compare V5 certificate fingerprint and discard from runner
+        run: |
+          set -euo pipefail
+          expected=d0e743d72659d129ab59d888e76e155b55b39a8cdfec8c6b78e5fc62bc13f76f
+          if test -s ~/.android/debug.keystore; then
+            actual=$(keytool -list -v -keystore ~/.android/debug.keystore -storepass android 2>/dev/null | grep -m1 'SHA256:' | sed 's/.*SHA256: //' | tr -d ':' | tr '[:upper:]' '[:lower:]' || true)
+            test "$actual" = "$expected" && echo 'V5_KEY_MATCH=YES' || echo 'V5_KEY_MATCH=NO'
+          else echo 'V5_KEY_CACHE=ABSENT'; fi
+          rm -f ~/.android/debug.keystore
+      - name: Restore V6 stable key
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: v6-central-stable-debug-key-v1
+          fail-on-cache-miss: false
+      - name: Compare V6 certificate fingerprint and discard from runner
+        run: |
+          set -euo pipefail
+          expected=d0e743d72659d129ab59d888e76e155b55b39a8cdfec8c6b78e5fc62bc13f76f
+          if test -s ~/.android/debug.keystore; then
+            actual=$(keytool -list -v -keystore ~/.android/debug.keystore -storepass android 2>/dev/null | grep -m1 'SHA256:' | sed 's/.*SHA256: //' | tr -d ':' | tr '[:upper:]' '[:lower:]' || true)
+            test "$actual" = "$expected" && echo 'V6_KEY_MATCH=YES' || echo 'V6_KEY_MATCH=NO'
+          else echo 'V6_KEY_CACHE=ABSENT'; fi
+          rm -f ~/.android/debug.keystore
