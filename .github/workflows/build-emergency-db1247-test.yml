@@ -1,0 +1,81 @@
+name: Emergency Freedom V3 DB1 1247 isolated APK test
+on:
+  push:
+    branches:
+      - research-emergency-db1-1247-20261022
+    paths:
+      - '.github/workflows/build-emergency-db1247-test.yml'
+      - 'build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/db1_v1247_patch.js'
+      - 'build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/index.html'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: Check original six-sentence bank and additive blind source
+        run: |
+          set -euo pipefail
+          BASE=build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets
+          test -s "$BASE/raw_bank.js"
+          test -s "$BASE/db1_v1247_patch.js"
+          grep -q 'src="db1_v1247_patch.js"' "$BASE/index.html"
+          node - <<'NODE'
+          const vm=require('node:vm'),fs=require('node:fs'),assert=require('node:assert/strict');
+          const p='build407/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/';
+          const source=fs.readFileSync(p+'raw_bank.js','utf8');
+          const patch=fs.readFileSync(p+'db1_v1247_patch.js','utf8');
+          const ctx={window:{}};ctx.window.window=ctx.window;
+          vm.runInNewContext(source,ctx,{timeout:10000});
+          assert.equal(Object.keys(ctx.window.V3_RAW_BANK).length,1244);
+          const original=ctx.window.V3_RAW_BANK['1'].text;
+          vm.runInNewContext(patch,ctx,{timeout:10000});
+          assert.equal(ctx.window.DB1_UPDATE_1247.status,'PASS',JSON.stringify(ctx.window.DB1_UPDATE_1247));
+          assert.equal(ctx.window.V3_RAW_BANK_META.count,1247);
+          assert.equal(ctx.window.V3_RAW_BANK['1'].text,original);
+          for(let i=1;i<=1247;i++)assert.equal(ctx.window.V3_RAW_BANK[String(i)].text.split(/\r?\n/).filter(Boolean).length,6,'round '+i);
+          const ctx2={window:{}};ctx2.window.window=ctx2.window;
+          vm.runInNewContext(source,ctx2,{timeout:10000});
+          ctx2.window.V3_RAW_BANK['1245']={text:'a deliberately conflicting original'};
+          vm.runInNewContext(patch,ctx2,{timeout:10000});
+          assert.equal(ctx2.window.DB1_UPDATE_1247.status,'HOLD');
+          console.log('PASS 1-1247 six sentence raw, no overwrite, conflicting originals HOLD');
+          NODE
+      - name: Separate test package; do not replace installed Freedom app
+        run: |
+          set -euo pipefail
+          FILE=build407/FREEDOM_V402_BUILD_THIS/app/build.gradle
+          sed -i "s/applicationId 'com.navigator.freedom.v3final'/applicationId 'com.navigator.freedom.v3final.db1trial'/" "$FILE"
+          sed -i 's/versionCode 30407/versionCode 30408/' "$FILE"
+          grep -q "applicationId 'com.navigator.freedom.v3final.db1trial'" "$FILE"
+      - name: Android Debug Build
+        working-directory: build407/FREEDOM_V402_BUILD_THIS
+        run: |
+          chmod +x gradlew
+          sed -i '/org.gradle.java.home/d' gradle.properties
+          ./gradlew assembleDebug --no-daemon
+      - name: Verify APK assets
+        run: |
+          set -euo pipefail
+          APK=build407/FREEDOM_V402_BUILD_THIS/app/build/outputs/apk/debug/FREEDOM_V3_FINAL_407-debug.apk
+          test -s "$APK"
+          unzip -t "$APK" | tail -n 1
+          unzip -p "$APK" assets/index.html | grep -q 'db1_v1247_patch.js'
+          unzip -p "$APK" assets/db1_v1247_patch.js | grep -q 'DB1_UPDATE_1247'
+          cp "$APK" Freedom_V3_DB1_1247_ISOLATED_TRIAL.apk
+          sha256sum Freedom_V3_DB1_1247_ISOLATED_TRIAL.apk > Freedom_V3_DB1_1247_ISOLATED_TRIAL.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Freedom_V3_DB1_1247_IsolatedTrial
+          path: |
+            Freedom_V3_DB1_1247_ISOLATED_TRIAL.apk
+            Freedom_V3_DB1_1247_ISOLATED_TRIAL.sha256
+          if-no-files-found: error
+          retention-days: 7
