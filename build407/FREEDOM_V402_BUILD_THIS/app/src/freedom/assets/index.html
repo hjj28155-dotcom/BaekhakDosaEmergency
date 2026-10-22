@@ -1443,7 +1443,7 @@ function sendAnalysisToEngine(round,raw){
     },3500);
     return;
   }
-  modal('분석 진행 중',`<div class="panel centerTitle"><h3>제${esc(round)}회 자동분석</h3><div class="small">보존된 원문과 비상용 엔진으로 자동구매 20조합을 계산합니다.</div><div style="font-size:32px;margin:18px">⚓</div><b>분석 중...</b></div>`);
+  modal('분석 진행 중',`<div class="panel centerTitle"><h3>제${esc(round)}회 자동분석</h3><div class="small">누적 데이터 기반 비상용 엔진으로 자동 A·B·C·D 각 5조합을 계산합니다.</div><div style="font-size:32px;margin:18px">⚓</div><b>분석 중...</b></div>`);
   f.contentWindow.postMessage({type:'V3_ANALYZE',round:Number(round),raw:String(raw||'')},'*');
 }
 
@@ -1671,11 +1671,11 @@ function rotate(a,k){if(!a.length)return [];k=((k%a.length)+a.length)%a.length;r
 function packFromPool(pool,variant=0){let p=pool.slice(0,10);if(variant===1)p=rotate(p,1);if(variant===2)p=rotate(p,3);if(variant===3)p=rotate(p.reverse(),2);return V3_OMIT10.map(omit=>p.filter((_,i)=>!omit.includes(i)).slice(0,6).sort((a,b)=>a-b))}
 function cleanGames(games){return (games||[]).slice(0,5).map(g=>(g||[]).map(Number).filter(n=>n>=1&&n<=45).slice(0,6).sort((a,b)=>a-b)).filter(g=>g.length===6)}
 function gamesToRows(games){return cleanGames(games).map((g,i)=>({slot:i+1,game:g}))}
-function analysisGroups(pool,original){let g0=cleanGames(original);if(g0.length!==5)g0=packFromPool(pool,0);return [
- {name:'원문분석 5조합',rows:gamesToRows(g0)},
- {name:'자동 A 5조합',rows:gamesToRows(packFromPool(pool,1))},
- {name:'자동 B 5조합',rows:gamesToRows(packFromPool(pool,2))},
- {name:'자동 C 5조합',rows:gamesToRows(packFromPool(pool,3))}
+function analysisGroups(pool,original){return [
+ {name:'자동 A 5조합',rows:gamesToRows(packFromPool(pool,0))},
+ {name:'자동 B 5조합',rows:gamesToRows(packFromPool(pool,1))},
+ {name:'자동 C 5조합',rows:gamesToRows(packFromPool(pool,2))},
+ {name:'자동 D 5조합',rows:gamesToRows(packFromPool(pool,3))}
 ]}
 function runAnalysisFromHome(){
  let r=cur(),saved=R().raw||{},raw=(saved.text||embeddedRaw(r)||'').trim();
