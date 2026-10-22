@@ -1,0 +1,32 @@
+name: Verify Android in-app browser receives HTML instead of blank APK
+on:
+  push:
+    branches: [fix-freedom-v3-screen-1244-20261022]
+    paths: ['.github/workflows/verify-v436-inapp-browser-landing.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Browser request goes to visible HTML download page
+        run: |
+          set -euo pipefail
+          BASE='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/latest-apk'
+          LANDING='https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/update.html?v=4.0.36'
+          curl -sS -D /tmp/browser.headers -o /dev/null --max-time 35 -H 'Accept: text/html,application/xhtml+xml' -H 'User-Agent: Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 Mobile Safari/537.36' "$BASE"
+          grep -q '^HTTP/.* 302' /tmp/browser.headers
+          grep -qi '^location: https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/update.html' /tmp/browser.headers
+          curl -fsSL --retry 3 --max-time 60 "$LANDING" -o /tmp/landing.html
+          grep -q 'APK 바로 다운로드' /tmp/landing.html
+          grep -q '다운로드 페이지 열기' /tmp/landing.html
+          grep -q 'HanghaeFreedom_V4.0.36_DB1_1247_FINAL.apk' /tmp/landing.html
+          echo 'PASS: mobile browser gets visible HTML with APK buttons'
+      - name: Native APK downloader still sees binary APK MIME
+        run: |
+          set -euo pipefail
+          BASE='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/latest-apk'
+          curl -fsSI --max-time 45 -H 'Accept: application/vnd.android.package-archive, application/octet-stream, */*' -H 'User-Agent: FreedomApp/40036' "$BASE" > /tmp/native.headers
+          grep -qi '^content-type: application/vnd.android.package-archive' /tmp/native.headers
+          grep -qi '^content-length: 46891111' /tmp/native.headers
+          echo 'PASS: native download URL still serves intact APK'
