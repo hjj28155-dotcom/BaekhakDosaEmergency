@@ -7,6 +7,9 @@ const html=fs.readFileSync(p+'index.html','utf8'),r14=fs.readFileSync(p+'freedom
 assert.equal(html.split('src="freedom_onboarding_r14.js"').length-1,1,'R14 imported exactly once');
 assert.ok(r14.includes('https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/update.html'),'app update route must open Freedom-only official download');
 assert.ok(!r14.includes('moveicon.html'),'Freedom app must not navigate to MoveIcon distribution page');
+assert.ok(r14.includes('freedom_v439_guide_video_finished'),'V439 guide must play once even for already approved upgrades');
+assert.ok(r14.includes('approvalCheckRequested=true'),'explicit approval-confirm state required');
+assert.ok(!r14.includes('else showScroll()'),'native app must never repeat web scroll stage');
 assert.ok(r14.includes('h.openOfficialUpdateLink()'),'in-app update should use dedicated native browser handler');
 assert.ok(!html.includes('id="r12AuthoritativeOnboardingMain"'),'old R12 authority removed');
 assert.ok(!html.includes('id="r13AuthoritativeOnboarding"'),'old R13 authority removed');
@@ -64,30 +67,32 @@ function createHarness(startState,storage=new Map()){
  vm.runInNewContext(r14,ctx,{timeout:30000,filename:'freedom_onboarding_r14.js'});
  return {win,document,logs,storage,get(id){return document.getElementById(id)}};
 }
-// New installation: 5 steps, no external link navigation, no premature home
+// V439 strict handoff: web does stages 1-3; installed app starts at stages 4-7.
 let t=createHarness({});
-assert.ok(t.get('freedomR14Start'),'stage1 scroll');
-t.get('freedomR14Start').onclick();
-assert.equal(t.get('freedomR14Video').src,'install_guide_final.mp4','stage2 install movie');
-assert.equal(t.logs.approvedRuntime,0);
-t.get('freedomR14Video').dispatch('ended');
-assert.ok(t.get('freedomR14Request'),'stage3 approval request');
-t.get('freedomR14Name').value='Test Name';t.get('freedomR14Ref').value='Test Ref';
+assert.equal(t.get('freedomR14Start'),null,'no duplicate scroll after APK install');
+assert.equal(t.get('freedomR14Video'),null,'no duplicate installation video after APK install');
+assert.ok(t.get('freedomR14Request'),'step4 app opens approval request');
+assert.ok(t.get('freedomR14Check'),'step5 app includes approval check');
+assert.equal(t.logs.approvedRuntime,0,'home must remain locked before approval');
+t.get('freedomR14Name').value='Test Name';
+t.get('freedomR14Ref').value='Test Ref';
 t.get('freedomR14Request').onclick();
-assert.equal(t.logs.submitted.length,1);
+assert.equal(t.logs.submitted.length,1,'exactly one approval request');
 assert.equal(t.logs.submitted[0].round,1244);
-assert.ok(t.get('freedomR14Request'),'pending remains on request screen');
 t.win.onSpecialApprovalState({status:'pending',has_request:true});
-assert.ok(t.get('freedomR14Request'),'pending cannot bypass');
+assert.ok(t.get('freedomR14Request'),'pending remains on approval screen');
 assert.equal(t.logs.approvedRuntime,0);
 t.logs.state={status:'approved',approved:true};
 t.win.onSpecialApprovalState({status:'approved',approved:true});
-assert.equal(t.get('freedomR14Video').src,'freedom_onboarding_postscroll_20260928.mp4','stage4 approved guide');
+assert.ok(t.get('freedomR14Check'),'approval callback does not skip approval-check button');
+assert.equal(t.get('freedomR14Video'),null,'must wait for approval-check click');
+t.get('freedomR14Check').onclick();
+assert.equal(t.get('freedomR14Video').src,'freedom_onboarding_postscroll_20260928.mp4','step6 approved guide');
 assert.equal(t.logs.approvedRuntime,0,'guide must finish before home');
 t.get('freedomR14Video').dispatch('ended');
-assert.equal(t.get('freedomR14FullScreen'),null,'stage5 gate removed');
+assert.equal(t.get('freedomR14FullScreen'),null,'step7 gate removed');
 assert.equal(t.logs.approvedRuntime,1,'home unlocked once');
-assert.equal(t.logs.urlOpen.length,0,'no external link during onboarding');
+assert.equal(t.logs.urlOpen.length,0,'no external link during all approval stages');
 // Already approved on next launch returns straight home
 const again=createHarness({approved:true,status:'approved'},t.storage);
 assert.equal(again.get('freedomR14FullScreen'),null);
@@ -111,4 +116,4 @@ assert.equal(captain.get('freedomR14Video').src,'freedom_onboarding_postscroll_2
 assert.equal(captain.logs.submitted.length,0);
 captain.get('freedomR14Video').dispatch('ended');
 assert.equal(captain.logs.approvedRuntime,1);
-console.log('PASS: scroll -> installation video -> approval -> guide -> home, captain approved bypasses re-request');
+console.log('PASS: Web 1-3 -> Native step4 approval request -> step5 explicit approval check -> step6 H264 guide -> step7 home; no MoveIcon links or duplicate approvals');
