@@ -40,3 +40,5 @@ jobs:
           grep -q 'V4.0.36' /tmp/page.html
           grep -q 'functions/v1/latest-apk' /tmp/page.html
           echo PASS_MOVEICON_UPDATE_PAGE
+
+# rerun after GitHub Pages deployment succeeded 2026-10-22
