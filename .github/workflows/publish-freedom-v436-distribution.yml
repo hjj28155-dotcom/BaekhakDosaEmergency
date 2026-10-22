@@ -5,6 +5,7 @@ on:
       - fix-freedom-v3-screen-1244-20261022
     paths:
       - '.github/workflows/publish-freedom-v436-distribution.yml'
+      - 'build405/FREEDOM_V402_BUILD_THIS/app/build.gradle'
   workflow_dispatch:
 permissions:
   contents: write
