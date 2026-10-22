@@ -7,12 +7,19 @@
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#071827;color:#fff;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif}
-.wrap{max-width:680px;margin:0 auto;padding:34px 18px;text-align:center}
-.card{background:#0c2236;border:1px solid #21445d;border-radius:20px;padding:24px 18px}
-h1{font-size:28px;color:#ffe39a;margin:0 0 14px}
-p{font-size:17px;line-height:1.6;color:#d9e8f1}
-.btn{display:block;margin-top:22px;padding:20px 16px;background:#17639a;color:#fff;text-decoration:none;border-radius:15px;font-size:22px;font-weight:900}
-.note{margin-top:18px;padding:14px;background:#113825;border:1px solid #2f7c55;border-radius:14px;font-size:16px;line-height:1.55;text-align:left}
+.wrap{max-width:680px;margin:0 auto;padding:14px 12px 18px;text-align:center}
+.card{background:#0c2236;border:1px solid #21445d;border-radius:16px;padding:16px 14px}
+h1{font-size:clamp(22px,5.2vw,28px);color:#ffe39a;margin:0 0 6px}
+p{font-size:15px;line-height:1.45;color:#d9e8f1;margin:9px 0}
+.btn{display:block;margin-top:11px;padding:15px 12px;background:#17639a;color:#fff;text-decoration:none;border-radius:12px;font-size:clamp(17px,4.7vw,21px);font-weight:900}
+.note{margin-top:11px;padding:10px;background:#113825;border:1px solid #2f7c55;border-radius:12px;font-size:14px;line-height:1.55;text-align:left}
+.note summary{cursor:pointer;color:#d2f6e2;font-weight:800;font-size:15px;list-style:disclosure-closed}
+.note[open] summary{margin-bottom:10px}
+#freedom-install{margin-top:12px!important;border-color:#b99a50}
+#freedom-install h2{font-size:clamp(21px,5vw,24px)!important;margin:0 0 7px!important}
+#freedom-install .btn{margin-top:11px}
+#moveicon-release-extra{font-size:14px;line-height:1.45}
+@media(max-width:480px){.wrap{padding:10px 10px 12px}.card{padding:13px 12px}#moveicon-title{line-height:1.25}.btn{min-height:56px}}
 </style>
 
 
@@ -22,21 +29,22 @@ p{font-size:17px;line-height:1.6;color:#d9e8f1}
 <h1 id="moveicon-title">⚓ 이동아이콘 공식 배포</h1>
 <p>기존 설치 앱은 삭제하지 마세요. 검증된 공식 APK만 제공하며, 새 버전이 확인되면 업데이트를 안내합니다.</p>
 <a id="moveicon-apk" class="btn" href="https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/v1.0.79/Hanghae_MoveIcon_v1.0.79.apk">⬇ APK 다운로드 시작</a>
-<div class="note">
+<details class="note">
+<summary>이동아이콘 기능 안내 펼쳐보기</summary>
 현재 공식 공개판의 기능 안내입니다. 승인된 신규 수정본의 배포 여부는 아래 공지를 확인하세요.<br>
 ① 긴 메뉴 세로 스크롤<br>
 ② ⚓ 위치 이동·저장 + 메뉴 밖 화면 터치 시 메뉴 접기<br>
 ③ MP3 <b>전체곡 재생</b> 추가<br>
 ④ MP3 창을 닫거나 재생을 시작하면 V3 화면이 뒤에 남지 않고 바로 돌아갑니다.<br>
 MP3·MP4는 자동검색이 아니라 <b>이동아이콘 내부 앱폴더 2개</b> 보관 방식 그대로입니다.
-</div>
+</details>
 </div>
 
-  <div class="card" id="freedom-install" style="margin-top:18px;border-color:#b99a50">
+  <div class="card" id="freedom-install" style="margin-top:12px;border-color:#b99a50">
     <h2 style="font-size:23px;color:#ffe39a;margin:0 0 12px">⚓ 항행의자유 앱</h2>
-    <p>이동아이콘과 별도로 배포하는 <strong>항행의자유</strong> 설치 및 업데이트입니다.</p>
+    <p>아래 버튼에서 항행의자유 기존 설치 안내를 확인하세요.</p>
     <a id="freedom-apk-route" class="btn" href="./" style="background:#745615;border:1px solid #e8c46e;color:#fff5bb">📱 항행의자유 설치 및 업데이트</a>
-    <p style="font-size:14px;color:#b8cfdd;margin-bottom:0">기존 항행의자유 안내 화면으로 이동합니다. 설치 안내를 마치면 V4.0.36 정식 다운로드 화면으로 연결됩니다.</p>
+    <p style="font-size:13px;color:#b8cfdd;margin-bottom:0">기존 설치 안내 및 승인 절차는 그대로 유지합니다.</p>
   </div>
 </div>
 
