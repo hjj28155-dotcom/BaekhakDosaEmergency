@@ -10,13 +10,13 @@
 <div class="card">
 <div id="scrollStage">
 <img src="welcome_scroll_final.png" alt="항행의자유 환영 두루마리" style="display:block;width:100%;height:auto;border-radius:14px;margin-top:14px">
-<button id="scrollNext" class="btn" type="button">두루마리 클릭 · 설치동영상</button>
+<button id="scrollNext" class="btn" type="button">두루마리 확인 · 설치설명서</button>
 </div>
 <div id="videoStage" style="display:none">
 <video id="video" playsinline preload="auto" controls><source src="freedom_guide_latest.mp4?v=20261007-flow1" type="video/mp4"></video>
-<div id="status" class="status">설치동영상을 끝까지 시청해 주세요.</div>
+<div id="status" class="status">설치설명서 동영상을 끝까지 시청해 주세요.</div>
 </div>
-<div class="note">두루마리 → 설치동영상 → 승인요청 → 서버접수 → 안내동영상 → 승인대기 → 항해사앱 승인 → 승인완료 확인 → 홈</div>
+<div class="note">두루마리 → 설치설명서 → APK 설치 → 승인요청 → 승인확인 → 안내동영상 → 홈화면</div>
 </div></div>
 <script>
 const scrollStage=document.getElementById('scrollStage');
@@ -25,5 +25,5 @@ const btn=document.getElementById('scrollNext');
 const v=document.getElementById('video');
 const status=document.getElementById('status');
 btn.addEventListener('click',()=>{scrollStage.style.display='none';videoStage.style.display='block';try{v.load();const p=v.play();if(p&&p.catch)p.catch(()=>{});}catch(e){}});
-v.addEventListener('ended',()=>{status.textContent='✅ 설치동영상 완료 · 항행의자유 설치/업데이트로 진행합니다.';window.location.href='./update.html?v=4.0.36';});
+v.addEventListener('ended',()=>{status.textContent='✅ 설치설명서 완료 · 항행의자유 APK 설치로 진행합니다.';window.location.href='./update.html?v=4.0.37';});
 </script></body></html>
