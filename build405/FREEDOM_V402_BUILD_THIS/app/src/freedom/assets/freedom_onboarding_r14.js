@@ -93,7 +93,7 @@ function showApproval(){
   const h=native();
   if(!h||typeof h.requestSpecialApproval!=='function'){message.textContent='승인요청 기능을 연결하지 못했습니다.';return}
   message.textContent='승인요청을 보내는 중입니다.';
-  try{h.requestSpecialApproval(1247,n,ref)}catch(e){message.textContent='승인 서버 연결을 확인해 주세요.'}
+  try{h.requestSpecialApproval(1244,n,ref)}catch(e){message.textContent='승인 서버 연결을 확인해 주세요.'}
  };
  g.querySelector('#freedomR14Check').onclick=()=>{
   const q=approvalState();
