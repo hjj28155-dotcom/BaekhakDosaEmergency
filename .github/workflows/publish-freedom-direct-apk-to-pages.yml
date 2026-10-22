@@ -1,0 +1,56 @@
+name: Publish verified Freedom APK on same-origin installation site
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish-freedom-direct-apk-to-pages.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  publish_freedom_apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          persist-credentials: true
+      - name: Download and verify existing immutable V4.0.39 release APK
+        run: |
+          set -euo pipefail
+          BASE="https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/v4.0.39-seven-stage-final"
+          APK="HanghaeFreedom_V4.0.39_DB1_1247_FINAL.apk"
+          curl -fL --retry 4 --retry-delay 2 --connect-timeout 20 "$BASE/$APK" -o "$APK"
+          curl -fL --retry 4 --retry-delay 2 --connect-timeout 20 "$BASE/$APK.sha256" -o "$APK.sha256"
+          sha256sum -c "$APK.sha256"
+          test "$(stat -c %s "$APK")" -eq 44054241
+          unzip -t "$APK" | tail -n 1
+          unzip -l "$APK" | grep -q 'assets/freedom_onboarding_r14.js'
+          unzip -l "$APK" | grep -q 'assets/raw_bank.js'
+          unzip -l "$APK" | grep -q 'assets/db1_v1247_patch.js'
+          cp "$APK" freedom-latest.apk
+          sha256sum freedom-latest.apk
+      - name: Save exactly verified binary as same-origin Pages download
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- freedom-latest.apk
+          if git diff --cached --quiet; then
+            echo "Direct download APK unchanged."
+            exit 0
+          fi
+          git commit -m 'Publish verified Freedom V4.0.39 binary for same-origin Android download'
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git rebase origin/main
+            if git push origin HEAD:main; then
+              echo 'PASS: same-origin APK committed to main'
+              exit 0
+            fi
+            echo "Push retry $attempt"
+            sleep 2
+          done
+          echo 'FAIL: cannot persist verified APK; installer link stays on release URL'
+          exit 1
