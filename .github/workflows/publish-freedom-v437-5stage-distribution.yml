@@ -56,7 +56,7 @@ jobs:
           assert.ok(java.includes('private void chooseApkUpdateFile() { openOfficialUpdateLink(); }'),'all Android update paths must open link');
           assert.ok(java.includes('Intent.ACTION_VIEW,uri'),'use browser for update');
           assert.ok(!java.includes('내 파일에서 업데이트 APK를 선택해 주세요.'),'remove file picker path');
-          assert.ok(java.includes('if (isSpecialApprovedLocal()) {\\n            sendSpecialApprovalState(specialApprovalSummaryJson());'),'never submit duplicate approval after approved');
+          assert.ok(java.includes('if (isSpecialApprovedLocal()) {\n            sendSpecialApprovalState(specialApprovalSummaryJson());'),'never submit duplicate approval after approved');
           assert.ok(java.includes('if (!specialApprovalPrefs().getString("request_token", "").isEmpty())'),'query existing application status instead of re-request');
           const ctx={window:{}};ctx.window.window=ctx.window;
           vm.runInNewContext(fs.readFileSync(p+'raw_bank.js','utf8'),ctx,{timeout:30000});
