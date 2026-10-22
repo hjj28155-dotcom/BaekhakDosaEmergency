@@ -1569,7 +1569,22 @@ function v330PurchasePage(round){
  if(games.length!==20){V330_AFTER='purchase';runAnalysisFromHome();return}
  modal(`제${round}회 · 이번주 구매번호`,`<div class="analysisCompact v330print"><div class="scoreHero success"><strong>자동분석 20조합</strong><span>비상용 분석엔진 · 후보우주 기반 · 외부번호 자동추가 없음</span></div><div class="r5grid">${v330GroupsPurchase(games)}</div><div class="r5actions"><button class="b gold" onclick="v330Print()">🖨 인쇄</button><button class="b" onclick="rawPage()">회차선택</button><button class="b" onclick="closeM()">닫기</button></div></div>`);
 }
-function v330OpenRound(n){n=Number(n);if(!V330_RECENT.includes(n))n=1247;if(!setRound(n))return;if(n===1247){let b=rawBank(1247);modal('제1247회 · 백학도사 비법신서 원문',`<div class="panel goldline"><h3>원문 보관 자료 · 공식 당첨결과 아님</h3><div style="white-space:pre-wrap;line-height:1.9;text-align:left">${esc(b&&b.text||'원문 없음')}</div><p class="small">${esc(b&&b.source||'')}</p><button class="b" onclick="rawPage()">회차선택</button></div>`);return}if(V330_WIN[n])v330ResultPage(n);else if(n===1245||n===1246){modal('제'+n+'회 · 결과 자료', '<div class="panel warn">공식 당첨결과와 기존 분석 기록의 대조 검증이 필요합니다. 임의 결과를 생성하지 않습니다.</div>');}else v330PurchasePage(n)}
+function v330OpenRound(n){
+ n=Number(n);if(!V330_RECENT.includes(n))n=1247;
+ if(!setRound(n))return;
+ if(V330_WIN[n]){v330ResultPage(n);return;}
+ const b=rawBank(n),r=R(),a=r.analysis||{},saved=r.raw||{};
+ const raw=String(saved.text||b&&b.text||'').trim();
+ const source=String(saved.source||b&&b.source||'');
+ const games=Array.isArray(a.auto20)?a.auto20.filter(g=>Array.isArray(g)&&g.length===6):[];
+ const buy=Array.isArray(r.buy&&r.buy.combos)?r.buy.combos.filter(x=>String(x||'').trim()):[];
+ let sections='';
+ if(raw)sections+='<div class="panel goldline"><h3>제'+n+'회 보존 원문</h3><div style="white-space:pre-wrap;line-height:1.9;text-align:left">'+esc(raw)+'</div><p class="small">'+esc(source)+'</p></div>';
+ if(games.length)sections+='<div class="panel"><h3>저장된 분석 '+games.length+'조합</h3>'+games.map((g,i)=>'<div class="r5row purchase"><b>'+(i+1)+'</b><div class="r5balls">'+g.map(x=>'<span class="r5ball">'+esc(x)+'</span>').join('')+'</div></div>').join('')+'</div>';
+ if(buy.length)sections+='<div class="panel"><h3>저장된 구매 '+buy.length+'조합</h3>'+buy.map((x,i)=>'<p>'+(i+1)+'. '+esc(x)+'</p>').join('')+'</div>';
+ if(!sections)sections='<div class="panel warn">제'+n+'회에 저장된 원문·분석·구매 자료를 찾지 못했습니다. 임의 내용을 만들지 않습니다.</div>';
+ modal('제'+n+'회 · 보존 자료',sections+'<div class="row"><button class="b" onclick="rawPage()">회차선택</button><button class="b" onclick="closeM()">닫기</button></div>');
+}
 
 function v124Round1243ResultPage(){
   if(!v126Ensure1243Auto20()){
