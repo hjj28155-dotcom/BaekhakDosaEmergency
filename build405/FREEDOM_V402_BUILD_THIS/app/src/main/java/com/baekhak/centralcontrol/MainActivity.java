@@ -21,6 +21,7 @@ import android.provider.MediaStore;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.WebChromeClient;
 import android.widget.Toast;
 import android.widget.FrameLayout;
 import android.view.View;
@@ -144,12 +145,15 @@ public class MainActivity extends Activity {
 
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setDomStorageEnabled(true);
+        // Approved onboarding H264 video plays inline in Android WebView.
+        webView.getSettings().setMediaPlaybackRequiresUserGesture(false);
         webView.getSettings().setAllowFileAccess(true);
         webView.getSettings().setAllowContentAccess(true);
         AndroidHostBridge nativeBridge = new AndroidHostBridge();
         webView.addJavascriptInterface(nativeBridge, "AndroidHost");
         webView.addJavascriptInterface(nativeBridge, "BaekhakNative");
         webView.setWebViewClient(new WebViewClient());
+        webView.setWebChromeClient(new WebChromeClient());
         configureAppWebView(webView);
 
         initScoreTts();
