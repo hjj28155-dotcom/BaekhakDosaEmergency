@@ -1,0 +1,23 @@
+name: Verify public compact MoveIcon page from Android browser
+on:
+  workflow_dispatch:
+  push:
+    branches: [fix-freedom-v3-screen-1244-20261022]
+    paths: ['.github/workflows/verify-public-moveicon-compact.yml']
+permissions: {contents: read}
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspect live GitHub Pages HTML and both unchanged APK link routes
+        run: |
+          set -euo pipefail
+          URL='https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/moveicon.html'
+          curl -fsSL --retry 4 --max-time 60 -H 'Cache-Control: no-cache' -A 'Mozilla/5.0 (Linux; Android 13; Mobile) AppleWebKit/537.36 Chrome/155.0 Safari/537.36' "$URL?fresh=20261023-compact-verified" -o /tmp/live.html
+          grep -q '이동아이콘 기능 안내 펼쳐보기' /tmp/live.html
+          grep -q '<details class="note">' /tmp/live.html
+          grep -q 'id="freedom-apk-route"' /tmp/live.html
+          grep -q 'href="./"' /tmp/live.html
+          grep -q 'id="moveicon-apk"' /tmp/live.html
+          grep -q 'Hanghae_MoveIcon_v1.0.79.apk' /tmp/live.html
+          echo 'PASS: public mobile browser receives compact moveicon.html with both original install routes'
