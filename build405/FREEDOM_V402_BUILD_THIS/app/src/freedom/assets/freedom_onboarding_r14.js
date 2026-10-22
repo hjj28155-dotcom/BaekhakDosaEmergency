@@ -21,7 +21,11 @@ function approvalState(){
  }catch(e){}
  return {};
 }
-function isApproved(q){return !!q&&(q.approved===true||q.status==='approved')}
+function isApproved(q){
+ if(!!q&&(q.approved===true||q.status==='approved'))return true;
+ try{const h=native();if(h&&typeof h.isSpecialApproved==='function')return h.isSpecialApproved()===true}catch(e){}
+ return false;
+}
 function marked(k){try{return localStorage.getItem(k)==='1'}catch(e){return false}}
 function mark(k){try{localStorage.setItem(k,'1')}catch(e){}}
 function clean(){
@@ -81,14 +85,30 @@ function showScroll(){
 }
 function showApproval(){
  if(stage===HOME||stage===GUIDE)return;
- if(isApproved(approvalState())){approvedOnce=true;showVideo(GUIDE);return}
+ const q=approvalState();
+ if(isApproved(q)){approvedOnce=true;showVideo(GUIDE);return}
  stage=APPROVAL;
- const q=approvalState(),pending=q.status==='pending'||q.has_request===true;
+ const pending=q.status==='pending'||q.has_request===true;
  const g=panel();
  g.innerHTML='<div style="max-width:620px;margin:8vh auto;padding:20px"><div style="border:1px solid #d9bc65;border-radius:18px;background:#082b45;padding:20px"><h2 style="text-align:center;color:#ffe29a">⚓ 항행의자유 설치 승인</h2><p style="line-height:1.6">설치승인을 받으면 안내동영상이 나오고, 동영상이 끝나면 홈화면으로 이동합니다.</p><input id="freedomR14Name" placeholder="본인 실명" style="width:100%;padding:13px;margin:8px 0;color:white;background:#051b2c;border:1px solid #6599b7;border-radius:10px"><input id="freedomR14Ref" placeholder="누구의 지인인지" style="width:100%;padding:13px;margin:8px 0;color:white;background:#051b2c;border:1px solid #6599b7;border-radius:10px"><div style="display:flex;gap:8px"><button id="freedomR14Request" style="flex:1;padding:14px;border-radius:11px;background:#765713;color:#fff;border:1px solid #d6b75e">승인요청</button><button id="freedomR14Check" style="flex:1;padding:14px;border-radius:11px;background:#115175;color:#fff;border:1px solid #84bdda">승인 확인</button></div><p id="freedomR14Status" style="text-align:center;color:#91ecc9">'+(pending?'승인대기 · 승인완료 후 승인 확인을 눌러주세요.':'승인요청을 진행해 주세요.')+'</p></div></div>';
  const message=g.querySelector('#freedomR14Status');
- g.querySelector('#freedomR14Request').onclick=()=>{
+ const requestBtn=g.querySelector('#freedomR14Request');
+ // 기존 승인요청이 있으면 중복 신청을 차단하고 기존 건만 조회.
+ if(pending){
+  requestBtn.disabled=true;
+  requestBtn.textContent='기존 승인 확인 중';
+  requestBtn.style.opacity='0.55';
+  g.querySelector('#freedomR14Name').style.display='none';
+  g.querySelector('#freedomR14Ref').style.display='none';
+  message.textContent='기존 승인기록을 확인 중입니다. 새 승인요청은 하지 마세요.';
+ }
+ requestBtn.onclick=()=>{
   const n=g.querySelector('#freedomR14Name').value.trim(),ref=g.querySelector('#freedomR14Ref').value.trim();
+  const existing=approvalState();
+  if(isApproved(existing)){approvedOnce=true;showVideo(GUIDE);return}
+  if(existing.has_request===true||existing.status==='pending'){
+   message.textContent='이미 승인요청이 접수되어 있습니다. 승인 확인을 눌러주세요.';return
+  }
   if(!n||!ref){message.textContent='실명과 지인 정보를 모두 입력해 주세요.';return}
   const h=native();
   if(!h||typeof h.requestSpecialApproval!=='function'){message.textContent='승인요청 기능을 연결하지 못했습니다.';return}
@@ -122,7 +142,7 @@ window.showFinalScroll=showScroll;
 window.onSpecialApprovalState=function(payload){
  let q={};
  try{q=typeof payload==='string'?JSON.parse(payload||'{}'):(payload||{})}catch(e){}
- if(isApproved(q)){
+ if(isApproved(q)||isApproved(approvalState())){
   approvedOnce=true;
   try{SPECIAL_APPROVED=true;D.specialApprovalUnlocked=true;save()}catch(e){}
   if(marked(DONE))goHome();else showVideo(GUIDE);
