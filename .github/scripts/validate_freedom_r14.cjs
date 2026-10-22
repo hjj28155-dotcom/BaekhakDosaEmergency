@@ -96,5 +96,16 @@ assert.equal(firstApproved.logs.approvedRuntime,0);
 // Pending user returns to approval, not movie loop
 const pending=createHarness({status:'pending',has_request:true});
 assert.ok(pending.get('freedomR14Check'));
+assert.equal(pending.get('freedomR14Request').disabled,true,'existing approval application cannot be resent');
 assert.equal(pending.logs.approvedRuntime,0);
-console.log('PASS: five-stage onboarding + approval gate + two distinct videos + DB1 and UI parse');
+assert.equal(pending.logs.submitted.length,0,'no automatic duplicate approval');
+pending.get('freedomR14Request').onclick();
+assert.equal(pending.logs.submitted.length,0,'duplicate approval guarded even when handler invoked');
+// Captain phone already approved: no approval request screen on upgrade or relaunch.
+const captain=createHarness({approved:true,status:'approved'});
+assert.equal(captain.get('freedomR14Request'),null,'captain must not see request button');
+assert.equal(captain.get('freedomR14Video').src,'freedom_onboarding_postscroll_20260928.mp4');
+assert.equal(captain.logs.submitted.length,0);
+captain.get('freedomR14Video').dispatch('ended');
+assert.equal(captain.logs.approvedRuntime,1);
+console.log('PASS: scroll -> installation video -> approval -> guide -> home, captain approved bypasses re-request');
