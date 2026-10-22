@@ -1669,83 +1669,21 @@ public class MainActivity extends Activity {
     private static final String LATEST_APK_URL =
             "https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/latest-apk";
 
-    private void chooseApkUpdateFile() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            runOnUiThread(() -> {
-                try {
-                    Intent s = new Intent("com.sec.android.app.myfiles.PICK_DATA");
-                    s.setPackage("com.sec.android.app.myfiles");
-                    s.putExtra("CONTENT_TYPE", "*/*");
-                    s.putExtra("FOLDERPATH", "/storage/emulated/0/Download");
-                    s.addCategory(Intent.CATEGORY_DEFAULT);
-                    s.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    startActivityForResult(s, APK_UPDATE_PICKER);
-                    Toast.makeText(this, "내 파일에서 업데이트 APK를 선택해 주세요.", Toast.LENGTH_SHORT).show();
-                } catch (Exception e) {
-                    Toast.makeText(this, "업데이트 파일 선택기를 열지 못했습니다.", Toast.LENGTH_LONG).show();
-                }
-            });
-            return;
-        }
-
-        Toast.makeText(this, "최신 업데이트를 다운로드합니다.", Toast.LENGTH_SHORT).show();
-        new Thread(() -> {
-            HttpURLConnection conn = null;
-            Uri apkUri = null;
+    private static final String OFFICIAL_UPDATE_PAGE = "https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/update.html";
+    private void openOfficialUpdateLink() {
+        runOnUiThread(() -> {
             try {
-                URL url = new URL(LATEST_APK_URL);
-                conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("GET");
-                conn.setConnectTimeout(20000);
-                conn.setReadTimeout(120000);
-                conn.setInstanceFollowRedirects(true);
-                conn.setUseCaches(false);
-                conn.setRequestProperty("Accept", "application/vnd.android.package-archive, application/octet-stream, */*");
-                conn.setRequestProperty("User-Agent", "FreedomApp/" + CONTENT_BUILD);
-
-                int code = conn.getResponseCode();
-                if (code < 200 || code >= 300) throw new Exception("HTTP " + code);
-
-                ContentValues values = new ContentValues();
-                values.put(MediaStore.Downloads.DISPLAY_NAME, "항행의자유_최신업데이트_" + (CONTENT_BUILD + 1) + ".apk");
-                values.put(MediaStore.Downloads.MIME_TYPE, "application/vnd.android.package-archive");
-                values.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
-                values.put(MediaStore.Downloads.IS_PENDING, 1);
-
-                apkUri = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
-                if (apkUri == null) throw new Exception("다운로드 파일 생성 실패");
-
-                try (InputStream in = conn.getInputStream();
-                     OutputStream out = getContentResolver().openOutputStream(apkUri, "w")) {
-                    if (out == null) throw new Exception("다운로드 저장 실패");
-                    byte[] buf = new byte[64 * 1024];
-                    int n;
-                    while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
-                    out.flush();
-                }
-
-                ContentValues done = new ContentValues();
-                done.put(MediaStore.Downloads.IS_PENDING, 0);
-                getContentResolver().update(apkUri, done, null, null);
-
-                final Uri installUri = apkUri;
-                runOnUiThread(() -> {
-                    Toast.makeText(this, "다운로드 완료 · 설치 화면을 엽니다.", Toast.LENGTH_SHORT).show();
-                    launchApkInstaller(installUri);
-                });
-            } catch (Exception e) {
-                final Uri failedUri = apkUri;
-                try {
-                    if (failedUri != null) getContentResolver().delete(failedUri, null, null);
-                } catch (Exception ignored) {}
-                final String msg = e.getMessage() == null ? "업데이트 다운로드 실패" : e.getMessage();
-                runOnUiThread(() ->
-                        Toast.makeText(this, "업데이트 다운로드 실패: " + msg, Toast.LENGTH_LONG).show());
-            } finally {
-                if (conn != null) conn.disconnect();
+                Uri uri=Uri.parse(OFFICIAL_UPDATE_PAGE);
+                Intent browser=new Intent(Intent.ACTION_VIEW,uri);
+                browser.addCategory(Intent.CATEGORY_BROWSABLE);
+                startActivity(browser);
+            } catch(Exception e) {
+                Toast.makeText(this,"공식 다운로드 링크를 열 수 없습니다. 인터넷 연결을 확인해 주세요.",Toast.LENGTH_LONG).show();
             }
-        }, "Freedom-ApkUpdate").start();
+        });
     }
+    // 기존 브리지/구버전 호출도 휴대폰 폴더 대신 다운로드 링크로 연결한다.
+    private void chooseApkUpdateFile() { openOfficialUpdateLink(); }
 
     private void launchApkInstaller(Uri uri) {
         try {
@@ -2113,6 +2051,7 @@ public class MainActivity extends Activity {
             });
         }
         @JavascriptInterface public void chooseApkUpdate() { chooseApkUpdateFile(); }
+        @JavascriptInterface public void openOfficialUpdateLink() { MainActivity.this.openOfficialUpdateLink(); }
         @JavascriptInterface public String getNativeVersion() {
             try {
                 android.content.pm.PackageInfo p = getPackageManager().getPackageInfo(getPackageName(), 0);
