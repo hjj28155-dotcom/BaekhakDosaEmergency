@@ -40,6 +40,11 @@ jobs:
           assert.match(html,/발표 후 당첨번호로 과거 조합을 새로 생성/);
           assert.ok(!html.includes("V330_AFTER='result';runAnalysisFromHome();return"));
           assert.match(html,/function v330OpenRound/);
+          assert.ok(html.includes("AndroidHost.openOfficialUpdateLink()"),'update must open official URL');
+          const java=fs.readFileSync('build405/FREEDOM_V402_BUILD_THIS/app/src/main/java/com/baekhak/centralcontrol/MainActivity.java','utf8');
+          assert.ok(java.includes('private void chooseApkUpdateFile() { openOfficialUpdateLink(); }'),'all Android update paths must open link');
+          assert.ok(java.includes('Intent.ACTION_VIEW,uri'),'use browser for update');
+          assert.ok(!java.includes('내 파일에서 업데이트 APK를 선택해 주세요.'),'remove file picker path');
           const ctx={window:{}};ctx.window.window=ctx.window;
           vm.runInNewContext(fs.readFileSync(p+'raw_bank.js','utf8'),ctx,{timeout:30000});
           assert.equal(Object.keys(ctx.window.V3_RAW_BANK).length,1244);
@@ -61,6 +66,16 @@ jobs:
           assert.equal(rendered.split('3/6').length-1,20);
           console.log('PASS: V4.0.35 latest features retained + DB1 1-1247 + 1244 score + 20 result rows');
           NODE
+      - name: Guarantee one persistent distribution signer before building
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.android
+          if test ! -s ~/.android/debug.keystore; then
+            keytool -genkeypair -keystore ~/.android/debug.keystore -storepass android -keypass android -alias androiddebugkey -dname 'CN=Hanghae Freedom V436 Distribution,O=Hanghae Freedom,C=KR' -keyalg RSA -keysize 2048 -validity 10000
+          fi
+          test -s ~/.android/debug.keystore
+          keytool -list -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey >/dev/null
+          echo 'Distribution key located, never export private key'
       - name: Build latest app with stable signing certificate
         working-directory: build405/FREEDOM_V402_BUILD_THIS
         run: |
