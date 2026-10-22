@@ -783,6 +783,30 @@ body:has(#modal[style*="display:block"]) .simpleHot{
 .r5actions{display:grid!important;grid-template-columns:1fr 1fr 1fr!important;gap:8px!important;margin-top:10px!important}
 @media(max-width:430px){.r5selector{grid-template-columns:repeat(3,1fr)!important}.r5selector .b{height:52px!important;font-size:15px!important}.r5grid{gap:4px!important}.r5group{padding:4px!important}.r5group h4{font-size:9px!important}.r5row{grid-template-columns:17px 1fr 28px!important;min-height:25px!important}.r5row.purchase{grid-template-columns:17px 1fr!important}.r5ball{width:17px!important;height:17px!important;flex-basis:17px!important;font-size:7px!important}.r5no,.r5hit{font-size:7px!important}.r5winning{gap:5px!important}.r5winning .r5ball{width:29px!important;height:29px!important;flex-basis:29px!important;font-size:11px!important}}
 </style>
+
+<style id="v340ResponsiveResultRepair">
+#modal.v340BackLabel .card{box-sizing:border-box!important;width:min(980px,calc(100vw - 8px))!important;max-width:calc(100vw - 8px)!important;padding:12px 8px 14px!important;overflow-x:hidden!important}
+#modal.v340BackLabel #mc,#modal.v340BackLabel .analysisCompact{box-sizing:border-box!important;width:100%!important;max-width:100%!important;min-width:0!important;overflow-x:hidden!important}
+#modal.v340BackLabel .r5grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;width:100%!important;min-width:0!important;gap:6px!important}
+#modal.v340BackLabel .r5group{box-sizing:border-box!important;min-width:0!important;max-width:100%!important;padding:4px!important;overflow:hidden!important}
+#modal.v340BackLabel .r5row{display:grid!important;grid-template-columns:clamp(13px,2vw,22px) minmax(0,1fr) clamp(24px,3.5vw,34px)!important;gap:2px!important;width:100%!important;min-width:0!important;box-sizing:border-box!important;align-items:center!important}
+#modal.v340BackLabel .r5row.purchase{grid-template-columns:clamp(13px,2vw,22px) minmax(0,1fr)!important}
+#modal.v340BackLabel .r5balls{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;width:100%!important;min-width:0!important;gap:2px!important;align-items:center!important}
+#modal.v340BackLabel .r5row .r5ball{box-sizing:border-box!important;display:flex!important;width:100%!important;max-width:24px!important;height:auto!important;min-width:0!important;aspect-ratio:1 / 1!important;flex:none!important;justify-self:center!important;padding:0!important;font-size:clamp(7px,1.3vw,11px)!important;line-height:1!important}
+#modal.v340BackLabel .r5hit{box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;max-width:34px!important;min-width:0!important;aspect-ratio:1 / 1!important;border:1px solid #81a9c5!important;border-radius:50%!important;background:linear-gradient(#17496b,#08263e)!important;color:#eaf5ff!important;font-size:clamp(7px,1.1vw,10px)!important;font-weight:900!important;white-space:nowrap!important}
+#modal.v340BackLabel .card>h2{font-size:clamp(16px,3.7vw,28px)!important}
+@media(max-width:450px){
+ #modal.v340BackLabel .card{padding:10px 6px 12px!important}
+ #modal.v340BackLabel .r5grid{gap:4px!important}
+ #modal.v340BackLabel .r5group{padding:3px!important}
+ #modal.v340BackLabel .r5row{grid-template-columns:13px minmax(0,1fr) 25px!important;gap:1px!important;min-height:26px!important}
+ #modal.v340BackLabel .r5row.purchase{grid-template-columns:13px minmax(0,1fr)!important}
+ #modal.v340BackLabel .r5balls{gap:1px!important}
+ #modal.v340BackLabel .r5row .r5ball{font-size:clamp(7px,1.8vw,9px)!important}
+ #modal.v340BackLabel .r5hit{font-size:8px!important}
+ #modal.v340BackLabel .r5no{font-size:9px!important}
+}
+</style>
 <style id="v335ApprovalHardLockStyle">
 #approvalHardLock{position:fixed;inset:0;z-index:2147483646;background:rgba(0,8,18,.38);color:#fff;display:flex;align-items:flex-end;justify-content:center;padding:18px 14px 26px;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif}
 #approvalHardLock .box{width:min(94vw,520px);background:rgba(7,35,57,.96);border:2px solid #d8b950;border-radius:18px;padding:17px 15px;text-align:center;box-shadow:0 16px 60px rgba(0,0,0,.72)}
@@ -832,7 +856,7 @@ body:has(#modal[style*="display:block"]) .simpleHot{
   </div>
 </div>
 <div id="modal" class="modal"><div class="card"><button class="b close" onclick="closeM()">닫기</button><h2 id="mt"></h2><div id="mc"></div></div></div>
-<script src="raw_bank.js"></script>
+<script src="raw_bank.js"></script><script src="db1_v1247_patch.js"></script>
 <script>
 const APP_BASE_VERSION='SHIPMATE_V3_FREEDOM_INTEGRATED_20260925'; const SHIPMATE_V3_UPDATE=true; const K='shipmate_v3_data';
 const GUIDE_VIDEO_URL_BASE='install_guide_final.mp4';
@@ -923,8 +947,8 @@ function closeInstallGuideVideo(reveal){
   /* FIX57: 설명서 재생 중에는 김광석 영상음악만 재생 */
 }
 
-if(!D.rounds)D.rounds={}; D.currentRound=1244; if(!D.notices)D.notices=[]; if(!D.approvalLog)D.approvalLog=[]; if(!D.suggestions)D.suggestions=[]; if(!D.historyNotes)D.historyNotes={}; if(!D.historyRound)D.historyRound=Math.min(Number(D.currentRound||1242),1242);
-const VISIBLE_ROUND_MIN=1240, VISIBLE_ROUND_MAX=1244;
+if(!D.rounds)D.rounds={}; D.currentRound=1247; if(!D.notices)D.notices=[]; if(!D.approvalLog)D.approvalLog=[]; if(!D.suggestions)D.suggestions=[]; if(!D.historyNotes)D.historyNotes={}; if(!D.historyRound)D.historyRound=Math.min(Number(D.currentRound||1242),1242);
+const VISIBLE_ROUND_MIN=1240, VISIBLE_ROUND_MAX=1247;
 const SPECIAL_APPROVAL_START_ROUND=1243;
 let SPECIAL_APPROVED=false,SPECIAL_APPROVAL_STATE={};
 let SPECIAL_APPROVAL_POLL_TIMER=null;
@@ -955,14 +979,14 @@ function bootSpecialApprovalAutoCheck(){
 }
 setTimeout(bootSpecialApprovalAutoCheck,1200);
 const PINNED_NOTICE={title:'',body:''};
-D.currentRound=1244;save();setTimeout(()=>{let q=document.getElementById('roundQuick');if(q)q.value=1244;let d=document.getElementById('homeRoundDirect');if(d)d.value=1244;refreshHomeUI()},0);
+D.currentRound=1247;save();setTimeout(()=>{let q=document.getElementById('roundQuick');if(q)q.value=1244;let d=document.getElementById('homeRoundDirect');if(d)d.value=1244;refreshHomeUI()},0);
 // 구버전 단일 메모가 있으면 현재 회차 데이터로 보존
 if(D.raw||D.buy||D.merge||D.score||D.compare){let r=String(D.currentRound);D.rounds[r]=D.rounds[r]||{};['raw','buy','merge','score','compare'].forEach(k=>{if(D[k]&&!D.rounds[r][k])D.rounds[r][k]=D[k]})}
-function save(){localStorage.setItem(K,JSON.stringify(D));refreshHomeUI()} function closeM(){let m=document.getElementById('modal');m.style.display='none';m.classList.remove('scoreOneScreen','musicOneScreen');document.querySelectorAll('.simpleHot').forEach(b=>b.style.pointerEvents='auto');document.body.style.overflowY='auto'}
+function save(){localStorage.setItem(K,JSON.stringify(D));refreshHomeUI()} function closeM(){let m=document.getElementById('modal');m.style.display='none';m.classList.remove('scoreOneScreen','musicOneScreen','v340BackLabel');document.querySelectorAll('.simpleHot').forEach(b=>b.style.pointerEvents='auto');document.body.style.overflowY='auto'}
 function approvalCounts(){let a=D.approvalLog||[];return {pending:a.filter(x=>x.status==='승인대기').length,approved:a.filter(x=>x.status==='승인완료').length,history:a.filter(x=>x.status==='승인완료'||x.status==='승인보류'||x.status==='배포완료'||x.status==='거절').length}}
 function refreshHomeUI(){try{let h=document.getElementById('homeRoundLabel');if(h)h.innerHTML='<b>제'+esc(cur())+'회</b><span>현재 작업 회차</span>';let st=document.getElementById('specialStateHome');if(st)st.textContent=SPECIAL_APPROVED?'완료':'대기';let am=document.getElementById('approvalMessage');if(am)am.textContent=SPECIAL_APPROVED?'특별승인 완료 · 1243회차 이후 이용 가능':'제1242회차까지 정상 이용 · 이후 특별승인';}catch(e){}}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-function cur(){let n=Number(D.currentRound||1244);if(n<1)n=1;if(n>1244)n=1244;D.currentRound=n;return String(n)} function R(){let r=cur();D.rounds[r]=D.rounds[r]||{};return D.rounds[r]}
+function cur(){let n=Number(D.currentRound||1244);if(n<1)n=1;if(n>1247)n=1247;D.currentRound=n;return String(n)} function R(){let r=cur();D.rounds[r]=D.rounds[r]||{};return D.rounds[r]}
 
 function v116RestoreDocumentedRoundData(){
   try{
@@ -1006,18 +1030,18 @@ function requireSpecialApprovalV117(target){
   return true;
 }
 
-function latestSimpleRawRound(){return 1244}
-function simpleRawRounds(){return [1243,1244]}
+function latestSimpleRawRound(){return 1247}
+function simpleRawRounds(){return [1246,1247]}
 function openSimpleRaw(){rawPage()}
 function simpleRawRoundHead(){let rr=simpleRawRounds(),n=Number(cur());if(!rr.includes(n))n=rr[1];return `<div class="panel goldline"><div class="label">원문분석 회차</div><div class="row"><button class="b ${n===rr[0]?'gold':''}" onclick="setSimpleRawRound(${rr[0]})">지난주 · 제${rr[0]}회</button><button class="b ${n===rr[1]?'gold':''}" onclick="setSimpleRawRound(${rr[1]})">금주 · 제${rr[1]}회</button></div><div class="small status" style="margin-top:8px">지난주와 금주 회차만 표시합니다.</div></div>`}
 function setSimpleRawRound(n){v123OpenVisibleRound(n)}
-function changeRawRound(delta){let rr=[1243,1244],n=Number(cur()),i=rr.indexOf(n);if(i<0)i=1;i=Math.max(0,Math.min(1,i+Number(delta||0)));if(setRound(rr[i]))rawPage()}
+function changeRawRound(delta){let rr=[1246,1247],n=Number(cur()),i=rr.indexOf(n);if(i<0)i=1;i=Math.max(0,Math.min(1,i+Number(delta||0)));if(setRound(rr[i]))rawPage()}
 
 function restoreEmbeddedRaw(){let b=rawBank(cur());if(!b){alert('이 회차의 내장 원문이 없습니다.');return}rawText.value=b.text||'';giText.value=b.gi||'';rawSource.value=b.source||'내장 원문은행';alert('제'+cur()+'회 내장 원문을 화면에 다시 불러왔습니다.')}
 function setRound(v){
  let n=parseInt(v,10);
  if(!Number.isFinite(n)||n<1)n=1244;
- if(n>1244)n=1244;
+ if(n>1247)n=1247;
  if(n>=SPECIAL_APPROVAL_START_ROUND&&!SPECIAL_APPROVED){
    D.pendingSpecialRound=n;
    try{localStorage.setItem(K,JSON.stringify(D))}catch(e){}
@@ -1255,8 +1279,8 @@ function onSpecialApprovalState(p){
   if(x)x.textContent='승인 상태 응답을 읽지 못했습니다. 확인을 다시 눌러 주세요.';
  }
 }
-function modal(title,html){let m=document.getElementById('modal');m.classList.remove('scoreOneScreen','musicOneScreen');document.getElementById('mt').textContent=title;document.getElementById('mc').innerHTML=html;document.querySelectorAll('.simpleHot').forEach(b=>b.style.pointerEvents='none');m.style.display='block';m.style.zIndex='2147483646';m.style.overflowY='auto';document.getElementById('mc').style.overflowY='auto'}
-function roundHead(sub){return `<div class="panel goldline"><div class="grid2"><div><div class="label">작업 회차</div><input id="roundInput" type="number" min="1240" max="1244" value="${esc(cur())}" onchange="setRound(this.value);openM('${sub}')"></div><div><div class="label">현재 저장 상태</div><div class="stat"><strong>${Object.keys(R()).length?'저장됨':'신규'}</strong><span class="small">제${esc(cur())}회</span></div></div></div></div>`}
+function modal(title,html){let m=document.getElementById('modal');m.classList.remove('scoreOneScreen','musicOneScreen','v340BackLabel');if(String(html).includes('class="analysisCompact v330print"'))m.classList.add('v340BackLabel');let close=m.querySelector('.close');if(close){close.textContent=m.classList.contains('v340BackLabel')?'이전':'닫기';close.setAttribute('onclick',m.classList.contains('v340BackLabel')?'rawPage()':'closeM()');}document.getElementById('mt').textContent=title;document.getElementById('mc').innerHTML=html;document.querySelectorAll('.simpleHot').forEach(b=>b.style.pointerEvents='none');m.style.display='block';m.style.zIndex='2147483646';m.style.overflowY='auto';document.getElementById('mc').style.overflowY='auto'}
+function roundHead(sub){return `<div class="panel goldline"><div class="grid2"><div><div class="label">작업 회차</div><input id="roundInput" type="number" min="1240" max="1247" value="${esc(cur())}" onchange="setRound(this.value);openM('${sub}')"></div><div><div class="label">현재 저장 상태</div><div class="stat"><strong>${Object.keys(R()).length?'저장됨':'신규'}</strong><span class="small">제${esc(cur())}회</span></div></div></div></div>`}
 function openM(k){if(k!=='approve'&&['buy','score','merge','db','compare'].includes(k)&&requireSpecialApprovalV117(cur()))return;if(k==='raw')return rawPage();if(k==='buy')return buyPage();if(k==='merge')return mergePage();if(k==='db')return dbPage();if(k==='approve')return specialApprovalPage();if(k==='score')return scorePage();if(k==='compare')return comparePage();if(k==='guide')return guidePage();if(k==='notice')return noticePage();if(k==='settings')return settingsPage();if(k==='total')return totalAnalysisPage();if(k==='history')return historyPage();if(k==='suggest')return suggestPage();if(k==='music')return musicPage();if(k==='update')return updatePage();if(k==='roundctl')return roundControlPage();if(k==='import')return legacyImportPage();}
 function isFilled(v){return String(v??'').trim()!==''}
 function buyHasData(b){return !!(b&&Array.isArray(b.combos)&&b.combos.some(isFilled))}
@@ -1266,7 +1290,7 @@ function rawHasData(r,n){return !!((r&&isFilled(r.text))||rawBank(n))}
 function userRawHasData(r){return !!(r&&(isFilled(r.text)||isFilled(r.gi)||isFilled(r.source)||isFilled(r.memo)))}
 function autoStamp(obj){obj.updated=new Date().toISOString();save()}
 function rawPage(){
- let n=Number(cur());if(!V330_RECENT.includes(n))n=1244;
+ let n=Number(cur());if(!V330_RECENT.includes(n))n=1247;
  modal('원문분석 · 최근 5회차',`<div class="panel goldline" style="padding:16px 12px"><div class="small status" style="text-align:center;margin-bottom:10px">현재회차 포함 최근 5회차</div><div class="r5selector">${V330_RECENT.map(r=>`<button class="b ${n===r?'gold':''}" onclick="v330OpenRound(${r})">${r}회</button>`).join('')}</div></div>`)
 }
 function saveRawAuto(){if(!document.getElementById('rawText'))return;let old=R().raw||{};R().raw={...old,text:rawText.value,gi:(giText.value.trim()===cur()?'':giText.value),source:rawSource.value,memo:rawMemo.value,updated:new Date().toISOString()};save()}
@@ -1440,7 +1464,7 @@ function totalRounds(kind){let keys=Object.keys(D.rounds||{}).map(Number).filter
 function totalAnalysisPage(kind='final'){let labels={final:'최종분석회차',scored:'성적기록회차',success:'성공회차'},arr=totalRounds(kind);let rows=arr.slice(0,100).map(r=>{let x=D.rounds[String(r)]||{},status=x.buy?.locked?'공식잠금':(x.legacy?.status|| (buyHasData(x.buy)?'분석저장':'-'));return `<tr><td>${r}</td><td>${esc(status)}</td><td>${roundBestHit(r)}/6</td><td><button class="b" style="padding:5px 8px" onclick="D.historyRound=${r};save();historyPage(${r})">보기</button></td></tr>`}).join('');modal('총 분석 결과',`<div class="grid3"><div class="stat"><strong>${totalRounds('final').length}</strong><span>최종분석</span></div><div class="stat"><strong>${totalRounds('scored').length}</strong><span>성적기록</span></div><div class="stat"><strong>${totalRounds('success').length}</strong><span>3/6+ 성공</span></div></div><div class="catTabs"><button class="${kind==='final'?'active':''}" onclick="totalAnalysisPage('final')">최종분석회차</button><button class="${kind==='scored'?'active':''}" onclick="totalAnalysisPage('scored')">성적기록회차</button><button class="${kind==='success'?'active':''}" onclick="totalAnalysisPage('success')">성공회차</button></div><div class="panel"><table class="table"><thead><tr><th>회차</th><th>상태</th><th>최고적중</th><th>상세</th></tr></thead><tbody>${rows||'<tr><td colspan="4">해당 기록이 없습니다.</td></tr>'}</tbody></table></div><div class="small">V3 운영원칙에 따라 HOLD 분류는 사용하지 않고, 최종분석·성적기록·성공회차로 정리합니다.</div>`)}
 function legacyGroups(round){return D.rounds?.[String(round)]?.legacy?.groups||[]}
 function legacyPackHtml(round){let gs=legacyGroups(round);if(!gs.length)return '<div class="panel small">이 회차에 이관된 20조합 자료가 없습니다.</div>';return gs.map(g=>{let rr=(g.rows||[]).map(x=>`<tr><td>${esc(x.slot||'')}</td><td>${esc((x.game||[]).join(', '))}</td><td>${esc(x.hits??'-')}</td><td>${x.bonusHit?'보너스':''}</td><td>${esc(x.rank||'—')}</td></tr>`).join('');return `<div class="legacyPack"><h4>${esc(g.name||'조합')}</h4><table><thead><tr><th>#</th><th>번호</th><th>적중</th><th>보너스</th><th>등수</th></tr></thead><tbody>${rr}</tbody></table></div>`}).join('')}
-function historyPage(forced){let n=parseInt(forced??D.historyRound??cur(),10);if(!Number.isFinite(n))n=Number(cur());if(n<1)n=1;if(n>1244)n=1244;D.historyRound=n;save();let x=D.rounds[String(n)]||{},raw=embeddedRaw(n),score=x.score||{},legacy=x.legacy||{};let win=score.result||(legacy.winning?.numbers||[]).join(' ');let bonus=score.bonus||legacy.winning?.bonus||'';modal('과거회차 독립보기',`<div class="historyWarn">과거회차 화면은 현재 실전 작업회차와 분리됩니다. 여기에서 회차를 이동해도 현재 작업 회차 제${esc(cur())}회는 바뀌지 않습니다.</div><div class="panel goldline"><div class="grid3"><button class="b" onclick="historyPage(${n-1})">◀ 이전</button><div class="stat"><strong>제${n}회</strong><span>과거 독립보기</span></div><button class="b" onclick="historyPage(${n+1})">다음 ▶</button></div></div><div class="panel"><h3>원문</h3><div class="small" style="white-space:pre-wrap">${esc(raw||'내장 원문 없음')}</div></div><div class="panel"><h3>당첨결과</h3><div>당첨번호: <b>${esc(win||'미보존')}</b></div><div>보너스: <b>${esc(bonus||'-')}</b></div><div>최고 적중: <b>${roundBestHit(n)}/6</b></div></div>${legacyPackHtml(n)}<div class="panel"><div class="label">과거회차 개인 메모</div><textarea id="histMemo" rows="5" oninput="D.historyNotes[String(${n})]=this.value;save()">${esc(D.historyNotes[String(n)]||'')}</textarea><div class="small">이 메모는 공식 RESULT-BEFORE에 합치지 않습니다.</div></div>`)}
+function historyPage(forced){let n=parseInt(forced??D.historyRound??cur(),10);if(!Number.isFinite(n))n=Number(cur());if(n<1)n=1;if(n>1247)n=1247;D.historyRound=n;save();let x=D.rounds[String(n)]||{},raw=embeddedRaw(n),score=x.score||{},legacy=x.legacy||{};let win=score.result||(legacy.winning?.numbers||[]).join(' ');let bonus=score.bonus||legacy.winning?.bonus||'';modal('과거회차 독립보기',`<div class="historyWarn">과거회차 화면은 현재 실전 작업회차와 분리됩니다. 여기에서 회차를 이동해도 현재 작업 회차 제${esc(cur())}회는 바뀌지 않습니다.</div><div class="panel goldline"><div class="grid3"><button class="b" onclick="historyPage(${n-1})">◀ 이전</button><div class="stat"><strong>제${n}회</strong><span>과거 독립보기</span></div><button class="b" onclick="historyPage(${n+1})">다음 ▶</button></div></div><div class="panel"><h3>원문</h3><div class="small" style="white-space:pre-wrap">${esc(raw||'내장 원문 없음')}</div></div><div class="panel"><h3>당첨결과</h3><div>당첨번호: <b>${esc(win||'미보존')}</b></div><div>보너스: <b>${esc(bonus||'-')}</b></div><div>최고 적중: <b>${roundBestHit(n)}/6</b></div></div>${legacyPackHtml(n)}<div class="panel"><div class="label">과거회차 개인 메모</div><textarea id="histMemo" rows="5" oninput="D.historyNotes[String(${n})]=this.value;save()">${esc(D.historyNotes[String(n)]||'')}</textarea><div class="small">이 메모는 공식 RESULT-BEFORE에 합치지 않습니다.</div></div>`)}
 function suggestPage(){let rows=(D.suggestions||[]).slice().reverse().map(x=>`<div class="panel"><div class="small">${esc(x.time?.slice(0,16).replace('T',' ')||'')}</div><div style="white-space:pre-wrap">${esc(x.body||'')}</div></div>`).join('');modal('건의사항',`<div class="panel"><div class="label">건의 내용</div><textarea id="suggestBody" rows="6" placeholder="V3 개선사항이나 다음 작업 내용을 입력하세요"></textarea><button class="b purple" onclick="addSuggestion()">건의 저장</button></div>${rows||'<div class="panel small">저장된 건의사항이 없습니다.</div>'}`)}
 function addSuggestion(){let b=document.getElementById('suggestBody')?.value.trim()||'';if(!b){alert('건의 내용을 입력하세요.');return}D.suggestions.push({time:new Date().toISOString(),body:b});save();suggestPage()}
 function legacyImportPage(){let i=D.legacyImport||{};modal('V2 자료이관',`<div class="panel goldline"><h3>V2 / 기존 MASTER 백업 가져오기</h3><div class="small">백업 JSON을 V3 형식으로 안전하게 추가합니다. 현재 V3에서 이미 저장한 내용은 덮어쓰지 않습니다.</div><div class="row" style="margin-top:10px"><button class="b green" onclick="chooseLegacyBackup()">백업 JSON 파일 선택</button></div></div><div class="panel"><h3>백업내용 직접 붙여넣기</h3><div class="small">V2에서 백업내용이 클립보드로만 나온 경우 여기에 그대로 붙여넣어도 됩니다.</div><textarea id="legacyPaste" rows="8" placeholder="{ &quot;format&quot;: &quot;BAEKHAK_DOSA_MASTER_BACKUP_V1&quot;, ... }"></textarea><button class="b green" onclick="importLegacyPaste()">붙여넣은 백업 이관</button></div><div class="grid2"><div class="stat"><strong>${esc(i.rounds||0)}</strong><span>이관 회차</span></div><div class="stat"><strong>${esc(i.packs||0)}</strong><span>이관 조합팩</span></div></div><div class="panel"><div>최근 이관 파일: <b>${esc(i.name||'없음')}</b></div><div class="small">${esc(i.importedAt||'')}</div></div>`)}
@@ -1644,13 +1668,15 @@ function v126Ensure1243Auto20(){
 }
 
 
-const V330_RECENT=[1240,1241,1242,1243,1244];
+const V330_RECENT=[1243,1244,1245,1246,1247];
 const V330_WIN={
 1240:{nums:[11,13,19,20,31,44],bonus:27},
 1241:{nums:[7,13,16,23,24,43],bonus:9},
 1242:{nums:[2,4,10,16,31,41],bonus:9},
 1243:{nums:[9,18,24,38,43,44],bonus:35},
-1244:{nums:[1,13,18,26,34,38],bonus:25}
+1244:{nums:[1,13,18,26,34,38],bonus:25},
+1245:{nums:[4,5,25,28,32,42],bonus:12},
+1246:{nums:[16,22,23,24,27,28],bonus:6}
 };
 let V330_AFTER='';
 function v330GroupsResult(games,result){
@@ -1926,10 +1952,10 @@ function v330Print(){
 }
 function v330ResultPage(round){
  const w=V330_WIN[round],a=R().analysis||{},games=(a.auto20||[]).slice(0,20);
- if(games.length!==20){V330_AFTER='result';runAnalysisFromHome();return}
+ if(games.length!==20){modal(`제${round}회 · 채점 자료 확인`,`<div class="panel warn"><strong>해당 회차에서 당첨 전에 저장한 자동분석 20조합 기록을 찾지 못했습니다.</strong><p>발표 후 당첨번호로 과거 조합을 새로 생성하거나 채점하지 않습니다. 원본 기록이 확인된 경우에만 결과를 표시합니다.</p><button class="b" onclick="rawPage()">이전</button></div>`);return}
  const set=new Set(w.nums),scores=games.map(g=>g.filter(n=>set.has(Number(n))).length),best=Math.max(...scores),wins=scores.filter(x=>x>=3).length;
  const banner=best>=3?`<div class="scoreHero success"><strong>🎉 축하합니다!</strong><span>최고 ${best}/6 적중 · 3/6 이상 ${wins}조합</span></div>`:`<div class="scoreHero fail"><strong>이번 회차는 아쉽게 지나갔습니다.</strong><span>제${round}회 최고 ${best}/6 적중 · 다음 분석에 이어갑니다.</span></div>`;
- modal(`제${round}회 · 자동분석 20조합 결과`,`<div class="analysisCompact v330print">${banner}<div class="panel goldline centerTitle"><h3>당첨번호</h3><div class="r5winning">${w.nums.map(n=>`<span class="r5ball hit">${n}</span>`).join('')}</div><div style="font-weight:950;color:#ffe58a;font-size:19px">보너스 ${w.bonus}</div></div><div class="r5grid">${v330GroupsResult(games,w.nums)}</div><div class="r5actions"><button class="b gold" onclick="v330Print()">🖨 인쇄</button><button class="b" onclick="rawPage()">회차선택</button><button class="b" onclick="closeM()">닫기</button></div></div>`);
+ modal(`제${round}회 · 자동분석 20조합 결과`,`<div class="analysisCompact v330print">${banner}<div class="panel goldline centerTitle"><h3>당첨번호</h3><div class="r5winning">${w.nums.map(n=>`<span class="r5ball hit">${n}</span>`).join('')}</div><div style="font-weight:950;color:#ffe58a;font-size:19px">보너스 ${w.bonus}</div></div><div class="r5grid">${v330GroupsResult(games,w.nums)}</div><div class="r5actions"><button class="b gold" onclick="v330Print()">🖨 인쇄</button><button class="b" onclick="rawPage()">회차선택</button><button class="b" onclick="rawPage()">이전</button></div></div>`);
  setTimeout(()=>{
    try{
      if(best>=3)showFanfare(round,best,wins);
@@ -1940,9 +1966,9 @@ function v330ResultPage(round){
 function v330PurchasePage(round){
  const a=R().analysis||{},games=(a.auto20||[]).slice(0,20);
  if(games.length!==20){V330_AFTER='purchase';runAnalysisFromHome();return}
- modal(`제${round}회 · 이번주 구매번호`,`<div class="analysisCompact v330print"><div class="scoreHero success"><strong>자동분석 20조합</strong><span>비상용 분석엔진 · 후보우주 기반 · 외부번호 자동추가 없음</span></div><div class="r5grid">${v330GroupsPurchase(games)}</div><div class="r5actions"><button class="b gold" onclick="v330Print()">🖨 인쇄</button><button class="b" onclick="rawPage()">회차선택</button><button class="b" onclick="closeM()">닫기</button></div></div>`);
+ modal(`제${round}회 · 이번주 구매번호`,`<div class="analysisCompact v330print"><div class="scoreHero success"><strong>자동분석 20조합</strong><span>비상용 분석엔진 · 후보우주 기반 · 외부번호 자동추가 없음</span></div><div class="r5grid">${v330GroupsPurchase(games)}</div><div class="r5actions"><button class="b gold" onclick="v330Print()">🖨 인쇄</button><button class="b" onclick="rawPage()">회차선택</button><button class="b" onclick="rawPage()">이전</button></div></div>`);
 }
-function v330OpenRound(n){n=Number(n);if(!V330_RECENT.includes(n))n=1244;if(!setRound(n))return;if(V330_WIN[n])v330ResultPage(n);else v330PurchasePage(n)}
+function v330OpenRound(n){n=Number(n);if(!V330_RECENT.includes(n))n=1247;if(!setRound(n))return;if(n===1247){let b=rawBank(1247);modal('제1247회 · 백학도사 비법신서 원문',`<div class="panel goldline"><h3>원문 보관 자료 · 공식 당첨결과 아님</h3><div style="white-space:pre-wrap;line-height:1.9;text-align:left">${esc(b&&b.text||'원문 없음')}</div><p class="small">${esc(b&&b.source||'')}</p><button class="b" onclick="rawPage()">이전</button></div>`);return}if(V330_WIN[n])v330ResultPage(n);else v330PurchasePage(n)}
 
 function v124Round1243ResultPage(){
   if(!v126Ensure1243Auto20()){
@@ -2221,7 +2247,7 @@ function settingsPage(){
     </div>
     <div class="panel">
       <div class="label">기본 작업 회차</div>
-      <input id="settingsRoundInput" type="number" min="1240" max="1244" inputmode="numeric" value="${esc(cur())}">
+      <input id="settingsRoundInput" type="number" min="1240" max="1247" inputmode="numeric" value="${esc(cur())}">
       <div class="row">
         <button class="b" onclick="if(setRound(document.getElementById('settingsRoundInput').value)){alert('기본 회차 저장 완료');settingsPage()}">저장</button>
         <button class="b gold" onclick="backup()">전체 백업</button>
