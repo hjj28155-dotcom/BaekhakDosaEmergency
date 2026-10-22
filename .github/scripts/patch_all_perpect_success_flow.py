@@ -44,19 +44,11 @@ js=r'''
   }
   function waitForRequest(){
     const q=summary();
-    if(q.approved===true){noticeVideo();return;}
+    if(q.approved===true){finish();return;}
     if(q.has_request===true||q.status==='pending'){
-      noticeVideo();return;
+      pending();return;
     }
     setTimeout(waitForRequest,800);
-  }
-  function noticeVideo(){
-    remove('approvalHardLock');
-    const g=gate();
-    const src='freedom_onboarding_postscroll_20260928.mp4';
-    g.innerHTML='<div style="position:absolute;inset:0;background:#000;display:flex;flex-direction:column"><div style="height:54px;display:flex;align-items:center;justify-content:center;color:#ffe07a;font-weight:900">안내동영상</div><video id="apsNoticeVideo" controls playsinline preload="auto" style="flex:1;width:100%;object-fit:contain;background:#000" src="'+src+'"></video><div style="padding:10px;text-align:center">안내동영상 종료 후 승인대기 화면으로 이동합니다.</div></div>';
-    const v=document.getElementById('apsNoticeVideo');try{v.load();const z=v.play();if(z&&z.catch)z.catch(()=>{});}catch(e){}
-    v.addEventListener('ended',pending,{once:true});
   }
   function pending(){
     const g=gate();
@@ -81,7 +73,7 @@ js=r'''
     if(q.approved===true&&done){remove('startupVideoGate');remove('approvalHardLock');document.body.style.overflow='';try{if(window.unlockApprovedApp)window.unlockApprovedApp();}catch(e){};return;}
     scroll();
   }
-  window.__ALL_PERPECT_SUCCESS_FLOW__={boot,scroll,installVideo,approval,noticeVideo,pending,finish};
+  window.__ALL_PERPECT_SUCCESS_FLOW__={boot,scroll,installVideo,approval,pending,finish};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,80),{once:true});else setTimeout(boot,80);
 })();
 </script>
