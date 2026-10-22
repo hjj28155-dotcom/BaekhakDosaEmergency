@@ -1,0 +1,31 @@
+name: Confirm live seven-stage Freedom V4.0.39 on canonical link
+on:
+  push:
+    branches: [fix-freedom-v3-screen-1244-20261022]
+    paths: [.github/workflows/verify-freedom-v439-live-seven-stage.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate_live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Confirm exact public URL serves seven-stage guide and V4.0.39 only
+        run: |
+          set -euo pipefail
+          URL='https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/moveicon.html'
+          CHECK='v4.0.39-seven-stage-final/HanghaeFreedom_V4.0.39_DB1_1247_FINAL.apk'
+          for i in $(seq 1 22); do
+            curl -fsSL -H 'Cache-Control: no-cache' --max-time 25 "$URL?verify=v439-seven-stage-$i" -o /tmp/public-seven.html || true
+            if grep -q 'V7-SEVEN-STAGE-20261023' /tmp/public-seven.html && grep -q "$CHECK" /tmp/public-seven.html && ! grep -q 'Hanghae_MoveIcon_' /tmp/public-seven.html; then
+              echo 'PASS: exact public URL now serves seven-stage Freedom V4.0.39 without MoveIcon APK'
+              grep -o "$CHECK" /tmp/public-seven.html | head -1
+              curl -fsSI --max-time 25 'https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/freedom_guide_latest.mp4' | head -12
+              exit 0
+            fi
+            echo "Public publishing not finished, live verification attempt $i"
+            sleep 15
+          done
+          echo 'FAIL: source is not yet the released V4.0.39'
+          exit 1
