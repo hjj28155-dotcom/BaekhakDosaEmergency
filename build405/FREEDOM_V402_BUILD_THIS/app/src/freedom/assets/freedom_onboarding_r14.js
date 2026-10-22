@@ -52,6 +52,7 @@ function goHome(){
 function showVideo(type){
  if(stage===HOME)return;
  const pre=type===INSTALL;
+ if(stage===(pre?INSTALL:GUIDE))return;
  if(!pre&&!approvedOnce&&!isApproved(approvalState())){showApproval();return}
  stage=pre?INSTALL:GUIDE;
  if(!pre)approvedOnce=true;
