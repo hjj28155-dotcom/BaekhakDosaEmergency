@@ -35,10 +35,10 @@ jobs:
           assert.match(html,/db1_v1247_patch[.]js/);
           assert.match(html,/v340ResponsiveResultRepair/);
           assert.match(html,/v340BackLabel/);
-          assert.match(html,/const V330_RECENT=\\[1243,1244,1245,1246,1247\\]/);
-          assert.match(html,/1244:\\{nums:\\[1,13,18,26,34,38\\],bonus:25\\}/);
+          assert.ok(html.includes('const V330_RECENT=[1243,1244,1245,1246,1247]'));
+          assert.ok(html.includes('1244:{nums:[1,13,18,26,34,38],bonus:25}'));
           assert.match(html,/발표 후 당첨번호로 과거 조합을 새로 생성/);
-          assert.doesNotMatch(html,/V330_AFTER='result';runAnalysisFromHome\\(\\);return/);
+          assert.ok(!html.includes("V330_AFTER='result';runAnalysisFromHome();return"));
           assert.match(html,/function v330OpenRound/);
           const ctx={window:{}};ctx.window.window=ctx.window;
           vm.runInNewContext(fs.readFileSync(p+'raw_bank.js','utf8'),ctx,{timeout:30000});
@@ -50,11 +50,11 @@ jobs:
           assert.equal(ctx.window.V3_RAW_BANK['1244'].text,original);
           for(let n=1;n<=1247;n++){
             const x=ctx.window.V3_RAW_BANK[String(n)];
-            assert.equal(x.text.split(/\\r?\\n/).filter(Boolean).length,6,'round '+n);
+            assert.equal(x.text.replaceAll(String.fromCharCode(13),'').split(String.fromCharCode(10)).filter(Boolean).length,6,'round '+n);
           }
-          const groups=html.match(/function v330GroupsResult\\(games,result\\)\\{[\\s\\S]*?\\n\\}\\nfunction v330GroupsPurchase/);
-          assert.ok(groups,'result groups source present');
-          const fx=vm.runInNewContext('('+groups[0].slice(0,groups[0].lastIndexOf('function v330GroupsPurchase')).trim()+')');
+          const groupStart=html.indexOf('function v330GroupsResult(games,result){'),groupEnd=html.indexOf('function v330GroupsPurchase',groupStart);
+          assert.ok(groupStart>=0&&groupEnd>groupStart,'result groups source present');
+          const fx=vm.runInNewContext('('+html.slice(groupStart,groupEnd).trim()+')');
           const games=Array.from({length:20},(_,i)=>[1,8,13,22,34,40]);
           const rendered=fx(games,[1,13,18,26,34,38]);
           assert.equal((rendered.match(/class="r5row"/g)||[]).length,20);
