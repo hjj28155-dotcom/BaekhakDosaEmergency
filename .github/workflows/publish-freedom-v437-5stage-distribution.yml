@@ -1,0 +1,138 @@
+name: Freedom V4.0.37 final distribution APK
+on:
+  push:
+    branches:
+      - fix-freedom-v3-screen-1244-20261022
+    paths:
+      - '.github/workflows/publish-freedom-v437-5stage-distribution.yml'
+      - 'build405/FREEDOM_V402_BUILD_THIS/app/build.gradle'
+      - 'build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/index.html'
+      - 'build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/freedom_onboarding_r14.js'
+      - '.github/scripts/validate_freedom_r14.cjs'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  final_release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Restore persistent Freedom signing identity
+        id: stable_signer
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: freedom-v436-production-debug-signer-20261022
+          fail-on-cache-miss: true
+      - name: Validate exact onboarding sequence and regression tests
+        run: |
+          set -euo pipefail
+          node .github/scripts/validate_freedom_r14.cjs
+      - name: Validate current latest source, original six-sentence bank and interface
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+          const p='build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/';
+          const html=fs.readFileSync(p+'index.html','utf8');
+          const d=fs.readFileSync(p+'db1_v1247_patch.js','utf8');
+          assert.match(html,/db1_v1247_patch[.]js/);
+          assert.match(html,/v340ResponsiveResultRepair/);
+          assert.match(html,/v340BackLabel/);
+          assert.ok(html.includes('const V330_RECENT=[1243,1244,1245,1246,1247]'));
+          assert.ok(html.includes('1244:{nums:[1,13,18,26,34,38],bonus:25}'));
+          assert.match(html,/발표 후 당첨번호로 과거 조합을 새로 생성/);
+          assert.ok(!html.includes("V330_AFTER='result';runAnalysisFromHome();return"));
+          assert.match(html,/function v330OpenRound/);
+          assert.ok(html.includes("AndroidHost.openOfficialUpdateLink()"),'update must open official URL');
+          const java=fs.readFileSync('build405/FREEDOM_V402_BUILD_THIS/app/src/main/java/com/baekhak/centralcontrol/MainActivity.java','utf8');
+          assert.ok(java.includes('private void chooseApkUpdateFile() { openOfficialUpdateLink(); }'),'all Android update paths must open link');
+          assert.ok(java.includes('Intent.ACTION_VIEW,uri'),'use browser for update');
+          assert.ok(!java.includes('내 파일에서 업데이트 APK를 선택해 주세요.'),'remove file picker path');
+          const ctx={window:{}};ctx.window.window=ctx.window;
+          vm.runInNewContext(fs.readFileSync(p+'raw_bank.js','utf8'),ctx,{timeout:30000});
+          assert.equal(Object.keys(ctx.window.V3_RAW_BANK).length,1244);
+          const original=ctx.window.V3_RAW_BANK['1244'].text;
+          vm.runInNewContext(d,ctx,{timeout:30000});
+          assert.equal(ctx.window.DB1_UPDATE_1247.status,'PASS',JSON.stringify(ctx.window.DB1_UPDATE_1247));
+          assert.equal(ctx.window.V3_RAW_BANK_META.count,1247);
+          assert.equal(ctx.window.V3_RAW_BANK['1244'].text,original);
+          for(let n=1;n<=1247;n++){
+            const x=ctx.window.V3_RAW_BANK[String(n)];
+            assert.equal(x.text.replaceAll(String.fromCharCode(13),'').split(String.fromCharCode(10)).filter(Boolean).length,6,'round '+n);
+          }
+          const groupStart=html.indexOf('function v330GroupsResult(games,result){'),groupEnd=html.indexOf('function v330GroupsPurchase',groupStart);
+          assert.ok(groupStart>=0&&groupEnd>groupStart,'result groups source present');
+          const fx=vm.runInNewContext('('+html.slice(groupStart,groupEnd).trim()+')');
+          const games=Array.from({length:20},(_,i)=>[1,8,13,22,34,40]);
+          const rendered=fx(games,[1,13,18,26,34,38]);
+          assert.equal((rendered.match(/class="r5row"/g)||[]).length,20);
+          assert.equal(rendered.split('3/6').length-1,20);
+          console.log('PASS: V4.0.35 latest features retained + DB1 1-1247 + 1244 score + 20 result rows');
+          NODE
+      - name: Guarantee one persistent distribution signer before building
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.android
+          test -s ~/.android/debug.keystore || { echo 'HOLD: production upgrade signer not restored'; exit 9; }
+          test -s ~/.android/debug.keystore
+          keytool -list -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey >/dev/null
+          echo 'Distribution key located, never export private key'
+      - name: Build latest app with stable signing certificate
+        working-directory: build405/FREEDOM_V402_BUILD_THIS
+        run: |
+          set -euo pipefail
+          chmod +x gradlew
+          sed -i '/org.gradle.java.home/d' gradle.properties
+          ./gradlew assembleDebug --no-daemon
+      - name: Validate signed release APK and preserve signing certificate
+        run: |
+          set -euo pipefail
+          APK=build405/FREEDOM_V402_BUILD_THIS/app/build/outputs/apk/debug/HANGHAE_FREEDOM_V4_0_37_FINAL.apk
+          test -s "$APK"
+          unzip -t "$APK" | tail -1
+          unzip -p "$APK" assets/index.html | grep -q 'v340ResponsiveResultRepair'
+          unzip -p "$APK" assets/db1_v1247_patch.js | grep -q 'DB1_UPDATE_1247'
+          unzip -p "$APK" assets/index.html | grep -q 'freedom_onboarding_r14.js'
+          unzip -p "$APK" assets/freedom_onboarding_r14.js | grep -q 'install_guide_final.mp4'
+          unzip -l "$APK" | grep -q 'assets/install_guide_final.mp4'
+          unzip -l "$APK" | grep -q 'assets/freedom_onboarding_postscroll_20260928.mp4'
+          AAPT=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
+          "$AAPT" dump badging "$APK" | tee v437-badging.txt | head -6
+          grep -q "package: name='com.navigator.freedom.v3final' versionCode='40037'" v437-badging.txt
+          "$APKSIGNER" verify --print-certs "$APK" | tee v437-signature.txt
+          test -s ~/.android/debug.keystore
+          KEY_SHA=$(keytool -list -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey | grep -m1 SHA256: | sed 's/.*SHA256: //' | tr -d ':' | tr '[:upper:]' '[:lower:]')
+          APK_SHA=$(grep 'certificate SHA-256 digest:' v437-signature.txt | head -1 | awk '{print $NF}')
+          test "$KEY_SHA" = "$APK_SHA"
+          test "$APK_SHA" = "bf281903f422fe925a23a7e72e82d690eaef899236e6d10365143ff32d9beb00" || { echo 'HOLD: signer changed from V4.0.36'; exit 8; }
+          echo "FINAL_RELEASE_SIGNER=$APK_SHA"
+          cp "$APK" HanghaeFreedom_V4.0.37_DB1_1247_FINAL.apk
+          sha256sum HanghaeFreedom_V4.0.37_DB1_1247_FINAL.apk > HanghaeFreedom_V4.0.37_DB1_1247_FINAL.apk.sha256
+          test "$(stat -c%s HanghaeFreedom_V4.0.37_DB1_1247_FINAL.apk)" -gt 30000000
+      - name: Attach release artifact for verification
+        uses: actions/upload-artifact@v4
+        with:
+          name: Freedom_V4_0_37_Final_Verified_APK
+          path: |
+            HanghaeFreedom_V4.0.37_DB1_1247_FINAL.apk
+            HanghaeFreedom_V4.0.37_DB1_1247_FINAL.apk.sha256
+            v437-signature.txt
+          if-no-files-found: error
+          retention-days: 30
+      - name: Publish verified public downloadable APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG=v4.0.37-5stage-final
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo 'Release tag exists. Refusing overwrite; preserve immutable prior APK.'
+            exit 1
+          fi
+          gh release create "$TAG" HanghaeFreedom_V4.0.37_DB1_1247_FINAL.apk HanghaeFreedom_V4.0.37_DB1_1247_FINAL.apk.sha256 --target "${GITHUB_SHA}" --title '항행의자유 V4.0.37 정식 배포 APK' --notes 'V4.0.36의 DB-1 원문 1~1247회·20조합·1244회 결과 화면 보존. 신규 설치 순서: 두루마리 → 설치동영상 → 승인요청 → 승인완료 후 안내동영상 → 홈화면. 중복 승인화면/외부 링크 이동 제거. V4.0.36과 동일한 서명키로 배포합니다.'
