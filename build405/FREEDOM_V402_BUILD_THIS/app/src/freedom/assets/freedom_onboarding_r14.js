@@ -6,7 +6,7 @@ const DONE='freedom_r14_guide_video_finished_40037';
 const INSTALL_DONE='freedom_r14_install_video_finished';
 const INTRO_INSTALL='install_guide_final.mp4';
 const INTRO_GUIDE='freedom_onboarding_postscroll_20260928.mp4';
-const HUB='https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/moveicon.html';
+const HUB='https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/update.html';
 const GATE='freedomR14FullScreen';
 let stage='init',approvedOnce=false;
 const native=()=>{try{return window.AndroidHost||window.BaekhakNative||null}catch(e){return null}};
@@ -158,10 +158,10 @@ window.onSpecialApprovalState=function(payload){
  }
 };
 window.updatePage=function(){
- modal('항행의자유 업데이트','<div class="panel goldline"><h3>공식 설치 및 업데이트</h3><p>이동아이콘 공동 배포 페이지로 연결합니다.</p><button class="b gold" id="freedomR14Update" style="width:100%">공식 설치 및 업데이트 링크 열기</button></div>');
+ modal('항행의자유 업데이트','<div class="panel goldline"><h3>공식 설치 및 업데이트</h3><p>항행의자유 전용 APK 다운로드 페이지로 연결합니다.</p><button class="b gold" id="freedomR14Update" style="width:100%">공식 설치 및 업데이트 링크 열기</button></div>');
  const b=document.getElementById('freedomR14Update');
  if(b)b.onclick=()=>{
-  try{const h=native();if(h&&h.openRadioPage){h.openRadioPage(HUB);return}window.open(HUB,'_blank')}catch(e){alert('업데이트 링크를 열지 못했습니다.')}
+  try{const h=native();if(h&&h.openOfficialUpdateLink){h.openOfficialUpdateLink();return}if(h&&h.openRadioPage){h.openRadioPage(HUB);return}window.open(HUB,'_blank')}catch(e){alert('업데이트 링크를 열지 못했습니다.')}
  };
 };
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
