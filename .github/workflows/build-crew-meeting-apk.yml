@@ -61,17 +61,17 @@ jobs:
           test "$NEW_CERT" = "e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be"
           echo "Recovery app signer pinned: $NEW_CERT"
           "$AAPT" dump badging "$APK" | head -5
-          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting.compact' versionCode='104'"
+          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting.compact' versionCode='105'"
           ! "$AAPT" dump badging "$APK" | grep -q "package: name='com.baekhak.dosa.v4'"
           mkdir -p crew-meeting-android/releases
-          cp "$APK" crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.4.apk
-          (cd crew-meeting-android/releases && sha256sum HANGHAE_CREW_MEETING_1.0.4.apk > HANGHAE_CREW_MEETING_1.0.4.apk.sha256)
+          cp "$APK" crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.5.apk
+          (cd crew-meeting-android/releases && sha256sum HANGHAE_CREW_MEETING_1.0.5.apk > HANGHAE_CREW_MEETING_1.0.5.apk.sha256)
       - uses: actions/upload-artifact@v4
         with:
-          name: HANGHAE-CREW-MEETING-1.0.4-APK
+          name: HANGHAE-CREW-MEETING-1.0.5-APK
           path: |
-            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.4.apk
-            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.4.apk.sha256
+            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.5.apk
+            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.5.apk.sha256
           if-no-files-found: error
           retention-days: 30
       - name: Publish only this isolated pilot to feature branch
@@ -79,8 +79,8 @@ jobs:
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -f crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.4.apk crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.4.apk.sha256
+          git add -f crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.5.apk crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.5.apk.sha256
           if ! git diff --cached --quiet; then
-            git commit -m 'Build isolated crew meeting v1.0.4 HANDOFF APK (no V3/V7 changes)'
+            git commit -m 'Build isolated crew meeting v1.0.5 LAUNCH APK (no V3/V7 changes)'
             git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
