@@ -1,6 +1,7 @@
 package kr.hanghae.crewmeeting;
 
 import android.app.Activity;
+import android.view.WindowManager;
 import android.os.Bundle;
 import android.content.Intent;
 import android.net.Uri;
@@ -17,18 +18,22 @@ import android.widget.Toast;
 
 public final class MainActivity extends Activity {
     private static final String ROOM_URL =
-        "https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/crew-meeting.html";
+        "https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/crew-meeting.html?app_version=101";
     private static final int FILE_CHOOSER_CODE = 502;
     private WebView web;
     private ValueCallback<Uri[]> fileCallback;
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         web = new WebView(this);
+        web.setVerticalScrollBarEnabled(false);
         setContentView(web);
         WebSettings settings = web.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
+        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         settings.setAllowFileAccess(false);
         settings.setAllowContentAccess(true);
         settings.setJavaScriptCanOpenWindowsAutomatically(false);
