@@ -63,3 +63,12 @@
 - HTML JavaScript syntax verified. V3 URL registry and RLS grant status independently read back. GitHub Pages deployment run #40172711562 to verify success.
 - **Unverified**: device access to original ChatGPT conversation with user's authenticated account, new buttons on actual Android phone, V7 exact original address and linking, full end-to-end authenticated API tests.
 - Next step: Verify GitHub Pages deployment; captain can tap "원본 항해사" in 1.0.3 after login. For V7, obtain its actual ChatGPT conversation URL, one-time register in app. Original chats remain separate; do not imply automatic shared-message forwarding.
+
+
+### 2026-10-25 정정 · V5 옛 항해사 URL은 V3 현재 원본으로 확정 불가
+- 과거 라이브러리 인계자료 `V5_이사인계_기존원문_20261015_복사본.txt`에서 찾은 항해사 URL은 **2026-10-15 V5 원본 기록**임. 선장이 2026-10-24까지 사용한 V3 원본 `기존항해사 - 북극성 - 7316` 대화와 동일하다는 근거 없음.
+- 잘못된 원본 연결을 막기 위해 해당 URL은 **비공개 DB 참고기록으로 보존**하되, 앱 자동 원본방 버튼의 활성 링크 목록에서 제외.
+- 수정 Edge Function **v5 ACTIVE**, `GET original-links`는 선장이 직접 등록한 `added_by=captain_registered`만 표시; `crew-meeting-android/server/crew-meeting-edge-v5-index.ts`, commit `6d6ae555b4bd2187c93fc91bf6560e3b9371f0e9`.
+- 통제관 `통제관 - 푸른등대`와 V3 항해사 `기존항해사 - 북극성 - 7316`의 정확한 채팅 `/c/` URL은 아직 미확보. 선장이 ChatGPT 원본 대화방에서 브라우저 **주소창 URL**을 복사하여 한 번만 등록해야 해당 버튼이 활성화됨. `/share/` 주소를 사용하면 대화 재개 불가.
+- 공개 GitHub Pages 원본 3버튼 웹 UI run #40172711562 `success` 확인. 앱 새 빌드는 필요 없으나 선장폰 실사용 미검증.
+- 외부 Android APK는 원본 ChatGPT 개인 세션에 메시지를 자동 주고받는 API를 제공받지 않음. 세 원본 ChatGPT 세션의 실시간 회의 연결은 **불가**; 원본 방을 직접 열어 선장이 대화하는 방식만 제공.
