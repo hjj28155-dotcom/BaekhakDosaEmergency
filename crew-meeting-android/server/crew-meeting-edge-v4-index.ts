@@ -180,8 +180,11 @@ Deno.serve(async(req)=>{
     let normalized;
     try{
       const u=new URL(url);
-      if(u.protocol!=="https:"||u.hostname!=="chatgpt.com"||u.port||u.username||u.password||
-         !(/^\\/c\\/[0-9a-f-]{36}\\/?$/i.test(u.pathname)||/^\\/g\\/g-[0-9a-z-]+\\/c\\/[0-9a-f-]{36}\\/?$/i.test(u.pathname)))
+      const parts=u.pathname.split("/").filter(Boolean);
+      const uuid=/^[0-9a-f-]{36}$/i;
+      const pathValid=(parts.length===2&&parts[0]==="c"&&uuid.test(parts[1]))||
+        (parts.length===4&&parts[0]==="g"&&/^g-[a-z0-9-]+$/i.test(parts[1])&&parts[2]==="c"&&uuid.test(parts[3]));
+      if(u.protocol!=="https:"||u.hostname!=="chatgpt.com"||u.port||u.username||u.password||!pathValid)
         throw Error("NOT_AN_ORIGINAL_CHAT");
       u.search="";u.hash="";normalized=u.href;
     }catch{return json(req,{error:"ORIGINAL_CHAT_URL_REQUIRED"},400);}
