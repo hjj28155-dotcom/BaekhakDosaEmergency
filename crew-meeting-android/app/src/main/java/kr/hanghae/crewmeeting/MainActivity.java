@@ -21,7 +21,7 @@ import android.widget.Toast;
 
 public final class MainActivity extends Activity {
     private static final String ROOM_URL =
-        "https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/crew-meeting.html?app_version=105";
+        "https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/crew-meeting.html?app_version=106";
     private static final int FILE_CHOOSER_CODE = 502;
     private static final int PICK_V3_APP = 503;
     private static final int PICK_V7_APP = 504;
