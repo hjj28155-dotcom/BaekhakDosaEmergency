@@ -1,3 +1,19 @@
+
+## 2026-10-25 · 공동회의 독립판 1.0.4-HANDOFF 정식 빌드 · 기존 앱 통합 질문
+
+- 선장 지시: 한 번 업데이트할 수 있도록 APK 제공. 추가 문의: 공동회의 앱에 V3 + V7을 넣을 수 있는지.
+- **새 업데이트판**: `kr.hanghae.crewmeeting.compact` / Android `versionCode 104` / `versionName 1.0.4-HANDOFF` (이전 공동회의 1.0.3에서 업데이트하는 독립 앱).
+- Android WebView가 `https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/crew-meeting.html?app_version=104` 로드. 최신 원본 3방 바로가기, 이사 후 주소 갱신/구방 보존, 첫머리 인계양식 복사 기능 유지.
+- 코드 수정: `crew-meeting-android/app/build.gradle`, `crew-meeting-android/app/src/main/java/kr/hanghae/crewmeeting/MainActivity.java`, `crew-meeting-android/app/src/main/assets/signing-identity.json`, `.github/workflows/build-crew-meeting-apk.yml`.
+- 기존 CI 서명키 캐시 `crew-meeting-independent-pilot-signing-v1` 재사용. 복구한 서명 인증서 SHA256 `e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be` 와 비교해 다를 경우 빌드 실패하도록 유지.
+- 성공 CI GitHub Actions `#40191047213` `completed/success`. 패키지 `kr.hanghae.crewmeeting.compact` / versionCode `104` 검사, Android `apksigner verify` / 서명 인증서 검사 통과.
+- APK 파일 SHA256: `ad4b71950c272b5feae01b5c9a5bb326b0bdee9382c49cb6a713a3ea95152a4d`. GitHub blob `4dd3a879c5f0e3c07cd2177b336dafa578538354`.
+- 공개 repo main 새 경로: `crew-meeting-releases/HANGHAE_CREW_MEETING_1.0.4.apk`, checksum `crew-meeting-releases/HANGHAE_CREW_MEETING_1.0.4.apk.sha256`; Git commit `2b0de0c252efd8c2b2992d5daa51b12d9fafd79e`. 이전 1.0.3 배포본은 삭제하거나 교체하지 않음.
+- 설치 페이지 `crew-meeting-releases/index.html` 1.0.4 버전·파일명·SHA 수정, main `a8309e8318c350d842d32f3eb1672414acef06b6`. Pages run `#40191392543` 성공 여부 최종 확인 필요.
+- V3/V7 두 앱 통합 원칙: 단일 공동회의 지휘화면에서 V3/V7 **별도 메뉴, 직접 열기, API 경유의 보고서 조회/검증**은 추가 구현 가능. 그러나 기존 V3/V7 APK 패키지/서명/데이터를 임의 병합하거나 기존 ChatGPT 원본 대화를 외부 API처럼 자동 송수신한다고 주장 금지. V3와 V7 각각 원본은 독립 보존.
+- **미검증:** 선장폰 실제 1.0.3→1.0.4 업데이트 성공, 기존 로컬 인증/원본 URL 유지, V3/V7 실행 연계 및 실제 통합 기능(현재 1.0.4에는 엔진 이식 없음). 개인 서명키 장기 보존 복구도 미확보.
+- 다음 작업: 1.0.4 선장폰 정상 업데이트/로컬 데이터 보존 확인 → V3와 V7 각 앱의 안정적인 연결 인터페이스와 인증된 보고서 읽기 연동 설계/검증. 사용자 승인 없는 V3/V7 APK 업데이트/데이터 변경 금지.
+
 ## ⚓ 2026-10-25 최신 지시 승계 — 원본방 등록 확인 및 새방 첫머리 강제양식 (시험 완료, 모바일 미검증)
 
 - 선장 보고: V3 항해사·V7 통제관에서도 현재 대화방 안에서 대화 가능하도록 구현됨. **선장 보고로만 접수**했으며 원본 세 ChatGPT 세션 사이의 메시지 자동전달·공유방 종단간 성공은 확인하지 않음.
