@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="192dp" android:height="192dp"
+    android:viewportWidth="512" android:viewportHeight="512">
+    <!-- Nautical flagship mark: gold ship's wheel / compass, aircraft carrier, waves -->
+    <path android:fillColor="#07192F" android:pathData="M0,0h512v512h-512z"/>
+    <path android:fillColor="#102F52" android:pathData="M22,22 L490,22 490,490 22,490 Z"/>
+    <path android:fillColor="#184775" android:pathData="M36,36 L476,36 476,476 36,476 Z"/>
+    <path android:fillColor="#0C2948" android:pathData="M44,44 L468,44 468,468 44,468 Z"/>
+    <path android:fillColor="#0A1D33" android:pathData="M56,56 L456,56 456,456 56,456 Z"/>
+    <path android:fillColor="#0D3354" android:pathData="M64,296 Q256,235 448,296 L448,448 64,448z"/>
+    <!-- Bright gold frame -->
+    <path android:fillColor="#F4C776" android:strokeColor="#C88B36" android:strokeWidth="4"
+          android:pathData="M256,32 A224,224 0,1 1,255.9 32"/>
+    <path android:fillColor="#0D2543" android:pathData="M256,48 A208,208 0,1 1,255.9 48"/>
+    <path android:fillColor="#D99C48" android:pathData="M256,61 A195,195 0,1 1,255.9 61"/>
+    <path android:fillColor="#06223D" android:pathData="M256,72 A184,184 0,1 1,255.9 72"/>
+    <!-- Nautical wheel / compass ring -->
+    <path android:fillColor="#EFC77D" android:pathData="M256,91 A117,117 0,1 1,255.9 91"/>
+    <path android:fillColor="#082641" android:pathData="M256,101 A107,107 0,1 1,255.9 101"/>
+    <path android:fillColor="#E2B25D" android:pathData="M256,111 A97,97 0,1 1,255.9 111"/>
+    <path android:fillColor="#0D2A46" android:pathData="M256,116 A92,92 0,1 1,255.9 116"/>
+    <!-- Eight-point compass rose -->
+    <path android:fillColor="#FFDF93" android:pathData="M256,121 L277,222 256,230 235,222 Z"/>
+    <path android:fillColor="#C3893A" android:pathData="M256,121 L256,230 235,222 Z"/>
+    <path android:fillColor="#FFE7A8" android:pathData="M256,311 L277,212 256,204 235,212 Z"/>
+    <path android:fillColor="#BE7A30" android:pathData="M256,311 L256,204 235,212 Z"/>
+    <path android:fillColor="#FBD084" android:pathData="M166,216 L267,195 275,216 267,237 Z"/>
+    <path android:fillColor="#AF752E" android:pathData="M166,216 L275,216 267,237 Z"/>
+    <path android:fillColor="#FAD486" android:pathData="M346,216 L244,195 237,216 244,237 Z"/>
+    <path android:fillColor="#BC803A" android:pathData="M346,216 L237,216 244,237 Z"/>
+    <path android:fillColor="#9BD8EF" android:pathData="M191,150 L256,197 244,210 Z"/>
+    <path android:fillColor="#C3974A" android:pathData="M321,150 L256,197 268,210 Z"/>
+    <path android:fillColor="#9BD8EF" android:pathData="M191,280 L256,234 244,222 Z"/>
+    <path android:fillColor="#C3974A" android:pathData="M321,280 L256,234 268,222 Z"/>
+    <path android:fillColor="#FFF4D6" android:pathData="M256,200 A16,16 0,1 1,255.9 200"/>
+    <path android:fillColor="#B67C32" android:pathData="M256,208 A8,8 0,1 1,255.9 208"/>
+    <!-- Gold-accented aircraft carrier -->
+    <path android:fillColor="#061522" android:strokeColor="#F6D181" android:strokeWidth="7"
+        android:pathData="M95,350 L410,350 382,385 318,406 290,447 256,458 222,447 194,406 130,385 Z"/>
+    <path android:fillColor="#64889F" android:pathData="M101,352 L404,352 378,377 308,396 284,435 256,446 228,435 204,396 134,377 Z"/>
+    <path android:fillColor="#D8ECF5" android:pathData="M113,353 L397,353 375,360 135,360 Z"/>
+    <path android:fillColor="#17344D" android:pathData="M148,344 L148,311 176,311 193,344 Z"/>
+    <path android:fillColor="#F2D88C" android:pathData="M145,311 L180,311 186,316 145,316 Z"/>
+    <path android:strokeColor="#FCE8AA" android:strokeWidth="3" android:pathData="M165,310 L165,290 M152,296 L182,296 M255,365 L255,435"/>
+    <path android:fillColor="#F4C878" android:pathData="M186,396 A8,8 0,1 1,185.9 396 M256,430 A8,8 0,1 1,255.9 430 M326,396 A8,8 0,1 1,325.9 396"/>
+    <!-- Blue water and white foam -->
+    <path android:fillColor="#0C679C" android:pathData="M56,453 Q95,429 131,446 Q169,469 210,446 Q256,421 302,446 Q348,470 392,446 Q424,432 456,451 L456,468 56,468 Z"/>
+    <path android:fillColor="#59C4E7" android:pathData="M52,455 Q97,434 144,455 Q190,469 230,453 Q280,431 330,454 Q386,471 456,450 L456,457 Q400,485 343,463 Q280,444 234,463 Q186,481 133,463 Q87,444 52,464 Z"/>
+</vector>
