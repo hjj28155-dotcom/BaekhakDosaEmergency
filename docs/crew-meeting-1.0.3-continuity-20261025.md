@@ -1,3 +1,10 @@
+### 최종 검증 보완 — 원본 3방 공유판
+- GitHub Pages workflow #40202568587 `completed/success` / main commit `997e1b89005b044c83897346dead2b355c7fa4fa`. 공동회의 원격 HTML 공용 공유판 버튼 배포 성공; 기존 APK 버전 `1.0.6-REPORTS`을 새로 빌드하거나 V3/V7 앱을 변경하지 않음.
+- 새 Edge server 업무 이벤트 경로 코드 단위 모의시험 8개 PASS: 인증 없는 GET 401, PATCH 405, 빈 POST 400, 정상 선장 POST 200, 임의 role navigator 사칭 POST 요청 시 서버가 저장 역할 captain으로 고정, 기록 출처는 `DECLARED_NOT_SESSION_VERIFIED`, 저장/조회 및 자동 원본 ChatGPT 연동 플래그 false. 실제 인증된 HTTP 요청의 종단간 시험은 아직 못했고 휴대폰에서 실제 새 공유판/메시지 표시 검증도 미실시.
+- 원본 링크 서버 레지스트리 확인: `navigator`, `controller` 두 역할만 선장 등록(`captain_registered`)됨. `linkofficer` 원본 ChatGPT 주소는 등록되어 있지 않음(본 등록 DB 조회 기준). 따라서 3방 원본 직접 이동도 미완료이며, 현 단계에서 자동 실시간 동기화 성공으로 보고 금지.
+- 개인정보 보호: 새 공유판 데이터 0건으로 실제 original-chat 자동 출처 가짜 메시지 없음, 새 테이블 RLS ON, anon/authenticated/PUBLIC grant 없음. 원본 채팅 URL·고정 입장키 출력/변경 없음.
+- 다음 실제 점검: 선장폰 공동회의 앱 1.0.6에서 `📡 세 원본방 업무 공유판` 표시 및 선장 메시지 1건 저장 확인 → 원본 항해사/통제관/중앙연결관 각 ChatGPT 원본방에서 역할 안내 1회 전달·연결된 Supabase 도구 권한 확인 → 해당 방에서 요청 시 SELECT 및 자신의 글 INSERT → 앱의 약 4초 내 새 행 반영 확인. 이후 원본방이 무인 상태에서 자동 응답하도록 만들 수 있는 공식 도구/API 제공 여부 추가 판단. 현재는 불가능으로 HOLD.
+
 ## ⚓ 2026-10-25 — 원본 3방 공동 통신 기반 1차 구축 (원본 자동연동은 HOLD)
 
 **선장 지시:** “세방의 실시간 연동 문제 해결해야죠.” V3 원본 항해사, V7 원본 통제관, 중앙연결관 기존 ChatGPT 대화 3방의 공동회의 통신을 최우선 작업으로 전환. 별도의 새 AI 또는 기존 채팅방인 척하는 응답으로 대체하지 말 것.
