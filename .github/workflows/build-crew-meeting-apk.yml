@@ -37,6 +37,11 @@ jobs:
         with:
           path: ~/.android/debug.keystore
           key: crew-meeting-independent-pilot-signing-v1
+      - name: Diagnose Android debug signing source (public metadata only)
+        working-directory: crew-meeting-android
+        run: |
+          set -euo pipefail
+          gradle :app:signingReport --no-daemon 2>&1 | grep -E "^(Variant:|Config:|Store:|Alias:|SHA-256:|SHA256:|Valid until:)" || true
       - name: Abort if original signing key is missing
         run: |
           set -euo pipefail
