@@ -140,6 +140,7 @@ footer{display:none}
 #handoffPanel>.actions button{flex:1 1 120px;min-height:34px;padding:7px;font-size:.73rem}
 @media(max-height:630px){#handoffOpen{min-height:25px;padding:3px 7px}}
 
+#relayCopyPreview[hidden]{display:none!important}
 /* Original-room MANUAL relay: never imply a separate API AI is the ChatGPT original. */
 #relayOpen{flex:none;min-height:30px;padding:5px 8px;background:#e1bd7b;color:#142b3d;font-size:.76rem}
 #relayPanel{flex:none;padding:10px;background:#112c43;border:1px solid #bb9768;border-radius:11px;max-height:65dvh;overflow-y:auto;overscroll-behavior:contain}
@@ -183,6 +184,8 @@ footer{display:none}
   <select id="relaySessionSelect" aria-label="저장된 회람 지시"></select>
   <div id="relaySessionNotice" class="relayNote">회람을 시작하면 담당자별 복사와 답변 기록이 표시됩니다.</div>
   <div id="relayRoleCards"></div>
+  <label for="relayCopyPreview">전달문·회람록 미리보기 (복사 실패 시 길게 눌러 직접 복사)</label>
+  <textarea id="relayCopyPreview" readonly rows="4" hidden aria-label="원본방에 전달할 텍스트 미리보기"></textarea>
   <div id="relayStatus" role="status" aria-live="polite">기존 ChatGPT 원본방의 답변은 자동으로 수집되지 않습니다.</div>
 </section>
 <button id="handoffOpen" type="button">📋 새방 첫머리 필수 인계양식</button>
@@ -502,6 +505,8 @@ function relayTranscript(record){
  return out.join('\n');
 }
 async function relayCopyText(text,statusElement){
+ $('relayCopyPreview').hidden=false;
+ $('relayCopyPreview').value=text;
  var ok=false;
  try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(text);ok=true;}}catch(e){}
  if(!ok){
