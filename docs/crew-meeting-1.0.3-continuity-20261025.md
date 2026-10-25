@@ -1,3 +1,16 @@
+## 2026-10-25 / 선장폰 V3·V7 설치확인 보고 접수 → 공동회의 1.0.5 별도 앱 실행기
+
+- **선장 최신 정보:** V3 항해사와 V7 중앙통제실은 선장폰에 이미 설치되어 있음. 이는 선장 보고 기준이며 실제 단말 설치 목록이나 실행 결과를 서버에서 직접 읽은 것은 아님. 재설치·APK 합병 불필요.
+- **구현 목적:** 공동회의 앱 안에 '📲 V3 항해사앱 실행', '📲 V7 중앙통제실 실행' 버튼 및 역할별 '연결 변경' 추가. 정확한 V3/V7 Android package ID가 확보되지 않아 **선장폰의 OS 앱 선택창에서 설치된 실제 앱을 최초 1회 고르고 이후 저장된 ComponentName으로 실행**. 사용자 확인 없는 패키지 추정·잘못된 앱 자동 매핑 금지.
+- 원본 V3·V7 앱을 합치거나 개조하지 않음. Android 앱 실행 `Intent.ACTION_PICK_ACTIVITY` + `Intent.ACTION_MAIN/CATEGORY_LAUNCHER`, 선택 결과를 공동회의 앱의 비공개 SharedPreferences `crew_meeting_installed_app_links_v1`에 역할별로 기록. 앱이 삭제/업데이트되어 실행 컴포넌트가 바뀌면 다시 선택 가능. JS bridge `CrewInstalledApps.openInstalled('v3'|'v7', Boolean)` 외 임의 앱 오픈/패키지 선택 외부 호출은 제공하지 않음.
+- 별도 공동회의 앱 1.0.5-LAUNCH, `kr.hanghae.crewmeeting.compact` / Android versionCode `105`. WebView 원격 주소 `?app_version=105`. Android 코드·Gradle·서명정체성·CI만 연구 기능 브랜치에서 수정; V3·V7 소스·DB·기기승인/서명키 불변.
+- GitHub Actions CI run #40194638263 `completed/success`. 기존 서명 지문 `e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be` 강제 비교, 기존 앱 package ID 유지, 버전코드 105 검증, apksigner 검증 통과.
+- APK SHA256 `0a0f15a866471a7ec6071536acd1fc5f9bf4641cb13d8dd651f80cc7d5cedcde` (파일 15574바이트). Git Blob SHA `64d72ae02019f3ce979ee6e2717c65353eb49080`; GitHub main 공개 경로 `crew-meeting-releases/HANGHAE_CREW_MEETING_1.0.5.apk` (main commit `851ede9671b1a21cf5c84b81d7831fcc8c2b6326`). 별도 해시 파일 존재, 압축 구조 및 SHA 검사 통과. 이전 1.0.4 릴리스 보존.
+- GitHub main 웹 UI 버튼 commit `61126906d6412ea7765afba047a1d0a61c591afd`; 설치 페이지 최신화 commit `d95a2c01966ffb2538e17079622a2d52b19f80bb`. Native 브리지 버튼 역할/재선택 전달 기능 JS 모의 호출 검증 PASS. Pages run #40194882637 성공 여부 후속 확인 필요.
+- **정확한 기능 범위:** 이는 두 기존 **Android 앱을 공동회의에서 실행**하는 것이며 두 앱 엔진을 동일 프로세스에 이식하거나, ChatGPT 원본 대화 3방을 자동으로 메시지 송수신시키는 기능이 아님. 원본 채팅 바로가기와 수동 회람은 별도 유지.
+- **미검증:** 선장폰 기존 1.0.4→1.0.5 앱 업데이트/로컬 설정 보존, OS 앱 선택화면에 V3/V7 표시, 최초 저장 후 클릭 실행, 뒤로 돌아왔을 때 공동회의 화면 상태 유지. 수동 확인 필요. 개인 서명키 장기 보존 사본도 여전히 미확보.
+- **다음 안전 단계:** 선장폰에서 기존 공동회의 1.0.4 삭제하지 않고 1.0.5 동일서명 업데이트 → V3/V7 각각 설치앱 선택창에서 한 번 선택 → 이후 버튼 실행/돌아오기 검증. 그 뒤 조회/보고서 연동을 API 권한검증 후 별도 진행.
+
 
 - **최종 Pages 배포 검증:** GitHub Actions #40193662736 `completed/success`, 배포 대상 main SHA `5b8796a4ee08f25c7ee762aa52bc5cac9959c62c`. 1.0.4 APK 웹 URL에서 신규 회람 UI 표시 대상 확정. Android 선장폰 실제 복사·왕복·로컬저장 테스트는 미실시.
 ## 2026-10-25 / 선장 '진행하십시오' — 1.0.4 앱 원본방 회람 대화 1차 구현
