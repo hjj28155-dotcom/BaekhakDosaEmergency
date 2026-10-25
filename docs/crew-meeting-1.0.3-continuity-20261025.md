@@ -1,3 +1,14 @@
+## ⚓ 2026-10-25 · 공동회의 APK 업데이트 경로 Google Drive 고정
+
+- 선장 지시: 새 APK 업데이트 시 폴더 탐색 없이 **현재 ChatGPT 대화방에서 직접 누를 수 있는 구글드라이브 고정 링크** 제공.
+- Google Drive 신규 등록 정본: `항행의자유_공동회의_최신업데이트.apk`, Drive file ID `1Ddg-fGo2q3JfowTjRTNUxmXPQ46CkUZL` (선장 계정의 연결된 Google Drive).
+- Drive가 제공한 실제 파일 주소: `https://drive.google.com/file/d/1Ddg-fGo2q3JfowTjRTNUxmXPQ46CkUZL/view?usp=drivesdk`. 링크 공유·외부 공개 설정은 변경하지 않음. 연결 계정에서 열 수 있는 파일.
+- 현재 업로드된 내용: 공동회의 `1.0.6-REPORTS` APK, 15,618 bytes, SHA-256 `8452b96f3f25b9d806535eb790b3614853f8afd4d8243ac74fb2d2723fb016a6`.
+- **검증:** Drive `upload_file` 성공 및 반환 file ID 확인 → Drive `fetch`로 직접 원본 다시 다운로드 → 원래 대화 첨부 APK와 바이너리 동일(sha256/byte comparison PASS).
+- 차기 업데이트에서는 기존 **동일 Drive file ID**에 `Google_Drive.update_file(fileId, file_uri)`로 바이너리만 덮어씌우고 파일명을 `항행의자유_공동회의_최신업데이트.apk`으로 유지. **새 파일 생성으로 주소를 바꾸지 않는다.** 수정 전에는 동일 app package와 원본 고정 서명, 버전 증가, SHA256 검증을 필수로 수행하고 기존 V3/V7 설치본·원본 기록은 변경하지 않는다.
+- 사용자 UX: 본 대화에 고정 Drive 파일 링크를 직접 게재. Drive 파일 화면에서 다운로드하고 Android가 제시하는 설치/업데이트 확인을 누르는 과정은 시스템상 남으며, 앱이 강제로 무단 설치하지 않음. 폴더를 직접 찾아갈 필요 없음.
+- 공동회의 1.0.6의 실제 선장폰 설치, 서버 V7 보고서 조회 및 V3 내보내기 파일 미리보기는 아직 선장 확인 대기.
+
 
 - **APK 최종 산출물 확인:** GitHub Actions run #40197046078의 Android SDK, 원본 서명키 복구, 빌드, `apksigner` 인증서/패키지·versionCode 검사, SHA256 생성, artifact 업로드 단계는 모두 **success**. 작업 전체 status는 마지막 `Publish only this isolated pilot to feature branch` 단계에서 **failure**, 따라서 GitHub 고정 공개 설치 페이지에는 1.0.6 게시 완료라고 주장하지 않음.
 - 검증 완료한 artifact ID `12600332803` (`HANGHAE-CREW-MEETING-1.0.6-APK`)을 내려받아 압축 해제 후 실제 Android APK(15,618바이트) 무결성/ZIP 구조 확인. 1.0.6 APK SHA256 `8452b96f3f25b9d806535eb790b3614853f8afd4d8243ac74fb2d2723fb016a6` — artifact 내 배포 해시와 일치.
