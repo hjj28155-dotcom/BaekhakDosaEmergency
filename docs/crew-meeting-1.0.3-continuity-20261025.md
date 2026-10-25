@@ -82,3 +82,5 @@
 - 키는 해당 동일 앱·브라우저의 로컬 저장소에 남으므로 개인 기기에서만 '자동 입장'을 권장. 공용 기기에서 선택 해제 및 퇴장 권장.
 - 동일 원격 HTML 로딩 방식이므로 공동회의 1.0.3 **APK 재설치 없이 갱신**. V3/V7 앱 영향 없음.
 - JavaScript 구문검사 성공. GitHub Pages deployment run #40181116415 검사 중; **실제 선장폰 저장 지속성은 미검증**.
+
+- 후속 배포검증: GitHub Pages Actions #40181116415 **completed/success**, head commit `aeda388ec309b9b3839ff22030889e7827ab2e4a`. 웹 앱 코드 배포 성공. 다만 Android 선장폰에서 실제 키 저장·재진입은 미검증. 같은 앱 내부 저장소에서 동작하며 Chrome과 WebView의 저장소는 공유되지 않을 수 있음.
