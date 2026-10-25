@@ -159,6 +159,14 @@ footer{display:none}
 #relayPanel .relayCard textarea{min-height:65px}
 #relayStatus{font-size:.72rem;color:#d9e8f5;line-height:1.3}
 @media(max-height:630px){#relayOpen{min-height:26px;padding:3px 5px}#relayPanel{max-height:70dvh}}
+
+/* Android 1.0.5+: installed-app launch is native, not a WebView ChatGPT/API session. */
+#installedAppBar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;flex:none}
+.installedAppUnit{display:flex;gap:3px;min-width:0}
+.installedAppUnit button{font-size:.7rem;min-width:0;min-height:32px;padding:5px 3px;line-height:1.15;border:1px solid #6798ab}
+.installedAppUnit button:first-child{background:#245674;color:#f7f0d5;flex:1}
+.installedAppUnit button:last-child{flex:0 0 auto;font-size:.61rem;background:#29425c;color:#dbe9f2}
+@media(max-height:630px){.installedAppUnit button{min-height:26px;padding:3px 2px;font-size:.65rem}.installedAppUnit button:last-child{font-size:.59rem}}
 </style>
 </head>
 <body>
@@ -188,6 +196,16 @@ footer{display:none}
   <textarea id="relayCopyPreview" readonly rows="4" hidden aria-label="원본방에 전달할 텍스트 미리보기"></textarea>
   <div id="relayStatus" role="status" aria-live="polite">기존 ChatGPT 원본방의 답변은 자동으로 수집되지 않습니다.</div>
 </section>
+<div id="installedAppBar" aria-label="선장폰에 이미 설치된 독립 V3 V7 앱 실행">
+ <div class="installedAppUnit">
+  <button type="button" id="openInstalledV3">📲 V3 항해사앱 실행</button>
+  <button type="button" class="secondary" id="changeInstalledV3">연결 변경</button>
+ </div>
+ <div class="installedAppUnit">
+  <button type="button" id="openInstalledV7">📲 V7 중앙통제실 실행</button>
+  <button type="button" class="secondary" id="changeInstalledV7">연결 변경</button>
+ </div>
+</div>
 <button id="handoffOpen" type="button">📋 새방 첫머리 필수 인계양식</button>
 <section id="handoffPanel" hidden aria-label="원본 새 대화방 첫머리 인계양식">
  <h2>⚓ 새 ChatGPT 방 첫머리 인계</h2>
@@ -246,6 +264,26 @@ window.addEventListener('resize',setAppHeight);
  * One-time link registration does NOT require entering the pilot meeting-room key.
  * Direct-link state is stored locally on this device; authenticated server registry remains optional.
  */
+/*
+ * APK v1.0.5 native-launch bridge. Opens only an installed activity chosen by
+ * the captain, never installs/modifies V3 or V7. Does not share chat/DB context.
+ */
+function requestInstalledLaunch(role,selectAgain){
+ try{
+  if(!window.CrewInstalledApps||typeof window.CrewInstalledApps.openInstalled!=='function'){
+   window.alert('설치된 V3/V7 앱 직접 실행은 공동회의 APK 1.0.5 이상에서 사용할 수 있습니다. 웹 브라우저에서는 실행되지 않습니다.');
+   return;
+  }
+  window.CrewInstalledApps.openInstalled(role,!!selectAgain);
+ }catch(err){
+  window.alert('설치 앱 실행을 시작하지 못했습니다. 1.0.5 업데이트와 앱 선택 상태를 확인해 주세요.');
+ }
+}
+$('openInstalledV3').addEventListener('click',function(){requestInstalledLaunch('v3',false);});
+$('openInstalledV7').addEventListener('click',function(){requestInstalledLaunch('v7',false);});
+$('changeInstalledV3').addEventListener('click',function(){requestInstalledLaunch('v3',true);});
+$('changeInstalledV7').addEventListener('click',function(){requestInstalledLaunch('v7',true);});
+
 var ORIGINAL_CHAT_KEY='crew_meeting_central_linkofficer_original_chat_url_v1';
 var ORIGINAL_ROLE_PREFIX='crew_meeting_direct_original_';
 var ORIGINAL_HISTORY_PREFIX='crew_meeting_original_history_v1_';
