@@ -39,3 +39,13 @@
 - `https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/crew-meeting.html` 에서도 접힌 파일 메뉴 확인 가능.
 - APK 1.0.3은 새 독립 앱 `kr.hanghae.crewmeeting.compact`이며 기존 1.0.2-COMPACT 설치 시 동일 서명 업데이트 가능.
 - 앱 삭제, 등록 데이터 초기화, 개인키 무단 교체, V3/V7 운영 DB 변경 금지.
+
+## 2026-10-25 추가 · 중앙연결관 원본 대화방 버튼 / 모바일 다운로드 개선
+- 선장 지시: 홈화면의 **중앙연결관 원본채팅방 버튼 누락** 및 **다운로드 클릭 시 표시 없음**.
+- 대응: `crew-meeting.html` 본문 상단에 「🔗 중앙연결관 원본채팅방」, 「주소 등록/변경」을 추가. 원본 ChatGPT 대화 링크는 사용자만 확인할 수 있어 **최초 1회 정확한 원본 URL**을 저장하고 그 이후 브라우저에서 엶. 원본 방 새 생성/자동연결이 아님.
+- 링크 등록값은 그 기기의 `localStorage`에만 저장, 외부 서버에 전송하지 않음. 입력값은 HTTPS ChatGPT URL로 제한함.
+- UI JavaScript 구문검사 통과. 원본 ChatGPT 방 실시간 3인 연결 기능 아님.
+- 공개 APK 설치 페이지: `https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/crew-meeting-releases/`
+- APK 공개 GitHub main 경로: `crew-meeting-releases/HANGHAE_CREW_MEETING_1.0.3.apk`; Git Blob `9ccf38b1cdc1c493311805cdc0e5ece47a63b01b`, SHA-256 `db76a68075da7482b126fe982fed455b83e7025b624c093ab7715440fd691a7e`.
+- 공개 설치 페이지 GitHub Pages 배포 run `40170472219` success. 추가 원본 버튼 반영 main commit `68cfa2364f758485716fc61223695514a3b7e285` 후 Pages 최신 배포 확인 필요.
+- APK 다시 빌드할 필요 없이 원격 웹화면 업데이트로 1.0.3에서 버튼 표시. 단, 실제 선장폰 다운로드/설치/버튼/외부 채팅 열기는 미검증.
