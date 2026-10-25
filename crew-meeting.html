@@ -125,6 +125,20 @@ footer{display:none}
 #originalRolePicker button.selected{background:#dfbc79;color:#14293a}
 #previousOriginalChat[hidden]{display:none!important}
 @media(max-height:630px){#migrateChatLinks{min-height:20px;padding:2px 6px}}
+
+/* Copy-first migration handshake, independent of pilot room login. */
+#handoffOpen{flex:none;align-self:stretch;min-height:30px;padding:5px 9px;font-size:.77rem;background:#e0be7d;color:#11293a}
+#handoffPanel{display:block;border:1px solid #b18d54;background:#132f49;margin:0;padding:10px;border-radius:12px;flex:none}
+#handoffPanel[hidden]{display:none!important}
+#handoffPanel h2{margin-bottom:5px}
+#handoffPanel small{font-size:.72rem;line-height:1.36}
+#handoffRolePicker{display:flex;gap:4px;flex-wrap:nowrap}
+#handoffRolePicker button{flex:1;min-width:0;padding:6px 3px;font-size:.71rem}
+#handoffRolePicker button.selected{background:#e0be7d;color:#11293a}
+#handoffText{font-size:.75rem;line-height:1.4;min-height:145px;max-height:190px;resize:vertical;margin-top:7px}
+#handoffPanel>.actions{display:flex;flex-wrap:wrap;gap:5px}
+#handoffPanel>.actions button{flex:1 1 120px;min-height:34px;padding:7px;font-size:.73rem}
+@media(max-height:630px){#handoffOpen{min-height:25px;padding:3px 7px}}
 </style>
 </head>
 <body>
@@ -135,6 +149,23 @@ footer{display:none}
 <button type="button" id="originalController">🛡️ 원본 통제관</button>
 <button type="button" id="originalLinkofficer">🔗 중앙연결관</button>
 </div>
+<button id="handoffOpen" type="button">📋 새방 첫머리 필수 인계양식</button>
+<section id="handoffPanel" hidden aria-label="원본 새 대화방 첫머리 인계양식">
+ <h2>⚓ 새 ChatGPT 방 첫머리 인계</h2>
+ <small>① 담당 선택 → ② 양식 복사 → ③ 새 대화방 첫 메시지에 붙여넣기 → ④ 새 대화 주소를 기존 역할에 갱신</small>
+ <div id="handoffRolePicker" class="actions" aria-label="인계 양식의 담당자 선택">
+  <button type="button" data-handoff-role="navigator" class="secondary">🧭 항해사</button>
+  <button type="button" data-handoff-role="controller" class="secondary">🛡️ 통제관</button>
+  <button type="button" data-handoff-role="linkofficer" class="secondary">🔗 연결관</button>
+ </div>
+ <textarea id="handoffText" readonly aria-label="새방 첫 메시지 복사용 양식" rows="7"></textarea>
+ <div class="actions">
+  <button id="handoffCopy" type="button">① 강제양식 복사</button>
+  <button id="handoffNewChat" type="button" class="secondary">② 새 ChatGPT 방 열기</button>
+  <button id="handoffClose" type="button" class="secondary">닫기</button>
+ </div>
+ <small id="handoffStatus">ChatGPT 새 대화방에 자동 입력되는 기능은 아닙니다. 첫 메시지로 직접 붙여넣어야 연속성이 확보됩니다.</small>
+</section>
 <button id="migrateChatLinks" type="button">🔄 원본방 이사 · 주소 변경</button>
 <div id="originalChatPanel" hidden>
 <label id="originalChatLabel" for="originalChatUrl">원본 ChatGPT 대화방 주소</label>
@@ -295,6 +326,77 @@ $('originalChatSave').addEventListener('click',async function(){
  if(!remembered)status('loginError','기기 저장을 사용할 수 없어 다음 실행 시 주소를 다시 등록해야 할 수 있습니다.');
 });
 redrawOriginalButtons();
+
+
+/* NEW CHAT FIRST-MESSAGE handoff. Explicit copy + paste is required because an
+ * external webview cannot write into another ChatGPT conversation's composer.
+ * No room access key, session bearer token, original URL or device token included. */
+var HANDOFF_ROLE='navigator';
+var HANDOFF_SHARED='https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/blob/feature/crew-meeting-standalone-apk-20261025/docs/crew-meeting-1.0.3-continuity-20261025.md';
+var HANDOFF_PROTOCOL='https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/blob/main/docs/crew-meeting-migration-first-message-v1.md';
+var HANDOFF_V3='https://docs.google.com/document/d/1PpJ-2mVDygCd-1UVqSVUB0o4mfEBWkj9J5yMW9i4K0Y/edit';
+var HANDOFF_V7='https://docs.google.com/document/d/17ilFpSr5fRADfmG0rORPNhfxDoekUHRc-oglfPe_qGg/edit';
+var HANDOFF_ROLE_DETAILS={
+ navigator:['V3 원본 항해사','V3 항해사앱 원본 작업과 V33 연구를 이어받으십시오. V32·V33·V7 및 배포판을 혼동하지 말고, 원본 25조합·결과전 잠금·실전구매 기록을 보존하십시오.',HANDOFF_V3],
+ controller:['V7 원본 통제관','V7 중앙통제실 원본 작업을 이어받으십시오. 운영 7.9.0·E100-R2 연구·AI1~AI5·최초등록 잠금을 구분하고, 연구 성능을 공식 성능으로 승격하지 마십시오.',HANDOFF_V7],
+ linkofficer:['중앙연결관','공동회의 앱 1.0.3과 V3·V7 작업의 연속성·링크·검증을 조정하십시오. 세 원본 ChatGPT 대화방은 서로 별도 세션임을 유지하고, 실시간 자동송수신을 검증 없이 주장하지 마십시오.',HANDOFF_SHARED]
+};
+function handoffMessage(role){
+ var detail=HANDOFF_ROLE_DETAILS[role]||HANDOFF_ROLE_DETAILS.navigator;
+ return [
+ '⚓ 항행의자유 중앙통제실 — 새방 첫머리 강제 인계양식 V1',
+ '담당 역할: '+detail[0],
+ '',
+ '선장의 최우선 지시: 이곳은 기존 항행의자유 프로젝트의 연속 작업방입니다. 새로운 프로젝트로 시작하거나 완료 작업을 반복하지 마십시오.',
+ '반드시 이 첫 메시지를 기준으로 정본 작업대장과 최근 변경 이력을 직접 조회한 다음, 확인된 최신 지점의 다음 안전한 단계부터 진행하십시오.',
+ '해당 담당 핵심 지시: '+detail[1],
+ '',
+ '반드시 확인할 정본:',
+ '1) 담당 작업대장: '+detail[2],
+ '2) 공동회의 중앙연결 작업대장: '+HANDOFF_SHARED,
+ '3) 새방 강제 인계 표준: '+HANDOFF_PROTOCOL,
+ '4) V3 별도 정본: '+HANDOFF_V3,
+ '5) V7 별도 정본: '+HANDOFF_V7,
+ '',
+ '절대 보존: 기존 V3·V7·공동회의 앱과 채팅, 원본 파일, APK, 결과전/후, 실전구매, 최초등록 잠금, 누적DB, 기기승인, 서명키. 선장 지시 없이 삭제·초기화·기록 덮어쓰기를 금지합니다.',
+ '연결 상태: 선장은 두 원본방의 현재방 대화 가능 구현을 보고하였으며 서버의 두 담당 원본 URL 등록도 확인됐습니다. 하지만 세 원본방 사이의 자동 메시지 송수신 종단간 검증은 별도로 필요합니다.',
+ '새 채팅방 URL은 기존 방과 달라집니다. 새방에서 이 첫 메시지를 보낸 후, 공동회의 앱 「🔄 원본방 이사 · 주소 변경」에서 담당자의 새 ChatGPT 대화 주소를 갱신하고 기존 대화방을 보존하십시오.',
+ '실제 확인한 것만 완료로 표시하고 최신 버전·변경 근거·검증 결과·미완료 사항·다음 작업 1개를 보고하십시오.',
+ '',
+ '지금부터 최신 정본을 확인하고 기존 진행 지점의 다음 단계부터 진행하십시오.'
+ ].join('\n');
+}
+function chooseHandoffRole(role){
+ if(!HANDOFF_ROLE_DETAILS[role])return;
+ HANDOFF_ROLE=role;
+ $('handoffText').value=handoffMessage(role);
+ $('handoffRolePicker').querySelectorAll('button').forEach(function(btn){
+  btn.classList.toggle('selected',btn.getAttribute('data-handoff-role')===role);
+ });
+ $('handoffStatus').textContent='① 양식 복사 후 ② 새 ChatGPT 방을 열고 반드시 첫 메시지에 붙여넣으세요.';
+}
+$('handoffOpen').addEventListener('click',function(){
+ $('handoffPanel').hidden=false;$('originalChatPanel').hidden=true;
+ chooseHandoffRole(HANDOFF_ROLE);
+ $('handoffText').focus();
+});
+$('handoffRolePicker').querySelectorAll('button').forEach(function(btn){
+ btn.addEventListener('click',function(){chooseHandoffRole(btn.getAttribute('data-handoff-role'));});
+});
+$('handoffClose').addEventListener('click',function(){$('handoffPanel').hidden=true;});
+$('handoffCopy').addEventListener('click',async function(){
+ var text=$('handoffText').value,ok=false;
+ try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(text);ok=true;}}catch(e){}
+ if(!ok){
+  try{$('handoffText').focus();$('handoffText').select();ok=document.execCommand('copy')===true;}catch(e){}
+ }
+ $('handoffStatus').textContent=ok?'인계양식을 복사했습니다. 새 대화방 첫 메시지로 붙여넣으십시오.':'자동 복사가 차단되었습니다. 위 내용을 길게 눌러 직접 복사한 뒤 새 방에 붙여넣으십시오.';
+});
+$('handoffNewChat').addEventListener('click',function(){
+ // Direct user interaction only. Opening a chat never auto-sends a message.
+ window.location.assign('https://chatgpt.com/');
+});
+chooseHandoffRole(HANDOFF_ROLE);
 
 function status(id,text){$(id).textContent=text;}
 async function api(endpoint,method,payload){
