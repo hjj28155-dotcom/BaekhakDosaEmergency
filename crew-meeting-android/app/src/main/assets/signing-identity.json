@@ -1,10 +1,10 @@
 {
   "app_name": "항행의자유 공동회의",
   "package_name": "kr.hanghae.crewmeeting.compact",
-  "current_update_version": "1.0.4-HANDOFF",
-  "old_version": "1.0.3-FLAGSHIP",
+  "current_update_version": "1.0.5-LAUNCH",
+  "old_version": "1.0.4-HANDOFF",
   "public_signing_certificate_sha256": "e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be",
-  "signing_certificate_sha256_origin": "Verified standalone signing certificate in 1.0.2 CI run 40165076575 and 1.0.3 CI run 40169130307; 1.0.4 requires same certificate",
+  "signing_certificate_sha256_origin": "Verified 1.0.3 and 1.0.4 CI signing certificate; 1.0.5 must match the same fixed SHA256",
   "key_alias": "androiddebugkey",
   "key_owner": "captain",
   "signing_mode": "pilot-debug-key",
@@ -12,6 +12,6 @@
   "secret_key_embedded_in_apk": false,
   "private_key_archived_externally": false,
   "currently_verified_signing_source": "GitHub Actions cache crew-meeting-independent-pilot-signing-v1",
-  "continuity_guarantee": "Must match v1.0.3-FLAGSHIP signing certificate and package; must not overwrite 1.0.0-PILOT. Build fails if the original v1.0.3 signing key is missing. Permanent private-key backup not verified.",
+  "continuity_guarantee": "Isolated crew meeting package; must use the 1.0.4 signing certificate. Does not modify installed V3/V7 apps or their data. Per-device native app launcher choices persist across matching-signature 1.0.5 upgrades.",
   "recovery_requirements": "Captain-controlled private encrypted signing-keystore backup required before treating as durable release. Never embed keystore, P12, password or seed in app."
 }
