@@ -42,6 +42,12 @@ jobs:
         run: |
           set -euo pipefail
           gradle :app:signingReport --no-daemon 2>&1 | grep -E "^(Variant:|Config:|Store:|Alias:|SHA-256:|SHA256:|Valid until:)" || true
+          if [ -s "$HOME/.config/.android/debug.keystore" ]; then
+            DEFAULT_CERT=$(keytool -list -v -keystore "$HOME/.config/.android/debug.keystore" -storepass android -alias androiddebugkey | awk '/SHA256:/ { print $2 }')
+            echo "Android Gradle DEFAULT debug signer SHA256: $DEFAULT_CERT"
+          else
+            echo "Android Gradle DEFAULT debug signer file missing"
+          fi
       - name: Abort if original signing key is missing
         run: |
           set -euo pipefail
