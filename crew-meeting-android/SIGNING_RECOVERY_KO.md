@@ -11,8 +11,13 @@
 ## 현재 공동회의 시험판 검증
 - 앱 패키지 `kr.hanghae.crewmeeting`.
 - 기존 v1.0.0 test APK: Android Debug signer certificate SHA-256 `b577038a98e7c5b40e137500068852182e3daa6ea72b7497774d8363884fbd2c`.
-- GitHub Actions 사용 키 별칭: `androiddebugkey`; CI 캐시 키 `crew-meeting-independent-pilot-signing-v1`.
+- GitHub Actions 사용 키 별칭: `androiddebugkey`; 새로 고친 CI 캐시 검색 키 `crew-meeting-original-b577038a-v1`는 **원본 키 백업의 확인이 없어 조회 실패할 수 있음**. 이전 잘못된 캐시 키 `crew-meeting-independent-pilot-signing-v1`은 사용 금지.
 - CI에 기존 키 파일 존재 검사, 인증서 SHA-256 고정 검사, 이전 APK 서명 지문 동일성 검사 추가. 키가 없으면 새로운 키를 생성하지 않고 **업데이트 중단**.
+- **추가 사고원인 확인(2026-10-25):** 초기 v1.0.0 Android Gradle의 진짜 서명키 경로는 `/home/runner/.config/.android/debug.keystore`였으나 GitHub Actions가 `/home/runner/.android/debug.keystore`라는 **다른 경로**를 백업했음.
+- 현재 GitHub 캐시에서 복원된 후자 키의 인증서 SHA-256은 `e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be`이고, 설치된 v1.0.0의 `b577038a...` 인증서와 불일치. **이 캐시 키로는 v1.0.0에 덮어쓰는 v1.0.1 업데이트를 만들 수 없음**.
+- 올바른 경로를 확인하고 작업 흐름을 변경했지만 원래 b577 키의 비공개 외부 백업은 발견되지 않음. 현재 이 프로젝트 내 접근 가능한 자료로는 원래 개인키 회수 불가. 기존 v1.0.0의 키가 복구되기 전까지 **v1.0.1 APK 배포를 보류**한다.
+- 기존 앱은 원격 HTML을 불러오므로 웹 화면 수정은 사용 가능. 이것을 APK 버전 갱신으로 보고하지 않는다.
+
 - 캐시 보관은 영구 보존을 보장하지 않는다. **개인키 암호화 외부 백업은 아직 확인되지 않았다.** 따라서 서명키 영구 보존 완료라고 보고하면 안 된다.
 - 향후 실사용 배포는 강한 암호의 별도 릴리스용 개인키 관리가 필요하다. 기존 시험판을 동일 패키지로 업데이트할 경우 기존 인증서 연속성을 지켜야 한다. 다른 키라면 기존 앱 위에 업데이트 설치 불가할 수 있다.
 
