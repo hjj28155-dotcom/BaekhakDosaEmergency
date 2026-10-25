@@ -49,3 +49,17 @@
 - APK 공개 GitHub main 경로: `crew-meeting-releases/HANGHAE_CREW_MEETING_1.0.3.apk`; Git Blob `9ccf38b1cdc1c493311805cdc0e5ece47a63b01b`, SHA-256 `db76a68075da7482b126fe982fed455b83e7025b624c093ab7715440fd691a7e`.
 - 공개 설치 페이지 GitHub Pages 배포 run `40170472219` success. 추가 원본 버튼 반영 main commit `68cfa2364f758485716fc61223695514a3b7e285` 후 Pages 최신 배포 확인 필요.
 - APK 다시 빌드할 필요 없이 원격 웹화면 업데이트로 1.0.3에서 버튼 표시. 단, 실제 선장폰 다운로드/설치/버튼/외부 채팅 열기는 미검증.
+
+
+## 2026-10-25 추가 · 실제 원본 항해사·통제관 직접 대화 연결 (준비/부분완료)
+- 선장 재강조: `새 AI API 역할`은 기존 원본 항해사 및 통제관 채팅이 아님. 방을 옮겨도 **원래 ChatGPT 대화에 실제로 다시 들어가 이야기할 수 있어야 함**. 기존 원본 삭제/복제/초기화 금지.
+- 공식 ChatGPT 기능 확인: 2026-07-09부터 새 그룹 채팅 생성/참여 또는 기존 개인 채팅의 그룹 전환 제공 중단. 외부 APK에서 ChatGPT 기존 개인 채팅에 메시지를 API로 전송하는 공식 연결 기능 없음.
+- 확보된 원본 V3 주소 출처: `V5_이사인계_기존원문_20261015_복사본.txt` 등 사용자 라이브러리의 2026-10-15 인계 기록. 정확한 `/g/g-p-.../c/...` URL을 확보하여 개인 비공개 서버 레지스트리에 등록. **공개 소스코드 안에 개인 URL을 넣지 않음**.
+- 원본 V7 통제관 `/c/` URL은 확인되지 않아 **주소 없이 연결 성공을 표시하지 않음**. 주소 등록 UI만 표시.
+- 중앙연결관 기존 로컬 링크 저장값 `crew_meeting_central_linkofficer_original_chat_url_v1` 유지.
+- 새 DB: `public.crew_meeting_original_links` with RLS, direct anon/authenticated read grants revoked, role-specific URLs. 기 등록값: navigator 1건, controller 0건, linkofficer 0건.
+- Edge Function `crew-meeting` **v4 ACTIVE**; 기존 `GET original-links` and `POST original-link` authorization uses room's bearer token. Strict `chatgpt.com` original `/c/<uuid>` or `/g/<id>/c/<uuid>` only; `/share/` excluded. Source snapshot: `crew-meeting-android/server/crew-meeting-edge-v4-index.ts`, commit `9485f9adc9a1978fe457ac5018d836d59d5bf90c`.
+- Website `crew-meeting.html` main, commit `ddcd3132fa82f80cdd3a613ae46bf16bd6323685`: three buttons original V3 / original V7 / central link officer. Authenticated original link lookup after login; clicking ready link leaves pilot WebView for original ChatGPT conversation. Existing AI pilot meeting remains visually identified as separate, and **no shared live conversation with three original ChatGPT sessions**.
+- HTML JavaScript syntax verified. V3 URL registry and RLS grant status independently read back. GitHub Pages deployment run #40172711562 to verify success.
+- **Unverified**: device access to original ChatGPT conversation with user's authenticated account, new buttons on actual Android phone, V7 exact original address and linking, full end-to-end authenticated API tests.
+- Next step: Verify GitHub Pages deployment; captain can tap "원본 항해사" in 1.0.3 after login. For V7, obtain its actual ChatGPT conversation URL, one-time register in app. Original chats remain separate; do not imply automatic shared-message forwarding.
