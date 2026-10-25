@@ -217,7 +217,7 @@ footer{display:none}
 <div class="roles" aria-label="참여 역할"><div class="role"><div class="mark">⚓</div><b>선장</b><small>지시 및 결정</small></div><div class="role"><div class="mark">🧭</div><b>항해사</b><small>분석 의견</small></div><div class="role"><div class="mark">🛡️</div><b>통제관</b><small>검토 및 검증</small></div></div>
 <section class="notice">⚓ <b>원본 대화 바로 연결:</b> 위 버튼은 공동회의 입장키 없이 기존 ChatGPT 대화를 직접 엽니다. <b>아래 공동회의 채팅은 별도 AI API 시험방</b>이며 원본 대화에 자동 전송되지 않습니다.</section>
 <section id="loginArea"><h2>공동회의방 입장</h2><p class="muted">승인된 선장만 이용할 수 있습니다. 입장키를 한 번 확인한 뒤 같은 앱에서는 자동으로 입장할 수 있습니다.</p><form id="loginForm"><label for="secret">전용 입장키</label><input id="secret" type="password" autocomplete="off" spellcheck="false" inputmode="text" placeholder="입장키를 붙여넣으세요" required><label id="rememberLabel" for="rememberDevice"><input type="checkbox" id="rememberDevice" checked> 이 기기에서 다음부터 자동 입장</label><div class="actions"><small id="serverState">서버 상태 확인 중…</small><button type="submit" id="loginButton">입장</button></div></form><div id="loginError" role="alert" class="status"></div></section>
-<section id="chatArea"><details id="continuityPanel" aria-label="원본 업무 연속성"><summary>원본 업무 연속성 점검 <span id="continuityFlag">미연결 · 자료 보기</span></summary><div id="continuityContent"><div class="actions"><h2>원본 업무 연속성 점검</h2><button id="continuityRefresh" type="button" class="secondary">근거 다시 확인</button></div><p id="continuitySummary" class="notice">원본 세션 연결 상태를 확인 중입니다.</p><div id="continuitySources" class="muted"></div></div></details><details id="filePanel" aria-label="공동회의 파일 교환"><summary>📎 회의 파일 주고받기 <span id="fileCount">0개 · 보기</span></summary><p class="pilotNotice">이 시험방의 별도 비공개 보관소입니다. 10MB 이하 파일만 가능하며, V3·V7 정식 자료실이나 기존 원본 AI 대화방과 자동 동기화되지 않습니다.</p><form id="fileForm"><input id="meetingFile" type="file" aria-label="올릴 파일 선택" accept=".pdf,.txt,.md,.json,.csv,.tsv,.js,.mjs,.ts,.html,.css,.png,.jpg,.jpeg,.webp,.zip,.apk" required><button id="fileUploadBtn" type="submit">파일 올리기</button></form><div id="fileStatus" role="status">입장 후 파일 목록을 확인합니다.</div><div id="fileList"></div></details><div class="actions"><h2>공동회의 대화록</h2><button class="secondary" id="refreshBtn" type="button">새로고침</button></div><div id="connectionState" class="status" aria-live="polite"></div><div id="messages" class="message-list" role="log" aria-label="회의 기록"><div class="muted">메시지를 불러오는 중입니다.</div></div><form id="sendForm"><label for="draft">선장 지시</label><textarea id="draft" maxlength="1200" placeholder="예: 항해사는 분석 의견을, 통제관은 검증 의견을 차례로 보고하세요." required></textarea><div class="actions"><small>하루 최대 8회 지시 · 응답은 순서대로 표시됩니다</small><small id="charCount">0 / 1200</small></div><button type="submit" id="sendMsg">항해사와 통제관에게 전달</button></form><div id="sendError" class="status" role="status"></div></section>
+<section id="chatArea"><details id="continuityPanel" aria-label="원본 업무 연속성"><summary>원본 업무 연속성 점검 <span id="continuityFlag">미연결 · 자료 보기</span></summary><div id="continuityContent"><div class="actions"><h2>원본 업무 연속성 점검</h2><button id="continuityRefresh" type="button" class="secondary">근거 다시 확인</button></div><p id="continuitySummary" class="notice">원본 세션 연결 상태를 확인 중입니다.</p><div id="continuitySources" class="muted"></div></div></details><details id="filePanel" aria-label="공동회의 파일 교환"><summary>📎 회의 파일 주고받기 <span id="fileCount">0개 · 보기</span></summary><p class="pilotNotice">이 시험방의 별도 비공개 보관소입니다. 10MB 이하 파일만 가능하며, V3·V7 정식 자료실이나 기존 원본 AI 대화방과 자동 동기화되지 않습니다.</p><form id="fileForm"><input id="meetingFile" type="file" aria-label="올릴 파일 선택" accept=".pdf,.txt,.md,.json,.csv,.tsv,.js,.mjs,.ts,.html,.css,.png,.jpg,.jpeg,.webp,.zip,.apk" required><button id="fileUploadBtn" type="submit">파일 올리기</button></form><div id="fileStatus" role="status">입장 후 파일 목록을 확인합니다.</div><div id="fileList"></div></details><div class="actions"><h2>공동회의 대화록</h2><button class="secondary" id="refreshBtn" type="button">새로고침</button></div><div id="connectionState" class="status" aria-live="polite"></div><div id="messages" class="message-list" role="log" aria-label="회의 기록"><div class="muted">메시지를 불러오는 중입니다.</div></div><form id="sendForm"><label for="draft">별도 시험 AI(API)에게 보내는 선장 지시</label><textarea id="draft" maxlength="1200" placeholder="예: 항해사는 분석 의견을, 통제관은 검증 의견을 차례로 보고하세요." required></textarea><div class="actions"><small>하루 최대 8회 지시 · 응답은 순서대로 표시됩니다</small><small id="charCount">0 / 1200</small></div><button type="submit" id="sendMsg">시험 AI(API)에만 전달</button></form><div id="sendError" class="status" role="status"></div></section>
 <footer>서버 저장형 시범방 · 기존 V3/V7 데이터와 별도 · 다른 AI 담당자 없음</footer>
 </main>
 <script>
@@ -501,11 +501,13 @@ function relayTranscript(record){
  });
  return out.join('\n');
 }
-async function relayCopyText(text,element,statusElement){
+async function relayCopyText(text,statusElement){
  var ok=false;
  try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(text);ok=true;}}catch(e){}
  if(!ok){
-  try{element.value=text;element.focus();element.select();ok=document.execCommand('copy')===true;}catch(e){}
+  var helper=document.createElement('textarea');
+  try{helper.value=text;helper.setAttribute('readonly','');helper.style.position='fixed';helper.style.left='-9999px';document.body.appendChild(helper);helper.select();ok=document.execCommand('copy')===true;}
+  catch(e){}finally{if(helper.parentNode)helper.parentNode.removeChild(helper);}
  }
  statusElement.textContent=ok?'복사했습니다. 원본 ChatGPT 대화방에 직접 붙여넣어 전송하세요.':'자동 복사가 제한됩니다. 텍스트를 길게 눌러 복사해 주세요.';
  return ok;
@@ -536,7 +538,7 @@ function relayRoleCard(role,record){
  var save=document.createElement('button');save.type='button';save.textContent='④ 답변 기록';save.className='secondary';
  var state=document.createElement('div');state.className='relaySmall';state.textContent=old&&old.recorded_at?'선장 수동 기록: '+relayTimestamp(old.recorded_at):'원본방 답변 미기록';
  copy.addEventListener('click',function(){
-  relayCopyText(relayInstructionFor(role,record),response,$('relayStatus'));
+  relayCopyText(relayInstructionFor(role,record),$('relayStatus'));
  });
  open.addEventListener('click',function(){
   var url=roleUrl(role);
@@ -588,7 +590,7 @@ $('relayCreate').addEventListener('click',function(){
 $('relaySessionSelect').addEventListener('change',function(){relayActive=this.value;relayRender();});
 $('relayExport').addEventListener('click',function(){
  var record=relayCurrent();if(!record)return;
- relayCopyText(relayTranscript(record),$('relayDraft'),$('relayStatus'));
+ relayCopyText(relayTranscript(record),$('relayStatus'));
 });
 
 function status(id,text){$(id).textContent=text;}
