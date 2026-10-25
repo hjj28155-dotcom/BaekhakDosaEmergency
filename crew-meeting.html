@@ -167,6 +167,25 @@ footer{display:none}
 .installedAppUnit button:first-child{background:#245674;color:#f7f0d5;flex:1}
 .installedAppUnit button:last-child{flex:0 0 auto;font-size:.61rem;background:#29425c;color:#dbe9f2}
 @media(max-height:630px){.installedAppUnit button{min-height:26px;padding:3px 2px;font-size:.65rem}.installedAppUnit button:last-child{font-size:.59rem}}
+
+/* V3 export-only local preview and authenticated V7 server read-only catalog. */
+#reportsPanel{flex:none;max-height:48dvh;overflow-y:auto;scrollbar-width:thin;padding:0 8px;border-radius:9px;background:#132d41}
+#reportsPanel summary{display:flex;gap:6px;align-items:center;justify-content:space-between;cursor:pointer;padding:7px 0;color:#f2dea9;font-size:.78rem;font-weight:800}
+#reportsCount{font-size:.68rem;color:#bad7ea;font-weight:500}
+#reportsPanel .reportDisclaimer{font-size:.71rem;color:#b8d2e2;line-height:1.35;margin:5px 0}
+#reportsPanel .reportGroup{border-top:1px solid #38516b;padding:7px 0}
+#reportsPanel .reportGroup>b{font-size:.78rem}
+#reportsPanel .reportControls{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0}
+#reportsPanel select,#reportsPanel input{font-size:.75rem;border:1px solid #56768b;border-radius:8px;min-width:0;background:#092036;color:#eff9ff;padding:6px}
+#reportsPanel .reportControls select{flex:3 1 170px}
+#reportsPanel .reportControls input{flex:1 1 70px;width:80px}
+#reportsPanel .reportControls button{font-size:.72rem;flex:0 0 auto;padding:6px 9px}
+#reportsPanel #v3ReportFile{width:100%;max-width:100%;font-size:.73rem;margin:5px 0}
+#reportStatus,#v3ReportStatus{font-size:.72rem;color:#c5e0f3;margin:5px 0}
+#reportList .reportRow{display:flex;justify-content:space-between;align-items:center;gap:5px;border-top:1px solid #35556e;padding:5px 0;font-size:.74rem;overflow-wrap:anywhere}
+#reportList .reportRow button{flex:none;font-size:.71rem;padding:5px 7px}
+#reportsPanel pre{white-space:pre-wrap;overflow-wrap:anywhere;overflow-y:auto;max-height:22dvh;background:#071f32;color:#e6f2ff;border:1px solid #47637a;border-radius:8px;padding:8px;font-size:.72rem;line-height:1.4}
+#reportsPanel pre[hidden]{display:none!important}
 </style>
 </head>
 <body>
@@ -238,7 +257,31 @@ footer{display:none}
 <div class="roles" aria-label="참여 역할"><div class="role"><div class="mark">⚓</div><b>선장</b><small>지시 및 결정</small></div><div class="role"><div class="mark">🧭</div><b>항해사</b><small>분석 의견</small></div><div class="role"><div class="mark">🛡️</div><b>통제관</b><small>검토 및 검증</small></div></div>
 <section class="notice">⚓ <b>원본 대화 바로 연결:</b> 위 버튼은 공동회의 입장키 없이 기존 ChatGPT 대화를 직접 엽니다. <b>아래 공동회의 채팅은 별도 AI API 시험방</b>이며 원본 대화에 자동 전송되지 않습니다.</section>
 <section id="loginArea"><h2>공동회의방 입장</h2><p class="muted">승인된 선장만 이용할 수 있습니다. 입장키를 한 번 확인한 뒤 같은 앱에서는 자동으로 입장할 수 있습니다.</p><form id="loginForm"><label for="secret">전용 입장키</label><input id="secret" type="password" autocomplete="off" spellcheck="false" inputmode="text" placeholder="입장키를 붙여넣으세요" required><label id="rememberLabel" for="rememberDevice"><input type="checkbox" id="rememberDevice" checked> 이 기기에서 다음부터 자동 입장</label><div class="actions"><small id="serverState">서버 상태 확인 중…</small><button type="submit" id="loginButton">입장</button></div></form><div id="loginError" role="alert" class="status"></div></section>
-<section id="chatArea"><details id="continuityPanel" aria-label="원본 업무 연속성"><summary>원본 업무 연속성 점검 <span id="continuityFlag">미연결 · 자료 보기</span></summary><div id="continuityContent"><div class="actions"><h2>원본 업무 연속성 점검</h2><button id="continuityRefresh" type="button" class="secondary">근거 다시 확인</button></div><p id="continuitySummary" class="notice">원본 세션 연결 상태를 확인 중입니다.</p><div id="continuitySources" class="muted"></div></div></details><details id="filePanel" aria-label="공동회의 파일 교환"><summary>📎 회의 파일 주고받기 <span id="fileCount">0개 · 보기</span></summary><p class="pilotNotice">이 시험방의 별도 비공개 보관소입니다. 10MB 이하 파일만 가능하며, V3·V7 정식 자료실이나 기존 원본 AI 대화방과 자동 동기화되지 않습니다.</p><form id="fileForm"><input id="meetingFile" type="file" aria-label="올릴 파일 선택" accept=".pdf,.txt,.md,.json,.csv,.tsv,.js,.mjs,.ts,.html,.css,.png,.jpg,.jpeg,.webp,.zip,.apk" required><button id="fileUploadBtn" type="submit">파일 올리기</button></form><div id="fileStatus" role="status">입장 후 파일 목록을 확인합니다.</div><div id="fileList"></div></details><div class="actions"><h2>공동회의 대화록</h2><button class="secondary" id="refreshBtn" type="button">새로고침</button></div><div id="connectionState" class="status" aria-live="polite"></div><div id="messages" class="message-list" role="log" aria-label="회의 기록"><div class="muted">메시지를 불러오는 중입니다.</div></div><form id="sendForm"><label for="draft">별도 시험 AI(API)에게 보내는 선장 지시</label><textarea id="draft" maxlength="1200" placeholder="예: 항해사는 분석 의견을, 통제관은 검증 의견을 차례로 보고하세요." required></textarea><div class="actions"><small>하루 최대 8회 지시 · 응답은 순서대로 표시됩니다</small><small id="charCount">0 / 1200</small></div><button type="submit" id="sendMsg">시험 AI(API)에만 전달</button></form><div id="sendError" class="status" role="status"></div></section>
+<section id="chatArea"><details id="continuityPanel" aria-label="원본 업무 연속성"><summary>원본 업무 연속성 점검 <span id="continuityFlag">미연결 · 자료 보기</span></summary><div id="continuityContent"><div class="actions"><h2>원본 업무 연속성 점검</h2><button id="continuityRefresh" type="button" class="secondary">근거 다시 확인</button></div><p id="continuitySummary" class="notice">원본 세션 연결 상태를 확인 중입니다.</p><div id="continuitySources" class="muted"></div></div></details><details id="reportsPanel" aria-label="V3 V7 원본 자료 읽기전용 조회">
+ <summary>📑 V3·V7 보고서·자료 확인 <span id="reportsCount">원본 보존 · 조회</span></summary>
+ <p class="reportDisclaimer">V7: 선장 고정키로 인증한 서버 기록의 <b>읽기 전용 조회</b>. V3: 선장폰에서 내보낸 TXT/JSON 보고서를 선택해 <b>이 기기에서만 미리보기</b>. 두 앱의 원본 DB와 보고서는 수정하거나 동기화하지 않습니다.</p>
+ <div class="reportGroup">
+  <b>🛡️ V7 중앙통제실 · 서버 원본 기록</b>
+  <div class="reportControls">
+   <select id="reportKind" aria-label="V7 자료 종류">
+    <option value="v7-purchase">선장방 5조합 기록 (V7_PURCHASE_5)</option>
+    <option value="v7-source">원문 6문장 (V7_SOURCE)</option>
+   </select>
+   <input id="reportRound" aria-label="조회할 회차" inputmode="numeric" type="number" min="1" max="9999" placeholder="전체 회차">
+   <button id="reportRefresh" type="button">목록 조회</button>
+  </div>
+  <div id="reportStatus" role="status" aria-live="polite">고정 입장키로 인증한 뒤 목록 조회를 누르세요.</div>
+  <div id="reportList"></div>
+  <pre id="reportDetail" hidden aria-label="선택한 V7 원본 기록 내용"></pre>
+ </div>
+ <div class="reportGroup">
+  <b>🧭 V3 항해사앱 · 휴대폰 내보내기 파일</b>
+  <p class="reportDisclaimer">V3 앱에서 저장·내보낸 결과전/후 TXT·JSON만 선택할 수 있습니다. 앱 내부 비공개 파일은 자동으로 열 수 없습니다. 파일을 공동회의 서버로 업로드하지 않습니다.</p>
+  <input id="v3ReportFile" type="file" accept=".txt,.json,text/plain,application/json" aria-label="V3 원본 TXT 또는 JSON 선택">
+  <div id="v3ReportStatus" role="status">아직 선택한 파일이 없습니다.</div>
+  <pre id="v3ReportPreview" hidden aria-label="선택한 V3 파일 미리보기"></pre>
+ </div>
+</details><details id="filePanel" aria-label="공동회의 파일 교환"><summary>📎 회의 파일 주고받기 <span id="fileCount">0개 · 보기</span></summary><p class="pilotNotice">이 시험방의 별도 비공개 보관소입니다. 10MB 이하 파일만 가능하며, V3·V7 정식 자료실이나 기존 원본 AI 대화방과 자동 동기화되지 않습니다.</p><form id="fileForm"><input id="meetingFile" type="file" aria-label="올릴 파일 선택" accept=".pdf,.txt,.md,.json,.csv,.tsv,.js,.mjs,.ts,.html,.css,.png,.jpg,.jpeg,.webp,.zip,.apk" required><button id="fileUploadBtn" type="submit">파일 올리기</button></form><div id="fileStatus" role="status">입장 후 파일 목록을 확인합니다.</div><div id="fileList"></div></details><div class="actions"><h2>공동회의 대화록</h2><button class="secondary" id="refreshBtn" type="button">새로고침</button></div><div id="connectionState" class="status" aria-live="polite"></div><div id="messages" class="message-list" role="log" aria-label="회의 기록"><div class="muted">메시지를 불러오는 중입니다.</div></div><form id="sendForm"><label for="draft">별도 시험 AI(API)에게 보내는 선장 지시</label><textarea id="draft" maxlength="1200" placeholder="예: 항해사는 분석 의견을, 통제관은 검증 의견을 차례로 보고하세요." required></textarea><div class="actions"><small>하루 최대 8회 지시 · 응답은 순서대로 표시됩니다</small><small id="charCount">0 / 1200</small></div><button type="submit" id="sendMsg">시험 AI(API)에만 전달</button></form><div id="sendError" class="status" role="status"></div></section>
 <footer>서버 저장형 시범방 · 기존 V3/V7 데이터와 별도 · 다른 AI 담당자 없음</footer>
 </main>
 <script>
@@ -637,6 +680,100 @@ $('relayExport').addEventListener('click',function(){
 });
 
 function status(id,text){$(id).textContent=text;}
+
+/* Read-only V7 catalog is a separate permissioned service; V3 is a local
+ * file-picker preview. Neither path writes the original app database. */
+var REPORT_ENDPOINT='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/crew-reports-readonly';
+async function reportGet(action,params){
+ if(!token)throw Error('UNAUTHORIZED');
+ var u=new URL(REPORT_ENDPOINT+'/'+action);
+ Object.keys(params||{}).forEach(function(k){if(params[k]!==null&&params[k]!==undefined&&params[k]!=='')u.searchParams.set(k,String(params[k]));});
+ var response=await fetch(u.href,{method:'GET',headers:{Authorization:'Bearer '+token,Accept:'application/json'},cache:'no-store'});
+ var payload=await response.json().catch(function(){return {error:'REPORT_SERVER_INVALID'};});
+ if(!response.ok||payload.error)throw Error(payload.error||'HTTP_'+response.status);
+ return payload;
+}
+function reportSummary(row){
+ return '제'+row.round_no+'회 · '+(row.document_type==='V7_SOURCE'?'원문 자료':'선장방 5조합 기록')+' · '+(row.filename||'서버 원본');
+}
+function reportContent(doc){
+ var lines=[
+  '출처: V7 중앙통제실 서버 / 읽기 전용',
+  '종류: '+doc.document_type,
+  '회차: '+doc.round_no,
+  '파일명: '+(doc.filename||'미표기'),
+  '작성일: '+(doc.created_at||'미표기'),
+  '엔진: '+(doc.engine||'미표기'),
+  '단계: '+(doc.stage||'미표기'),
+  '결과전 추첨 전 수신 여부: '+(doc.received_before_draw?'예':'아니오/미확인'),
+  '원문 SHA-256: '+(doc.source_sha256||'미표기'),
+  '---'
+ ];
+ if(doc.document_type==='V7_SOURCE')lines.push('【원문】',String(doc.source_text||''));
+ else lines.push('【조합 기록】',JSON.stringify(doc.combinations||[],null,2));
+ return lines.join('\n');
+}
+function reportRows(items,kind){
+ var list=$('reportList');list.replaceChildren();
+ if(!items.length){list.textContent='조건에 맞는 V7 서버 원본 기록이 없습니다.';return;}
+ items.forEach(function(doc){
+  var row=document.createElement('div');row.className='reportRow';
+  var label=document.createElement('span');label.textContent=reportSummary(doc);
+  var button=document.createElement('button');button.className='secondary';button.type='button';button.textContent='원본 내용';
+  button.addEventListener('click',async function(){
+   button.disabled=true;$('reportStatus').textContent='해당 기록을 읽는 중입니다…';
+   try{
+    var result=await reportGet('detail',{kind:kind,id:doc.id});
+    $('reportDetail').textContent=reportContent(result.report);
+    $('reportDetail').hidden=false;
+    $('reportStatus').textContent='서버 원본을 읽기 전용으로 표시했습니다. 다운로드·누적DB 쓰기 없음.';
+   }catch(e){$('reportStatus').textContent='상세 조회 실패: '+String(e.message||e);}
+   finally{button.disabled=false;}
+  });
+  row.append(label,button);list.appendChild(row);
+ });
+}
+async function refreshV7Reports(){
+ if(!token){$('reportStatus').textContent='V7 서버 조회는 공동회의 고정키로 입장한 뒤 이용할 수 있습니다.';return;}
+ var kind=$('reportKind').value;
+ if(kind!=='v7-source'&&kind!=='v7-purchase')return;
+ var round=$('reportRound').value.trim();
+ if(round&&!/^[1-9][0-9]{0,3}$/.test(round)){$('reportStatus').textContent='회차는 1~9999 숫자만 입력하세요.';return;}
+ var button=$('reportRefresh');button.disabled=true;$('reportStatus').textContent='V7 서버 기록을 확인하는 중…';
+ try{
+  var result=await reportGet('list',{kind:kind,round:round||null});
+  $('reportDetail').hidden=true;$('reportDetail').textContent='';
+  reportRows(result.items||[],kind);
+  $('reportStatus').textContent='V7 서버에서 읽기 전용 '+(result.items||[]).length+'건 확인 · 출처: '+(kind==='v7-source'?'공용 원문':'선장방 5조합');
+  $('reportsCount').textContent='V7 '+(result.items||[]).length+'건 · 자료 보기';
+ }catch(err){$('reportStatus').textContent='V7 조회 실패: '+String(err.message||err);}
+ finally{button.disabled=false;}
+}
+$('reportRefresh').addEventListener('click',refreshV7Reports);
+$('reportKind').addEventListener('change',function(){$('reportDetail').hidden=true;$('reportDetail').textContent='';$('reportList').replaceChildren();$('reportStatus').textContent='자료 종류가 변경됐습니다. 목록 조회를 누르세요.';});
+$('reportsPanel').addEventListener('toggle',function(){
+ if(this.open&&token)refreshV7Reports();
+});
+$('v3ReportFile').addEventListener('change',async function(){
+ var file=this.files&&this.files[0],out=$('v3ReportPreview'),statusNode=$('v3ReportStatus');
+ out.hidden=true;out.textContent='';
+ if(!file){statusNode.textContent='선택한 파일이 없습니다.';return;}
+ if(!/\.(txt|json)$/i.test(file.name)||file.size<1||file.size>1024*1024){
+  statusNode.textContent='TXT/JSON 파일 1MB 이하만 미리보기 가능합니다. 선택한 파일은 전송되지 않았습니다.';return;
+ }
+ try{
+  var buffer=await file.arrayBuffer();
+  var text=new TextDecoder('utf-8',{fatal:false}).decode(buffer);
+  var digest=await crypto.subtle.digest('SHA-256',buffer);
+  var sha=Array.from(new Uint8Array(digest)).map(function(x){return x.toString(16).padStart(2,'0');}).join('');
+  var warning='';
+  if(/\.json$/i.test(file.name))try{JSON.parse(text);}catch(e){warning=' · JSON 구문을 확인하세요';}
+  out.textContent='출처: 선장폰에서 직접 선택한 V3 내보내기 파일\n파일: '+file.name+'\n크기: '+file.size+' bytes\nSHA-256: '+sha+'\n주의: 공동회의 서버에 업로드되지 않았습니다.\n---\n'+text.slice(0,30000)+(text.length>30000?'\n... (미리보기 30,000자까지만 표시)':'');
+  out.hidden=false;
+  statusNode.textContent='휴대폰 로컬 파일 미리보기 완료'+warning+' · V3 저장원본 변경 없음';
+ }catch(e){statusNode.textContent='파일을 읽을 수 없습니다. Android 파일 선택기와 파일 저장 위치를 확인하세요.';}
+});
+
 async function api(endpoint,method,payload){
  var options={method:method||'GET',headers:{'Accept':'application/json'},cache:'no-store'};
  if(token)options.headers.Authorization='Bearer '+token;
