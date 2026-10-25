@@ -117,6 +117,14 @@ footer{display:none}
 /* One-time captain login: optional persistent login for the same private handset. */
 #rememberLabel{display:flex;align-items:center;gap:8px;margin:9px 0 5px;font-size:.78rem;font-weight:500;color:#d7e7f1;cursor:pointer}
 #rememberLabel input[type=checkbox]{width:19px;height:19px;flex:none;accent-color:#e1bd7b;margin:0}
+
+/* Stable role buttons, rotating ChatGPT thread addresses when rooms migrate. */
+#migrateChatLinks{flex:none;align-self:stretch;min-height:24px;padding:3px 9px;font-size:.7rem;text-align:center;background:#284862;border:1px solid #6d8ca1;color:#ecf2f7}
+#originalRolePicker{display:flex;justify-content:space-between;gap:5px;flex-wrap:nowrap}
+#originalRolePicker button{flex:1 1 auto;min-width:0;font-size:.7rem;padding:5px 2px;white-space:nowrap}
+#originalRolePicker button.selected{background:#dfbc79;color:#14293a}
+#previousOriginalChat[hidden]{display:none!important}
+@media(max-height:630px){#migrateChatLinks{min-height:20px;padding:2px 6px}}
 </style>
 </head>
 <body>
@@ -127,10 +135,16 @@ footer{display:none}
 <button type="button" id="originalController">🛡️ 원본 통제관</button>
 <button type="button" id="originalLinkofficer">🔗 중앙연결관</button>
 </div>
+<button id="migrateChatLinks" type="button">🔄 원본방 이사 · 주소 변경</button>
 <div id="originalChatPanel" hidden>
 <label id="originalChatLabel" for="originalChatUrl">원본 ChatGPT 대화방 주소</label>
 <input id="originalChatUrl" type="url" inputmode="url" autocomplete="url" placeholder="https://chatgpt.com/c/…">
-<div class="actions"><button id="originalChatSave" type="button">주소 등록</button><button id="originalChatCancel" type="button" class="secondary">닫기</button></div>
+<div id="originalRolePicker" class="actions" aria-label="이사할 담당 원본방 선택">
+<button type="button" data-original-role="navigator" class="secondary">🧭 항해사</button>
+<button type="button" data-original-role="controller" class="secondary">🛡️ 통제관</button>
+<button type="button" data-original-role="linkofficer" class="secondary">🔗 중앙연결관</button>
+</div>
+<div class="actions"><button id="originalChatSave" type="button">현재방 주소 저장</button><button id="previousOriginalChat" type="button" class="secondary" hidden>이전방 열기</button><button id="originalChatCancel" type="button" class="secondary">닫기</button></div>
 <small id="originalChatNotice">/share/ 읽기 전용 주소가 아닌, 실제 원본 대화방의 주소를 등록하세요. 입장키 없이 등록 가능합니다. 등록 뒤 원본 채팅방에서 직접 대화합니다.</small>
 </div>
 <div class="roles" aria-label="참여 역할"><div class="role"><div class="mark">⚓</div><b>선장</b><small>지시 및 결정</small></div><div class="role"><div class="mark">🧭</div><b>항해사</b><small>분석 의견</small></div><div class="role"><div class="mark">🛡️</div><b>통제관</b><small>검토 및 검증</small></div></div>
@@ -164,6 +178,7 @@ window.addEventListener('resize',setAppHeight);
  */
 var ORIGINAL_CHAT_KEY='crew_meeting_central_linkofficer_original_chat_url_v1';
 var ORIGINAL_ROLE_PREFIX='crew_meeting_direct_original_';
+var ORIGINAL_HISTORY_PREFIX='crew_meeting_original_history_v1_';
 var originalLinks={},editingRole=null;
 var origNames={navigator:'🧭 원본 항해사',controller:'🛡️ 원본 통제관',linkofficer:'🔗 중앙연결관'};
 var origButtons={navigator:'originalNavigator',controller:'originalController',linkofficer:'originalLinkofficer'};
@@ -184,6 +199,29 @@ function roleUrl(role){
  }catch(e){}
  return originalLinks[role]||'';
 }
+
+function priorRoleUrls(role){
+ try{
+  var val=JSON.parse(localStorage.getItem(ORIGINAL_HISTORY_PREFIX+role)||'[]');
+  return Array.isArray(val)?val.map(function(item){return validOriginalUrl(item);}).filter(Boolean).slice(0,6):[];
+ }catch(e){return [];}
+}
+function archivePriorRoleUrl(role,newUrl){
+ var old=roleUrl(role);
+ if(!old||old===newUrl)return;
+ try{
+  var history=priorRoleUrls(role).filter(function(x){return x!==old&&x!==newUrl;});
+  history.unshift(old);
+  localStorage.setItem(ORIGINAL_HISTORY_PREFIX+role,JSON.stringify(history.slice(0,6)));
+ }catch(e){}
+}
+function updateOriginalRolePicker(){
+ var all=$('originalRolePicker').querySelectorAll('button');
+ all.forEach(function(btn){btn.classList.toggle('selected',btn.getAttribute('data-original-role')===editingRole);});
+ var past=editingRole?priorRoleUrls(editingRole):[];
+ $('previousOriginalChat').hidden=past.length===0;
+ $('originalChatSave').textContent=roleUrl(editingRole)?'새방 주소로 갱신':'현재방 주소 저장';
+}
 function rememberRoleUrl(role,url){
  try{
   localStorage.setItem(ORIGINAL_ROLE_PREFIX+role,url);
@@ -201,9 +239,10 @@ function redrawOriginalButtons(){
 }
 function editOriginalRole(role){
  editingRole=role;$('originalChatPanel').hidden=false;
- $('originalChatLabel').textContent=origNames[role]+'의 기존 ChatGPT 대화방 주소';
+ $('originalChatLabel').textContent=origNames[role]+' · 현재 대화방 주소';
  $('originalChatUrl').value=roleUrl(role);
- status('originalChatNotice','원본 ChatGPT 방의 주소창 URL을 한 번만 등록하십시오. 공동회의 입장키는 필요하지 않습니다. /share/ 링크는 제외됩니다.');
+ updateOriginalRolePicker();
+ status('originalChatNotice','새 채팅방으로 이사한 경우, 새방의 첫 메시지를 보낸 뒤 브라우저 주소창의 새 URL을 붙여넣고 저장하세요. 이 기기의 예전 주소는 이전방 기록으로 보존합니다.');
  $('originalChatUrl').focus();
 }
 async function refreshOriginalLinks(){
@@ -224,13 +263,25 @@ Object.keys(origButtons).forEach(function(role){
   catch(e){editOriginalRole(role);}
  });
 });
+$('migrateChatLinks').addEventListener('click',function(){editOriginalRole('navigator');});
+$('originalRolePicker').querySelectorAll('button').forEach(function(btn){
+ btn.addEventListener('click',function(){editOriginalRole(btn.getAttribute('data-original-role'));});
+});
+$('previousOriginalChat').addEventListener('click',function(){
+ if(!editingRole)return;
+ var previous=priorRoleUrls(editingRole)[0];
+ if(!previous)return;
+ try{window.location.assign(validOriginalUrl(previous));}
+ catch(e){status('originalChatNotice','이전 원본방 주소를 열지 못했습니다.');}
+});
 $('originalChatCancel').addEventListener('click',function(){$('originalChatPanel').hidden=true;});
 $('originalChatSave').addEventListener('click',async function(){
  var role=editingRole,url,btn=$('originalChatSave');
  if(!origButtons[role])return;
  try{url=validOriginalUrl($('originalChatUrl').value);}
  catch(e){status('originalChatNotice','정확한 ChatGPT 원본 채팅 주소를 입력해 주세요. 공유(/share/) 주소는 원본 대화를 계속할 수 없습니다.');return;}
- // Save first; server sync cannot block the user's ability to open their actual conversation.
+ // Preserve earlier real conversation URL before switching this stable role button.
+ archivePriorRoleUrl(role,url);
  var remembered=rememberRoleUrl(role,url);
  originalLinks[role]=url;
  $('originalChatPanel').hidden=true;
