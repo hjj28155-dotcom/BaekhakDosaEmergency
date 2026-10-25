@@ -41,7 +41,9 @@ jobs:
         run: |
           set -euo pipefail
           test -s "$HOME/.android/debug.keystore" || { echo "Original signing key missing: STOP; do not generate a replacement."; exit 1; }
-          keytool -list -v -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey | grep -Fq "SHA256: B5:77:03:8A:98:E7:C5:B4:0E:13:75:00:06:88:52:18:2E:3D:AA:6E:A7:2B:74:97:77:4D:83:63:88:4F:BD:2C" || { echo "Unexpected signing key: STOP"; exit 1; }
+          ACTUAL=$(keytool -list -v -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey | awk '/SHA256:/ { print $2 }')
+          echo "Restored signing certificate SHA256: $ACTUAL"
+          test "$ACTUAL" = "B5:77:03:8A:98:E7:C5:B4:0E:13:75:00:06:88:52:18:2E:3D:AA:6E:A7:2B:74:97:77:4D:83:63:88:4F:BD:2C" || { echo "Unexpected signing key: STOP"; exit 1; }
       - name: Assemble separate app
         working-directory: crew-meeting-android
         run: gradle :app:assembleDebug --no-daemon --stacktrace
