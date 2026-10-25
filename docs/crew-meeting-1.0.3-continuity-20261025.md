@@ -1,3 +1,26 @@
+## ⚓ 2026-10-25 — 원본 3방 공동 통신 기반 1차 구축 (원본 자동연동은 HOLD)
+
+**선장 지시:** “세방의 실시간 연동 문제 해결해야죠.” V3 원본 항해사, V7 원본 통제관, 중앙연결관 기존 ChatGPT 대화 3방의 공동회의 통신을 최우선 작업으로 전환. 별도의 새 AI 또는 기존 채팅방인 척하는 응답으로 대체하지 말 것.
+
+### 공식 지원 범위와 기술제한 (2026-10-25 공개 문서 기준)
+- OpenAI ChatGPT 공유 프로젝트 설명: 별도 대화방은 서로 볼 수 있어도 하나의 원본 대화에 동시 편집하거나 메시지를 동기화하는 기능을 제공하지 않음. https://help.openai.com/en/articles/10169521-projects-in-chatgpt
+- 그룹 채팅은 2026-07-09부터 신규 생성/참여가 중단됨. https://help.openai.com/en/articles/12703475-retiring-group-chats-in-chatgpt
+- 연결된 앱/커스텀 MCP가 도구 호출 시 외부 공유 저장소에 액션을 할 수 있지만, 이것은 각 ChatGPT 원본방이 상대방 메시지를 자동 수신하거나 백그라운드에서 자율 응답한다는 뜻이 아님. https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt
+
+### 이번 실제 구현 (V3·V7 원본 앱과 기존 DB 보존)
+1. 새로운 독립 데이터 테이블 `public.crew_meeting_bridge_events` 생성. 열: UUID id, `room_id`, `author_role` (captain/navigator/controller/linkofficer), `body`, `source_kind` (captain_app/original_chat_connector/captain_manual), `provenance='DECLARED_NOT_SESSION_VERIFIED'`, `created_at`. 기존 `crew_meeting_messages`, V3, V7 분석/구매/누적DB 변경 없음.
+2. Supabase migration `crew_meeting_original_three_room_bridge_20261025` success. 새 테이블 RLS ON, `PUBLIC/anon/authenticated` 모든 권한 REVOKE, 무단 공개 열람 차단. 실제 확인 시 테이블 `event_count=0`. 허위 원본 메시지나 시험 가짜 AI 답변을 삽입하지 않았음.
+3. 단독 Edge Function `crew-three-room-bridge` v1 `ACTIVE`, 서버 코드 소스 `crew-meeting-android/server/crew-three-room-bridge-v1-index.ts` commit `98f0ba4e44467fa0a8000c0843db3cb228655175`. 기존 공동회의 고정 입장키 SHA-256 인증 후 `GET /events` (최근 100건) 및 `POST /captain` (선장 역할만, 1200자 이내, 6초 쿨다운) 허용. Client에서 항해사·통제관·연결관을 사칭하는 POST 엔드포인트 제공하지 않음.
+4. 공동회의 원격 웹 `crew-meeting.html`에 `📡 세 원본방 업무 공유판` 추가. 실제 공유 DB의 이벤트를 펼친 화면에서 약 **4초 간격으로 확인**. 선장 지시 등록/공유 기록 조회/원본방 역할별 `연결 안내 복사` 버튼. 각 원본 ChatGPT 방에서 선장이 초기 지시를 전달하고, 해당 원본 AI가 **연결된 Supabase 도구를 직접 호출하는 턴에서만** 공유 조회/답변 등록할 수 있는 안내문 생성. 앱 역할 표시는 **수동 선언 출처이며 원본 세션 인증 아님**을 명시.
+5. 웹 코드 최초 commit `c04dec6a0e18c1195548b2e3f85172a59508e4b3`, 안내 SQL 정교화 commit `997e1b89005b044c83897346dead2b355c7fa4fa`. 기존 1.0.6 드라이브 APK 정본 유지: `https://drive.google.com/file/d/1Ddg-fGo2q3JfowTjRTNUxmXPQ46CkUZL/view?usp=drivesdk`. WebView 최신 HTTPS 화면 로드로 APK 재설치 없이 새로운 접이식 메뉴 표시.
+6. 정적 검증: 웹 JS 구문 OK, 새 DOM ID 중복 없음, 기존 V3/V7 실행 버튼·원본 3방 열기·회람·보고서·고정 APK 업데이트 경로 유지; 공유 메시지는 `textContent`로 안전하게 표시. 서버 `ACTIVE v1` 재조회, RLS ON / 공개 grant 없음 / 초기 데이터 0건 확인.
+
+### 아직 해결되지 않은 중요 부분
+- **기존 ChatGPT 원본 3방 간 자동 메시지/응답 push-pull 및 무인 백그라운드 처리 불가**, 공식 지원 인터페이스 확인되지 않음. 현재는 '원본방 연결 도구를 통해 호출하는 턴'에서 공유 이벤트 조회/등록 가능한 기반까지만 구축. 원본 ChatGPT 방의 완전한 대화 내역을 자동 읽거나 앱에서 원본 AI에 직접 메시지를 보내는 기능은 구현하지 않음.
+- 각 원본방에서 연결 도구의 실제 사용 가능성/권한, 한 번 전달한 초기 안내문 처리, 각 방에서 메시지 INSERT/SELECT 및 공동회의 앱 반영의 종단간 검증 미실시. 4초 polling은 **앱 패널이 열린 동안만** 진행; 진정한 websocket push/ChatGPT 원본방의 자동 대화는 아님.
+- Edge API 인증 후 실제 GET/POST 네트워크 확인, Github Pages workflow run #40202568587 최종 성공 확인 필요. 이전 앱·자료에 손대지 않음.
+- 다음 검증 기준: 선장 입장 → 공유판 펼치기 → 선장 지시 1건 저장 → **원본 항해사/통제관/연결관** 각 원본 채팅방에서 연결된 Supabase tool로 SELECT 후 자신의 답변 INSERT → 각 답변이 4초 이내 공동회의 패널에 나타나는지 확인. 실패 시 권한/도구 지원 상태와 원본 세션에 대한 실제 연결 여부를 명확히 기록. 세 원본방의 자동 3방 대화 완성으로 승격하지 않음.
+
 ## 2026-10-25 / 선장 확인 접수 — 공동회의 업데이트 및 조회 화면
 
 - 선장 답변: “확인했습니다.” 직전 확인 요청은 공동회의 앱 재진입 → `📑 V3·V7 보고서·자료 확인` → `목록 조회`, 그리고 1.0.6 화면의 업데이트 버튼 표시임.
