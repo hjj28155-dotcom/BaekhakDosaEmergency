@@ -6,8 +6,8 @@ android {
         applicationId 'kr.hanghae.crewmeeting'
         minSdk 24
         targetSdk 34
-        versionCode 100
-        versionName '1.0.0-PILOT'
+        versionCode 101
+        versionName '1.0.1-PILOT'
     }
     compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
     buildTypes { debug { minifyEnabled false }; release { minifyEnabled false } }
