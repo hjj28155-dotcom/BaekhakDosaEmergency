@@ -122,7 +122,7 @@ footer{display:none}
 <body>
 <main>
 <header><div><h1>⚓ 항행의자유 공동회의</h1><small>선장 · 항해사 · 통제관 · 시험판</small></div><button id="disconnectBtn" class="secondary" type="button">퇴장</button></header>
-<div id="originalChatBar" role="navigation" aria-label="원본 ChatGPT 대화방 바로가기">
+<div id="originalChatBar" role="navigation" aria-label="원본 ChatGPT 대화방 직접 열기">
 <button type="button" id="originalNavigator">🧭 원본 항해사</button>
 <button type="button" id="originalController">🛡️ 원본 통제관</button>
 <button type="button" id="originalLinkofficer">🔗 중앙연결관</button>
@@ -131,10 +131,10 @@ footer{display:none}
 <label id="originalChatLabel" for="originalChatUrl">원본 ChatGPT 대화방 주소</label>
 <input id="originalChatUrl" type="url" inputmode="url" autocomplete="url" placeholder="https://chatgpt.com/c/…">
 <div class="actions"><button id="originalChatSave" type="button">주소 등록</button><button id="originalChatCancel" type="button" class="secondary">닫기</button></div>
-<small id="originalChatNotice">/share/ 읽기 전용 주소가 아닌, 실제 원본 대화방의 주소를 등록하세요. 원본방에 직접 들어가 대화합니다.</small>
+<small id="originalChatNotice">/share/ 읽기 전용 주소가 아닌, 실제 원본 대화방의 주소를 등록하세요. 입장키 없이 등록 가능합니다. 등록 뒤 원본 채팅방에서 직접 대화합니다.</small>
 </div>
 <div class="roles" aria-label="참여 역할"><div class="role"><div class="mark">⚓</div><b>선장</b><small>지시 및 결정</small></div><div class="role"><div class="mark">🧭</div><b>항해사</b><small>분석 의견</small></div><div class="role"><div class="mark">🛡️</div><b>통제관</b><small>검토 및 검증</small></div></div>
-<section class="notice">⚠️ <b>원본방에서 대화:</b> 위 세 버튼은 기존 ChatGPT 원본 대화로 이동합니다. <b>아래 공동회의 채팅은 별도 AI API 시험방</b>이며 원본 대화에 자동 전송되지 않습니다.</section>
+<section class="notice">⚓ <b>원본 대화 바로 연결:</b> 위 버튼은 공동회의 입장키 없이 기존 ChatGPT 대화를 직접 엽니다. <b>아래 공동회의 채팅은 별도 AI API 시험방</b>이며 원본 대화에 자동 전송되지 않습니다.</section>
 <section id="loginArea"><h2>공동회의방 입장</h2><p class="muted">승인된 선장만 이용할 수 있습니다. 입장키를 한 번 확인한 뒤 같은 앱에서는 자동으로 입장할 수 있습니다.</p><form id="loginForm"><label for="secret">전용 입장키</label><input id="secret" type="password" autocomplete="off" spellcheck="false" inputmode="text" placeholder="입장키를 붙여넣으세요" required><label id="rememberLabel" for="rememberDevice"><input type="checkbox" id="rememberDevice" checked> 이 기기에서 다음부터 자동 입장</label><div class="actions"><small id="serverState">서버 상태 확인 중…</small><button type="submit" id="loginButton">입장</button></div></form><div id="loginError" role="alert" class="status"></div></section>
 <section id="chatArea"><details id="continuityPanel" aria-label="원본 업무 연속성"><summary>원본 업무 연속성 점검 <span id="continuityFlag">미연결 · 자료 보기</span></summary><div id="continuityContent"><div class="actions"><h2>원본 업무 연속성 점검</h2><button id="continuityRefresh" type="button" class="secondary">근거 다시 확인</button></div><p id="continuitySummary" class="notice">원본 세션 연결 상태를 확인 중입니다.</p><div id="continuitySources" class="muted"></div></div></details><details id="filePanel" aria-label="공동회의 파일 교환"><summary>📎 회의 파일 주고받기 <span id="fileCount">0개 · 보기</span></summary><p class="pilotNotice">이 시험방의 별도 비공개 보관소입니다. 10MB 이하 파일만 가능하며, V3·V7 정식 자료실이나 기존 원본 AI 대화방과 자동 동기화되지 않습니다.</p><form id="fileForm"><input id="meetingFile" type="file" aria-label="올릴 파일 선택" accept=".pdf,.txt,.md,.json,.csv,.tsv,.js,.mjs,.ts,.html,.css,.png,.jpg,.jpeg,.webp,.zip,.apk" required><button id="fileUploadBtn" type="submit">파일 올리기</button></form><div id="fileStatus" role="status">입장 후 파일 목록을 확인합니다.</div><div id="fileList"></div></details><div class="actions"><h2>공동회의 대화록</h2><button class="secondary" id="refreshBtn" type="button">새로고침</button></div><div id="connectionState" class="status" aria-live="polite"></div><div id="messages" class="message-list" role="log" aria-label="회의 기록"><div class="muted">메시지를 불러오는 중입니다.</div></div><form id="sendForm"><label for="draft">선장 지시</label><textarea id="draft" maxlength="1200" placeholder="예: 항해사는 분석 의견을, 통제관은 검증 의견을 차례로 보고하세요." required></textarea><div class="actions"><small>하루 최대 8회 지시 · 응답은 순서대로 표시됩니다</small><small id="charCount">0 / 1200</small></div><button type="submit" id="sendMsg">항해사와 통제관에게 전달</button></form><div id="sendError" class="status" role="status"></div></section>
 <footer>서버 저장형 시범방 · 기존 V3/V7 데이터와 별도 · 다른 AI 담당자 없음</footer>
@@ -158,8 +158,12 @@ window.addEventListener('resize',setAppHeight);
 
 
 
-/* Authenticated original-thread registry. No sending messages to ChatGPT via API. */
+/* Open the ACTUAL ChatGPT original conversation; not an API clone or message forwarder.
+ * One-time link registration does NOT require entering the pilot meeting-room key.
+ * Direct-link state is stored locally on this device; authenticated server registry remains optional.
+ */
 var ORIGINAL_CHAT_KEY='crew_meeting_central_linkofficer_original_chat_url_v1';
+var ORIGINAL_ROLE_PREFIX='crew_meeting_direct_original_';
 var originalLinks={},editingRole=null;
 var origNames={navigator:'🧭 원본 항해사',controller:'🛡️ 원본 통제관',linkofficer:'🔗 중앙연결관'};
 var origButtons={navigator:'originalNavigator',controller:'originalController',linkofficer:'originalLinkofficer'};
@@ -170,56 +174,74 @@ function validOriginalUrl(input){
  u.hash='';u.search='';return u.href;
 }
 function roleUrl(role){
- if(originalLinks[role])return originalLinks[role];
- if(role==='linkofficer')try{return localStorage.getItem(ORIGINAL_CHAT_KEY)||'';}catch(e){}
- return '';
+ try{
+  var locally=localStorage.getItem(ORIGINAL_ROLE_PREFIX+role);
+  if(locally)return validOriginalUrl(locally);
+  if(role==='linkofficer'){
+   var old=localStorage.getItem(ORIGINAL_CHAT_KEY);
+   if(old)return validOriginalUrl(old);
+  }
+ }catch(e){}
+ return originalLinks[role]||'';
+}
+function rememberRoleUrl(role,url){
+ try{
+  localStorage.setItem(ORIGINAL_ROLE_PREFIX+role,url);
+  if(role==='linkofficer')localStorage.setItem(ORIGINAL_CHAT_KEY,url);
+  return true;
+ }catch(e){return false;}
 }
 function redrawOriginalButtons(){
  Object.keys(origButtons).forEach(function(role){
   var btn=$(origButtons[role]),ready=!!roleUrl(role);
   btn.textContent=origNames[role]+(ready?' · 원본방 열기':' · 주소 등록');
   btn.classList.toggle('ready',ready);
+  btn.title=ready?'기존 ChatGPT 대화방에서 직접 대화':'원본 채팅방 주소를 한 번 등록';
  });
 }
 function editOriginalRole(role){
  editingRole=role;$('originalChatPanel').hidden=false;
- $('originalChatLabel').textContent=origNames[role]+'의 기존 대화방 주소';
+ $('originalChatLabel').textContent=origNames[role]+'의 기존 ChatGPT 대화방 주소';
  $('originalChatUrl').value=roleUrl(role);
- status('originalChatNotice','현재 사용 중인 기존 ChatGPT 원본 대화방 주소를 붙여넣으세요. 공유(/share/) 주소는 대화를 이어갈 수 없습니다.');
+ status('originalChatNotice','원본 ChatGPT 방의 주소창 URL을 한 번만 등록하십시오. 공동회의 입장키는 필요하지 않습니다. /share/ 링크는 제외됩니다.');
  $('originalChatUrl').focus();
 }
 async function refreshOriginalLinks(){
  if(!token)return;
  try{
   var data=await api('original-links');
-  (data.links||[]).forEach(function(rec){if(origButtons[rec.role])try{originalLinks[rec.role]=validOriginalUrl(rec.chat_url);}catch(e){}});
+  (data.links||[]).forEach(function(rec){if(origButtons[rec.role])try{
+   originalLinks[rec.role]=validOriginalUrl(rec.chat_url);
+  }catch(e){}});
   redrawOriginalButtons();
- }catch(e){status('connectionState','원본 대화 주소 확인에 실패했습니다.');}
+ }catch(e){status('connectionState','원본 대화 주소 동기화를 확인할 수 없습니다. 저장한 바로가기는 계속 사용 가능합니다.');}
 }
 Object.keys(origButtons).forEach(function(role){
  $(origButtons[role]).addEventListener('click',function(){
   var saved=roleUrl(role);
-  if(!saved){if(!token){status('loginError','원본방 주소 확인은 먼저 전용 입장키로 입장해 주세요.');return;}editOriginalRole(role);return;}
+  if(!saved){editOriginalRole(role);return;}
   try{window.location.assign(validOriginalUrl(saved));}
   catch(e){editOriginalRole(role);}
  });
 });
 $('originalChatCancel').addEventListener('click',function(){$('originalChatPanel').hidden=true;});
 $('originalChatSave').addEventListener('click',async function(){
- if(!token){status('originalChatNotice','먼저 공동회의 입장키로 입장해 주세요.');return;}
  var role=editingRole,url,btn=$('originalChatSave');
  if(!origButtons[role])return;
  try{url=validOriginalUrl($('originalChatUrl').value);}
- catch(e){status('originalChatNotice','정확한 기존 ChatGPT 원본 대화 주소를 입력해 주세요. /share/ 주소는 사용할 수 없습니다.');return;}
- btn.disabled=true;
- try{
-  var out=await api('original-link','POST',{role:role,chat_url:url});
-  if(!out.saved)throw Error('SAVE_NOT_CONFIRMED');
-  originalLinks[role]=url;
-  if(role==='linkofficer')try{localStorage.setItem(ORIGINAL_CHAT_KEY,url);}catch(e){}
-  $('originalChatPanel').hidden=true;redrawOriginalButtons();
- }catch(e){status('originalChatNotice','등록 오류: '+String(e.message||e));}
- finally{btn.disabled=false;}
+ catch(e){status('originalChatNotice','정확한 ChatGPT 원본 채팅 주소를 입력해 주세요. 공유(/share/) 주소는 원본 대화를 계속할 수 없습니다.');return;}
+ // Save first; server sync cannot block the user's ability to open their actual conversation.
+ var remembered=rememberRoleUrl(role,url);
+ originalLinks[role]=url;
+ $('originalChatPanel').hidden=true;
+ redrawOriginalButtons();
+ if(token){
+  btn.disabled=true;
+  try{await api('original-link','POST',{role:role,chat_url:url});}
+  catch(e){status('connectionState','원본 링크 서버 동기화 실패 · 이 기기의 원본 바로가기는 보존됩니다.');}
+  finally{btn.disabled=false;}
+ }
+ if(!remembered)status('loginError','기기 저장을 사용할 수 없어 다음 실행 시 주소를 다시 등록해야 할 수 있습니다.');
 });
 redrawOriginalButtons();
 
