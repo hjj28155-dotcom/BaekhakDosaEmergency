@@ -83,15 +83,31 @@ footer{display:none}
  #chatArea>.actions{min-height:23px}
 }
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+/* Flagship 1.0.3: private attachments live inside a collapsible panel to retain one-screen layout */
+#filePanel{flex:none;max-height:43dvh;overflow-y:auto;scrollbar-width:thin;padding:0 8px;border-radius:9px;background:#132d41}
+#filePanel summary{display:flex;justify-content:space-between;gap:8px;align-items:center;cursor:pointer;font-size:.79rem;font-weight:750;padding:7px 0;color:#f3d698}
+#filePanel summary:before{content:"▸";color:#efc577}
+#filePanel[open] summary:before{content:"▾"}
+#filePanel form{margin:5px 0;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+#filePanel input[type=file]{flex:1 1 170px;min-width:0;width:auto;max-width:100%;font-size:.73rem;padding:6px}
+#filePanel button{font-size:.76rem;min-height:32px;padding:6px 8px}
+#fileList{padding-bottom:6px}
+#fileList .fileRow{display:flex;justify-content:space-between;align-items:center;gap:5px;border-top:1px solid #36506b;padding:5px 0}
+#fileList .fileLabel{flex:1;min-width:0;overflow-wrap:anywhere;font-size:.73rem}
+#fileList .fileLabel small{display:block;margin-top:2px;font-size:.67rem}
+#fileStatus{font-size:.7rem;color:#cbe3f1;margin:4px 0}
+#filePanel .pilotNotice{font-size:.67rem;line-height:1.2;color:#a8bbcd;margin:4px 0}
+@media(max-height:630px){#filePanel summary{padding:4px 0}}
 </style>
 </head>
 <body>
 <main>
-<header><div><h1>⚓ 선장 · 항해사 · 통제관</h1><small>공동회의 · 시험판</small></div><button id="disconnectBtn" class="secondary" type="button">퇴장</button></header>
+<header><div><h1>⚓ 항행의자유 공동회의</h1><small>선장 · 항해사 · 통제관 · 시험판</small></div><button id="disconnectBtn" class="secondary" type="button">퇴장</button></header>
 <div class="roles" aria-label="참여 역할"><div class="role"><div class="mark">⚓</div><b>선장</b><small>지시 및 결정</small></div><div class="role"><div class="mark">🧭</div><b>항해사</b><small>분석 의견</small></div><div class="role"><div class="mark">🛡️</div><b>통제관</b><small>검토 및 검증</small></div></div>
 <section class="notice">⚠️ <b>시험방</b> · 항해사·통제관은 별도 API입니다. 기존 ChatGPT 원본 대화 및 V3·V7 엔진은 <b>미연결</b>입니다. 실제 분석·저장 완료로 간주하지 마십시오.</section>
 <section id="loginArea"><h2>공동회의방 입장</h2><p class="muted">승인된 선장만 이용할 수 있습니다. 아래에 발급받은 전용 입장키를 붙여넣으세요. 입장키는 이 브라우저 탭에서만 임시 보관됩니다.</p><form id="loginForm"><label for="secret">전용 입장키</label><input id="secret" type="password" autocomplete="off" spellcheck="false" inputmode="text" placeholder="입장키를 붙여넣으세요" required><div class="actions"><small id="serverState">서버 상태 확인 중…</small><button type="submit" id="loginButton">입장</button></div></form><div id="loginError" role="alert" class="status"></div></section>
-<section id="chatArea"><details id="continuityPanel" aria-label="원본 업무 연속성"><summary>원본 업무 연속성 점검 <span id="continuityFlag">미연결 · 자료 보기</span></summary><div id="continuityContent"><div class="actions"><h2>원본 업무 연속성 점검</h2><button id="continuityRefresh" type="button" class="secondary">근거 다시 확인</button></div><p id="continuitySummary" class="notice">원본 세션 연결 상태를 확인 중입니다.</p><div id="continuitySources" class="muted"></div></div></details><div class="actions"><h2>공동회의 대화록</h2><button class="secondary" id="refreshBtn" type="button">새로고침</button></div><div id="connectionState" class="status" aria-live="polite"></div><div id="messages" class="message-list" role="log" aria-label="회의 기록"><div class="muted">메시지를 불러오는 중입니다.</div></div><form id="sendForm"><label for="draft">선장 지시</label><textarea id="draft" maxlength="1200" placeholder="예: 항해사는 분석 의견을, 통제관은 검증 의견을 차례로 보고하세요." required></textarea><div class="actions"><small>하루 최대 8회 지시 · 응답은 순서대로 표시됩니다</small><small id="charCount">0 / 1200</small></div><button type="submit" id="sendMsg">항해사와 통제관에게 전달</button></form><div id="sendError" class="status" role="status"></div></section>
+<section id="chatArea"><details id="continuityPanel" aria-label="원본 업무 연속성"><summary>원본 업무 연속성 점검 <span id="continuityFlag">미연결 · 자료 보기</span></summary><div id="continuityContent"><div class="actions"><h2>원본 업무 연속성 점검</h2><button id="continuityRefresh" type="button" class="secondary">근거 다시 확인</button></div><p id="continuitySummary" class="notice">원본 세션 연결 상태를 확인 중입니다.</p><div id="continuitySources" class="muted"></div></div></details><details id="filePanel" aria-label="공동회의 파일 교환"><summary>📎 회의 파일 주고받기 <span id="fileCount">0개 · 보기</span></summary><p class="pilotNotice">이 시험방의 별도 비공개 보관소입니다. 10MB 이하 파일만 가능하며, V3·V7 정식 자료실이나 기존 원본 AI 대화방과 자동 동기화되지 않습니다.</p><form id="fileForm"><input id="meetingFile" type="file" aria-label="올릴 파일 선택" accept=".pdf,.txt,.md,.json,.csv,.tsv,.js,.mjs,.ts,.html,.css,.png,.jpg,.jpeg,.webp,.zip,.apk" required><button id="fileUploadBtn" type="submit">파일 올리기</button></form><div id="fileStatus" role="status">입장 후 파일 목록을 확인합니다.</div><div id="fileList"></div></details><div class="actions"><h2>공동회의 대화록</h2><button class="secondary" id="refreshBtn" type="button">새로고침</button></div><div id="connectionState" class="status" aria-live="polite"></div><div id="messages" class="message-list" role="log" aria-label="회의 기록"><div class="muted">메시지를 불러오는 중입니다.</div></div><form id="sendForm"><label for="draft">선장 지시</label><textarea id="draft" maxlength="1200" placeholder="예: 항해사는 분석 의견을, 통제관은 검증 의견을 차례로 보고하세요." required></textarea><div class="actions"><small>하루 최대 8회 지시 · 응답은 순서대로 표시됩니다</small><small id="charCount">0 / 1200</small></div><button type="submit" id="sendMsg">항해사와 통제관에게 전달</button></form><div id="sendError" class="status" role="status"></div></section>
 <footer>서버 저장형 시범방 · 기존 V3/V7 데이터와 별도 · 다른 AI 담당자 없음</footer>
 </main>
 <script>
@@ -123,7 +139,7 @@ async function api(endpoint,method,payload){
 }
 function readableError(err){
  var key=String(err.message||err);
- var known={UNAUTHORIZED:'입장키가 올바르지 않습니다.',DAILY_LIMIT_REACHED:'오늘의 시범 지시 한도(8회)에 도달했습니다.',WAIT_15_SECONDS:'15초 간격으로 전송해 주세요.',INVALID_MESSAGE_LENGTH:'메시지는 1~1200자여야 합니다.',MESSAGE_SAVE_FAILED:'메시지 저장에 실패했습니다. 다시 확인해 주세요.'};
+ var known={UNAUTHORIZED:'입장키가 올바르지 않습니다.',DAILY_LIMIT_REACHED:'오늘의 시범 지시 한도(8회)에 도달했습니다.',WAIT_15_SECONDS:'15초 간격으로 전송해 주세요.',INVALID_MESSAGE_LENGTH:'메시지는 1~1200자여야 합니다.',MESSAGE_SAVE_FAILED:'메시지 저장에 실패했습니다. 다시 확인해 주세요.',FILE_TOO_LARGE:'10MB 이하 파일만 올릴 수 있습니다.',INVALID_FILE_SIZE:'파일 크기를 확인해 주세요.',FILE_TYPE_OR_NAME_REJECTED:'지원되지 않는 파일 이름 또는 형식입니다.',ROOM_FILE_LIMIT_REACHED:'시범 회의방 파일 한도(60개)에 도달했습니다.',FILE_STORAGE_FAILED:'파일 저장소 오류입니다.',FILE_LIST_FAILED:'파일 목록을 읽을 수 없습니다.',FILE_LINK_FAILED:'다운로드 링크를 만들지 못했습니다.'};
  return known[key]||'연결 오류: '+key;
 }
 function dateTime(value){try{return new Date(value).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});}catch{return '';}}
@@ -181,13 +197,64 @@ async function showContinuity(){
    list.replaceChildren();
  }
 }
+
+async function refreshFiles(){
+ if(!token)return;
+ try{
+  var data=await api('files'),items=data.files||[],el=$('fileList');
+  $('fileCount').textContent=items.length+'개 · 보기';el.replaceChildren();
+  if(!items.length){el.textContent='아직 등록된 파일이 없습니다.';}
+  items.forEach(function(item){
+   var row=document.createElement('div');row.className='fileRow';
+   var label=document.createElement('div');label.className='fileLabel';
+   label.textContent=item.filename;
+   var small=document.createElement('small');small.textContent=Math.ceil(item.byte_count/1024)+'KB · '+dateTime(item.created_at)+' · 선장 등록';
+   label.appendChild(small);
+   var download=document.createElement('button');download.type='button';download.className='secondary';download.textContent='받기';download.setAttribute('aria-label',item.filename+' 다운로드');
+   download.addEventListener('click',async function(){
+    download.disabled=true;status('fileStatus','보안 다운로드 링크 확인 중…');
+    try{
+      var r=await api('file-link?id='+encodeURIComponent(item.id));
+      var u=new URL(r.url);
+      if(u.protocol!=='https:'||u.hostname!=='jyqkohpeowkhuaohlezc.supabase.co')throw Error('UNSAFE_FILE_LINK');
+      status('fileStatus','브라우저에서 다운로드를 시작합니다.');
+      window.location.assign(u.href);
+    }catch(err){status('fileStatus',readableError(err));}
+    finally{download.disabled=false;}
+   });
+   row.append(label,download);el.appendChild(row);
+  });
+  status('fileStatus','서버에 저장된 회의 파일 '+items.length+'개');
+ }catch(err){status('fileStatus',readableError(err));}
+}
+$('filePanel').addEventListener('toggle',function(){if(this.open&&token)refreshFiles();});
+$('fileForm').addEventListener('submit',async function(event){
+ event.preventDefault();
+ if(!token)return;
+ var file=$('meetingFile').files[0];
+ if(!file)return;
+ if(file.size<1||file.size>10*1024*1024){status('fileStatus','파일은 1바이트 이상, 10MB 이하여야 합니다.');return;}
+ var btn=$('fileUploadBtn');btn.disabled=true;status('fileStatus','파일을 비공개 저장소에 저장하는 중…');
+ try{
+   var body=new FormData();body.append('file',file,file.name);
+   var reply=await fetch(BASE+'/file-upload',{method:'POST',headers:{Authorization:'Bearer '+token},body:body,cache:'no-store'});
+   var data=await reply.json().catch(function(){return {error:'FILE_UPLOAD_RESPONSE_INVALID'};});
+   if(!reply.ok||data.error)throw Error(data.error||'HTTP_'+reply.status);
+   if(!data.saved||!data.file?.sha256)throw Error('FILE_SAVE_NOT_CONFIRMED');
+   $('meetingFile').value='';
+   await refreshFiles();
+   status('fileStatus','저장 확인: '+data.file.filename+' · SHA-256 '+data.file.sha256.slice(0,12)+'…');
+ }catch(err){status('fileStatus',readableError(err));}
+ finally{btn.disabled=false;}
+});
+
 function enter(){
  $('loginArea').style.display='none';$('chatArea').style.display='flex';$('disconnectBtn').style.display='inline-block';$('draft').focus();
- if(timer)clearInterval(timer);timer=setInterval(refresh,4000);refresh();showContinuity();
+ if(timer)clearInterval(timer);timer=setInterval(refresh,4000);refresh();showContinuity();refreshFiles();
 }
 function disconnect(){
  if(timer)clearInterval(timer);timer=null;token='';sessionStorage.removeItem('crew_meeting_auth');lastFingerprint='';
- $('loginArea').style.display='block';$('chatArea').style.display='none';$('disconnectBtn').style.display='none';$('secret').value='';
+ $('loginArea').style.display='block';$('chatArea').style.display='none';$('disconnectBtn').style.display='none';$('secret').value='';$('fileList').replaceChildren();$('fileCount').textContent='0개 · 보기';
 }
 $('loginForm').addEventListener('submit',async function(event){
  event.preventDefault();status('loginError','확인 중입니다…');var key=$('secret').value.trim().toLowerCase();
