@@ -37,13 +37,11 @@ jobs:
         with:
           path: ~/.android/debug.keystore
           key: crew-meeting-independent-pilot-signing-v1
-      - name: Create signing key only if absent
+      - name: Abort if original signing key is missing
         run: |
           set -euo pipefail
-          mkdir -p ~/.android
-          if [ ! -s ~/.android/debug.keystore ]; then
-            keytool -genkeypair -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -dname "CN=Hanghae Crew Meeting Pilot,O=Hanghae,C=KR" -keyalg RSA -keysize 2048 -validity 10000
-          fi
+          test -s "$HOME/.android/debug.keystore" || { echo "Original signing key missing: STOP; do not generate a replacement."; exit 1; }
+          keytool -list -v -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey | grep -Fq "SHA256: B5:77:03:8A:98:E7:C5:B4:0E:13:75:00:06:88:52:18:2E:3D:AA:6E:A7:2B:74:97:77:4D:83:63:88:4F:BD:2C" || { echo "Unexpected signing key: STOP"; exit 1; }
       - name: Assemble separate app
         working-directory: crew-meeting-android
         run: gradle :app:assembleDebug --no-daemon --stacktrace
@@ -58,10 +56,11 @@ jobs:
           OLD=crew-meeting-android/releases/CREW_MEETING_PILOT_1.0.0.apk
           test -s "$OLD"
           "$APKSIGNER" verify --verbose --print-certs "$OLD" > /tmp/crew-old-signer.log
-          OLD_CERT=$(sed -n "s/^Signer #1 certificate SHA-256 digest: //p" /tmp/crew-old-signer.log | head -1)
-          NEW_CERT=$(sed -n "s/^Signer #1 certificate SHA-256 digest: //p" /tmp/crew-apk-signer.log | head -1)
+          OLD_CERT=$(sed -n "s/^V2 Signer: certificate SHA-256 digest: //p" /tmp/crew-old-signer.log | head -1)
+          NEW_CERT=$(sed -n "s/^V2 Signer: certificate SHA-256 digest: //p" /tmp/crew-apk-signer.log | head -1)
           test -n "$OLD_CERT"
           test "$OLD_CERT" = "$NEW_CERT"
+          test "$NEW_CERT" = "b577038a98e7c5b40e137500068852182e3daa6ea72b7497774d8363884fbd2c"
           echo "Same signing certificate verified for update: $NEW_CERT"
           "$AAPT" dump badging "$APK" | head -5
           "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting' versionCode='101'"
