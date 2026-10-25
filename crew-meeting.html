@@ -186,6 +186,12 @@ footer{display:none}
 #reportList .reportRow button{flex:none;font-size:.71rem;padding:5px 7px}
 #reportsPanel pre{white-space:pre-wrap;overflow-wrap:anywhere;overflow-y:auto;max-height:22dvh;background:#071f32;color:#e6f2ff;border:1px solid #47637a;border-radius:8px;padding:8px;font-size:.72rem;line-height:1.4}
 #reportsPanel pre[hidden]{display:none!important}
+
+/* Fixed Google Drive APK update from the existing 1.0.5+ WebView screen.
+ * This does not auto-install and never touches V3/V7 APK data. */
+#crewUpdateOpen{display:block;flex:none;background:#25496a;border:1px solid #8bbbd1;color:#e1f5ff;border-radius:9px;text-align:center;text-decoration:none;font-size:.73rem;font-weight:750;padding:5px 7px;min-height:28px;line-height:1.4}
+#crewUpdateOpen:focus-visible{outline:3px solid #ffe3a5;outline-offset:2px}
+@media(max-height:630px){#crewUpdateOpen{font-size:.68rem;padding:3px 4px;min-height:23px}}
 </style>
 </head>
 <body>
@@ -196,6 +202,7 @@ footer{display:none}
 <button type="button" id="originalController">🛡️ 원본 통제관</button>
 <button type="button" id="originalLinkofficer">🔗 중앙연결관</button>
 </div>
+<a id="crewUpdateOpen" href="https://drive.google.com/file/d/1Ddg-fGo2q3JfowTjRTNUxmXPQ46CkUZL/view?usp=drivesdk" aria-label="구글드라이브 고정 링크에서 공동회의 최신 APK 업데이트">📥 공동회의 APK 업데이트 · 구글드라이브 바로가기</a>
 <button id="relayOpen" type="button">⚓ 원본 3방 지시·답변 회람</button>
 <section id="relayPanel" hidden aria-label="기존 원본 대화방 수동 회람">
   <h2>⚓ 원본방 업무 회람</h2>
