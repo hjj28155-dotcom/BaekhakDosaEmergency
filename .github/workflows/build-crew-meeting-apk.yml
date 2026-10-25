@@ -1,4 +1,4 @@
-name: Build isolated crew meeting pilot APK
+name: Build separate compact meeting recovery APK
 on:
   push:
     branches:
@@ -35,27 +35,16 @@ jobs:
       - name: Restore isolated pilot signing key
         uses: actions/cache@v4
         with:
-          path: ~/.config/.android/debug.keystore
-          key: crew-meeting-original-b577038a-v1
+          path: ~/.android/debug.keystore
+          key: crew-meeting-independent-pilot-signing-v1
           fail-on-cache-miss: true
-      - name: Diagnose Android debug signing source (public metadata only)
-        working-directory: crew-meeting-android
-        run: |
-          set -euo pipefail
-          gradle :app:signingReport --no-daemon 2>&1 | grep -E "^(Variant:|Config:|Store:|Alias:|SHA-256:|SHA256:|Valid until:)" || true
-          if [ -s "$HOME/.config/.android/debug.keystore" ]; then
-            DEFAULT_CERT=$(keytool -list -v -keystore "$HOME/.config/.android/debug.keystore" -storepass android -alias androiddebugkey | awk '/SHA256:/ { print $2 }')
-            echo "Android Gradle DEFAULT debug signer SHA256: $DEFAULT_CERT"
-          else
-            echo "Android Gradle DEFAULT debug signer file missing"
-          fi
       - name: Abort if original signing key is missing
         run: |
           set -euo pipefail
-          test -s "$HOME/.config/.android/debug.keystore" || { echo "Original signing key missing: STOP; do not generate a replacement."; exit 1; }
-          ACTUAL=$(keytool -list -v -keystore "$HOME/.config/.android/debug.keystore" -storepass android -alias androiddebugkey | awk '/SHA256:/ { print $2 }')
+          test -s "$HOME/.android/debug.keystore" || { echo "Original signing key missing: STOP; do not generate a replacement."; exit 1; }
+          ACTUAL=$(keytool -list -v -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey | awk '/SHA256:/ { print $2 }')
           echo "Restored signing certificate SHA256: $ACTUAL"
-          test "$ACTUAL" = "B5:77:03:8A:98:E7:C5:B4:0E:13:75:00:06:88:52:18:2E:3D:AA:6E:A7:2B:74:97:77:4D:83:63:88:4F:BD:2C" || { echo "Unexpected signing key: STOP"; exit 1; }
+          test "$ACTUAL" = "E2:4E:95:73:E5:E9:85:67:EA:2E:5A:BD:DA:C4:27:12:6C:43:D8:F1:E4:6B:37:E4:09:9D:AB:C9:11:CF:70:BE" || { echo "Unexpected signing key: STOP"; exit 1; }
       - name: Assemble separate app
         working-directory: crew-meeting-android
         run: gradle :app:assembleDebug --no-daemon --stacktrace
@@ -67,27 +56,22 @@ jobs:
           AAPT=$(find "$ANDROID_HOME/build-tools" -name aapt -type f | sort -V | tail -1)
           APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort -V | tail -1)
           "$APKSIGNER" verify --verbose --print-certs "$APK" | tee /tmp/crew-apk-signer.log
-          OLD=crew-meeting-android/releases/CREW_MEETING_PILOT_1.0.0.apk
-          test -s "$OLD"
-          "$APKSIGNER" verify --verbose --print-certs "$OLD" > /tmp/crew-old-signer.log
-          OLD_CERT=$(sed -n "s/^V2 Signer: certificate SHA-256 digest: //p" /tmp/crew-old-signer.log | head -1)
           NEW_CERT=$(sed -n "s/^V2 Signer: certificate SHA-256 digest: //p" /tmp/crew-apk-signer.log | head -1)
-          test -n "$OLD_CERT"
-          test "$OLD_CERT" = "$NEW_CERT"
-          test "$NEW_CERT" = "b577038a98e7c5b40e137500068852182e3daa6ea72b7497774d8363884fbd2c"
-          echo "Same signing certificate verified for update: $NEW_CERT"
+          test -n "$NEW_CERT"
+          test "$NEW_CERT" = "e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be"
+          echo "Recovery app signer pinned: $NEW_CERT"
           "$AAPT" dump badging "$APK" | head -5
-          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting' versionCode='101'"
+          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting.compact' versionCode='102'"
           ! "$AAPT" dump badging "$APK" | grep -q "package: name='com.baekhak.dosa.v4'"
           mkdir -p crew-meeting-android/releases
-          cp "$APK" crew-meeting-android/releases/CREW_MEETING_PILOT_1.0.1.apk
-          (cd crew-meeting-android/releases && sha256sum CREW_MEETING_PILOT_1.0.1.apk > CREW_MEETING_PILOT_1.0.1.apk.sha256)
+          cp "$APK" crew-meeting-android/releases/CREW_MEETING_COMPACT_1.0.2.apk
+          (cd crew-meeting-android/releases && sha256sum CREW_MEETING_COMPACT_1.0.2.apk > CREW_MEETING_COMPACT_1.0.2.apk.sha256)
       - uses: actions/upload-artifact@v4
         with:
-          name: CREW-MEETING-PILOT-1.0.1-APK
+          name: CREW-MEETING-COMPACT-1.0.2-APK
           path: |
-            crew-meeting-android/releases/CREW_MEETING_PILOT_1.0.1.apk
-            crew-meeting-android/releases/CREW_MEETING_PILOT_1.0.1.apk.sha256
+            crew-meeting-android/releases/CREW_MEETING_COMPACT_1.0.2.apk
+            crew-meeting-android/releases/CREW_MEETING_COMPACT_1.0.2.apk.sha256
           if-no-files-found: error
           retention-days: 30
       - name: Publish only this isolated pilot to feature branch
@@ -95,7 +79,7 @@ jobs:
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -f crew-meeting-android/releases/CREW_MEETING_PILOT_1.0.1.apk crew-meeting-android/releases/CREW_MEETING_PILOT_1.0.1.apk.sha256
+          git add -f crew-meeting-android/releases/CREW_MEETING_COMPACT_1.0.2.apk crew-meeting-android/releases/CREW_MEETING_COMPACT_1.0.2.apk.sha256
           if ! git diff --cached --quiet; then
             git commit -m 'Build isolated crew meeting PILOT APK (no V3/V7 changes)'
             git push origin "HEAD:${GITHUB_REF_NAME}"
