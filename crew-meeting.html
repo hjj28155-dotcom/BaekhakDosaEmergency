@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <title>선장 · 항해사 · 통제관 공동회의</title>
 <style>
 :root{color-scheme:dark;font-family:system-ui,-apple-system,"Malgun Gothic",sans-serif;--ink:#ecf6ff;--dim:#a8bdd0;--line:#36506b;--panel:#11293fcc}
@@ -10,15 +10,88 @@
 main{max-width:840px;margin:0 auto;padding:17px 15px 35px}header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}h1{font-size:1.42rem;margin:0;line-height:1.35}h2{font-size:1rem;margin:0 0 9px}small,.muted{color:var(--dim);font-size:.8rem}p{line-height:1.5}section{border:1px solid var(--line);border-radius:16px;background:var(--panel);padding:16px;margin:12px 0;box-shadow:0 9px 30px #0002}.notice{font-size:.84rem;color:#cfe4f5;background:#18344c;border-left:3px solid #8ab8d5;padding:10px 12px;border-radius:4px}
 .roles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.role{border:1px solid var(--line);border-radius:12px;padding:10px 8px;text-align:center;background:#16334d}.role b{display:block;margin:3px 0}.role small{display:block}.role .mark{font-size:1.36rem}
 label{display:block;font-size:.88rem;font-weight:650;margin:10px 0 5px}input,textarea,button{font:inherit}input,textarea{color:var(--ink);background:#081b2d;border:1px solid #54708d;border-radius:10px;padding:12px;width:100%;font-size:1rem}input:focus,textarea:focus{outline:2px solid #66b8ec;outline-offset:1px}textarea{min-height:90px;max-height:170px;resize:vertical}button{border:0;border-radius:10px;padding:11px 15px;background:#c9e6fa;color:#092438;font-weight:750;cursor:pointer}button:disabled{opacity:.45;cursor:default}.secondary{background:#274660;color:#e4f4ff;border:1px solid #5b7890}.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.row button{flex:0 0 auto}.stretch{flex:1 1 180px}.message-list{min-height:150px;max-height:62dvh;overflow-y:auto;border:1px solid #36506b;border-radius:12px;padding:12px;background:#071a2a;display:flex;flex-direction:column;gap:10px}.message{max-width:90%;padding:11px 13px;border-radius:13px;border:1px solid #36516d;background:#15344e;line-height:1.5;overflow-wrap:anywhere;white-space:pre-wrap}.message.mine{align-self:flex-end;background:#254966;border-color:#6286aa}.message.meta{align-self:center;background:#13283b;color:#b4c8d8;font-size:.85rem}.who{font-weight:800;font-size:.88rem;margin-bottom:3px}.when{font-size:.7rem;color:#a8bdce;margin-top:6px}.message.mine .who{color:#d4ecff}.message.navigator .who{color:#9de1ff}.message.controller .who{color:#f9e3aa}.actions{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:9px 0}.status{font-size:.84rem;color:#b7d9ef}footer{margin-top:15px;text-align:center;font-size:.79rem;color:#99b0c1}#chatArea,#disconnectBtn{display:none}#sendMsg{width:100%}@media(max-width:440px){.role{padding:8px 4px}.role small{font-size:.69rem}main{padding-left:11px;padding-right:11px}.message{max-width:97%}h1{font-size:1.18rem}}
+
+/* v1.0.1: single-screen phone layout, preserve embedded V3/V7 state */
+html,body{height:100%;width:100%;overflow:hidden}
+body{height:100dvh}
+main{
+  height:100dvh;height:var(--app-height,100dvh);max-height:100dvh;
+  padding:max(6px,env(safe-area-inset-top)) 9px max(6px,env(safe-area-inset-bottom));
+  display:flex;flex-direction:column;gap:5px;overflow:hidden;min-height:0;
+}
+header{flex:none;margin:0;min-height:35px}
+h1{font-size:1.08rem;line-height:1.18}
+header small{font-size:.68rem}
+header button{padding:6px 10px}
+.roles{flex:none;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+.role{display:flex;align-items:center;justify-content:center;gap:4px;min-width:0;padding:5px 3px;border-radius:9px}
+.role .mark{font-size:1.05rem;line-height:1.2}
+.role b{font-size:.82rem;line-height:1.2;margin:0;white-space:nowrap}
+.role small{display:none}
+section{margin:0;box-shadow:none}
+section.notice{flex:none;padding:6px 9px;font-size:.72rem;line-height:1.28;max-height:45px;overflow:auto}
+#loginArea{flex:none;margin-top:min(7dvh,40px);padding:14px}
+#loginArea h2{font-size:1rem}
+#loginArea .muted{font-size:.83rem;margin:5px 0}
+#chatArea{flex:1 1 auto;min-height:0;min-width:0;padding:0;border:0;background:transparent;box-shadow:none;flex-direction:column;overflow:hidden;gap:5px}
+#chatArea>.actions{flex:none;margin:0 0 1px;min-height:27px}
+#chatArea>.actions button{padding:6px 10px;font-size:.75rem}
+#chatArea>.actions h2{margin:0;font-size:.93rem}
+#continuityPanel{flex:none;padding:0 8px;background:#132d41;border-radius:9px;max-height:34dvh;overflow-y:auto;scrollbar-width:thin}
+#continuityPanel summary{cursor:pointer;list-style:none;padding:8px 0;display:flex;align-items:center;justify-content:space-between;gap:5px;line-height:1.2;font-size:.79rem;font-weight:700}
+#continuityPanel summary::-webkit-details-marker{display:none}
+#continuityPanel summary:before{content:"▸";color:#a6d7f7;flex:none}
+#continuityPanel[open] summary:before{content:"▾"}
+#continuityFlag{font-size:.72rem;color:#ffdeb1;margin-left:auto;font-weight:600}
+#continuityContent{padding-bottom:6px}
+#continuityContent>.actions{margin:1px 0 4px}
+#continuityContent>.actions h2{font-size:.83rem;margin:0}
+#continuityContent>.actions button{font-size:.74rem;padding:5px 8px}
+#continuityContent .notice{max-height:none}
+#continuitySources{font-size:.76rem}
+#continuitySources p{margin:5px 0}
+#messages.message-list{flex:1 1 auto;min-height:0;max-height:none;padding:8px;gap:7px;overscroll-behavior:contain}
+.message{padding:8px 10px;font-size:.84rem;border-radius:10px}
+.who{font-size:.78rem}
+.when{font-size:.66rem;margin-top:3px}
+#connectionState{flex:none;min-height:12px;font-size:.69rem;line-height:1.2}
+#sendForm{flex:none;min-height:0;display:flex;flex-direction:column;gap:4px}
+#sendForm label{margin:0;font-size:.8rem}
+#sendForm textarea{min-height:54px;height:60px;max-height:105px;padding:8px 10px;line-height:1.3;font-size:.88rem}
+#sendForm .actions{margin:0}
+#sendForm .actions small{font-size:.69rem}
+#sendMsg{padding:10px 12px;min-height:38px;font-size:.88rem}
+#sendError{flex:none;min-height:0;max-height:34px;overflow-y:auto;font-size:.7rem}
+footer{display:none}
+@media(max-width:440px){
+ main{padding-left:7px;padding-right:7px}
+ h1{font-size:.98rem}
+ header small{font-size:.64rem}
+ .role{padding:5px 1px}
+ .role b{font-size:.78rem}
+ #loginArea{margin-top:8px}
+}
+@media(max-height:630px){
+ main{gap:3px}
+ header{min-height:28px}
+ header small{display:none}
+ section.notice{font-size:.68rem;max-height:32px;padding:4px 8px}
+ .role{padding:3px 1px}
+ #continuityPanel summary{padding:5px 0}
+ #sendForm textarea{height:45px;min-height:40px}
+ #sendMsg{padding:7px 12px;min-height:33px}
+ #chatArea>.actions{min-height:23px}
+}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
 <main>
-<header><div><h1>⚓ 선장 · 항해사 · 통제관</h1><small>공동회의 · 독립 시범방</small></div><button id="disconnectBtn" class="secondary" type="button">퇴장</button></header>
+<header><div><h1>⚓ 선장 · 항해사 · 통제관</h1><small>공동회의 · 시험판</small></div><button id="disconnectBtn" class="secondary" type="button">퇴장</button></header>
 <div class="roles" aria-label="참여 역할"><div class="role"><div class="mark">⚓</div><b>선장</b><small>지시 및 결정</small></div><div class="role"><div class="mark">🧭</div><b>항해사</b><small>분석 의견</small></div><div class="role"><div class="mark">🛡️</div><b>통제관</b><small>검토 및 검증</small></div></div>
-<section class="notice">본 시범방의 항해사·통제관은 <b>별도 API 역할</b>입니다. ChatGPT의 기존 원본 대화방, V3 엔진, V7 중앙통제실과 아직 자동 연결되지 않았습니다. 따라서 실제 분석·누적DB 수정이나 보고서 등록을 완료했다고 간주하면 안 됩니다.</section>
+<section class="notice">⚠️ <b>시험방</b> · 항해사·통제관은 별도 API입니다. 기존 ChatGPT 원본 대화 및 V3·V7 엔진은 <b>미연결</b>입니다. 실제 분석·저장 완료로 간주하지 마십시오.</section>
 <section id="loginArea"><h2>공동회의방 입장</h2><p class="muted">승인된 선장만 이용할 수 있습니다. 아래에 발급받은 전용 입장키를 붙여넣으세요. 입장키는 이 브라우저 탭에서만 임시 보관됩니다.</p><form id="loginForm"><label for="secret">전용 입장키</label><input id="secret" type="password" autocomplete="off" spellcheck="false" inputmode="text" placeholder="입장키를 붙여넣으세요" required><div class="actions"><small id="serverState">서버 상태 확인 중…</small><button type="submit" id="loginButton">입장</button></div></form><div id="loginError" role="alert" class="status"></div></section>
-<section id="chatArea"><section id="continuityPanel" aria-label="원본 업무 연속성"><div class="actions"><h2>원본 업무 연속성 점검</h2><button id="continuityRefresh" type="button" class="secondary">근거 다시 확인</button></div><p id="continuitySummary" class="notice">원본 세션 연결 상태를 확인 중입니다.</p><div id="continuitySources" class="muted"></div></section><div class="actions"><h2>공동회의 대화록</h2><button class="secondary" id="refreshBtn" type="button">새로고침</button></div><div id="connectionState" class="status" aria-live="polite"></div><div id="messages" class="message-list" role="log" aria-label="회의 기록"><div class="muted">메시지를 불러오는 중입니다.</div></div><form id="sendForm"><label for="draft">선장 지시</label><textarea id="draft" maxlength="1200" placeholder="예: 항해사는 분석 의견을, 통제관은 검증 의견을 차례로 보고하세요." required></textarea><div class="actions"><small>하루 최대 8회 지시 · 응답은 순서대로 표시됩니다</small><small id="charCount">0 / 1200</small></div><button type="submit" id="sendMsg">항해사와 통제관에게 전달</button></form><div id="sendError" class="status" role="status"></div></section>
+<section id="chatArea"><details id="continuityPanel" aria-label="원본 업무 연속성"><summary>원본 업무 연속성 점검 <span id="continuityFlag">미연결 · 자료 보기</span></summary><div id="continuityContent"><div class="actions"><h2>원본 업무 연속성 점검</h2><button id="continuityRefresh" type="button" class="secondary">근거 다시 확인</button></div><p id="continuitySummary" class="notice">원본 세션 연결 상태를 확인 중입니다.</p><div id="continuitySources" class="muted"></div></div></details><div class="actions"><h2>공동회의 대화록</h2><button class="secondary" id="refreshBtn" type="button">새로고침</button></div><div id="connectionState" class="status" aria-live="polite"></div><div id="messages" class="message-list" role="log" aria-label="회의 기록"><div class="muted">메시지를 불러오는 중입니다.</div></div><form id="sendForm"><label for="draft">선장 지시</label><textarea id="draft" maxlength="1200" placeholder="예: 항해사는 분석 의견을, 통제관은 검증 의견을 차례로 보고하세요." required></textarea><div class="actions"><small>하루 최대 8회 지시 · 응답은 순서대로 표시됩니다</small><small id="charCount">0 / 1200</small></div><button type="submit" id="sendMsg">항해사와 통제관에게 전달</button></form><div id="sendError" class="status" role="status"></div></section>
 <footer>서버 저장형 시범방 · 기존 V3/V7 데이터와 별도 · 다른 AI 담당자 없음</footer>
 </main>
 <script>
@@ -27,6 +100,17 @@ label{display:block;font-size:.88rem;font-weight:650;margin:10px 0 5px}input,tex
 var BASE='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/crew-meeting';
 var token='';var timer=null;var sending=false;var lastFingerprint='';
 var $=function(id){return document.getElementById(id);};
+function setAppHeight(){
+ try{
+   var h=window.visualViewport?window.visualViewport.height:window.innerHeight;
+   var usable=Math.max(280,Math.min(window.innerHeight,h));
+   document.documentElement.style.setProperty('--app-height',Math.round(usable)+'px');
+ }catch(e){}
+}
+setAppHeight();
+if(window.visualViewport)window.visualViewport.addEventListener('resize',setAppHeight);
+window.addEventListener('resize',setAppHeight);
+
 function status(id,text){$(id).textContent=text;}
 async function api(endpoint,method,payload){
  var options={method:method||'GET',headers:{'Accept':'application/json'},cache:'no-store'};
@@ -60,10 +144,10 @@ function render(rows){
 async function refresh(){if(!token)return;try{var r=await api('messages');render(r.messages||[]);status('connectionState','연결됨 · 기록 자동 확인 중 (4초 간격)');}catch(err){status('connectionState',readableError(err));if(err.status===401)disconnect();}}
 async function showContinuity(){
  var summary=$('continuitySummary'),list=$('continuitySources');
- summary.textContent='원본 출처 점검 중입니다…';
+ summary.textContent='원본 출처 점검 중입니다…';$('continuityFlag').textContent='확인 중';
  try{
    var data=await api('continuity');
-   summary.textContent='정식 연속성 미인증 · 기존 원본 ChatGPT 2개 세션 미연결 · 출처 참조만 가능. V3/V7 엔진 자동 연동 없음.';
+   summary.textContent='정식 연속성 미인증 · 기존 원본 ChatGPT 2개 세션 미연결 · 출처 참조만 가능. V3/V7 엔진 자동 연동 없음.';$('continuityFlag').textContent='미연결 · 근거 보기';
    list.replaceChildren();
    var p=document.createElement('p');
    p.textContent='서버 V7 배포: '+(data.v7_deployment?String(data.v7_deployment.version_name)+' (게시 기록 확인)':'조회 미확인')+' · 이 목록은 실시간 문서 자동 동기화가 아닙니다.';
@@ -93,12 +177,12 @@ async function showContinuity(){
      list.appendChild(item);
    });
  }catch(err){
-   summary.textContent='연속성 근거를 확인할 수 없습니다. 정식방으로 사용하지 마십시오. '+readableError(err);
+   summary.textContent='연속성 근거를 확인할 수 없습니다. 정식방으로 사용하지 마십시오. '+readableError(err);$('continuityFlag').textContent='확인 오류 · 보기';
    list.replaceChildren();
  }
 }
 function enter(){
- $('loginArea').style.display='none';$('chatArea').style.display='block';$('disconnectBtn').style.display='inline-block';$('draft').focus();
+ $('loginArea').style.display='none';$('chatArea').style.display='flex';$('disconnectBtn').style.display='inline-block';$('draft').focus();
  if(timer)clearInterval(timer);timer=setInterval(refresh,4000);refresh();showContinuity();
 }
 function disconnect(){
