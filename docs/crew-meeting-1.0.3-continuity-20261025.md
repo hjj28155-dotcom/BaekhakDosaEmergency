@@ -1,3 +1,15 @@
+## ⚓ 2026-10-25 / 선장 '진행하십시오' — 구글드라이브 고정 APK 업데이트 경로 정비 및 V7 읽기전용 회귀검증
+
+- **최신 작업 기준:** 공동회의 독립 Android **1.0.6-REPORTS** 유지, V3·V7 설치앱은 선장폰에 설치 및 공동회의에서 실행 연결 성공(선장 보고). V3/V7 자체 APK·서명·DB·잠금 상태·AI 원본방 연결 기록 변경 없음.
+- 선장 직전 지시: 폴더를 열지 않고 **구글드라이브 APK 고정 링크로 바로 업데이트**하고, 뒤이어 `진행하십시오`로 미완료된 공개 설치 페이지/보고서 조회 검증 지속.
+- **Drive 정본 재검증**: File ID `1Ddg-fGo2q3JfowTjRTNUxmXPQ46CkUZL`, 실제 다운로드 `항행의자유_공동회의_최신업데이트.apk`, 크기 `15618` byte, SHA-256 `8452b96f3f25b9d806535eb790b3614853f8afd4d8243ac74fb2d2723fb016a6`, ZIP CRC 검사 통과. `1.0.6` 배포본 변경·재업로드하지 않고 동일 파일 보존.
+- **공식 설치 페이지 수정:** GitHub main `crew-meeting-releases/index.html` 기존 1.0.5-LAUNCH 안내 및 구식 1.0.5 APK 링크를 제거하고 **1.0.6-REPORTS** 최신 확인판으로 갱신. Git commit `443cab7757a7f087f02720be94a361fee741e647`. 대형 '구글드라이브 최신 APK 열기' 링크가 현재 정본 `https://drive.google.com/file/d/1Ddg-fGo2q3JfowTjRTNUxmXPQ46CkUZL/view?usp=drivesdk` 직접 열기. Android 드라이브 다운로드/설치 최종 동작은 사용자가 확인해야 함. 기존 릴리스 APK 파일 1.0.3~1.0.5는 삭제하지 않음.
+- **앱 내부 바로가기 추가:** 메인 원격 `crew-meeting.html`에 `📥 공동회의 APK 업데이트 · 구글드라이브 바로가기` 앵커 삽입. Git commit `b1ee75ae4e0b9d4e5f57787c44e61ace26bd2436`. Android 1.0.6의 WebView는 기존과 동일하게 최신 HTTPS 화면을 불러오므로 **새 APK 빌드·재설치 불필요**. 외부 Drive 링크는 Android WebView 네이티브 라우트가 브라우저/드라이브로 실행하도록 설계되어 있음; 실기기 확인은 미실시.
+- **검증:** GitHub 최신 HTML readback 정상, JS 문법·DOM ID 중복 없음, 기존 V3/V7 설치 앱 실행버튼, 원본 ChatGPT 3방 링크, 새방 인계/수동 회람 및 V3/V7 보고서 조회 DOM 모두 보존. 정적 회귀 검사 13/13 통과. 구글드라이브 URL 동일성·1.0.6 표기·파일 SHA-256 표기 검증.
+- **V7 서버 확인:** 기존 Supabase Edge Function `crew-reports-readonly` version 1 `ACTIVE` (재배포/수정 없음). `public.v7_documents` 읽기전용 조회에서 공용 원문 `V7_SOURCE` 16건과 선장방 `V7_PURCHASE_5` 16건 그대로 확인. 당첨률·추첨 전 확정 데이터로 과대 주장 금지. 개인 입장키를 소스·기록·요청으로 노출하지 않음.
+- **배포 상태:** GitHub Pages workflow run `#40200549637`의 최종 완료 확인 필요. 정적 HTML 커밋/소스 readback과 실제 Pages 배포 성공 여부는 구분.
+- **남은 검증:** 실제 선장폰에서 기존 1.0.6 앱 열기 → 새 고정 업데이트 버튼 표시/Drive 링크 이동 → 앱 복귀 시 기존 등록·고정키·V3/V7 실행 지속 확인, `📑 V3·V7 보고서·자료 확인` 내 V7 원본 목록/상세 및 V3 내보내기 파일 미리보기 동작 확인. 실제 모바일 조회 성공 증거 확보 전 완료로 판정 금지. 실시간 원본 ChatGPT 3방 자동 송수신과 V3/V7 DB 자동 동기화는 여전히 미구현/HOLD.
+
 ## ⚓ 2026-10-25 · 공동회의 APK 업데이트 경로 Google Drive 고정
 
 - 선장 지시: 새 APK 업데이트 시 폴더 탐색 없이 **현재 ChatGPT 대화방에서 직접 누를 수 있는 구글드라이브 고정 링크** 제공.
