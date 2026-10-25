@@ -1,9 +1,9 @@
 {
   "app_name": "항행의자유 공동회의",
-  "package_name": "kr.hanghae.crewmeeting",
-  "current_update_version": "1.0.1-PILOT",
+  "package_name": "kr.hanghae.crewmeeting.compact",
+  "current_update_version": "1.0.2-COMPACT",
   "old_version": "1.0.0-PILOT",
-  "public_signing_certificate_sha256": "b577038a98e7c5b40e137500068852182e3daa6ea72b7497774d8363884fbd2c",
+  "public_signing_certificate_sha256": "e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be",
   "signing_certificate_sha256_origin": "Verified apksigner output from 1.0.0 CI run 40158630872",
   "key_alias": "androiddebugkey",
   "key_owner": "captain",
@@ -12,6 +12,6 @@
   "secret_key_embedded_in_apk": false,
   "private_key_archived_externally": false,
   "currently_verified_signing_source": "GitHub Actions cache crew-meeting-independent-pilot-signing-v1",
-  "continuity_guarantee": "FAIL-CLOSED: absent or mismatched key blocks APK update instead of resigning",
+  "continuity_guarantee": "Pinned CI cache certificate; side-by-side install to avoid signing conflict with v1.0.0. Private durable key escrow still pending.",
   "recovery_requirements": "Captain-controlled private encrypted signing-keystore backup required before treating as durable release. Never embed keystore, P12, password or seed in app."
 }
