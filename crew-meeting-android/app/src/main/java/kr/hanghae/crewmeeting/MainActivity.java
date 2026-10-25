@@ -18,7 +18,7 @@ import android.widget.Toast;
 
 public final class MainActivity extends Activity {
     private static final String ROOM_URL =
-        "https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/crew-meeting.html?app_version=101";
+        "https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/crew-meeting.html?app_version=102";
     private static final int FILE_CHOOSER_CODE = 502;
     private WebView web;
     private ValueCallback<Uri[]> fileCallback;
