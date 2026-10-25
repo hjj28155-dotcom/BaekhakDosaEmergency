@@ -35,8 +35,9 @@ jobs:
       - name: Restore isolated pilot signing key
         uses: actions/cache@v4
         with:
-          path: ~/.android/debug.keystore
-          key: crew-meeting-independent-pilot-signing-v1
+          path: ~/.config/.android/debug.keystore
+          key: crew-meeting-original-b577038a-v1
+          fail-on-cache-miss: true
       - name: Diagnose Android debug signing source (public metadata only)
         working-directory: crew-meeting-android
         run: |
@@ -51,8 +52,8 @@ jobs:
       - name: Abort if original signing key is missing
         run: |
           set -euo pipefail
-          test -s "$HOME/.android/debug.keystore" || { echo "Original signing key missing: STOP; do not generate a replacement."; exit 1; }
-          ACTUAL=$(keytool -list -v -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey | awk '/SHA256:/ { print $2 }')
+          test -s "$HOME/.config/.android/debug.keystore" || { echo "Original signing key missing: STOP; do not generate a replacement."; exit 1; }
+          ACTUAL=$(keytool -list -v -keystore "$HOME/.config/.android/debug.keystore" -storepass android -alias androiddebugkey | awk '/SHA256:/ { print $2 }')
           echo "Restored signing certificate SHA256: $ACTUAL"
           test "$ACTUAL" = "B5:77:03:8A:98:E7:C5:B4:0E:13:75:00:06:88:52:18:2E:3D:AA:6E:A7:2B:74:97:77:4D:83:63:88:4F:BD:2C" || { echo "Unexpected signing key: STOP"; exit 1; }
       - name: Assemble separate app
