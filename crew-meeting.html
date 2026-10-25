@@ -192,6 +192,26 @@ footer{display:none}
 #crewUpdateOpen{display:block;flex:none;background:#25496a;border:1px solid #8bbbd1;color:#e1f5ff;border-radius:9px;text-align:center;text-decoration:none;font-size:.73rem;font-weight:750;padding:5px 7px;min-height:28px;line-height:1.4}
 #crewUpdateOpen:focus-visible{outline:3px solid #ffe3a5;outline-offset:2px}
 @media(max-height:630px){#crewUpdateOpen{font-size:.68rem;padding:3px 4px;min-height:23px}}
+
+/* Genuine shared-event log; no claim of real-time original ChatGPT API bridging. */
+#threeRoomLivePanel{flex:none;max-height:46dvh;overflow-y:auto;overscroll-behavior:contain;padding:0 8px;border:1px solid #5b7790;border-radius:9px;background:#132d41}
+#threeRoomLivePanel summary{font-size:.76rem;padding:7px 0;font-weight:750;cursor:pointer;color:#d8f0ff;display:flex;justify-content:space-between;gap:6px}
+#threeRoomLiveState{font-size:.64rem;color:#f2d99f;font-weight:400}
+#threeRoomLivePanel .threeRoomWarning{font-size:.7rem;line-height:1.34;margin:4px 0 8px;color:#d0dce7}
+#threeRoomLivePanel .threeRoomActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;margin:6px 0}
+#threeRoomLivePanel .threeRoomActions button{font-size:.67rem;padding:6px 4px;min-height:30px}
+#threeRoomGuideCopy{font-size:.73rem;min-height:95px;max-height:170px}
+#threeRoomGuideCopy[hidden]{display:none!important}
+#threeRoomEvents{border:1px solid #476378;padding:6px;background:#081d2e;border-radius:8px;font-size:.74rem;max-height:23dvh;overflow-y:auto}
+.threeRoomEvent{border-top:1px solid #334c66;padding:6px 1px;white-space:pre-wrap;overflow-wrap:anywhere}
+.threeRoomEvent:first-child{border-top:0}
+.threeRoomEvent b{color:#ffe2a1}
+.threeRoomEvent small{display:block;font-size:.63rem;color:#a8c4d7}
+#threeRoomCaptainForm{display:flex;flex-direction:column;gap:5px;padding:6px 0}
+#threeRoomCaptainForm label{font-size:.74rem;margin:0}
+#threeRoomCaptainForm textarea{font-size:.8rem;min-height:52px;padding:7px}
+#threeRoomCaptainForm button{font-size:.74rem;padding:7px}
+#threeRoomStatus{font-size:.69rem;color:#bed8e7;line-height:1.4;padding-bottom:7px}
 </style>
 </head>
 <body>
@@ -203,6 +223,25 @@ footer{display:none}
 <button type="button" id="originalLinkofficer">🔗 중앙연결관</button>
 </div>
 <a id="crewUpdateOpen" href="https://drive.google.com/file/d/1Ddg-fGo2q3JfowTjRTNUxmXPQ46CkUZL/view?usp=drivesdk" aria-label="구글드라이브 고정 링크에서 공동회의 최신 APK 업데이트">📥 공동회의 APK 업데이트 · 구글드라이브 바로가기</a>
+
+<details id="threeRoomLivePanel" aria-label="세 원본방 업무 공유 서버">
+ <summary>📡 세 원본방 업무 공유판 <span id="threeRoomLiveState">원본방 자동 연결 전</span></summary>
+ <p class="threeRoomWarning">이 화면은 <b>실제 공동 메시지 서버의 기록</b>을 보여줍니다. 선장 지시는 공유 서버에만 저장됩니다. <b>기존 ChatGPT 세 대화방으로 자동 전송되거나 원본 메시지를 자동 수집하지 않습니다.</b> 원본 AI의 참여는 각 원본방에서 연결된 Supabase 도구를 실제 호출할 때에만 발생합니다.</p>
+ <div class="threeRoomActions">
+  <button type="button" class="secondary" id="threeRoomRefresh">공유 기록 확인</button>
+  <button type="button" class="secondary" id="threeRoomNavigatorGuide">🧭 항해사 연결 안내 복사</button>
+  <button type="button" class="secondary" id="threeRoomControllerGuide">🛡️ 통제관 연결 안내 복사</button>
+  <button type="button" class="secondary" id="threeRoomLinkofficerGuide">🔗 연결관 연결 안내 복사</button>
+ </div>
+ <textarea id="threeRoomGuideCopy" readonly rows="5" hidden aria-label="원본 대화방 한 번 전달할 연동 안내"></textarea>
+ <div id="threeRoomEvents" aria-label="공유 서버의 시간순 메시지" role="log"></div>
+ <form id="threeRoomCaptainForm">
+  <label for="threeRoomCaptainText">선장 지시를 공동 공유판에 등록</label>
+  <textarea id="threeRoomCaptainText" rows="2" maxlength="1200" placeholder="세 원본방이 연결 도구를 사용해 확인할 선장 지시"></textarea>
+  <button id="threeRoomSend" type="submit">공유 서버에 지시 기록</button>
+ </form>
+ <div id="threeRoomStatus" role="status" aria-live="polite">공동회의 입장 후 목록을 읽을 수 있습니다. 화면을 펼친 동안 약 4초 간격으로 자동 확인합니다.</div>
+</details>
 <button id="relayOpen" type="button">⚓ 원본 3방 지시·답변 회람</button>
 <section id="relayPanel" hidden aria-label="기존 원본 대화방 수동 회람">
   <h2>⚓ 원본방 업무 회람</h2>
@@ -686,6 +725,105 @@ $('relayExport').addEventListener('click',function(){
  relayCopyText(relayTranscript(record),$('relayStatus'));
 });
 
+
+/* Three-room shared EVENT server. This is not an API to read/act on original
+ * ChatGPT conversations. Original-thread tools must publish explicitly. */
+var THREE_ROOM_BASE='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/crew-three-room-bridge';
+var THREE_ROOM_ID='96774ce6-c34f-4505-bbcc-c62e07d3ef3a';
+var threeRoomTimer=null,threeRoomBusy=false;
+function threeRoomHeaders(){return {Authorization:'Bearer '+token,Accept:'application/json'};}
+async function threeRoomRequest(action,method,body){
+ if(!token)throw Error('입장키 인증이 필요합니다.');
+ var headers=threeRoomHeaders(),opts={method:method||'GET',headers:headers,cache:'no-store'};
+ if(body){headers['Content-Type']='application/json';opts.body=JSON.stringify(body);}
+ var res=await fetch(THREE_ROOM_BASE+'/'+action,opts);
+ var data=await res.json().catch(function(){return {error:'INVALID_SERVER_RESPONSE'};});
+ if(!res.ok||data.error)throw Error(String(data.error||res.status));
+ return data;
+}
+var threeRoomName={captain:'⚓ 선장',navigator:'🧭 항해사',controller:'🛡️ 통제관',linkofficer:'🔗 중앙연결관'};
+function threeRoomRender(rows){
+ var area=$('threeRoomEvents');area.replaceChildren();
+ if(!rows||!rows.length){area.textContent='원본방에서 등록된 공유 메시지는 아직 없습니다.';return;}
+ rows.forEach(function(e){
+  var item=document.createElement('div');item.className='threeRoomEvent';
+  var title=document.createElement('b');title.textContent=threeRoomName[e.author_role]||'출처 불명';
+  var meta=document.createElement('small');
+  meta.textContent=(e.source_kind==='captain_app'?'공동회의 앱에서 입력':'연결 도구를 통한 역할 선언 · 원본 세션 자동 인증 없음')+
+   ' · '+dateTime(e.created_at);
+  var body=document.createElement('div');body.textContent=String(e.body||'');
+  item.append(title,meta,body);area.appendChild(item);
+ });
+}
+async function threeRoomRefresh(){
+ if(!token||!$('threeRoomLivePanel').open)return;
+ if(threeRoomBusy)return;
+ threeRoomBusy=true;
+ try{
+  var x=await threeRoomRequest('events');
+  threeRoomRender(x.items||[]);
+  $('threeRoomLiveState').textContent='공유 서버 조회됨 · 자동 세션 연동 없음';
+  $('threeRoomStatus').textContent='공유 서버 메시지 '+(x.items||[]).length+'건 조회 · 약 4초 간격 자동 확인. 역할 표시는 본인 주장 정보이며 실제 원본 ChatGPT 세션 자동 인증은 아닙니다.';
+ }catch(err){
+  $('threeRoomStatus').textContent='공유판 조회 실패: '+String(err.message||err);
+  $('threeRoomLiveState').textContent='서버 확인 필요';
+ }finally{threeRoomBusy=false;}
+}
+function threeRoomStop(){if(threeRoomTimer)clearInterval(threeRoomTimer);threeRoomTimer=null;}
+$('threeRoomLivePanel').addEventListener('toggle',function(){
+ threeRoomStop();
+ if(this.open){threeRoomRefresh();threeRoomTimer=setInterval(threeRoomRefresh,4000);}
+});
+$('threeRoomRefresh').addEventListener('click',threeRoomRefresh);
+$('threeRoomCaptainForm').addEventListener('submit',async function(ev){
+ ev.preventDefault();
+ if(!token){$('threeRoomStatus').textContent='입장키로 공동회의에 먼저 입장하십시오.';return;}
+ var body=$('threeRoomCaptainText').value.trim();
+ if(!body||body.length>1200){$('threeRoomStatus').textContent='선장 지시는 1~1200자 이내로 작성하십시오.';return;}
+ var btn=$('threeRoomSend');btn.disabled=true;
+ try{
+  var out=await threeRoomRequest('captain','POST',{body:body});
+  if(!out.saved)throw Error('저장 결과 확인 실패');
+  $('threeRoomCaptainText').value='';
+  $('threeRoomStatus').textContent='공유 서버에 저장되었습니다. 원본 세 대화방에 자동 전송한 것은 아닙니다.';
+  await threeRoomRefresh();
+ }catch(e){$('threeRoomStatus').textContent='저장 실패: '+String(e.message||e);}
+ finally{btn.disabled=false;}
+});
+function threeRoomGuide(role){
+ var label=threeRoomName[role];
+ return [
+  '⚓ 항행의자유 중앙통제실 — '+label+' 원본 채팅방용 공동 업무기록 연결 지시',
+  '',
+  '원래 대화방·역할·기존 작업의 연속성을 그대로 유지하십시오. 별도의 새 AI나 모의 응답으로 대체하지 마십시오.',
+  '연결된 Supabase 도구를 사용할 수 있는 경우, 선장이 업무 공유를 요청하거나 이 원본방이 응답을 작성할 때 아래 공용 메시지 기록을 확인하십시오.',
+  '프로젝트 ID: jyqkohpeowkhuaohlezc',
+  '조회 SQL:',
+  "SELECT author_role, body, source_kind, created_at FROM public.crew_meeting_bridge_events WHERE room_id = '"+THREE_ROOM_ID+"' ORDER BY created_at DESC LIMIT 30;",
+  '',
+  '원본방이 실제로 작성한 업무 답변을 공유할 때만 동일 테이블에 INSERT하십시오.',
+  "author_role='"+role+"', source_kind='original_chat_connector', provenance='DECLARED_NOT_SESSION_VERIFIED'",
+  'room_id='+THREE_ROOM_ID,
+  'body는 원본방에서 직접 검토해 승인된 새 업무 보고문으로 하며 SQL 문자열 인용을 안전하게 처리하십시오.',
+  '계정 비밀번호, 토큰, 키, 개인 대화 원문을 자동 복제하거나 노출하지 마십시오.',
+  '중요: 이 공유 기록만으로 원본 ChatGPT 방의 자동 메시지 수신·송신이 완료되지는 않습니다. 각 대화 턴에서 연결 도구 호출이 필요한 방식입니다.',
+  '업로드 여부와 함께 새로 등록된 행 ID를 확인한 뒤 선장에게 보고하십시오.'
+ ].join('\n');
+}
+async function threeRoomCopyGuide(role){
+ var guide=threeRoomGuide(role);
+ $('threeRoomGuideCopy').hidden=false;$('threeRoomGuideCopy').value=guide;
+ var copied=false;
+ try{if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(guide);copied=true;}}catch(e){}
+ if(!copied){
+  try{$('threeRoomGuideCopy').focus();$('threeRoomGuideCopy').select();copied=document.execCommand('copy')===true;}catch(e){}
+ }
+ $('threeRoomStatus').textContent=copied?'원본 '+threeRoomName[role]+' 대화방용 연결 지시 복사 완료. 해당 원본방에 첫 메시지로 직접 전달하십시오.':'자동 복사가 제한됩니다. 아래 문구를 길게 눌러 복사한 후 원본방에 전달하십시오.';
+}
+$('threeRoomNavigatorGuide').addEventListener('click',function(){threeRoomCopyGuide('navigator');});
+$('threeRoomControllerGuide').addEventListener('click',function(){threeRoomCopyGuide('controller');});
+$('threeRoomLinkofficerGuide').addEventListener('click',function(){threeRoomCopyGuide('linkofficer');});
+
 function status(id,text){$(id).textContent=text;}
 
 /* Read-only V7 catalog is a separate permissioned service; V3 is a local
@@ -918,6 +1056,7 @@ function saveConfirmedEntry(){
  }catch(e){status('loginError','기기 저장이 제한되어 이번 앱 사용 중에만 입장이 유지될 수 있습니다.');}
 }
 function disconnect(){
+ threeRoomStop();
  if(timer)clearInterval(timer);timer=null;token='';clearRememberedEntry();lastFingerprint='';
  $('loginArea').style.display='block';$('chatArea').style.display='none';$('disconnectBtn').style.display='none';$('secret').value='';$('fileList').replaceChildren();$('fileCount').textContent='0개 · 보기';
 }
