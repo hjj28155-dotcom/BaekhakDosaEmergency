@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET" />
-    <application android:label="공동회의 한눈에"
+    <application android:label="항행의자유 공동회의" android:icon="@drawable/ic_crew_flagship"
         android:usesCleartextTraffic="false"
         android:allowBackup="false"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
