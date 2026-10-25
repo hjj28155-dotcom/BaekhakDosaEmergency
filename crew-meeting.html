@@ -18,7 +18,7 @@ label{display:block;font-size:.88rem;font-weight:650;margin:10px 0 5px}input,tex
 <div class="roles" aria-label="참여 역할"><div class="role"><div class="mark">⚓</div><b>선장</b><small>지시 및 결정</small></div><div class="role"><div class="mark">🧭</div><b>항해사</b><small>분석 의견</small></div><div class="role"><div class="mark">🛡️</div><b>통제관</b><small>검토 및 검증</small></div></div>
 <section class="notice">본 시범방의 항해사·통제관은 <b>별도 API 역할</b>입니다. ChatGPT의 기존 원본 대화방, V3 엔진, V7 중앙통제실과 아직 자동 연결되지 않았습니다. 따라서 실제 분석·누적DB 수정이나 보고서 등록을 완료했다고 간주하면 안 됩니다.</section>
 <section id="loginArea"><h2>공동회의방 입장</h2><p class="muted">승인된 선장만 이용할 수 있습니다. 아래에 발급받은 전용 입장키를 붙여넣으세요. 입장키는 이 브라우저 탭에서만 임시 보관됩니다.</p><form id="loginForm"><label for="secret">전용 입장키</label><input id="secret" type="password" autocomplete="off" spellcheck="false" inputmode="text" placeholder="입장키를 붙여넣으세요" required><div class="actions"><small id="serverState">서버 상태 확인 중…</small><button type="submit" id="loginButton">입장</button></div></form><div id="loginError" role="alert" class="status"></div></section>
-<section id="chatArea"><div class="actions"><h2>공동회의 대화록</h2><button class="secondary" id="refreshBtn" type="button">새로고침</button></div><div id="connectionState" class="status" aria-live="polite"></div><div id="messages" class="message-list" role="log" aria-label="회의 기록"><div class="muted">메시지를 불러오는 중입니다.</div></div><form id="sendForm"><label for="draft">선장 지시</label><textarea id="draft" maxlength="1200" placeholder="예: 항해사는 분석 의견을, 통제관은 검증 의견을 차례로 보고하세요." required></textarea><div class="actions"><small>하루 최대 8회 지시 · 응답은 순서대로 표시됩니다</small><small id="charCount">0 / 1200</small></div><button type="submit" id="sendMsg">항해사와 통제관에게 전달</button></form><div id="sendError" class="status" role="status"></div></section>
+<section id="chatArea"><section id="continuityPanel" aria-label="원본 업무 연속성"><div class="actions"><h2>원본 업무 연속성 점검</h2><button id="continuityRefresh" type="button" class="secondary">근거 다시 확인</button></div><p id="continuitySummary" class="notice">원본 세션 연결 상태를 확인 중입니다.</p><div id="continuitySources" class="muted"></div></section><div class="actions"><h2>공동회의 대화록</h2><button class="secondary" id="refreshBtn" type="button">새로고침</button></div><div id="connectionState" class="status" aria-live="polite"></div><div id="messages" class="message-list" role="log" aria-label="회의 기록"><div class="muted">메시지를 불러오는 중입니다.</div></div><form id="sendForm"><label for="draft">선장 지시</label><textarea id="draft" maxlength="1200" placeholder="예: 항해사는 분석 의견을, 통제관은 검증 의견을 차례로 보고하세요." required></textarea><div class="actions"><small>하루 최대 8회 지시 · 응답은 순서대로 표시됩니다</small><small id="charCount">0 / 1200</small></div><button type="submit" id="sendMsg">항해사와 통제관에게 전달</button></form><div id="sendError" class="status" role="status"></div></section>
 <footer>서버 저장형 시범방 · 기존 V3/V7 데이터와 별도 · 다른 AI 담당자 없음</footer>
 </main>
 <script>
@@ -58,9 +58,48 @@ function render(rows){
  if(stick)el.scrollTop=el.scrollHeight;
 }
 async function refresh(){if(!token)return;try{var r=await api('messages');render(r.messages||[]);status('connectionState','연결됨 · 기록 자동 확인 중 (4초 간격)');}catch(err){status('connectionState',readableError(err));if(err.status===401)disconnect();}}
+async function showContinuity(){
+ var summary=$('continuitySummary'),list=$('continuitySources');
+ summary.textContent='원본 출처 점검 중입니다…';
+ try{
+   var data=await api('continuity');
+   summary.textContent='정식 연속성 미인증 · 기존 원본 ChatGPT 2개 세션 미연결 · 출처 참조만 가능. V3/V7 엔진 자동 연동 없음.';
+   list.replaceChildren();
+   var p=document.createElement('p');
+   p.textContent='서버 V7 배포: '+(data.v7_deployment?String(data.v7_deployment.version_name)+' (게시 기록 확인)':'조회 미확인')+' · 이 목록은 실시간 문서 자동 동기화가 아닙니다.';
+   list.appendChild(p);
+   (data.sources||[]).forEach(function(entry){
+     var item=document.createElement('div');
+     item.style.cssText='border-top:1px solid #36506b;padding:10px 0';
+     var title=document.createElement('strong');
+     title.textContent=(entry.role==='navigator'?'🧭 항해사':'🛡️ 통제관')+' · '+entry.source_title;
+     item.appendChild(title);
+     var detail=document.createElement('p');
+     detail.className='muted';
+     detail.textContent=entry.source_summary;
+     item.appendChild(detail);
+     var status=document.createElement('small');
+     status.textContent=entry.evidence_status==='NOT_CONNECTED'?'원본 세션 직접 연결 없음':(entry.evidence_status==='SERVER_VERIFIED'?'서버 기록 읽기 확인 · 참조 전용':'문서 읽기 확인 · 참조 전용');
+     item.appendChild(status);
+     if(entry.source_url){
+       try{var u=new URL(entry.source_url);if(u.protocol==='https:'){
+         var link=document.createElement('a');
+         link.href=u.href;link.target='_blank';link.rel='noopener noreferrer';
+         link.style.cssText='display:inline-block;margin-left:10px;color:#a9daff';
+         link.textContent='근거 원문 열기';
+         item.appendChild(link);
+       }}catch(e){}
+     }
+     list.appendChild(item);
+   });
+ }catch(err){
+   summary.textContent='연속성 근거를 확인할 수 없습니다. 정식방으로 사용하지 마십시오. '+readableError(err);
+   list.replaceChildren();
+ }
+}
 function enter(){
  $('loginArea').style.display='none';$('chatArea').style.display='block';$('disconnectBtn').style.display='inline-block';$('draft').focus();
- if(timer)clearInterval(timer);timer=setInterval(refresh,4000);refresh();
+ if(timer)clearInterval(timer);timer=setInterval(refresh,4000);refresh();showContinuity();
 }
 function disconnect(){
  if(timer)clearInterval(timer);timer=null;token='';sessionStorage.removeItem('crew_meeting_auth');lastFingerprint='';
@@ -76,6 +115,7 @@ $('loginForm').addEventListener('submit',async function(event){
 });
 $('disconnectBtn').addEventListener('click',disconnect);
 $('refreshBtn').addEventListener('click',refresh);
+$('continuityRefresh').addEventListener('click',showContinuity);
 $('draft').addEventListener('input',function(){status('charCount',$('draft').value.length+' / 1200');});
 $('sendForm').addEventListener('submit',async function(event){
  event.preventDefault();if(sending||!token)return;
