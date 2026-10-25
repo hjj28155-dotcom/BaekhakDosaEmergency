@@ -139,6 +139,25 @@ footer{display:none}
 #handoffPanel>.actions{display:flex;flex-wrap:wrap;gap:5px}
 #handoffPanel>.actions button{flex:1 1 120px;min-height:34px;padding:7px;font-size:.73rem}
 @media(max-height:630px){#handoffOpen{min-height:25px;padding:3px 7px}}
+
+/* Original-room MANUAL relay: never imply a separate API AI is the ChatGPT original. */
+#relayOpen{flex:none;min-height:30px;padding:5px 8px;background:#e1bd7b;color:#142b3d;font-size:.76rem}
+#relayPanel{flex:none;padding:10px;background:#112c43;border:1px solid #bb9768;border-radius:11px;max-height:65dvh;overflow-y:auto;overscroll-behavior:contain}
+#relayPanel[hidden]{display:none!important}
+#relayPanel h2{font-size:.92rem;margin:0 0 4px}
+#relayPanel .relayNote{font-size:.73rem;line-height:1.35;color:#bfd7e9;margin:5px 0 9px}
+#relayPanel label{margin:5px 0 3px;font-size:.75rem}
+#relayPanel textarea{font-size:.81rem;min-height:67px;max-height:160px;padding:8px;border-radius:7px}
+#relayPanel select{width:100%;color:#edf5fb;background:#081b2d;border:1px solid #54708d;border-radius:7px;padding:7px;font-size:.78rem}
+#relayPanel .relayActions{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0}
+#relayPanel .relayActions button{flex:1 1 108px;min-height:30px;padding:5px;font-size:.73rem}
+#relayPanel .relayCard{margin:7px 0;padding:8px;border:1px solid #365775;background:#19354d;border-radius:9px}
+#relayPanel .relayCard b{font-size:.8rem}
+#relayPanel .relayCard .relaySmall{font-size:.7rem;color:#bcd0e3;white-space:pre-wrap;overflow-wrap:anywhere}
+#relayPanel .relayCard .relayActions button{flex:1 1 88px;font-size:.71rem}
+#relayPanel .relayCard textarea{min-height:65px}
+#relayStatus{font-size:.72rem;color:#d9e8f5;line-height:1.3}
+@media(max-height:630px){#relayOpen{min-height:26px;padding:3px 5px}#relayPanel{max-height:70dvh}}
 </style>
 </head>
 <body>
@@ -149,6 +168,23 @@ footer{display:none}
 <button type="button" id="originalController">🛡️ 원본 통제관</button>
 <button type="button" id="originalLinkofficer">🔗 중앙연결관</button>
 </div>
+<button id="relayOpen" type="button">⚓ 원본 3방 지시·답변 회람</button>
+<section id="relayPanel" hidden aria-label="기존 원본 대화방 수동 회람">
+  <h2>⚓ 원본방 업무 회람</h2>
+  <p class="relayNote">선장 지시를 원본 채팅방에 직접 전달하고, 받은 답변을 이 화면에 기록합니다. <b>원본 3방 자동 채팅이 아닌 수동 회람</b>입니다. 저장은 이 기기의 공동회의 앱에만 적용됩니다.</p>
+  <label for="relayDraft">모두에게 전달할 선장 지시</label>
+  <textarea id="relayDraft" maxlength="1200" rows="3" placeholder="원본 항해사·통제관·중앙연결관에게 전달할 같은 지시를 작성하세요."></textarea>
+  <div class="relayActions">
+    <button id="relayCreate" type="button">① 새 회람 지시 저장</button>
+    <button id="relayExport" type="button" class="secondary">회람록 복사</button>
+    <button id="relayClose" type="button" class="secondary">접기</button>
+  </div>
+  <label for="relaySessionSelect">저장된 회람 선택</label>
+  <select id="relaySessionSelect" aria-label="저장된 회람 지시"></select>
+  <div id="relaySessionNotice" class="relayNote">회람을 시작하면 담당자별 복사와 답변 기록이 표시됩니다.</div>
+  <div id="relayRoleCards"></div>
+  <div id="relayStatus" role="status" aria-live="polite">기존 ChatGPT 원본방의 답변은 자동으로 수집되지 않습니다.</div>
+</section>
 <button id="handoffOpen" type="button">📋 새방 첫머리 필수 인계양식</button>
 <section id="handoffPanel" hidden aria-label="원본 새 대화방 첫머리 인계양식">
  <h2>⚓ 새 ChatGPT 방 첫머리 인계</h2>
@@ -397,6 +433,163 @@ $('handoffNewChat').addEventListener('click',function(){
  window.location.assign('https://chatgpt.com/');
 });
 chooseHandoffRole(HANDOFF_ROLE);
+
+
+/* The original ChatGPT rooms have NO external read/write API.
+ * Manual relay is local, opt-in and copies text only on direct user presses.
+ * No automatic chatbot simulation, server upload, credential or room link in exported text.
+ */
+var RELAY_STORAGE_KEY='crew_meeting_original_manual_relay_v1';
+var RELAY_ROLES=['navigator','controller','linkofficer'];
+var relayData=[],relayActive='',relayUnavailable=false;
+function relayClean(raw){
+ if(!Array.isArray(raw))throw Error('RELAY_STORAGE_INVALID');
+ return raw.map(function(v){
+  if(!v||typeof v.id!=='string'||typeof v.text!=='string'||!v.replies||typeof v.replies!=='object')throw Error('RELAY_ITEM_INVALID');
+  return v;
+ });
+}
+function relayLoad(){
+ try{
+  var saved=localStorage.getItem(RELAY_STORAGE_KEY);
+  relayData=saved?relayClean(JSON.parse(saved)):[];
+  relayActive=relayData.length?relayData[0].id:'';
+ }catch(e){
+  relayData=[];relayUnavailable=true;
+  $('relayCreate').disabled=true;$('relayStatus').textContent='기존 회람 저장소를 읽지 못했습니다. 데이터 보호를 위해 새 회람 저장을 중단했습니다. 앱 데이터를 삭제하지 마십시오.';
+ }
+}
+function relayPersist(next){
+ if(relayUnavailable)return false;
+ try{localStorage.setItem(RELAY_STORAGE_KEY,JSON.stringify(next));relayData=next;return true;}
+ catch(e){$('relayStatus').textContent='기기 저장 실패. 기존 회람은 삭제하지 않았습니다. 저장공간을 확인하십시오.';return false;}
+}
+function relayCurrent(){return relayData.find(function(v){return v.id===relayActive;})||null;}
+function relayTimestamp(date){try{return new Date(date).toLocaleString('ko-KR');}catch(e){return '';}}
+function relayInstructionFor(role,record){
+ var label=origNames[role]||role;
+ var lines=[
+  '⚓ 항행의자유 공동회의 — 선장 원본방 회람 '+record.id,
+  '대상: '+label,
+  '원본 대화방에서 기존 작업 연속성을 유지해 주세요.',
+  '선장 지시:',
+  record.text,
+  ''
+ ];
+ var count=0;
+ RELAY_ROLES.forEach(function(other){
+  if(other===role)return;
+  var ans=record.replies[other];
+  if(ans&&typeof ans.text==='string'&&ans.text.trim()){
+   count++;
+   lines.push('【'+origNames[other]+'의 답변 — 선장이 수동으로 옮긴 내용, 원본 자동검증 아님】');
+   lines.push(ans.text);
+   lines.push('');
+  }
+ });
+ if(count)lines.push('다른 담당자의 의견을 참고하여 해당 담당자의 검토 또는 후속 답변을 부탁합니다.');
+ else lines.push('위 지시에 답해 주시면 선장이 공동회의에 답변을 옮기겠습니다.');
+ return lines.join('\n');
+}
+function relayTranscript(record){
+ var out=['⚓ 공동회의 원본방 수동 회람록','기록번호: '+record.id,'기록일시: '+relayTimestamp(record.created_at),'상태: 선장 수동 전사 / 원본 자동 검증·자동 동기화 없음','', '【선장 지시】',record.text];
+ RELAY_ROLES.forEach(function(role){
+  var ans=record.replies[role];
+  out.push('','【'+origNames[role]+'】');
+  out.push(ans&&ans.text?ans.text:'답변 미기록');
+  if(ans&&ans.recorded_at)out.push('수동 기록: '+relayTimestamp(ans.recorded_at));
+ });
+ return out.join('\n');
+}
+async function relayCopyText(text,element,statusElement){
+ var ok=false;
+ try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(text);ok=true;}}catch(e){}
+ if(!ok){
+  try{element.value=text;element.focus();element.select();ok=document.execCommand('copy')===true;}catch(e){}
+ }
+ statusElement.textContent=ok?'복사했습니다. 원본 ChatGPT 대화방에 직접 붙여넣어 전송하세요.':'자동 복사가 제한됩니다. 텍스트를 길게 눌러 복사해 주세요.';
+ return ok;
+}
+function relaySessionOptions(){
+ var select=$('relaySessionSelect');
+ select.replaceChildren();
+ if(!relayData.length){var opt=document.createElement('option');opt.value='';opt.textContent='저장된 회람 없음';select.appendChild(opt);return;}
+ relayData.forEach(function(v){
+  var opt=document.createElement('option');
+  opt.value=v.id;opt.textContent=relayTimestamp(v.created_at)+' · '+v.text.slice(0,33);
+  select.appendChild(opt);
+ });
+ select.value=relayActive;
+}
+function relayRoleCard(role,record){
+ var el=document.createElement('article');el.className='relayCard';
+ var heading=document.createElement('b');heading.textContent=origNames[role]+' · 실제 원본 대화방';
+ var note=document.createElement('div');note.className='relaySmall';note.textContent='원본방 답변 수집: 자동 아님 · 선장 수동 복사';
+ var controls=document.createElement('div');controls.className='relayActions';
+ var copy=document.createElement('button');copy.type='button';copy.textContent='② 전달문 복사';
+ var open=document.createElement('button');open.type='button';open.className='secondary';open.textContent='③ 원본방 열기';
+ controls.append(copy,open);
+ var response=document.createElement('textarea');response.maxLength=4000;response.rows=3;
+ response.placeholder='원본 대화방에서 받은 답변을 선장님이 여기에 직접 붙여넣으십시오 (4,000자 이내).';
+ var old=record.replies[role];
+ if(old&&typeof old.text==='string')response.value=old.text;
+ var save=document.createElement('button');save.type='button';save.textContent='④ 답변 기록';save.className='secondary';
+ var state=document.createElement('div');state.className='relaySmall';state.textContent=old&&old.recorded_at?'선장 수동 기록: '+relayTimestamp(old.recorded_at):'원본방 답변 미기록';
+ copy.addEventListener('click',function(){
+  relayCopyText(relayInstructionFor(role,record),response,$('relayStatus'));
+ });
+ open.addEventListener('click',function(){
+  var url=roleUrl(role);
+  if(!url){$('relayStatus').textContent=origNames[role]+' 원본 주소가 없습니다. 위 원본방 주소 등록 버튼으로 먼저 등록하십시오.';editOriginalRole(role);return;}
+  try{window.location.assign(validOriginalUrl(url));}
+  catch(e){$('relayStatus').textContent='원본 대화방 주소 형식에 오류가 있습니다.';}
+ });
+ save.addEventListener('click',function(){
+  var reply=response.value.trim();
+  if(!reply){$('relayStatus').textContent='원본방에서 받은 실제 답변을 붙여넣으십시오. 공백 답변은 기록할 수 없습니다.';return;}
+  if(reply.length>4000){$('relayStatus').textContent='답변은 4000자 이하로 기록하세요.';return;}
+  var updated=Object.assign({},record,{replies:Object.assign({},record.replies)});
+  updated.replies[role]={text:reply,recorded_at:new Date().toISOString(),manual:true};
+  var next=relayData.map(function(v){return v.id===record.id?updated:v;});
+  if(!relayPersist(next))return;
+  relayRender();
+  $('relayStatus').textContent=origNames[role]+' 답변을 선장 수동 회람록에 저장했습니다. 원본 서버 자동 확인 결과가 아닙니다.';
+ });
+ el.append(heading,note,controls,response,save,state);return el;
+}
+function relayRender(){
+ relaySessionOptions();
+ var record=relayCurrent(),cards=$('relayRoleCards');
+ cards.replaceChildren();
+ $('relayExport').disabled=!record;
+ $('relaySessionNotice').textContent=record?'선장 지시: '+record.text+' / 현재 담당자별 답변 '+RELAY_ROLES.filter(function(role){return record.replies[role]&&record.replies[role].text;}).length+'/3건':'먼저 새 지시를 저장하면 V3·V7·중앙연결관으로 보내는 버튼이 생깁니다.';
+ if(record)RELAY_ROLES.forEach(function(role){cards.appendChild(relayRoleCard(role,record));});
+}
+relayLoad();
+relayRender();
+$('relayOpen').addEventListener('click',function(){
+ $('relayPanel').hidden=false;$('handoffPanel').hidden=true;$('originalChatPanel').hidden=true;
+ relayRender();
+ $('relayDraft').focus();
+});
+$('relayClose').addEventListener('click',function(){$('relayPanel').hidden=true;});
+$('relayCreate').addEventListener('click',function(){
+ var text=$('relayDraft').value.trim();
+ if(!text||text.length>1200){$('relayStatus').textContent='선장 지시는 1~1200자로 입력하세요.';return;}
+ if(relayData.length>=50){$('relayStatus').textContent='저장된 회람이 50건입니다. 기존 기록을 자동 삭제하지 않습니다. 회람록을 백업하고 별도 정리를 계획하십시오.';return;}
+ var time=new Date().toISOString();
+ var record={id:'R-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7),created_at:time,text:text,replies:{}};
+ if(!relayPersist([record].concat(relayData)))return;
+ relayActive=record.id;
+ $('relayDraft').value='';
+ relayRender();
+ $('relayStatus').textContent='새 선장 지시를 이 기기에 보관했습니다. 각 원본방에 복사해 직접 전송하세요.';
+});
+$('relaySessionSelect').addEventListener('change',function(){relayActive=this.value;relayRender();});
+$('relayExport').addEventListener('click',function(){
+ var record=relayCurrent();if(!record)return;
+ relayCopyText(relayTranscript(record),$('relayDraft'),$('relayStatus'));
+});
 
 function status(id,text){$(id).textContent=text;}
 async function api(endpoint,method,payload){
