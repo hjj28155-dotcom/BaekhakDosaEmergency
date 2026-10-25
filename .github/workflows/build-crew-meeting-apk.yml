@@ -55,18 +55,26 @@ jobs:
           AAPT=$(find "$ANDROID_HOME/build-tools" -name aapt -type f | sort -V | tail -1)
           APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort -V | tail -1)
           "$APKSIGNER" verify --verbose --print-certs "$APK" | tee /tmp/crew-apk-signer.log
+          OLD=crew-meeting-android/releases/CREW_MEETING_PILOT_1.0.0.apk
+          test -s "$OLD"
+          "$APKSIGNER" verify --verbose --print-certs "$OLD" > /tmp/crew-old-signer.log
+          OLD_CERT=$(sed -n "s/^Signer #1 certificate SHA-256 digest: //p" /tmp/crew-old-signer.log | head -1)
+          NEW_CERT=$(sed -n "s/^Signer #1 certificate SHA-256 digest: //p" /tmp/crew-apk-signer.log | head -1)
+          test -n "$OLD_CERT"
+          test "$OLD_CERT" = "$NEW_CERT"
+          echo "Same signing certificate verified for update: $NEW_CERT"
           "$AAPT" dump badging "$APK" | head -5
-          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting' versionCode='100'"
+          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting' versionCode='101'"
           ! "$AAPT" dump badging "$APK" | grep -q "package: name='com.baekhak.dosa.v4'"
           mkdir -p crew-meeting-android/releases
-          cp "$APK" crew-meeting-android/releases/CREW_MEETING_PILOT_1.0.0.apk
-          (cd crew-meeting-android/releases && sha256sum CREW_MEETING_PILOT_1.0.0.apk > CREW_MEETING_PILOT_1.0.0.apk.sha256)
+          cp "$APK" crew-meeting-android/releases/CREW_MEETING_PILOT_1.0.1.apk
+          (cd crew-meeting-android/releases && sha256sum CREW_MEETING_PILOT_1.0.1.apk > CREW_MEETING_PILOT_1.0.1.apk.sha256)
       - uses: actions/upload-artifact@v4
         with:
-          name: CREW-MEETING-PILOT-APK
+          name: CREW-MEETING-PILOT-1.0.1-APK
           path: |
-            crew-meeting-android/releases/CREW_MEETING_PILOT_1.0.0.apk
-            crew-meeting-android/releases/CREW_MEETING_PILOT_1.0.0.apk.sha256
+            crew-meeting-android/releases/CREW_MEETING_PILOT_1.0.1.apk
+            crew-meeting-android/releases/CREW_MEETING_PILOT_1.0.1.apk.sha256
           if-no-files-found: error
           retention-days: 30
       - name: Publish only this isolated pilot to feature branch
@@ -74,7 +82,7 @@ jobs:
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -f crew-meeting-android/releases/CREW_MEETING_PILOT_1.0.0.apk crew-meeting-android/releases/CREW_MEETING_PILOT_1.0.0.apk.sha256
+          git add -f crew-meeting-android/releases/CREW_MEETING_PILOT_1.0.1.apk crew-meeting-android/releases/CREW_MEETING_PILOT_1.0.1.apk.sha256
           if ! git diff --cached --quiet; then
             git commit -m 'Build isolated crew meeting PILOT APK (no V3/V7 changes)'
             git push origin "HEAD:${GITHUB_REF_NAME}"
