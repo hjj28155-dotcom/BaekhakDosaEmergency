@@ -6,6 +6,8 @@ on:
     paths:
       - 'build405/FREEDOM_V402_BUILD_THIS/app/**'
       - '.github/workflows/verify-freedom-v4043-candidate.yml'
+      - '.github/scripts/verify_freedom_v4043.cjs'
+      - '.github/scripts/validate_freedom_r14.cjs'
   workflow_dispatch:
 permissions:
   contents: read
