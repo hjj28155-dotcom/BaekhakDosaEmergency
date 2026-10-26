@@ -306,6 +306,16 @@ footer{display:none}
 @media(max-width:390px){#installedAppBar .installedAppUnit button,#installedAppBar .installedAppUnit a{font-size:.70rem;padding:3px}#centralRoundPanel{padding:7px}.centralRoundRow button{font-size:.7rem;padding:4px 6px}}
 body{background:linear-gradient(180deg,rgba(2,15,34,.86),rgba(2,26,48,.58) 55%,rgba(2,16,38,.96)),radial-gradient(ellipse at 50% 46%,#397e9d 0%,#104669 55%,#041629 100%)}
 
+
+/* Central-link officer: dedicated Freedom distribution approval room in the ACTUAL central HOME. */
+#homeApprovalBtn{display:block;flex:none;width:100%;box-sizing:border-box;min-height:50px;border:2px solid #dfbb79;border-radius:12px;background:linear-gradient(155deg,#85601e,#664915);color:#fff4d4;font-size:.91rem;font-weight:850;line-height:1.25;padding:9px 10px;text-align:center}
+#homeApprovalBtn[aria-expanded="true"]{background:#265775;border-color:#f0dba1}
+#homeApprovalPanel{flex:1 1 auto;min-height:0;min-width:0;display:flex;flex-direction:column;gap:5px;overflow:hidden;border:1px solid #6f9db4;border-radius:13px;background:#071f34;padding:6px}
+#homeApprovalPanel[hidden]{display:none!important}
+#homeApprovalPanel .homePaneTop{flex:none;padding:3px 3px 5px}
+#homeApprovalPanel iframe{flex:1 1 auto;width:100%;min-height:0;border:0;border-radius:8px;background:#08283e}
+#homeApprovalPanel .approvalFallback{flex:none;color:#b9d6e9;text-align:center;font-size:.69rem;line-height:1.35;text-decoration:underline;padding:3px}
+@media(max-height:650px){#homeApprovalBtn{min-height:41px;padding:5px 8px;font-size:.82rem}}
 </style>
 </head>
 <body>
@@ -334,6 +344,7 @@ body{background:linear-gradient(180deg,rgba(2,15,34,.86),rgba(2,26,48,.58) 55%,r
   <a id="openFreedomDistribution" href="https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/hanghae-freedom-distribution.html" target="_self" rel="noopener" aria-label="항해의자유 배포판 공식 설치 및 접속 안내">🚢 항해의자유 배포판</a>
  </div>
 </div>
+<button id="homeApprovalBtn" type="button" aria-expanded="false" aria-controls="homeApprovalPanel">🚢 배포용 승인관리방 · 승인요청 / 승인확인</button>
 <div id="centralRoundPanel" aria-label="중앙통제실 전회차 조회">
  <label for="centralRoundInput">🔎 중앙통제실 · 제1회부터 현회차까지 조회</label>
  <div class="centralRoundRow">
@@ -348,6 +359,11 @@ body{background:linear-gradient(180deg,rgba(2,15,34,.86),rgba(2,26,48,.58) 55%,r
  <strong>항해사 V3 · 통제관 V7 · 항해의자유 배포판 연결</strong>
  <p>담당자를 선택하거나 아래 메뉴를 이용하세요.</p>
  <small>실시간 기록은 공유 서버에서 확인합니다.</small>
+</div>
+<div id="homeApprovalPanel" hidden aria-label="항행의자유 배포용 승인관리방">
+ <div class="homePaneTop"><strong>🚢 항행의자유 배포용 승인관리방</strong><button id="homeApprovalBackBtn" type="button" class="secondary">홈으로</button></div>
+ <iframe id="homeApprovalFrame" title="배포용 승인요청 조회·승인·거절·상태확인" loading="lazy" referrerpolicy="no-referrer" data-src="./hanghae-distribution-approval-room.html"></iframe>
+ <a class="approvalFallback" href="./hanghae-distribution-approval-room.html" target="_self">승인관리 화면이 보이지 않으면 직접 열기</a>
 </div>
 <div id="homeWorkspace" hidden aria-label="선택한 기능">
  <div class="homePaneTop"><strong id="homeWorkspaceTitle">업무 공유</strong><button id="homeBackBtn" type="button" class="secondary">홈으로</button></div>
@@ -479,12 +495,18 @@ var $=function(id){return document.getElementById(id);};
 })();
 var HOME_SELECTED='home';
 function homeView(which){
- if(!['live','reports','more'].includes(which))which='home';
+ if(!['live','reports','more','approval'].includes(which))which='home';
  HOME_SELECTED=which;
  var active=which==='live'||which==='reports';
  $('homeOverview').hidden=which!=='home';
  $('homeWorkspace').hidden=!active;
  $('homeMorePanel').hidden=which!=='more';
+ $('homeApprovalPanel').hidden=which!=='approval';
+ $('homeApprovalBtn').setAttribute('aria-expanded',String(which==='approval'));
+ if(which==='approval'){
+   var frame=$('homeApprovalFrame');
+   if(!frame.getAttribute('src'))frame.setAttribute('src',frame.getAttribute('data-src'));
+ }
  $('homeMoreBtn').setAttribute('aria-expanded',String(which==='more'));
  $('homeLiveBtn').setAttribute('aria-pressed',String(which==='live'));
  $('homeReportBtn').setAttribute('aria-pressed',String(which==='reports'));
@@ -497,6 +519,8 @@ function homeView(which){
  if(which==='reports'&&token)refreshV7Reports();
  if(which==='more')$('homeMorePanel').scrollTop=0;
 }
+$('homeApprovalBtn').addEventListener('click',function(){homeView(HOME_SELECTED==='approval'?'home':'approval');});
+$('homeApprovalBackBtn').addEventListener('click',function(){homeView('home');});
 $('homeLiveBtn').addEventListener('click',function(){homeView('live');});
 $('homeReportBtn').addEventListener('click',function(){homeView('reports');});
 $('homeMoreBtn').addEventListener('click',function(){homeView(HOME_SELECTED==='more'?'home':'more');});
