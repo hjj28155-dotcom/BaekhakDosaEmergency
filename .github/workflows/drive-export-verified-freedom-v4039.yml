@@ -1,0 +1,31 @@
+name: Export signed Freedom v4.0.39 for Drive archive
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/drive-export-verified-freedom-v4039.yml'
+permissions:
+  contents: read
+jobs:
+  verified_export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Get original GitHub release APK and verify immutable digest
+        shell: bash
+        run: |
+          set -euo pipefail
+          name="HanghaeFreedom_V4.0.39_DB1_1247_FINAL.apk"
+          url="https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/v4.0.39-seven-stage-final/$name"
+          curl -fL --retry 3 --retry-delay 2 --connect-timeout 20 "$url" -o "$name"
+          test "$(stat -c%s "$name")" -eq 44054241
+          printf '%s  %s\n' '4661b2d2f59ac462ae48aa85c4b9457d0e5adf7a77680aaac31a440af6be9b83' "$name" | sha256sum -c -
+          unzip -t "$name" | tail -n 1
+      - name: Hand off original bytes without repackaging changes
+        uses: actions/upload-artifact@v4
+        with:
+          name: HanghaeFreedom_V4_0_39_original_verified
+          path: HanghaeFreedom_V4.0.39_DB1_1247_FINAL.apk
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 3
