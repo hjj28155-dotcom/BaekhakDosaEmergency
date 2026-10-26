@@ -1,8 +1,8 @@
 {
   "app_name": "항행의자유 공동회의",
   "package_name": "kr.hanghae.crewmeeting.compact",
-  "current_update_version": "1.0.7-HOME70",
-  "old_version": "1.0.6-REPORTS",
+  "current_update_version": "1.0.8-APPROVAL",
+  "old_version": "1.0.7-HOME70",
   "public_signing_certificate_sha256": "e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be",
   "signing_certificate_sha256_origin": "Certificate SHA-256 pinned in CI from verified 1.0.3–1.0.6 fixed signer; any mismatch blocks 1.0.7. The secret keystore is NOT included in the APK or repo.",
   "key_alias": "androiddebugkey",
@@ -12,6 +12,6 @@
   "secret_key_embedded_in_apk": false,
   "private_key_archived_externally": false,
   "currently_verified_signing_source": "GitHub Actions cache crew-meeting-independent-pilot-signing-v1",
-  "continuity_guarantee": "VersionCode 107 overlays same package and fixed signing identity of 1.0.6, retains existing private app data including V3/V7 native launcher preferences. Remote home uses verified 70px same-height seven-button CSS. V3/V7 APKs, original chats and databases are unchanged.",
+  "continuity_guarantee": "VersionCode 108 updates the same package and verified e24e9573 signing identity of 1.0.7. Preserves local app data and V3/V7 launcher choices. Native WebView additionally keeps only the new Freedom approval room within the app. Original V3/V7/APK/DB unchanged.",
   "recovery_requirements": "Captain-controlled private encrypted signing-keystore backup required before treating as durable release. Never embed keystore, P12, password or seed in app."
 }
