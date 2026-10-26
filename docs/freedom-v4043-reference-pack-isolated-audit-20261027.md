@@ -26,3 +26,9 @@ The included success case classification, learning memo and retrospective 3/6 re
 - Until those pass **this branch is a technical candidate, not a signed APK / deployment / installed app / certified prediction model**.
 
 No past saved combinations, approval data, DB rows, signature key or permanent Drive download URLs have been changed.
+
+## 2026-10-27 liaison extension (isolated only)
+- Found exact preserved `백학_공식해독규칙_V1.0.txt` and two named 6/6 success archives with byte-verified SHA-256. Their own statements about historical successes do NOT substitute independently timestamped prospective locks.
+- Added all three files to `reference_sources` under their original names, with no changes to current scoring functions; result-after records are permanently excluded from current-round scoring.
+- Recorded the official-rule priority: sentence action/relationship/position before secondary dream-word matching. No claim that the old core engine fully implements the manual.
+- CI now compiles Android `assembleRelease` as internal unsigned APK, verifies manifest and asset hashes then destroys the unsigned APK before any artifact upload. This is NOT a production APK and does not bypass the existing original signer gate.

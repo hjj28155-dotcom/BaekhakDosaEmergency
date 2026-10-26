@@ -6,6 +6,9 @@ const sha=x=>crypto.createHash('sha256').update(x).digest('hex');
 const manifest=JSON.parse(fs.readFileSync(base+'reference_sources_manifest_v4043.json','utf8'));
 assert.equal(manifest.mode,'ISOLATED_CANDIDATE_UNAPPROVED_NOT_OFFICIAL');
 const cases=[
+ ['백학_공식해독규칙_V1.0.txt','657e3a32b0b7be6bc9cc7d40a327232a4502706c05f8ae99ac53ae9478999ad1',18277],
+ ['00_6대6_성공회차_마스터목록_20260818.txt','53d38c03de30c08aee51422e5bd37cefcb40b6771cee8e67206e3a8b72e9c39f',3534],
+ ['신서_1001_1033_6대6_성공패턴_기준판_V1.0.txt','26b05caf362dd46b3e01e6ac0464bb4ff3419b954b0c1a97f78aa53ed1a8911e',10463],
  ['백학.txt','4f8059ee26987ac1482ac687ddbe4056e7215ccbd7e719e8377bff7eb097eb3a',977383],
  ['백학 로또꿈해몽백과 2026 6월신버젼 (1).txt','1842831fe89e7d413a3ae6ea46fafd774e333c084750d80e90aff4f880a8b722',536793],
  ['백학도사_197풀이_198-202신서_공식교본_원문보존_20260818.txt','52769ee60f5d0346b97d1a51bbb37c2dc0b55651088551f53e4bd8ac8deeba7f',11135],
@@ -51,3 +54,8 @@ assert.equal(delivered.db1Evidence.referenceEvidence.successCases,'POST_RESULT_E
 assert.equal(delivered.db1Evidence.referenceEvidence.winningNumbersUsed,false);
 assert.ok(!html.includes("getOriginalSourceAndDrawDataForFuture"),'no invented result path');
 console.log('PASS: exact 6 material files; dream CP949→UTF8 with CRLF; offline 45-number index; V4.0.43 actual reference bridge; preserved primary six; post-result exclusion; no signer change.');
+
+assert.ok(manifest.rule_precedence.includes('sentence relation/geometry first'));
+assert.ok(manifest.approved_four_originals_status.startsWith('PARTIAL_NOT_CERTIFIED'));
+for(const name of ['00_6대6_성공회차_마스터목록_20260818.txt','신서_1001_1033_6대6_성공패턴_기준판_V1.0.txt']) assert.ok(manifest.files[name].runtime_role.includes('RESULT_AFTER'));
+console.log('PASS: extra exact official-rule candidate and two success archives preserved ONLY for retrospective audit; not certified as signed official scorer.');

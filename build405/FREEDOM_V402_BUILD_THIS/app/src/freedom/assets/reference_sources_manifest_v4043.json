@@ -28,7 +28,24 @@
     "백학신서_청명방_혹독예행6_성공사례_3of6_결과후복기_V1.0_20260821.txt": {
       "source_sha256": "bcbc7ebe0dd272540892e52fcf7aef48189d2ba02428d4d987a4415e990e1b16",
       "runtime_role": "POST_RESULT_RESEARCH_ONLY"
+    },
+    "백학_공식해독규칙_V1.0.txt": {
+      "source_sha256": "657e3a32b0b7be6bc9cc7d40a327232a4502706c05f8ae99ac53ae9478999ad1",
+      "runtime_role": "SOURCE_RULE_REFERENCE_AUDIT_ONLY_NOT_MACHINE_INTERPRETED",
+      "note": "Official rule document favors sentence geometry, relational logic, and operations. Lexicon secondary."
+    },
+    "00_6대6_성공회차_마스터목록_20260818.txt": {
+      "source_sha256": "53d38c03de30c08aee51422e5bd37cefcb40b6771cee8e67206e3a8b72e9c39f",
+      "runtime_role": "RESULT_AFTER_REFERENCE_ONLY_EXCLUDED_FROM_NUMBER_SCORING",
+      "note": "Archived success claims have not been independently verified against contemporary immutable pre-draw records."
+    },
+    "신서_1001_1033_6대6_성공패턴_기준판_V1.0.txt": {
+      "source_sha256": "26b05caf362dd46b3e01e6ac0464bb4ff3419b954b0c1a97f78aa53ed1a8911e",
+      "runtime_role": "RESULT_AFTER_PATTERN_REFERENCE_ONLY_EXCLUDED_FROM_NUMBER_SCORING",
+      "note": "Result-aware examples only. Do not use historical answers as forward-looking input."
     }
   },
-  "safety": "NOT_FOR_RESULT_BEFORE: past drawing outcomes from success-case evidence and the source master are not fed to scoring. Never label later analysis as sealed result-before. No signer/deployment modifications."
+  "safety": "NOT_FOR_RESULT_BEFORE: past drawing outcomes from success-case evidence and the source master are not fed to scoring. Never label later analysis as sealed result-before. No signer/deployment modifications.",
+  "rule_precedence": "백학_공식해독규칙_V1.0.txt: sentence relation/geometry first; dream lexicon secondary only, current scoreRaw is NOT full rule engine",
+  "approved_four_originals_status": "PARTIAL_NOT_CERTIFIED: exact standalone 백학설명서 and all success-case master sources require further authentication"
 }

@@ -77,6 +77,52 @@ jobs:
               if not (base/name).is_file(): raise SystemExit('Missing merged asset: '+name)
           print('PASS: Android merge contains exact master SHA256 and UTF8 dream SHA256, index, engine adapter, manifest. No APK signing.')
           PY
+      - name: Compile isolated release and inspect unsigned APK (DO NOT DISTRIBUTE)
+        working-directory: build405/FREEDOM_V402_BUILD_THIS
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./gradlew :app:assembleRelease --no-daemon
+          python3 - <<'PY'
+          import hashlib,zipfile
+          from pathlib import Path
+          apks=list(Path('app/build/outputs/apk/release').glob('*.apk'))
+          if len(apks)!=1: raise SystemExit(f'Expected exactly one unsigned internal release APK, found {len(apks)}')
+          apk=apks[0]
+          checks={
+            'assets/reference_sources/백학.txt':'4f8059ee26987ac1482ac687ddbe4056e7215ccbd7e719e8377bff7eb097eb3a',
+            'assets/reference_sources/백학 로또꿈해몽백과 2026 6월신버젼 (1).txt':'1842831fe89e7d413a3ae6ea46fafd774e333c084750d80e90aff4f880a8b722',
+            'assets/reference_sources/백학_공식해독규칙_V1.0.txt':'657e3a32b0b7be6bc9cc7d40a327232a4502706c05f8ae99ac53ae9478999ad1',
+            'assets/reference_sources/00_6대6_성공회차_마스터목록_20260818.txt':'53d38c03de30c08aee51422e5bd37cefcb40b6771cee8e67206e3a8b72e9c39f',
+            'assets/reference_sources/신서_1001_1033_6대6_성공패턴_기준판_V1.0.txt':'26b05caf362dd46b3e01e6ac0464bb4ff3419b954b0c1a97f78aa53ed1a8911e',
+          }
+          with zipfile.ZipFile(apk) as z:
+            names=set(z.namelist())
+            assert 'classes.dex' in names, 'No Android dex classes'
+            for name,digest in checks.items():
+              if name not in names or hashlib.sha256(z.read(name)).hexdigest()!=digest:
+                raise SystemExit('APK asset absent/hash mismatch: '+name)
+            for name in ('assets/index.html','assets/engine_v2.html','assets/raw_bank.js','assets/db1_v1247_patch.js','assets/freedom_reference_v4043.js','assets/reference_sources_manifest_v4043.json'):
+              if name not in names: raise SystemExit('APK asset missing: '+name)
+            index=z.read('assets/index.html').decode('utf-8')
+            assert 'src="freedom_reference_v4043.js"' in index, 'Active reference module must be loaded'
+          print('PASS: full Android release compilation and internal unsigned ZIP assets checked; NO signing or distribution.')
+          PY
+          APK=$(find app/build/outputs/apk/release -maxdepth 1 -name '*.apk' -type f -print -quit)
+          AAPT=$(find "$ANDROID_HOME/build-tools" -name aapt -type f | sort -V | tail -1)
+          "$AAPT" dump badging "$APK" | grep -m1 '^package:' | tee /tmp/internal_unsigned_badging.txt
+          grep -q "package: name='com.navigator.freedom.v3final' versionCode='40043'" /tmp/internal_unsigned_badging.txt
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort -V | tail -1)
+          if "$APKSIGNER" verify "$APK" >/tmp/unsigned_verify.txt 2>&1; then
+            echo 'ERROR: internal research release unexpectedly signed; stop before distribution.'
+            exit 1
+          fi
+          echo 'PASS: research-only APK intentionally unsigned, excluded from artifacts.'
+          rm -f "$APK"
+          PYTHONWARNINGS=ignore python3 - <<'PY'
+          from pathlib import Path
+          assert not list(Path('app/build/outputs/apk/release').glob('*.apk')), 'Research unsigned artifact must not remain for upload'
+          PY
       - name: Restore original Freedom signer
         uses: actions/cache/restore@v4
         with:
