@@ -1,8 +1,8 @@
 {
   "app_name": "항행의자유 공동회의",
   "package_name": "kr.hanghae.crewmeeting.compact",
-  "current_update_version": "1.0.9-FLAGSHIP",
-  "old_version": "1.0.8-APPROVAL",
+  "current_update_version": "1.0.10-COMPACT",
+  "old_version": "1.0.9-FLAGSHIP",
   "public_signing_certificate_sha256": "e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be",
   "signing_certificate_sha256_origin": "Certificate SHA-256 pinned in CI from verified 1.0.3–1.0.6 fixed signer; any mismatch blocks 1.0.7. The secret keystore is NOT included in the APK or repo.",
   "key_alias": "androiddebugkey",
@@ -12,6 +12,6 @@
   "secret_key_embedded_in_apk": false,
   "private_key_archived_externally": false,
   "currently_verified_signing_source": "GitHub Actions cache crew-meeting-independent-pilot-signing-v1",
-  "continuity_guarantee": "VersionCode 109 updates existing signed package kr.hanghae.crewmeeting.compact with unchanged pinned e24e9573 certificate. New remote home includes cinematic flagship wallpaper and every internal room opens at viewport top. Existing device app data, original approval DB, V3/V7 app links and passwords preserved.",
+  "continuity_guarantee": "VersionCode 110 updates the existing kr.hanghae.crewmeeting.compact app using the identical e24e9573 signing identity from v1.0.9. Home rows compressed to 42–49 CSSpx; bright visible ship wallpaper, transparent lower home vista, top-opening internal rooms. No existing reports, authorizations, or installed-app links changed.",
   "recovery_requirements": "Captain-controlled private encrypted signing-keystore backup required before treating as durable release. Never embed keystore, P12, password or seed in app."
 }
