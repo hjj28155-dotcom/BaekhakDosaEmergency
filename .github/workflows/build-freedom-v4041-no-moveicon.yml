@@ -3,7 +3,7 @@ on:
   push:
     branches: [fix-freedom-v3-screen-1244-20261022]
     paths:
-      - '.github/workflows/build-freedom-v4041-stable-signer-branch.yml'
+      - '.github/workflows/build-freedom-v4041-no-moveicon.yml'
 permissions:
   contents: read
 jobs:
@@ -14,7 +14,7 @@ jobs:
       - name: Checkout isolated Freedom update source branch
         uses: actions/checkout@v4
         with:
-          ref: release/freedom-v4041-new-guide-20261026
+          ref: release/freedom-v4041-without-moveicon-20261026
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
