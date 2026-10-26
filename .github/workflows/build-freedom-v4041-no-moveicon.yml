@@ -88,7 +88,7 @@ jobs:
           unzip -l "$APK" | grep -q 'assets/install_guide_final.mp4'
           mkdir -p handoff
           cp "$APK" handoff/HanghaeFreedom_V4.0.41_NO_MOVEICON_SIGNED.apk
-          sha256sum handoff/HanghaeFreedom_V4.0.41_CORRECT_GUIDE_SIGNED.apk > handoff/sha256.txt
+          sha256sum handoff/HanghaeFreedom_V4.0.41_NO_MOVEICON_SIGNED.apk > handoff/sha256.txt
           cp /tmp/freedom-v4041-signature.txt handoff/signature.txt
           cp /tmp/freedom-v4041-badging.txt handoff/badging.txt
           echo "VERIFIED_SIGNED_APK_SIZE=$(stat -c%s "$APK")"
