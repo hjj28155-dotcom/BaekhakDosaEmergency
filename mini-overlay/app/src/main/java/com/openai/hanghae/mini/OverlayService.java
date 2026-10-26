@@ -550,16 +550,15 @@ public class OverlayService extends Service {
     private void openFreedomApp(){
         collapseStations();
         collapseMenu();
-
-        // v1.0.18: 항행의자유 버튼은 설치 여부와 관계없이 항상 설치/실행 페이지를 엽니다.
-        // 사용자가 설치동영상을 먼저 확인한 뒤 본인 의사로 설치/업데이트를 선택하도록 고정합니다.
+        // 항행의자유는 MoveIcon 자체와 별도 패키지. 설치돼 있으면 재설치 화면 대신 앱 바로 실행.
+        if(launchPackage("com.navigator.freedom.v3final","🚢 항행의자유 실행")) return;
         try{
-            Intent web=new Intent(Intent.ACTION_VIEW,Uri.parse("https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/index.html?v=40033-r12-installvideo-v18"));
+            Intent web=new Intent(Intent.ACTION_VIEW,Uri.parse("https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/hanghae-freedom-distribution.html"));
             web.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(web);
-            setNow("🚢 항행의자유 설치/실행 페이지를 엽니다.");
+            setNow("🚢 항행의자유 전용 설치 안내를 엽니다.");
         }catch(Exception e){
-            toast("항행의자유 설치/실행 페이지를 열 수 없습니다.");
+            toast("항행의자유 전용 안내를 열 수 없습니다.");
         }
     }
 
