@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
+<meta name="theme-color" content="#071b30">
+<title>항행의자유 설치링크 복구판 · 2026-10-26</title>
+<meta name="description" content="두루마리 → 설치동영상 → APK 설치 → 승인요청 → 승인확인 → 안내동영상 → 홈화면">
+<meta name="freedom-flow-engine" content="V7-FREEDOM-RESTORED-NEW-PATH-20261026">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#041626;color:#edf4fc;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif}
+body{min-height:100vh;padding:16px 12px 38px}
+.wrap{max-width:660px;margin:0 auto}
+header{text-align:center;padding:14px 4px}
+h1{font-size:clamp(23px,5.4vw,30px);line-height:1.3;color:#ffe39a;margin:0 0 8px}
+.subtitle{font-size:15px;color:#c7dce9;line-height:1.55;margin:0}
+.card{background:#0b2940;border:1px solid #39617a;border-radius:18px;padding:18px 14px;margin-top:13px;text-align:center}
+h2{font-size:21px;color:#ffdf93;margin:0 0 12px}
+p{font-size:15px;line-height:1.7;color:#d8e9f1;margin:9px 0}
+button,.button{display:block;width:100%;border-radius:13px;border:1px solid #e9c574;background:linear-gradient(#977021,#634709);color:#fff5c8;font-size:19px;font-weight:850;padding:17px 12px;margin:15px 0 0;text-decoration:none;cursor:pointer;font-family:inherit;min-height:56px}
+button:focus-visible,.button:focus-visible{outline:3px solid #93e9ff;outline-offset:3px}
+button.secondary{background:#154866;border-color:#6d9abc;font-size:16px}
+img{display:block;width:100%;max-height:65vh;object-fit:contain;border-radius:13px;background:#041829}
+video{display:block;width:100%;min-height:180px;max-height:70vh;aspect-ratio:16/9;object-fit:contain;border-radius:11px;background:#000}
+[hidden]{display:none!important}
+.steps{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin:12px 0 2px}
+.steps span{padding:9px 0;border-radius:7px;background:#163751;border:1px solid #315774;font-size:13px;text-align:center;color:#adccde}
+.steps span.active{background:#926b21;color:#fff5bd;border-color:#e5c375;font-weight:900}
+.flow{font-size:13px;line-height:1.8;color:#b6cedc;text-align:center;padding:10px}
+.notice{border:1px solid #47836d;border-radius:11px;padding:11px;background:#113329;color:#dcfaec;margin-top:14px;line-height:1.6}
+.error{color:#ffbfab;min-height:22px;font-size:14px}
+footer{color:#91b1c3;text-align:center;font-size:12px;line-height:1.7;margin-top:18px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>⚓ 항행의자유 공식 설치 안내</h1>
+  <p class="subtitle">선장님 지정 7단계 · 다운로드 복구 전용 화면</p>
+  <div class="steps" aria-label="설치 순서">
+    <span class="active" data-step="1">①</span><span data-step="2">②</span><span data-step="3">③</span><span data-step="4">④</span><span data-step="5">⑤</span><span data-step="6">⑥</span><span data-step="7">⑦</span>
+  </div>
+</header>
+<main>
+  <section class="card" id="scrollStage" aria-labelledby="scrollTitle">
+    <h2 id="scrollTitle">① 환영 두루마리</h2>
+    <img src="./welcome_scroll_final.png" alt="항행의자유 환영 두루마리" loading="eager">
+    <button id="startInstallVideo" type="button">두루마리 확인 · 설치동영상 보기</button>
+  </section>
+  <section class="card" id="videoStage" aria-labelledby="videoTitle" hidden>
+    <h2 id="videoTitle">② 설치동영상</h2>
+    <video id="installVideo" playsinline webkit-playsinline controls preload="metadata" controlsList="nodownload noplaybackrate">
+      <source src="./freedom_guide_latest.mp4" type="video/mp4">
+      휴대폰에서 동영상을 재생할 수 없습니다.
+    </video>
+    <p>동영상을 끝까지 보면 설치링크 화면이 자동으로 나옵니다.</p>
+    <button type="button" id="replayVideo" class="secondary">▶ 설치동영상 재생</button>
+    <p id="videoStatus" class="error" role="status" aria-live="polite"></p>
+  </section>
+  <section class="card" id="installStage" aria-labelledby="installTitle" hidden>
+    <h2 id="installTitle">③ 항행의자유 설치링크 화면</h2>
+    <div class="notice">설치동영상 시청 완료 · 다음은 <strong>항행의자유 APK만 설치</strong>합니다.</div>
+    <p>아래 버튼을 누르면 항행의자유 공식 APK가 다운로드됩니다.<br>이동아이콘 APK는 이 설치 절차에 포함되지 않습니다.</p>
+    <a class="button" id="freedomApkInstall" rel="external" download="HanghaeFreedom_V4.0.39_DB1_1247_FINAL.apk" href="./freedom-latest.apk">⬇️ 항행의자유 V4.0.39 공식 APK 다운로드</a>
+    <div class="notice" style="border-color:#c7a359;background:#29301f">✅ 복구판 2026-10-26 · 이 페이지에서만 시험하세요. 아래 주 다운로드가 열리지 않을 때는 <a style="color:#fff4a5;font-weight:800" href="https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/v4.0.39-seven-stage-final/HanghaeFreedom_V4.0.39_DB1_1247_FINAL.apk" rel="external">이전 검증된 GitHub 배포판 다운로드 주소</a>를 이용할 수 있습니다. 기존 앱은 삭제하지 마십시오.</div>
+    <div class="notice">④ 다운로드한 APK를 설치한 다음, 휴대폰에서 <strong>항행의자유 앱을 실행</strong>하세요.<br>⑤ 기존 승인 기기는 재승인하지 않습니다. 신규 기기는 앱 안에서 승인을 받은 후 ⑥ 안내동영상 → ⑦ 홈화면 순서입니다.<br>기존 앱을 삭제하거나 승인·데이터를 초기화하지 마세요.</div>
+    <button class="secondary" type="button" id="openAfterApprovalGuide">이미 설치·승인된 기기 · ⑥ 안내동영상 보기</button>
+    <p class="error">안내동영상은 설치 후 승인확인 단계의 영상입니다. 이 웹페이지는 기기 승인 여부를 자동 확인하지 않습니다.</p>
+  </section>
+  <section class="card" id="guideStage" aria-labelledby="guideTitle" hidden>
+    <h2 id="guideTitle">⑥ 승인확인 후 안내동영상</h2>
+    <video id="afterApprovalVideo" playsinline webkit-playsinline controls preload="metadata" controlsList="nodownload noplaybackrate">
+      <source src="./freedom_onboarding_postscroll_20260928.mp4" type="video/mp4">
+      휴대전화에서 안내동영상을 재생할 수 없습니다.
+    </video>
+    <p>안내동영상이 끝나면 ⑦ 홈 화면 안내로 넘어갑니다. 앱 내부 승인 절차는 설치된 항행의자유 앱에서 진행합니다.</p>
+    <button type="button" class="secondary" id="replayAfterApproval">▶ 안내동영상 다시 보기</button>
+    <p class="error" id="guideStatus" role="status"></p>
+  </section>
+  <section class="card" id="homeStage" aria-labelledby="homeStageTitle" hidden>
+    <h2 id="homeStageTitle">⑦ 항행의자유 홈 화면</h2>
+    <div class="notice">안내동영상 시청 후 <strong>휴대전화에 설치된 항행의자유 앱의 홈 화면</strong>으로 이동하십시오.</div>
+    <p>이 웹페이지는 앱 실행·승인 상태를 대신하지 않습니다. 앱에서 승인이 확인돼야 정상 사용이 가능합니다.</p>
+    <button type="button" class="secondary" id="replayAfterApprovalFromHome">⑥ 안내동영상 다시 보기</button>
+  </section>
+</main>
+<div class="flow">① 두루마리 → ② 설치동영상 → ③ APK 설치 → ④ 승인요청 → ⑤ 승인확인 → ⑥ 안내동영상 → ⑦ 홈 화면</div>
+<footer>공식 항행의자유 전용 설치 · 기존 앱을 삭제하지 않고 업데이트할 수도 있습니다.</footer>
+</div>
+<script>
+(function(){
+  "use strict";
+  const scroll=document.getElementById("scrollStage");
+  const videoStage=document.getElementById("videoStage");
+  const install=document.getElementById("installStage");
+  const guide=document.getElementById("guideStage");
+  const home=document.getElementById("homeStage");
+  const guideVideo=document.getElementById("afterApprovalVideo");
+  const guideStatus=document.getElementById("guideStatus");
+  const v=document.getElementById("installVideo");
+  const status=document.getElementById("videoStatus");
+  let stage="scroll";
+  function show(which){
+    if(which==="install" && stage!=="video")return;
+    if(which==="video" && stage!=="scroll")return;
+    if(which==="guide" && stage!=="install" && stage!=="home")return;
+    if(which==="home" && stage!=="guide")return;
+    stage=which;
+    scroll.hidden=which!=="scroll";
+    videoStage.hidden=which!=="video";
+    install.hidden=which!=="install";
+    guide.hidden=which!=="guide";
+    home.hidden=which!=="home";
+    const current=which==="scroll"?1:which==="video"?2:which==="install"?3:which==="guide"?6:7;
+    document.querySelectorAll(".steps [data-step]").forEach(el=>{
+      const n=Number(el.getAttribute("data-step"));
+      el.classList.toggle("active",n===current);
+      el.setAttribute("aria-current",n===current?"step":"false");
+    });
+    window.scrollTo(0,0);
+  }
+  function play(){
+    if(stage!=="video")return;
+    status.textContent="";
+    try{
+      const result=v.play();
+      if(result&&result.catch)result.catch(()=>{status.textContent="휴대폰의 동영상 ▶ 재생 버튼을 눌러주세요."});
+    }catch(_){status.textContent="동영상 재생 버튼을 다시 눌러주세요."}
+  }
+  document.getElementById("startInstallVideo").addEventListener("click",()=>{
+    show("video");
+    play();
+  });
+  document.getElementById("replayVideo").addEventListener("click",play);
+  v.addEventListener("ended",()=>{
+    if(stage==="video"){try{v.pause()}catch(_){} show("install")}
+  });
+  v.addEventListener("error",()=>{
+    if(stage==="video")status.textContent="동영상 파일을 재생할 수 없습니다. 인터넷 연결을 확인하고 다시 재생하세요.";
+  });
+  function playGuide(){
+    if(stage!=="guide")return;
+    guideStatus.textContent="";
+    try{
+      const result=guideVideo.play();
+      if(result&&result.catch)result.catch(()=>{guideStatus.textContent="휴대폰의 안내동영상 ▶ 재생 버튼을 눌러주세요.";});
+    }catch(_){guideStatus.textContent="안내동영상 재생 버튼을 누르세요.";}
+  }
+  document.getElementById("openAfterApprovalGuide").addEventListener("click",()=>{show("guide");playGuide();});
+  document.getElementById("replayAfterApproval").addEventListener("click",()=>{guideVideo.currentTime=0;playGuide();});
+  document.getElementById("replayAfterApprovalFromHome").addEventListener("click",()=>{show("guide");guideVideo.currentTime=0;playGuide();});
+  guideVideo.addEventListener("ended",()=>{if(stage==="guide"){try{guideVideo.pause()}catch(_){}show("home");}});
+  guideVideo.addEventListener("error",()=>{if(stage==="guide")guideStatus.textContent="영상 확인이 필요합니다. 인터넷 연결 후 다시 재생하세요.";});
+  show("scroll");
+})();
+</script>
+</body>
+</html>
