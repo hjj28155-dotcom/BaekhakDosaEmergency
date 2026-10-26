@@ -21,7 +21,7 @@ import android.widget.Toast;
 
 public final class MainActivity extends Activity {
     private static final String ROOM_URL =
-        "https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/crew-meeting.html?app_version=107";
+        "https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/crew-meeting.html?app_version=108";
     private static final int FILE_CHOOSER_CODE = 502;
     private static final int PICK_V3_APP = 503;
     private static final int PICK_V7_APP = 504;
@@ -146,7 +146,8 @@ public final class MainActivity extends Activity {
         if (uri == null) return true;
         if ("https".equalsIgnoreCase(uri.getScheme())
             && "hjj28155-dotcom.github.io".equalsIgnoreCase(uri.getHost())
-            && "/BaekhakDosaEmergency/crew-meeting.html".equals(uri.getPath())) return false;
+            && ("/BaekhakDosaEmergency/crew-meeting.html".equals(uri.getPath())
+              || "/BaekhakDosaEmergency/hanghae-distribution-approval-room.html".equals(uri.getPath()))) return false;
         if (!"https".equalsIgnoreCase(uri.getScheme())) return true;
         try {
             Intent external = new Intent(Intent.ACTION_VIEW, uri);
