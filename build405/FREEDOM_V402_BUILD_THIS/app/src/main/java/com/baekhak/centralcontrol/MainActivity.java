@@ -123,11 +123,11 @@ public class MainActivity extends Activity {
         prepareBuildMigration();
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
-        // HARDLOCK: 승인완료 전에는 이동아이콘/음악을 시작하지 않습니다.
-        if (isSpecialApprovedLocal()) {
-            startAlwaysOverlayExperiment();
-        } else {
-            try { stopService(new Intent(this, OverlayControlService.class)); } catch (Exception ignored) {}
+        // V4.0.41 distribution app: disable its bundled floating icon on every update and launch.
+        // Preserve user approval, stored reports, DB and ordinary music/radio functions.
+        try { getSharedPreferences("overlay_control", MODE_PRIVATE).edit().putBoolean("enabled", false).apply(); } catch (Exception ignored) {}
+        try { stopService(new Intent(this, OverlayControlService.class)); } catch (Exception ignored) {}
+        if (!isSpecialApprovedLocal()) {
             try {
                 Intent stopMusic = new Intent(this, MusicPlaybackService.class).setAction(MusicPlaybackService.ACTION_STOP);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(stopMusic); else startService(stopMusic);
@@ -256,43 +256,16 @@ public class MainActivity extends Activity {
     }
 
 
-    private boolean isOverlayControlEnabled() {
-        try { return getSharedPreferences("overlay_control", MODE_PRIVATE).getBoolean("enabled", true); }
-        catch (Exception e) { return true; }
-    }
+    // V4.0.41: Freedom distribution never activates a floating MoveIcon overlay.
+    private boolean isOverlayControlEnabled() { return false; }
 
     private void setOverlayControlEnabled(boolean enabled) {
-        try { getSharedPreferences("overlay_control", MODE_PRIVATE).edit().putBoolean("enabled", enabled).apply(); }
-        catch (Exception ignored) {}
-        try {
-            Intent service = new Intent(this, OverlayControlService.class)
-                    .setAction(enabled ? OverlayControlService.ACTION_SHOW : OverlayControlService.ACTION_HIDE);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(service);
-            else startService(service);
-        } catch (Exception ignored) {}
-        if (enabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !android.provider.Settings.canDrawOverlays(this)) {
-            try {
-                Intent permission = new Intent(android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
-                startActivity(permission);
-            } catch (Exception ignored) {}
-        }
+        try { getSharedPreferences("overlay_control", MODE_PRIVATE).edit().putBoolean("enabled", false).apply(); } catch (Exception ignored) {}
+        try { stopService(new Intent(this, OverlayControlService.class)); } catch (Exception ignored) {}
     }
 
-    // V3.1.04 항해사 전용 실험: 상시 음악/FM/AM 오버레이. 기존 onResume은 건드리지 않습니다.
     private void startAlwaysOverlayExperiment() {
-        if (!isOverlayControlEnabled()) return;
-        try {
-            Intent service = new Intent(this, OverlayControlService.class).setAction(OverlayControlService.ACTION_SHOW);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(service);
-            else startService(service);
-        } catch (Exception ignored) {}
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !android.provider.Settings.canDrawOverlays(this)) {
-            try {
-                Intent permission = new Intent(android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
-                startActivity(permission);
-                Toast.makeText(this, "상단 음악·FM·AM 미니바를 위해 '다른 앱 위에 표시'를 허용해 주세요.", Toast.LENGTH_LONG).show();
-            } catch (Exception ignored) {}
-        }
+        // Deliberately disabled. MoveIcon belongs to its separate dedicated app.
     }
 
     private void closeAppScreen() {
