@@ -539,6 +539,8 @@ function redrawOriginalButtons(){
  });
 }
 function editOriginalRole(role){
+ // A role without a saved URL must reveal its existing setting panel from the compact home.
+ if(HOME_SELECTED!=='more')homeView('more');
  editingRole=role;$('originalChatPanel').hidden=false;
  $('originalChatLabel').textContent=origNames[role]+' · 현재 대화방 주소';
  $('originalChatUrl').value=roleUrl(role);
