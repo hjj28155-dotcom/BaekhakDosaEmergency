@@ -522,6 +522,35 @@ main:not(.roomMode) > header button{min-height:33px!important;padding:3px 9px!im
  box-sizing:border-box!important;
 }
 @media(max-width:365px){#originalChatBar > button{font-size:.60rem!important}}
+
+/* New independent 3-app integrated library, without changing any report archive. */
+#homeSpecialRooms{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;flex:none!important}
+#homeSpecialRooms button{width:100%!important;height:42px!important;max-height:42px!important;min-height:42px!important;box-sizing:border-box!important;border-radius:10px!important;font-size:.76rem!important;line-height:1.1!important;padding:4px!important}
+#homeMaterialsBtn{border:1.7px solid #eac783!important;background:linear-gradient(130deg,rgba(5,63,91,.88),rgba(25,95,114,.9))!important;color:#ffedbd!important;font-weight:800}
+#homeMaterialsPanel{flex-direction:column;gap:7px;border:1.5px solid #e4c181;border-radius:12px;padding:8px;background:rgba(3,26,50,.96);min-width:0;min-height:0}
+#homeMaterialsPanel[hidden]{display:none!important}
+main.roomMode > :not(#homeWorkspace):not(#homeMorePanel):not(#homeApprovalPanel):not(#homeMaterialsPanel){display:none!important}
+main.roomMode > #homeMaterialsPanel:not([hidden]){display:flex!important;flex:1 1 auto;height:100%;min-height:0;overflow:hidden;margin:0}
+#materialsBody{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:4px}
+.materialsNote{font-size:.72rem;line-height:1.45;color:#d5e6f0;margin:8px 0}
+.materialsGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:7px 0}
+.materialsGrid button{min-height:42px;border:1px solid #6caabe;border-radius:9px;background:#143d60;color:#ffecce;padding:5px 2px;font-size:.74rem;font-weight:750}
+.materialsGrid button.selected{background:#9b712e;color:#fff;border-color:#f5d591}
+.materialsFind{border:1px solid #4f8298;border-radius:9px;padding:8px;background:#052a49}
+.materialsFind label,#materialsLocal label{display:block;color:#ffda98;font-weight:800;font-size:.76rem;margin:3px 0}
+.materialsFindRow{display:grid;grid-template-columns:1fr auto;gap:5px}
+.materialsFindRow input{min-height:40px;min-width:0}
+.materialsFindRow button{min-height:40px;padding:5px 12px;background:#97712d;border:1px solid #dabe84;border-radius:8px}
+#materialsList{display:grid;gap:5px;font-size:.75rem;margin:5px 0}
+.matRecord{border:1px solid #406d86;background:#082d4a;border-radius:9px;padding:9px;line-height:1.45;overflow-wrap:anywhere}
+#materialsLocal{border:1px solid #658799;border-radius:9px;padding:8px}
+#materialsLocal input{width:100%}
+#materialsLocalPreview{max-height:200px;overflow:auto;font-size:.68rem;background:#041b30;padding:9px;white-space:pre-wrap;overflow-wrap:anywhere}
+.materialsCompare{margin-top:9px;border:1px solid #d9bb83;border-radius:10px;padding:11px;background:rgba(7,51,74,.8)}
+.materialsCompare strong{color:#ffe5ab}
+.materialsCompare p{font-size:.72rem;line-height:1.5}
+.materialsCompare button{border:1px solid #efc581;background:#926729;color:#fff1d4;border-radius:8px;padding:9px}
+@media(max-width:360px){#homeSpecialRooms button{font-size:.67rem!important}.materialsGrid button{font-size:.64rem}}
 </style>
 </head>
 <body>
@@ -548,10 +577,13 @@ main:not(.roomMode) > header button{min-height:33px!important;padding:3px 9px!im
   <button type="button" id="openInstalledV7" aria-label="통제관 전담 V7 설치본 실행">🛡️ 통제관 V7</button>
  </div>
  <div class="installedAppUnit">
-  <a id="openFreedomDistribution" href="https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/hanghae-freedom-distribution.html" target="_self" rel="noopener" aria-label="항해의자유 배포판 공식 설치 및 접속 안내">🚢 항해의자유 배포판</a>
+  <a id="openFreedomDistribution" href="https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/hanghae-freedom-distribution.html" target="_self" rel="noopener" aria-label="항행의자유 공식 설치 및 접속 안내">🚢 항행의자유</a>
  </div>
 </div>
-<button id="homeApprovalBtn" type="button" aria-expanded="false" aria-controls="homeApprovalPanel">🚢 배포용 승인관리방 · 승인요청 / 승인확인</button>
+<div id="homeSpecialRooms" aria-label="승인관리방과 통합자료방">
+<button id="homeApprovalBtn" type="button" aria-expanded="false" aria-controls="homeApprovalPanel">🚢 배포용 승인관리방</button>
+<button id="homeMaterialsBtn" type="button" aria-expanded="false" aria-controls="homeMaterialsPanel">📚 3앱 통합자료방</button>
+</div>
 <div id="centralRoundPanel" aria-label="중앙통제실 전회차 조회">
  <label for="centralRoundInput">🔎 중앙통제실 · 제1회부터 현회차까지 조회</label>
  <div class="centralRoundRow">
@@ -571,6 +603,42 @@ main:not(.roomMode) > header button{min-height:33px!important;padding:3px 9px!im
  <div class="homePaneTop"><strong>🚢 항행의자유 배포용 승인관리방</strong><button id="homeApprovalBackBtn" type="button" class="secondary">홈으로</button></div>
  <iframe id="homeApprovalFrame" title="배포용 승인요청 조회·승인·거절·상태확인" loading="lazy" referrerpolicy="no-referrer" data-src="./hanghae-distribution-approval-room.html"></iframe>
  <a class="approvalFallback" href="./hanghae-distribution-approval-room.html" target="_self">승인관리 화면이 보이지 않으면 직접 열기</a>
+</div>
+<div id="homeMaterialsPanel" hidden aria-label="V7 V3 항행의자유 통합 자료방">
+ <div class="homePaneTop"><strong>📚 3앱 통합자료방 · 1~1247회차</strong><button id="homeMaterialsBack" type="button" class="secondary">홈으로</button></div>
+ <div id="materialsBody">
+  <p class="materialsNote">원본 독립보존 · 결과전 최초 잠금 · 결과후 채점 · 누적DB · 엔진 검증. <b>확인되지 않은 과거 분석은 생성하거나 등록하지 않습니다.</b></p>
+  <div class="materialsGrid" aria-label="세 앱 독립 자료 원본">
+   <button type="button" class="matApp selected" data-material-app="v7">🛡️ V7 중앙통제실</button>
+   <button type="button" class="matApp" data-material-app="v3">🧭 V3 항해사앱</button>
+   <button type="button" class="matApp" data-material-app="freedom">🚢 항행의자유</button>
+  </div>
+  <div class="materialsGrid" aria-label="자료 구분">
+   <button type="button" class="matStage selected" data-material-stage="before">📄 결과전</button>
+   <button type="button" class="matStage" data-material-stage="after">📑 결과후</button>
+   <button type="button" class="matStage" data-material-stage="db">🗄️ 누적DB</button>
+  </div>
+  <div class="materialsFind">
+   <label for="materialsRound">회차 선택 (1~1247, 빈칸은 전체 등록내역)</label>
+   <div class="materialsFindRow"><input id="materialsRound" type="number" min="1" max="1247" inputmode="numeric" placeholder="1~1247">
+   <button id="materialsRefresh" type="button">🔎 조회</button></div>
+  </div>
+  <p id="materialsStatus" class="materialsNote" role="status" aria-live="polite">V7 원본 서버를 읽기 전용으로 조회할 수 있습니다. V3와 항행의자유는 원본 연결 상태를 구분합니다.</p>
+  <div id="materialsList" aria-label="확인된 실제 자료 기록"></div>
+  <div id="materialsLocal" hidden>
+   <label for="materialsLocalFile">📎 독립 앱에서 내보낸 결과전·결과후·누적DB TXT/JSON 임시 미리보기</label>
+   <input type="file" id="materialsLocalFile" accept=".txt,.json,text/plain,application/json">
+   <p class="materialsNote">원본 파일은 이 휴대전화에서만 미리 보며 서버에 자동 전송·DB 등록하지 않습니다. 결과전 최초 기록으로 소급 인정하지 않습니다.</p>
+   <pre id="materialsLocalPreview" hidden></pre>
+  </div>
+  <div class="materialsCompare">
+   <strong>⚙️ 3앱 엔진 동일조건 비교</strong>
+   <p>동일 원문·동일 회차, 대상 회차 정답 블라인드, 결과전 1회 잠금, SHA-256 원본 검증, 결과 발표 후 별도 채점, 3/6 이상 비율과 0~6 적중분포를 비교합니다. 250회차마다 원본/버전 고정. 자료가 미등록인 회차는 0점 처리하지 않습니다.</p>
+   <button type="button" id="materialsComparison">📊 현재 비교 가능 여부 확인</button>
+   <p id="materialsComparisonStatus" class="materialsNote">세 앱의 동일 회차 검증자료가 연결될 때만 순위를 산출합니다.</p>
+  </div>
+  <p class="materialsNote">⚠️ 항행의자유 일반 사용자 화면은 기존 최근 5회차만 열람하도록 유지합니다. 이 선장 전용 통합자료방의 전체 검증 범위와 구분됩니다.</p>
+ </div>
 </div>
 <div id="homeWorkspace" hidden aria-label="선택한 기능">
  <div class="homePaneTop"><strong id="homeWorkspaceTitle">업무 공유</strong><button id="homeBackBtn" type="button" class="secondary">홈으로</button></div>
@@ -703,13 +771,15 @@ var $=function(id){return document.getElementById(id);};
 })();
 var HOME_SELECTED='home';
 function homeView(which){
- if(!['live','reports','more','approval'].includes(which))which='home';
+ if(!['live','reports','more','approval','materials'].includes(which))which='home';
  HOME_SELECTED=which;
  var active=which==='live'||which==='reports';
  $('homeOverview').hidden=which!=='home';
  $('homeWorkspace').hidden=!active;
  $('homeMorePanel').hidden=which!=='more';
  $('homeApprovalPanel').hidden=which!=='approval';
+ $('homeMaterialsPanel').hidden=which!=='materials';
+ $('homeMaterialsBtn').setAttribute('aria-expanded',String(which==='materials'));
  var root=document.querySelector('main');
  root.classList.toggle('roomMode',which!=='home');
  $('homeApprovalBtn').setAttribute('aria-expanded',String(which==='approval'));
@@ -743,6 +813,68 @@ function homeView(which){
  document.documentElement.scrollTop=0;
  document.body.scrollTop=0;
 }
+
+/* Captain-only original ledger links for three independent apps.
+ * No leakage of raw combinations or retrospective fabricated 'result-before' entries. */
+var materialApp='v7',materialStage='before',materialLast=null;
+function materialsLabel(stage){return {before:'결과전',after:'결과후',db:'누적DB'}[stage]||stage;}
+function materialsSelect(kind,value){
+ if(kind==='app')materialApp=value; else materialStage=value;
+ var selector=kind==='app'?'data-material-app':'data-material-stage';
+ document.querySelectorAll('['+selector+']').forEach(function(el){el.classList.toggle('selected',el.getAttribute(selector)===value);});
+ $('materialsLocal').hidden=materialApp==='v7';
+ $('materialsList').replaceChildren();
+ $('materialsStatus').textContent='자료를 조회하면 확인된 기록만 표시합니다.';
+ loadIntegratedMaterials();
+}
+document.querySelectorAll('[data-material-app]').forEach(function(button){
+ button.addEventListener('click',function(){materialsSelect('app',button.getAttribute('data-material-app'));});
+});
+document.querySelectorAll('[data-material-stage]').forEach(function(button){
+ button.addEventListener('click',function(){materialsSelect('stage',button.getAttribute('data-material-stage'));});
+});
+$('materialsRefresh').addEventListener('click',loadIntegratedMaterials);
+$('materialsRound').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();loadIntegratedMaterials();}});
+async function loadIntegratedMaterials(){
+ if(!token){$('materialsStatus').textContent='선장 인증 후에 원본 조회가 가능합니다.';$('materialsList').replaceChildren();return;}
+ var round=String($('materialsRound').value||'').trim();
+ if(round&&(!/^\\d{1,4}$/.test(round)||Number(round)<1||Number(round)>1247)){
+  $('materialsStatus').textContent='1~1247회차만 조회할 수 있습니다.';return;
+ }
+ var url='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/crew-three-app-materials?app='+encodeURIComponent(materialApp)+'&stage='+encodeURIComponent(materialStage)+(round?'&round='+round:'');
+ $('materialsStatus').textContent='원본 조회 중…';
+ try{
+  const resp=await fetch(url,{method:'GET',headers:{'Authorization':'Bearer '+token,'Accept':'application/json'},cache:'no-store'});
+  const result=await resp.json();
+  if(!resp.ok||result.error)throw Error(result.error||String(resp.status));
+  materialLast=result;
+  $('materialsList').replaceChildren();
+  if(!result.linked){
+   $('materialsStatus').textContent=materialApp==='v3'?'V3 독립 앱 원본 자동 연동 대기 · 내보낸 파일로 아래 임시 미리보기를 할 수 있습니다.':'항행의자유 독립 앱 원본 자동 연동 대기 · 기존 일반 사용자 최근 5회차 제한 유지.';
+   return;
+  }
+  $('materialsStatus').textContent='🛡️ V7 원본 서버 '+materialsLabel(materialStage)+' · 실제 등록 '+result.total+'건 · 결과전 사전잠금의 적법성은 별도 확인';
+  if(!result.items||!result.items.length){
+   var none=document.createElement('p');none.className='materialsNote';none.textContent='이 조건에 검증된 등록 자료가 없습니다. 0점이나 0조합으로 간주하지 않습니다.';$('materialsList').append(none);return;
+  }
+  result.items.forEach(function(row){
+   var item=document.createElement('div');item.className='matRecord';
+   var date=row.locked_at||row.graded_at||row.created_at||'일시 미확인';
+   item.textContent='제'+row.round_no+'회 · '+materialsLabel(materialStage)+' · '+(row.room_key||'')+' · '+(row.status||'')+' · '+date;
+   $('materialsList').append(item);
+  });
+ }catch(e){$('materialsStatus').textContent='자료 연동 실패 · 기존 원본은 변경되지 않았습니다. ('+String(e.message||e).slice(0,90)+')';$('materialsList').replaceChildren();}
+}
+$('materialsLocalFile').addEventListener('change',async function(){
+ var file=this.files&&this.files[0],out=$('materialsLocalPreview');
+ if(!file){out.hidden=true;return;}
+ if(!/\\.(txt|json)$/i.test(file.name)||file.size>2097152){out.hidden=false;out.textContent='TXT/JSON 2MB 이하 파일만 임시 미리보기 가능합니다.';return;}
+ try{out.textContent=(await file.text()).slice(0,9000);out.hidden=false;}catch(e){out.hidden=false;out.textContent='파일을 읽을 수 없습니다.';}
+});
+$('materialsComparison').addEventListener('click',function(){
+ $('materialsComparisonStatus').textContent='1~1247회차 동일원문·동일회차 결과전 잠금 및 결과후 채점이 V7/V3/항행의자유 3개 앱 모두에서 확인되어야 합니다. 현재 V3·항행의자유 원본 자동 연동이 미검증이므로 순위를 계산하지 않습니다. 승격 HOLD.';
+});
+
 function showMoreDetailFromTop(panelId){
  var selected=$(panelId),more=$('homeMorePanel');
  if(!selected||!more)return;
@@ -752,6 +884,8 @@ function showMoreDetailFromTop(panelId){
 }
 
 $('homeApprovalBtn').addEventListener('click',function(){homeView(HOME_SELECTED==='approval'?'home':'approval');});
+$('homeMaterialsBtn').addEventListener('click',function(){homeView(HOME_SELECTED==='materials'?'home':'materials');if(HOME_SELECTED==='materials')loadIntegratedMaterials();});
+$('homeMaterialsBack').addEventListener('click',function(){homeView('home');});
 $('homeApprovalBackBtn').addEventListener('click',function(){homeView('home');});
 $('homeLiveBtn').addEventListener('click',function(){homeView('live');});
 $('homeReportBtn').addEventListener('click',function(){homeView('reports');});
