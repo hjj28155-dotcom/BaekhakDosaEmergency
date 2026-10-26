@@ -84,10 +84,8 @@ assert.ok(t.get('freedomR14Request'),'pending remains on approval screen');
 assert.equal(t.logs.approvedRuntime,0);
 t.logs.state={status:'approved',approved:true};
 t.win.onSpecialApprovalState({status:'approved',approved:true});
-assert.ok(t.get('freedomR14Check'),'approval callback does not skip approval-check button');
-assert.equal(t.get('freedomR14Video'),null,'must wait for approval-check click');
-t.get('freedomR14Check').onclick();
-assert.equal(t.get('freedomR14Video').src,'freedom_onboarding_postscroll_20260928.mp4','step6 approved guide');
+assert.equal(t.get('freedomR14Check'),null,'confirmed first approval must not request manual second approval');
+assert.equal(t.get('freedomR14Video').src,'freedom_onboarding_postscroll_20260928.mp4','step6 after server confirms approval');
 assert.equal(t.logs.approvedRuntime,0,'guide must finish before home');
 t.get('freedomR14Video').dispatch('ended');
 assert.equal(t.get('freedomR14FullScreen'),null,'step7 gate removed');
@@ -116,4 +114,4 @@ assert.equal(captain.get('freedomR14Video').src,'freedom_onboarding_postscroll_2
 assert.equal(captain.logs.submitted.length,0);
 captain.get('freedomR14Video').dispatch('ended');
 assert.equal(captain.logs.approvedRuntime,1);
-console.log('PASS: Web 1-3 -> Native step4 approval request -> step5 explicit approval check -> step6 H264 guide -> step7 home; no MoveIcon links or duplicate approvals');
+console.log('PASS: Web 1-3 -> first approval confirmation automatically advances to step6 guide and step7 home; preserved approved upgrade skips requests; no duplicate approvals');
