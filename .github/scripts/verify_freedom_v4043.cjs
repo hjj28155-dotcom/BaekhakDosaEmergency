@@ -39,4 +39,43 @@ assert.equal(rec.analysisResearch.auto20.length,20,'20 generated combos availabl
 assert.equal(rec.analysis,undefined,'historic original analysis must remain absent');
 assert.deepEqual(rec.buy,{locked:true,combos:['1 2 3 4 5 6'],lockedAt:'BEFORE'},'past locked tickets not rewritten');
 assert.equal(rec.analysisResearch.researchOnly,true);
+
+// Integration regression: current six sentences + three historical DB-1 texts each
+// travel through the original V3_ANALYZE engine protocol before rank merging.
+const historyHelpers=extract('function v4043Db1Text(round){','function runAnalysisFromHome(){');
+const lines=v=>[v+'사과','둘째하늘','셋째바다','넷째강물','다섯째별','여섯째바람'].join('\n');
+const historyBank={
+ '1247':{text:lines('현재')},
+ '1246':{text:lines('지난')},
+ '1245':{text:lines('그전')},
+ '620':{text:lines('중간')},
+ '610':{text:lines('중간대')},
+ '400':{text:lines('옛날')}
+};
+const posted=[],modals=[];let combined=null;
+const hctx={
+ window:{V3_RAW_BANK:historyBank,DB1_UPDATE_1247:{status:'PASS'},V3_RAW_BANK_META:{count:1247}},
+ document:{getElementById(id){assert.equal(id,'engineFrame');return {contentWindow:{postMessage(payload){posted.push(payload)}}}}},
+ modal(title,msg){modals.push(title)},
+ setTimeout(fn){fn()},handleEngineResult(m){combined=m},console
+};
+vm.createContext(hctx);vm.runInContext(historyHelpers,hctx);
+vm.runInContext("v4043BeginAnalysis(1247,window.V3_RAW_BANK['1247'].text)",hctx);
+assert.equal(posted[0].round,1247);
+assert.equal(posted[0].raw,historyBank['1247'].text);
+let processed=0;
+while(processed<posted.length&&processed<8){
+ const call=posted[processed++];
+ const first=call.round===1247?[1,2,3,4,5,6,7,8,9,10]:[3,4,5,6,7,8,9,10,11,12];
+ hctx.v4043AcceptEngineResult({ok:true,round:call.round,rank:first.map(n=>({n}))});
+}
+assert.equal(processed,4,'three historical calls plus current call');
+assert(combined&&combined.db1Evidence,'combined engine response must include provenance');
+assert.equal(combined.db1Evidence.historySearched,5);
+assert.equal(combined.db1Evidence.historyEngineAnalysed.length,3);
+assert.equal(combined.db1Evidence.comparedWithoutWinningNumbers,true);
+assert.deepEqual(Array.from(combined.rank.slice(0,6),x=>Number(x.n)),[1,2,3,4,5,6],
+ 'current raw has first-six candidate priority');
+assert.equal(modals.length,0,'successful co-analysis must not display a false error');
+
 console.log('PASS: DB-1 six-line fallback, strict 1247 check, current auto20 route, historical 20-combo research isolation, locked purchase preservation');
