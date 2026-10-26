@@ -77,11 +77,13 @@ jobs:
           nodes.get('installMovie').fire('ended');check(3);
           nodes.get('go6Existing').fire('click');check(6);assert.equal(nodes.get('approvalMovie').count,1,'existing approved path skips new approval');
           nodes.get('approvalMovie').fire('ended');check(7);
-          nodes.get('go2').fire('click');
-          // Reinitialize to verify first-time unauthorised 4->5 path separately.
+          // A separate first-time user simulation starts again at stage 1.
+          vm.runInNewContext(code,{document:doc,window:{scrollTo(){}},console},{timeout:10000});
+          check(1);nodes.get('go2').fire('click');check(2);
+          nodes.get('installMovie').fire('ended');check(3);
           nodes.get('go4').fire('click');check(4);
           nodes.get('go5').fire('click');check(5);
-          nodes.get('go6').fire('click');check(6);assert.equal(nodes.get('approvalMovie').count,1);
+          nodes.get('go6').fire('click');check(6);assert.equal(nodes.get('approvalMovie').count,2);
           nodes.get('approvalMovie').fire('ended');check(7);
           console.log('PASS: five distinct pages, MoveIcon top-left, Freedom stages 1→2→3→4→5→6→7, original APK not linked');
           NODE
