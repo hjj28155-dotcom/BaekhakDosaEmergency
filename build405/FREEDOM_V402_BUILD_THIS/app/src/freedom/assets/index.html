@@ -1901,7 +1901,7 @@ function runAnalysisFromHome(){
  }
  const research=!!V330_WIN[Number(r)];
  V4043_ANALYSIS_INPUT={round:Number(r),source:manual?'사용자 저장 원문':'내장 DB-1 1~1247',research:research,started:Date.now()};
- let before=String((research?R().analysisResearch:R().analysis||{}).analyzedAt||'');
+ let before=String(((research?R().analysisResearch:R().analysis)||{}).analyzedAt||'');
  sendAnalysisToEngine(r,raw);
  setTimeout(()=>{try{
    let now=String(((research?R().analysisResearch:R().analysis)||{}).analyzedAt||'');
