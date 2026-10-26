@@ -1593,7 +1593,7 @@ function sendAnalysisToEngine(round,raw){
     return;
   }
   modal('분석 진행 중',`<div class="panel centerTitle"><h3>제${esc(round)}회 자동분석</h3><div class="small">보존된 원문과 비상용 엔진으로 자동구매 20조합을 계산합니다.</div><div style="font-size:32px;margin:18px">⚓</div><b>분석 중...</b></div>`);
-  f.contentWindow.postMessage({type:'V3_ANALYZE',round:Number(round),raw:String(raw||'')},'*');
+  f.contentWindow.postMessage({type:'V3_ANALYZE',round:Number(round),raw:String(raw||''),source:(V4043_ANALYSIS_INPUT||{}).source||'내장 DB-1',db1Rounds:1247},'*');
 }
 
 let V123_AFTER_ANALYSIS='';
@@ -1726,9 +1726,21 @@ function v4043DisplaySavedFive(round,mode){
  return true;
 }
 
+function v4043HistoricalResearchPage(round){
+ const a=R().analysisResearch||{},games=(a.auto20||[]).slice(0,20);
+ if(games.length!==20)return false;
+ modal('제'+round+'회 · DB-1 사후 연구 조합','<div class="analysisCompact v330print"><div class="panel warn"><b>사후 연구 20조합 · 실제 결과전 등록 조합 아님</b><p class="small">내장 DB-1과 분석엔진으로 지금 재계산한 자료입니다. 구매기록, 최초잠금, 성적 및 과거 분석원본은 변경하지 않습니다.</p></div><div class="r5grid">'+v330GroupsPurchase(games)+'</div><div class="r5actions"><button class="b" onclick="rawPage()">회차선택</button><button class="b" onclick="closeM()">닫기</button></div></div>');
+ return true;
+}
+function v4043MissingHistoricalCombos(round){
+ if(v4043HistoricalResearchPage(round))return;
+ const b=rawBank(round);
+ modal('제'+round+'회 · DB-1 연구 분석','<div class="panel goldline"><h3>실제 당첨 전 20조합 기록 없음</h3><p>DB-1 원문 '+(b&&b.text?'탑재됨':'미확인')+'. 지금 20조합을 생성할 수 있지만 과거 구매조합으로 소급 등록하지 않습니다.</p><button class="b gold" onclick="V330_AFTER=\'research\';runAnalysisFromHome()">DB-1 사후 연구 20조합 생성</button><button class="b" onclick="rawPage()">회차선택</button></div>');
+}
+
 function v330ResultPage(round){
  const w=V330_WIN[round],a=R().analysis||{},games=(a.auto20||[]).slice(0,20);
- if(games.length!==20){if(v4043DisplaySavedFive(round,'result'))return;modal(`제${round}회 · 채점 자료 확인`,`<div class="panel warn"><strong>해당 회차에서 당첨 전에 저장한 자동분석 20조합 기록을 찾지 못했습니다.</strong><p>발표 후 당첨번호로 과거 조합을 새로 생성하거나 채점하지 않습니다. 원본 기록이 확인된 경우에만 결과를 표시합니다.</p><button class="b" onclick="rawPage()">이전</button></div>`);return}
+ if(games.length!==20){if(v4043DisplaySavedFive(round,'result'))return;v4043MissingHistoricalCombos(round);return}
  const set=new Set(w.nums),scores=games.map(g=>g.filter(n=>set.has(Number(n))).length),best=Math.max(...scores),wins=scores.filter(x=>x>=3).length;
  const banner=best>=3?`<div class="scoreHero success"><strong>🎉 축하합니다!</strong><span>최고 ${best}/6 적중 · 3/6 이상 ${wins}조합</span></div>`:`<div class="scoreHero fail"><strong>이번 회차는 아쉽게 지나갔습니다.</strong><span>제${round}회 최고 ${best}/6 적중 · 다음 분석에 이어갑니다.</span></div>`;
  modal(`제${round}회 · 자동분석 20조합 결과`,`<div class="analysisCompact v330print">${banner}<div class="panel goldline centerTitle"><h3>당첨번호</h3><div class="r5winning">${w.nums.map(n=>`<span class="r5ball hit">${n}</span>`).join('')}</div><div style="font-weight:950;color:#ffe58a;font-size:19px">보너스 ${w.bonus}</div></div><div class="r5grid">${v330GroupsResult(games,w.nums)}</div><div class="r5actions"><button class="b gold" onclick="v330Print()">🖨 인쇄</button><button class="b" onclick="rawPage()">회차선택</button><button class="b" onclick="rawPage()">이전</button></div></div>`);
@@ -1741,10 +1753,22 @@ function v330ResultPage(round){
 }
 function v330PurchasePage(round){
  const a=R().analysis||{},games=(a.auto20||[]).slice(0,20);
- if(games.length!==20){if(v4043DisplaySavedFive(round,'purchase'))return;if(round===1247){V330_AFTER='purchase';runAnalysisFromHome();return}modal('제'+round+'회 · 조합 원본 없음','<div class="panel warn">이 회차에 저장된 자동분석 20조합 또는 최종 구매 5조합 기록이 없습니다. 과거 번호를 임의 생성하지 않습니다.</div>');return}
+ if(games.length!==20){if(v4043DisplaySavedFive(round,'purchase'))return;if(round===1247){V330_AFTER='purchase';runAnalysisFromHome();return}v4043MissingHistoricalCombos(round);return}
  modal(`제${round}회 · 이번주 구매번호`,`<div class="analysisCompact v330print"><div class="scoreHero success"><strong>자동분석 20조합</strong><span>비상용 분석엔진 · 후보우주 기반 · 외부번호 자동추가 없음</span></div><div class="r5grid">${v330GroupsPurchase(games)}</div><div class="r5actions"><button class="b gold" onclick="v330Print()">🖨 인쇄</button><button class="b" onclick="rawPage()">회차선택</button><button class="b" onclick="rawPage()">이전</button></div></div>`);
 }
-function v330OpenRound(n){n=Number(n);if(!V330_RECENT.includes(n))n=1247;if(!setRound(n))return;if(n===1247){const a=R().analysis||{};if(Array.isArray(a.auto20)&&a.auto20.length===20){v330PurchasePage(n);return}if(v4043DisplaySavedFive(n,'purchase'))return;let b=rawBank(n);modal('제1247회 · 원문과 조합 상태',`<div class="panel goldline"><h3>원문 보관 자료 · 공식 당첨결과 아님</h3><div class="small status">이 기기에 저장된 제1247회 조합은 아직 없습니다. 원문과 엔진이 준비되면 현재 회차만 신규 분석할 수 있습니다.</div><div style="white-space:pre-wrap;line-height:1.9;text-align:left">${esc(b&&b.text||'원문 없음')}</div><p class="small">${esc(b&&b.source||'')}</p><div class="row"><button class="b gold" onclick="V330_AFTER='purchase';runAnalysisFromHome()">제1247회 자동분석 20조합 생성</button><button class="b" onclick="rawPage()">회차선택</button></div></div>`);return}if(V330_WIN[n])v330ResultPage(n);else v330PurchasePage(n)}
+function v330OpenRound(n){
+ n=Number(n);if(!V330_RECENT.includes(n))n=1247;
+ if(!setRound(n))return;
+ const a=R().analysis||{};
+ if(n===1247){
+  if(Array.isArray(a.auto20)&&a.auto20.length===20){v330PurchasePage(n);return}
+  if(v4043DisplaySavedFive(n,'purchase'))return;
+  // Current round: DB-1 already holds six sentences. Start the engine without requiring manual raw.
+  V330_AFTER='purchase';runAnalysisFromHome();return;
+ }
+ if(V330_WIN[n])v330ResultPage(n);
+ else v330PurchasePage(n);
+}
 
 function v124Round1243ResultPage(){
   if(!v126Ensure1243Auto20()){
@@ -1860,13 +1884,27 @@ function analysisGroups(pool,original){let g0=cleanGames(original);if(g0.length!
  {name:'자동 B 5조합',rows:gamesToRows(packFromPool(pool,2))},
  {name:'자동 C 5조합',rows:gamesToRows(packFromPool(pool,3))}
 ]}
+/* V4.0.43 DB-1 fallback: no manually supplied text is required. Preserve complete 1..1247 raw bank. */
+function v4043Db1Text(round){
+ const bank=window.V3_RAW_BANK||{},status=window.DB1_UPDATE_1247||{},meta=window.V3_RAW_BANK_META||{};
+ if(status.status!=='PASS'||Number(meta.count)!==1247)return '';
+ const entry=bank[String(round)],raw=String(entry&&entry.text||'').trim();
+ return raw.split(/\r?\n/).filter(x=>x.trim()).length===6?raw:'';
+}
+let V4043_ANALYSIS_INPUT=null;
 function runAnalysisFromHome(){
- let r=cur(),saved=R().raw||{},raw=(saved.text||embeddedRaw(r)||'').trim();
- if(!raw){rawPage();setTimeout(()=>alert('이 회차의 보존 원문이 없습니다.'),120);return}
- let before=String((R().analysis||{}).analyzedAt||'');
+ let r=cur(),saved=R().raw||{},manual=String(saved.text||'').trim(),db1=v4043Db1Text(r);
+ let raw=manual||db1;
+ if(!raw){
+  modal('DB-1 데이터 점검', '<div class="panel warn">수동 원문이 없어도 DB-1에서 6문장을 불러와 분석해야 합니다. 현재 내장 DB-1 검증이 되지 않아 번호를 임의 생성하지 않습니다. 앱의 DB-1 탑재 상태를 확인해 주세요.</div>');
+  return;
+ }
+ const research=!!V330_WIN[Number(r)];
+ V4043_ANALYSIS_INPUT={round:Number(r),source:manual?'사용자 저장 원문':'내장 DB-1 1~1247',research:research,started:Date.now()};
+ let before=String((research?R().analysisResearch:R().analysis||{}).analyzedAt||'');
  sendAnalysisToEngine(r,raw);
  setTimeout(()=>{try{
-   let now=String((R().analysis||{}).analyzedAt||'');
+   let now=String(((research?R().analysisResearch:R().analysis)||{}).analyzedAt||'');
    if(now===before&&Number(cur())===Number(r)){
      modal('분석 엔진 확인',`<div class="panel"><div class="warn">분석 엔진 응답이 아직 없습니다.</div><div class="small">임의 번호는 생성하지 않습니다.</div><div class="row" style="margin-top:10px"><button class="b gold" onclick="runAnalysisFromHome()">다시 분석</button><button class="b" onclick="rawPage()">회차선택</button></div></div>`)
    }
@@ -1900,7 +1938,16 @@ function storeAnalysisResult(m,pool,original,fallback,error){
    return
  }
  let autoGroup={name:'자동구매 20조합',rows:auto20.map((g,i)=>({slot:i+1,game:g}))};
- let a={round:Number(cur()),engine:String(m.engine||'V2_MASTER_ENGINE'),candidates:[...new Set(pool.map(Number))],rank:m.rank||[],groups:[autoGroup],originalGroup:{name:'원문분석 5조합',rows:gamesToRows(original5)},engineGames:original5,auto20,fallback:!!fallback,error:String(error||''),analyzedAt:new Date().toISOString()};
+ let a={round:Number(cur()),engine:String(m.engine||'V2_MASTER_ENGINE'),candidates:[...new Set(pool.map(Number))],rank:m.rank||[],groups:[autoGroup],originalGroup:{name:'원문분석 5조합',rows:gamesToRows(original5)},engineGames:original5,auto20,fallback:!!fallback,error:String(error||''),source:(V4043_ANALYSIS_INPUT||{}).source||'내장 DB-1',analyzedAt:new Date().toISOString()};
+ // Past draw reanalysis is separate RESEARCH data. Never overwrite RESULT-BEFORE buy/locked records.
+ if(V330_WIN[Number(cur())]){
+   a.researchOnly=true;a.historicalResultExcluded=true;
+   R().analysisResearch=a;
+   V330_AFTER='';V123_AFTER_ANALYSIS='';
+   save();
+   v4043HistoricalResearchPage(Number(cur()));
+   return;
+ }
  R().analysis=a;
  let b=R().buy||{};
  if(!b.locked){
