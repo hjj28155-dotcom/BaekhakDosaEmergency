@@ -22,14 +22,17 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
+      - name: Validate database, onboarding and DB-1 20-combo fallback
+        run: |
+          set -euo pipefail
+          node .github/scripts/validate_freedom_r14.cjs
+          node .github/scripts/verify_freedom_v4043.cjs
       - name: Restore original Freedom signer
         uses: actions/cache/restore@v4
         with:
           path: ~/.android/debug.keystore
           key: freedom-v436-production-debug-signer-20261022
           fail-on-cache-miss: true
-      - name: Verify frontend JavaScript
-        run: node .github/scripts/validate_freedom_r14.cjs
       - name: Build signed candidate
         working-directory: build405/FREEDOM_V402_BUILD_THIS
         run: |
