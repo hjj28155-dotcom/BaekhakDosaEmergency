@@ -884,18 +884,47 @@ async function threeRoomRequest(action,method,body){
  return data;
 }
 var threeRoomName={captain:'⚓ 선장',navigator:'🧭 항해사',controller:'🛡️ 통제관',linkofficer:'🔗 중앙연결관'};
-function threeRoomRoleSummary(rows){
- var status={navigator:null,controller:null,linkofficer:null};
+/* Independent shared-event reply tracking; this does NOT attest original ChatGPT session identity.
+ * Captains' event UUIDs are correlation IDs only. Old records and original links are preserved. */
+function threeRoomReplyState(rows){
+ var latest=null,roles={navigator:false,controller:false,linkofficer:false};
  (rows||[]).forEach(function(e){
-  if(!Object.prototype.hasOwnProperty.call(status,e.author_role))return;
-  if(!status[e.author_role]||new Date(e.created_at)>new Date(status[e.author_role].created_at))status[e.author_role]=e;
+  if(e.author_role==='captain'&&e.source_kind==='captain_app'&&
+    (!latest||new Date(e.created_at)>new Date(latest.created_at)))latest=e;
  });
- Object.keys(status).forEach(function(role){
+ if(!latest)return {latest:null,roles:roles,count:0};
+ var marker='회람응답:'+latest.id;
+ (rows||[]).forEach(function(e){
+  if(!Object.prototype.hasOwnProperty.call(roles,e.author_role)||
+     e.source_kind!=='original_chat_connector'||
+     new Date(e.created_at)<new Date(latest.created_at))return;
+  var first=String(e.body||'').split(/\r?\n/)[0].trim();
+  if(first===marker)roles[e.author_role]=true;
+ });
+ return {latest:latest,roles:roles,count:Object.values(roles).filter(Boolean).length};
+}
+function threeRoomRoleSummary(rows){
+ var latestByRole={navigator:null,controller:null,linkofficer:null};
+ var reply=threeRoomReplyState(rows);
+ (rows||[]).forEach(function(e){
+  if(!Object.prototype.hasOwnProperty.call(latestByRole,e.author_role))return;
+  if(!latestByRole[e.author_role]||new Date(e.created_at)>new Date(latestByRole[e.author_role].created_at))latestByRole[e.author_role]=e;
+ });
+ Object.keys(latestByRole).forEach(function(role){
   var node=$('threeRoomRoleStatus').querySelector('[data-room-role="'+role+'"]');
   if(!node)return;
-  var item=status[role];
-  node.textContent=threeRoomName[role]+' · '+(item?'최근 공유 '+dateTime(item.created_at)+' (원본 세션 자동 인증 없음)':'공유 메시지 기록 없음');
+  var item=latestByRole[role];
+  if(reply.latest){
+   node.textContent=threeRoomName[role]+' · '+(reply.roles[role]?
+    '이번 지시 답변 기록됨 (원본 세션 미인증)':
+    '이번 지시 답변 미확인')+(item?' · 최근 '+dateTime(item.created_at):'');
+  }else{
+   node.textContent=threeRoomName[role]+' · '+(item?
+    '최근 공유 '+dateTime(item.created_at)+' (원본 세션 자동 인증 없음)':
+    '공유 메시지 기록 없음');
+  }
  });
+ return reply;
 }
 function threeRoomRender(rows){
  var area=$('threeRoomEvents');area.replaceChildren();
@@ -918,8 +947,9 @@ async function threeRoomRefresh(){
  try{
   var x=await threeRoomRequest('events');
   threeRoomRender(x.items||[]);
-  $('threeRoomLiveState').textContent='공유 서버 조회됨 · 자동 세션 연동 없음';
-  $('threeRoomStatus').textContent='공유 서버 메시지 '+(x.items||[]).length+'건 조회 · 약 4초 간격 자동 확인. 역할 표시는 본인 주장 정보이며 실제 원본 ChatGPT 세션 자동 인증은 아닙니다.';
+  var reply=threeRoomReplyState(x.items||[]);
+  $('threeRoomLiveState').textContent=reply.latest?'이번 지시 회신 '+reply.count+'/3 · 원본 세션 미인증':'공유 기록 조회 · 선장 지시 없음';
+  $('threeRoomStatus').textContent='공유 서버 메시지 '+(x.items||[]).length+'건 조회 · 약 4초 간격 새 기록 확인. 회신은 선장 지시 UUID와 각 역할이 선언한 답변을 대조한 결과이며 실제 원본 ChatGPT 세션 인증이나 자동 송수신을 의미하지 않습니다.';
  }catch(err){
   $('threeRoomStatus').textContent='공유판 조회 실패: '+String(err.message||err);
   $('threeRoomLiveState').textContent='서버 확인 필요';
@@ -955,9 +985,12 @@ function threeRoomGuide(role){
   '연결된 Supabase 도구를 사용할 수 있는 경우, 선장이 업무 공유를 요청하거나 이 원본방이 응답을 작성할 때 아래 공용 메시지 기록을 확인하십시오.',
   '프로젝트 ID: jyqkohpeowkhuaohlezc',
   '조회 SQL:',
-  "SELECT author_role, body, source_kind, created_at FROM public.crew_meeting_bridge_events WHERE room_id = '"+THREE_ROOM_ID+"' ORDER BY created_at DESC LIMIT 30;",
+  "SELECT id, author_role, body, source_kind, provenance, created_at FROM public.crew_meeting_bridge_events WHERE room_id = '"+THREE_ROOM_ID+"' ORDER BY created_at DESC LIMIT 30;",
   '',
   '원본방이 직접 검토한 새 업무 답변을 공유할 때만 아래 형식으로 INSERT하십시오. 원본 채팅의 전체 대화 내역을 자동 복사하지 마십시오.',
+  '최신 선장 이벤트(captain_app)의 id를 읽고, 답변 첫 줄을 정확히 회람응답:<선장 이벤트 UUID>로 시작하십시오. 예: 회람응답:123e4567-e89b-12d3-a456-426614174000',
+  '이미 해당 역할의 같은 선장 이벤트 ID에 대한 답변이 있으면 중복 등록하지 마십시오. 선장 이벤트가 없으면 ID를 임의로 만들지 마십시오.',
+  '위 INSERT 예시의 <검토한 업무 보고문>은 실제 답변으로 바꾸어야 하며, 예시 문구 자체는 절대로 등록하지 마십시오.',
   '저장 SQL 예시 (보고문 안에 작은따옴표가 있으면 SQL용으로 두 번 써야 합니다):',
   "INSERT INTO public.crew_meeting_bridge_events(room_id,author_role,body,source_kind,provenance) VALUES ('"+THREE_ROOM_ID+"','"+role+"','<검토한 업무 보고문>','original_chat_connector','DECLARED_NOT_SESSION_VERIFIED') RETURNING id, created_at;",
   '원본방 자체에서 사용 가능한 연결 도구가 없으면 이 절차는 수행할 수 없으며, 연결됐다고 보고하지 마십시오.',
