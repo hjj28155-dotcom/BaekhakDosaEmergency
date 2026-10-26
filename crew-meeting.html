@@ -481,7 +481,7 @@ var ORIGINAL_CHAT_KEY='crew_meeting_central_linkofficer_original_chat_url_v1';
 var ORIGINAL_ROLE_PREFIX='crew_meeting_direct_original_';
 var ORIGINAL_HISTORY_PREFIX='crew_meeting_original_history_v1_';
 var originalLinks={},editingRole=null;
-var origNames={navigator:'🧭 원본 항해사',controller:'🛡️ 원본 통제관',linkofficer:'🔗 중앙연결관'};
+var origNames={navigator:'🧭 항해사',controller:'🛡️ 통제관',linkofficer:'🔗 중앙연결관'};
 var origButtons={navigator:'originalNavigator',controller:'originalController',linkofficer:'originalLinkofficer'};
 function validOriginalUrl(input){
  var u=new URL(String(input||'').trim()),p=u.pathname.split('/').filter(Boolean),uid=/^[0-9a-f-]{36}$/i;
@@ -533,7 +533,7 @@ function rememberRoleUrl(role,url){
 function redrawOriginalButtons(){
  Object.keys(origButtons).forEach(function(role){
   var btn=$(origButtons[role]),ready=!!roleUrl(role);
-  btn.textContent=origNames[role]+(ready?' · 원본방 열기':' · 주소 등록');
+  btn.textContent=origNames[role];
   btn.classList.toggle('ready',ready);
   btn.title=ready?'기존 ChatGPT 대화방에서 직접 대화':'원본 채팅방 주소를 한 번 등록';
  });
