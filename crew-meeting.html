@@ -291,34 +291,61 @@ footer{display:none}
  }
 }
 
+
+/* INDEPENDENT CENTRAL CONTROL HOME — 2026-10-26. Web-only changes; original app/DB preserved. */
+#installedAppBar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;align-items:stretch}
+#installedAppBar .installedAppUnit{min-width:0;width:100%}
+#installedAppBar .installedAppUnit button,#installedAppBar .installedAppUnit a{display:flex;align-items:center;justify-content:center;width:100%;height:65px;min-height:65px;max-height:65px;padding:5px;font-size:.79rem;font-weight:800;line-height:1.3;text-align:center;text-decoration:none;border:1px solid #7aa8c5;border-radius:12px;background:linear-gradient(160deg,#16476b,#0e3154);color:#fff0ce;box-sizing:border-box}
+#installedAppBar .installedAppUnit a{border-color:#e3b66d;background:linear-gradient(150deg,#1e5b73,#113b5b)}
+#centralRoundPanel{padding:9px 10px;margin:6px 0;border:1px solid #4c7595;border-radius:13px;background:linear-gradient(135deg,rgba(3,27,50,.95),rgba(9,63,83,.90))}
+#centralRoundPanel label{display:block;font-weight:800;font-size:.82rem;color:#fbe4b2;margin-bottom:6px}
+.centralRoundRow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px}
+.centralRoundRow input{width:100%;min-width:0;padding:6px 8px;min-height:40px}
+.centralRoundRow button{min-width:0;min-height:40px;padding:5px 9px;font-size:.79rem}
+#centralRoundPanel small{display:block;line-height:1.36;font-size:.69rem;color:#d0e0ef;margin-top:6px}
+@media(max-width:390px){#installedAppBar .installedAppUnit button,#installedAppBar .installedAppUnit a{font-size:.70rem;padding:3px}#centralRoundPanel{padding:7px}.centralRoundRow button{font-size:.7rem;padding:4px 6px}}
+body{background:linear-gradient(180deg,rgba(2,15,34,.86),rgba(2,26,48,.58) 55%,rgba(2,16,38,.96)),radial-gradient(ellipse at 50% 46%,#397e9d 0%,#104669 55%,#041629 100%)}
+
 </style>
 </head>
 <body>
 <main>
-<header><div><h1>⚓ 항행의자유 공동회의</h1><small>선장의 공동 업무 공간</small></div><button id="disconnectBtn" class="secondary" type="button">퇴장</button></header>
+<header><div><h1>⚓ 항행의자유 중앙통제실</h1><small>선장의 공동 업무 공간</small></div><button id="disconnectBtn" class="secondary" type="button">퇴장</button></header>
 <div id="originalChatBar" role="navigation" aria-label="담당자 대화방 바로가기">
-<button type="button" id="originalNavigator">🧭 항해사</button>
-<button type="button" id="originalController">🛡️ 통제관</button>
-<button type="button" id="originalLinkofficer">🔗 중앙연결관</button>
+<button type="button" id="originalNavigator">🧭 항해사<br>V3 전담</button>
+<button type="button" id="originalController">🛡️ 통제관<br>V7 전담</button>
+<button type="button" id="originalLinkofficer">🔗 중앙연락관<br>배포판 전담</button>
 </div>
 
 <nav id="homeQuickActions" aria-label="홈 주요 기능">
- <button type="button" id="homeLiveBtn" aria-controls="homeWorkspace">📡<span>실시간 공유</span></button>
+ <button type="button" id="homeLiveBtn" aria-controls="homeWorkspace">📡<span>실시간 소통방</span></button>
  <button type="button" id="homeReportBtn" aria-controls="homeWorkspace">📑<span>보고서</span></button>
  <a id="crewUpdateOpen" href="https://drive.google.com/file/d/1Ddg-fGo2q3JfowTjRTNUxmXPQ46CkUZL/view?usp=drivesdk" aria-label="구글드라이브 공동회의 최신 APK 업데이트">⬇️<span>업데이트</span></a>
  <button type="button" id="homeMoreBtn" aria-controls="homeMorePanel" aria-expanded="false">☰<span>더보기</span></button>
 </nav>
-<div id="installedAppBar" aria-label="선장폰에 이미 설치된 독립 V3 V7 앱 실행">
+<div id="installedAppBar" aria-label="서로 독립된 세 앱 바로가기">
  <div class="installedAppUnit">
-  <button type="button" id="openInstalledV3">📲 V3 항해사앱 실행</button>
+  <button type="button" id="openInstalledV3" aria-label="항해사앱 V3 설치본 실행">🧭 항해사앱 V3</button>
  </div>
  <div class="installedAppUnit">
-  <button type="button" id="openInstalledV7">📲 V7 중앙통제실 실행</button>
+  <button type="button" id="openInstalledV7" aria-label="통제관 전담 V7 설치본 실행">🛡️ 통제관 V7</button>
  </div>
+ <div class="installedAppUnit">
+  <a id="openFreedomDistribution" href="https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/moveicon.html" target="_self" rel="noopener" aria-label="항해의자유 배포판 공식 설치 및 접속 안내">🚢 항해의자유 배포판</a>
+ </div>
+</div>
+<div id="centralRoundPanel" aria-label="중앙통제실 전회차 조회">
+ <label for="centralRoundInput">🔎 중앙통제실 · 제1회부터 현회차까지 조회</label>
+ <div class="centralRoundRow">
+  <input id="centralRoundInput" type="number" min="1" max="9999" inputmode="numeric" placeholder="조회 회차">
+  <button id="centralRoundLookup" type="button">회차 조회</button>
+  <button id="centralRoundAll" type="button" class="secondary">전체 목록</button>
+ </div>
+ <small>세 앱의 원본은 각 앱에 보존합니다. V7은 인증된 읽기 전용 조회, V3는 내보낸 자료 조회입니다. 배포판은 현회차 포함 최근 5회차만 이용합니다.</small>
 </div>
 <div id="homeOverview">
  <div class="homeShip">⚓</div>
- <strong>함께 보고, 바로 소통하는 중앙회의실</strong>
+ <strong>항해사 V3 · 통제관 V7 · 항해의자유 배포판 연결</strong>
  <p>담당자를 선택하거나 아래 메뉴를 이용하세요.</p>
  <small>실시간 기록은 공유 서버에서 확인합니다.</small>
 </div>
@@ -510,6 +537,25 @@ function requestInstalledLaunch(role,selectAgain){
 }
 $('openInstalledV3').addEventListener('click',function(){requestInstalledLaunch('v3',false);});
 $('openInstalledV7').addEventListener('click',function(){requestInstalledLaunch('v7',false);});
+/* Central-control lookup uses existing read-only reports; no report duplication or edits. */
+(function(){
+ var input=$('centralRoundInput'),lookup=$('centralRoundLookup'),all=$('centralRoundAll');
+ function maxRound(){return Math.max(1,Math.floor((Date.now()-Date.UTC(2002,11,7,11,35))/604800000)+2)}
+ function lookupRound(showAll){
+  var text=showAll?'':input.value.trim(),n=Number(text);
+  if(!showAll&&(!/^[1-9][0-9]*$/.test(text)||!Number.isInteger(n)||n>maxRound())){
+   window.alert('제1회부터 현회차('+maxRound()+'회)까지 입력해 주세요.');return;
+  }
+  if(!showAll)input.value=String(n);
+  $('reportRound').value=showAll?'':String(n);
+  $('homeReportBtn').click();
+  if(typeof token!=='undefined'&&token)$('reportRefresh').click();
+ }
+ lookup.addEventListener('click',function(){lookupRound(false)});
+ all.addEventListener('click',function(){lookupRound(true)});
+ input.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();lookupRound(false)}});
+})();
+
 
 
 
