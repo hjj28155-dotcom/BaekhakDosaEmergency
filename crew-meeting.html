@@ -253,6 +253,23 @@ footer{display:none}
 @media(max-height:650px){#originalChatBar button{min-height:54px;font-size:.84rem}#homeQuickActions button,#homeQuickActions a,#homeQuickActions #crewUpdateOpen{min-height:49px}#homeOverview{gap:5px;padding:9px}.homeShip{font-size:1.8rem}}
 @media(max-width:375px){#originalChatBar{gap:5px}#originalChatBar button{font-size:.81rem}#homeQuickActions{gap:4px}#homeQuickActions span{font-size:.64rem}#homeOverview strong{font-size:.88rem}}
 
+
+/* Captain-approved seven-home-button same-height rule 2026-10-26 */
+:root{--captain-home-button-height:70px}
+#originalChatBar > button,
+#homeQuickActions > button,
+#homeQuickActions > a,
+#homeQuickActions > #crewUpdateOpen{
+ box-sizing:border-box;
+ height:var(--captain-home-button-height);
+ min-height:var(--captain-home-button-height);
+ max-height:var(--captain-home-button-height);
+ align-items:center;
+ justify-content:center;
+ flex-shrink:0;
+}
+/* The same height wins over earlier mobile/short-screen min-height rules. */
+
 </style>
 </head>
 <body>
