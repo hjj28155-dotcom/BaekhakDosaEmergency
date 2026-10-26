@@ -1657,6 +1657,53 @@ public class MainActivity extends Activity {
             "https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/latest-apk";
 
     private static final String OFFICIAL_UPDATE_PAGE = "https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/update.html";
+    private static final String FREEDOM_RELEASE_STATUS_URL =
+            "https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/freedom-release-latest.json";
+
+    // Check actual installed versionCode against the independently published Freedom release.
+    // Never claim "latest" on network errors, and never reset approvals or app data.
+    private void checkLatestFreedomVersionAsync() {
+        new Thread(() -> {
+            JSONObject reply = new JSONObject();
+            HttpURLConnection connection = null;
+            try {
+                reply.put("installed_code", getInstalledVersionCode());
+                reply.put("installed_name", currentVersionName());
+                URL endpoint = new URL(FREEDOM_RELEASE_STATUS_URL + "?check=" + System.currentTimeMillis());
+                connection = (HttpURLConnection) endpoint.openConnection();
+                connection.setConnectTimeout(8000);
+                connection.setReadTimeout(8000);
+                connection.setRequestProperty("Cache-Control", "no-cache");
+                if (connection.getResponseCode() != 200) throw new Exception("release unavailable");
+                byte[] body;
+                try (InputStream stream = connection.getInputStream()) { body = readAll(stream); }
+                if (body.length > 16384) throw new Exception("release metadata too large");
+                JSONObject meta = new JSONObject(new String(body, StandardCharsets.UTF_8));
+                if (!"com.navigator.freedom.v3final".equals(meta.optString("application_id"))) throw new Exception("wrong APK package");
+                long latest = meta.optLong("version_code", 0L);
+                if (latest < 40041L || latest > 200000L) throw new Exception("invalid remote version");
+                String downloadUrl = meta.optString("apk_url", "");
+                URL verified = new URL(downloadUrl);
+                if (!"https".equals(verified.getProtocol()) || !"drive.google.com".equals(verified.getHost())) throw new Exception("invalid APK host");
+                reply.put("latest_code", latest);
+                reply.put("latest_name", meta.optString("version_name", ""));
+                reply.put("status", getInstalledVersionCode() >= latest ? "latest" : "update");
+            } catch (Exception e) {
+                try { reply.put("status", "error"); } catch (Exception ignored) {}
+            } finally {
+                if (connection != null) connection.disconnect();
+            }
+            final String payload = reply.toString();
+            runOnUiThread(() -> {
+                try {
+                    if (webView != null) webView.evaluateJavascript(
+                        "if(window.onFreedomVersionStatus)window.onFreedomVersionStatus(" + JSONObject.quote(payload) + ");",
+                        null);
+                } catch (Exception ignored) {}
+            });
+        }, "Freedom-APK-Version-Check").start();
+    }
+
     private void openOfficialUpdateLink() {
         runOnUiThread(() -> {
             try {
@@ -2039,6 +2086,7 @@ public class MainActivity extends Activity {
         }
         @JavascriptInterface public void chooseApkUpdate() { chooseApkUpdateFile(); }
         @JavascriptInterface public void openOfficialUpdateLink() { MainActivity.this.openOfficialUpdateLink(); }
+        @JavascriptInterface public void checkLatestFreedomVersion() { MainActivity.this.checkLatestFreedomVersionAsync(); }
         @JavascriptInterface public String getNativeVersion() {
             try {
                 android.content.pm.PackageInfo p = getPackageManager().getPackageInfo(getPackageName(), 0);
