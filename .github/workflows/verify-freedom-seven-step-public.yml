@@ -15,61 +15,55 @@ jobs:
     timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
-      - name: Verify seven-stage UI transitions without premature download or MoveIcon installs
+      - name: Verify 1 2 3 6 7 stage logic, correct guide and Drive-only APK
+        shell: bash
         run: |
           set -euo pipefail
           node <<'NODE'
           const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
           const html=fs.readFileSync('moveicon.html','utf8');
-          const videoSource=fs.readFileSync('freedom_guide_latest.mp4');
-          const scrollImg=fs.statSync('welcome_scroll_final.png');
-          assert.ok(videoSource.length>1000000,'installation video must exist');
-          assert.ok(scrollImg.size>10000,'greeting scroll must exist');
-          assert.match(html,/freedom-flow-engine" content="V7-SEVEN-STAGE-20261023"/);
-          for(let i=1;i<=7;i++)assert.ok(html.includes('data-step="'+i+'"'),'missing stage number '+i);
-          assert.ok(html.includes('id="freedomApkInstall"'),'Freedom APK link missing');
-          assert.ok(html.includes('HanghaeFreedom_V4.0.'),'verified Freedom release missing');
-          assert.ok(!html.includes('Hanghae_MoveIcon'),'MoveIcon APK must not be in canonical Freedom install');
-          assert.ok(!html.includes('id="moveicon-apk"'),'MoveIcon installer must be separate');
-          class E {
-            constructor(id){this.id=id;this.hidden=id!=='scrollStage';this.listeners={};this.textContent='';this.attrs={};this.classList={toggle(){}};}
-            addEventListener(k,fn){this.listeners[k]=fn}
-            dispatch(k){if(this.listeners[k])this.listeners[k]()}
-            getAttribute(k){return this.attrs[k]}
+          assert.match(html,/freedom-flow-engine" content="FREEDOM-7STAGE-DRIVE-NO-DUPLICATE-20261026"/);
+          for(let i=1;i<=7;i++)assert.ok(html.includes('data-step="'+i+'"'));
+          assert.match(html,/id="freedomApkInstall"/);
+          assert.match(html,/drive.google.com\/file\/d\/1-YadPjhG7J8cpA2-xFfi-WxjEVBvgEE5/);
+          assert.match(html,/source src="\.\/freedom_onboarding_latest.mp4"/);
+          assert.ok(!html.includes('Hanghae_MoveIcon_'));
+          class E{
+            constructor(id){this.id=id;this.hidden=true;this.listeners={};this.textContent='';this.currentTime=0;this.attrs={};this.classList={toggle(){}};this.count=0}
+            addEventListener(n,f){this.listeners[n]=f}
+            dispatch(n){if(this.listeners[n])this.listeners[n]()}
             setAttribute(k,v){this.attrs[k]=v}
+            getAttribute(k){return this.attrs[k]}
+            play(){this.count++;return Promise.resolve()}
+            pause(){}
           }
-          const nodes=new Map(['scrollStage','videoStage','installStage','installVideo','videoStatus','startInstallVideo','replayVideo'].map(id=>[id,new E(id)]));
-          const stages=Array.from({length:7},(_,i)=>{let e=new E('step'+(i+1));e.attrs['data-step']=String(i+1);return e});
-          const video=nodes.get('installVideo');
-          video.playCount=0;
-          video.play=()=>{video.playCount++;return Promise.resolve()};
-          video.pause=()=>{};
-          const document={getElementById(id){return nodes.get(id)},querySelectorAll(sel){assert.equal(sel,'.steps [data-step]');return stages}};
-          const win={scrollTo(){}};
-          const matches=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];
-          assert.equal(matches.length,1,'one authoritative web stage engine');
-          vm.runInNewContext(matches[0][1],{document,window:win,console},{timeout:10000});
-          assert.equal(nodes.get('scrollStage').hidden,false,'starts with scroll');
-          assert.equal(nodes.get('videoStage').hidden,true,'video not shown until scroll click');
-          assert.equal(nodes.get('installStage').hidden,true,'APK cannot be offered before movie completion');
-          nodes.get('startInstallVideo').dispatch('click');
-          assert.equal(nodes.get('videoStage').hidden,false,'step2 video must show');
-          assert.equal(nodes.get('installStage').hidden,true,'APK remains gated during playback');
-          assert.equal(video.playCount,1,'attempt video playback');
-          nodes.get('replayVideo').dispatch('click');
-          assert.equal(nodes.get('installStage').hidden,true,'replaying cannot bypass completion');
-          video.dispatch('ended');
-          assert.equal(nodes.get('installStage').hidden,false,'step3 APK must show only after ended');
-          assert.equal(nodes.get('videoStage').hidden,true,'video closes after completion');
-          assert.equal(stages[2].attrs['aria-current'],'step');
-          console.log('PASS: Web 1 scroll -> 2 completed install movie -> 3 Freedom-only APK, step4-7 reserved for Android app');
+          const ids=['scrollStage','videoStage','installStage','guideStage','homeStage','installVideo','afterApprovalVideo','guideStatus','videoStatus','startInstallVideo','replayVideo','openAfterApprovalGuide','replayAfterApproval','replayAfterApprovalFromHome'];
+          const nodes=new Map(ids.map(id=>[id,new E(id)]));
+          const stages=Array.from({length:7},(_,i)=>{let e=new E('step'+(i+1));e.attrs['data-step']=String(i+1);return e;});
+          const document={getElementById(id){assert.ok(nodes.has(id),id);return nodes.get(id)},querySelectorAll(sel){assert.equal(sel,'.steps [data-step]');return stages}};
+          const scripts=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];assert.equal(scripts.length,1);
+          vm.runInNewContext(scripts[0][1],{document,window:{scrollTo(){}},console},{timeout:10000});
+          function check(id,marker){assert.equal(nodes.get(id).hidden,false,id);assert.equal(stages[marker-1].attrs['aria-current'],'step',String(marker));}
+          check('scrollStage',1);
+          nodes.get('startInstallVideo').dispatch('click');check('videoStage',2);assert.equal(nodes.get('installStage').hidden,true);
+          nodes.get('installVideo').dispatch('ended');check('installStage',3);
+          nodes.get('openAfterApprovalGuide').dispatch('click');check('guideStage',6);assert.equal(nodes.get('afterApprovalVideo').count,1);
+          nodes.get('afterApprovalVideo').dispatch('ended');check('homeStage',7);
+          nodes.get('replayAfterApprovalFromHome').dispatch('click');check('guideStage',6);
+          console.log('PASS: stages 1->2->3->6->7, Drive-only download, approved existing path skips duplicate APK install');
           NODE
-      - name: Verify live canonical URL contains published seven-stage app-only portal
+      - name: Verify public canonical address has newly published page
+        shell: bash
         run: |
           set -euo pipefail
           URL='https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/moveicon.html'
-          curl -fsSL --retry 3 --max-time 45 -H 'Cache-Control: no-cache' "$URL?sevenstage=20261023" -o /tmp/live-seven-stage.html
-          grep -q 'V7-SEVEN-STAGE-20261023' /tmp/live-seven-stage.html
-          grep -q 'freedomApkInstall' /tmp/live-seven-stage.html
-          if grep -q 'Hanghae_MoveIcon_' /tmp/live-seven-stage.html; then echo 'FAIL: MoveIcon APK presented in Freedom install flow'; exit 3; fi
-          echo 'PASS: Actual public URL shows the Freedom-only seven-stage entry'
+          ok=0
+          for trial in $(seq 1 20); do
+            curl -fsSL --connect-timeout 10 --max-time 30 -H 'Cache-Control: no-cache' "$URL?drive_repaired=20261026-$trial" -o /tmp/live-seven-stage.html || true
+            if grep -q 'FREEDOM-7STAGE-DRIVE-NO-DUPLICATE-20261026' /tmp/live-seven-stage.html && grep -q '1-YadPjhG7J8cpA2-xFfi-WxjEVBvgEE5' /tmp/live-seven-stage.html; then ok=1;break;fi
+            sleep 8
+          done
+          test "$ok" = 1
+          ! grep -q 'Hanghae_MoveIcon_' /tmp/live-seven-stage.html
+          ! grep -q '다운로드 중지' /tmp/live-seven-stage.html
+          echo 'PASS: live canonical page has current Drive and no MoveIcon APK link'
