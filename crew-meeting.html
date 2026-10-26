@@ -316,13 +316,101 @@ body{background:linear-gradient(180deg,rgba(2,15,34,.86),rgba(2,26,48,.58) 55%,r
 #homeApprovalPanel iframe{flex:1 1 auto;width:100%;min-height:0;border:0;border-radius:8px;background:#08283e}
 #homeApprovalPanel .approvalFallback{flex:none;color:#b9d6e9;text-align:center;font-size:.69rem;line-height:1.35;text-decoration:underline;padding:3px}
 @media(max-height:650px){#homeApprovalBtn{min-height:41px;padding:5px 8px;font-size:.82rem}}
-/* Full-height approval room: hide HOME dashboard while open, leaving the
-   ship header and the room itself. This prevents the room from being cut off
-   below the home buttons on narrow Android screens. */
-main.approvalMode > :not(header):not(#homeApprovalPanel){display:none!important}
-main.approvalMode #homeApprovalPanel{display:flex;flex:1 1 auto;min-height:0;height:auto;max-height:none;overflow:hidden}
-main.approvalMode #homeApprovalPanel .homePaneTop{align-items:center;min-height:44px}
-main.approvalMode #homeApprovalPanel iframe{display:block;flex:1 1 auto;min-height:0;width:100%;height:100%;overflow:auto}
+/* CAPTAIN'S FLAGSHIP FINAL HOME: cinematic gold + sapphire + sea.
+   Wallpaper stays behind existing buttons and preserves their readability. */
+body{
+ background:
+  linear-gradient(170deg,rgba(1,11,28,.44),rgba(1,18,37,.42) 42%,rgba(3,16,34,.58)),
+  url('./assets/central-control-flagship-final.svg') center 54% / cover no-repeat fixed!important;
+ background-color:#041b30!important;
+}
+main{position:relative}
+main:not(.roomMode) header{
+ padding:7px 9px;border:1px solid rgba(232,198,129,.65);border-radius:12px;
+ background:linear-gradient(110deg,rgba(3,24,48,.91),rgba(17,73,95,.82),rgba(7,29,55,.91));
+ box-shadow:inset 0 1px 0 rgba(255,241,191,.21),0 3px 13px rgba(0,17,34,.25);
+}
+main:not(.roomMode) header h1{
+ color:#ffe6a8;text-shadow:0 1px 1px #071523,0 0 16px rgba(247,204,119,.31);
+}
+#originalChatBar button{
+ border:1.5px solid #d7b574!important;
+ background:linear-gradient(145deg,rgba(19,72,100,.97),rgba(8,36,68,.98))!important;
+ box-shadow:inset 0 1px 0 #ffffff33,0 3px 11px #06192c55;
+ color:#fff1c3!important;
+}
+#originalChatBar button.ready{background:linear-gradient(135deg,#d6b374,#f9e1a1)!important;color:#0a2941!important}
+#homeQuickActions button,#homeQuickActions a{
+ background:linear-gradient(140deg,rgba(15,55,89,.97),rgba(6,31,63,.97))!important;
+ border:1.5px solid #78bfd1!important;
+ box-shadow:inset 0 1px 0 #d7f7ff22,0 4px 12px #0010224f;
+ color:#f2faff!important;
+}
+#homeQuickActions #crewUpdateOpen{background:linear-gradient(135deg,#0e6879,#1d3d70)!important}
+#homeQuickActions button[aria-pressed="true"],#homeQuickActions button[aria-expanded="true"]{
+ border-color:#f9d68a!important;color:#ffe6a9!important;
+ background:linear-gradient(120deg,#12647a,#1a4b75)!important;
+}
+#installedAppBar .installedAppUnit button,#installedAppBar .installedAppUnit a{
+ border:1.8px solid #e9c47b!important;
+ background:linear-gradient(155deg,rgba(25,96,127,.96),rgba(5,43,77,.98))!important;
+ box-shadow:inset 0 1px 0 #ffffff38,0 5px 15px #05152655;
+ color:#ffedb8!important;text-shadow:0 1px 2px #041523;
+}
+#homeApprovalBtn{
+ border:2px solid #ffe29c!important;
+ background:linear-gradient(115deg,#16476d 0%,#217f9a 31%,#145477 62%,#825e2f 100%)!important;
+ color:#fff6d1!important;text-shadow:0 2px 4px #04162b;
+ box-shadow:inset 0 1px 0 #ffffff66,0 5px 20px rgba(249,192,84,.24),0 0 0 1px #f6cb6a36;
+}
+#centralRoundPanel{
+ border:1.5px solid #d6c17b!important;
+ background:linear-gradient(125deg,rgba(3,27,59,.97),rgba(12,68,98,.96))!important;
+ box-shadow:0 5px 18px #00172a66,inset 0 1px 0 #ffffff26;
+}
+#homeOverview{
+ border:1.5px solid rgba(230,202,136,.8)!important;
+ background:linear-gradient(160deg,rgba(3,30,58,.91),rgba(7,70,91,.76),rgba(2,24,50,.94))!important;
+ box-shadow:inset 0 0 22px #63ced115,0 4px 22px #00182c66;
+}
+#homeOverview .homeShip{
+ color:#f9de9a;text-shadow:0 0 24px rgba(255,220,129,.5);
+}
+#homeWorkspace,#homeMorePanel,#homeApprovalPanel{
+ border:1.5px solid #d5b77b!important;
+ background:linear-gradient(160deg,rgba(4,31,54,.96),rgba(3,17,42,.98))!important;
+ box-shadow:inset 0 1px 0 #ffffff30,0 4px 20px #00162977;
+}
+/* Every INTERNAL room must replace the home dashboard from the TOP.
+   External app launchers/download links keep their original navigation. */
+main.roomMode > :not(#homeWorkspace):not(#homeMorePanel):not(#homeApprovalPanel){
+ display:none!important;
+}
+main.roomMode > #homeWorkspace:not([hidden]),
+main.roomMode > #homeMorePanel:not([hidden]),
+main.roomMode > #homeApprovalPanel:not([hidden]){
+ display:flex!important;flex-direction:column;flex:1 1 auto;
+ min-width:0;min-height:0;height:100%;max-height:none;margin:0;
+ overflow:hidden;
+}
+main.roomMode #homeWorkspaceItems{
+ flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+}
+main.roomMode #homeMorePanel{overflow-y:auto;overscroll-behavior:contain}
+main.roomMode .homePaneTop{flex:none;min-height:44px;padding:4px 4px 9px;border-bottom:1px solid #a99b7066}
+main.roomMode .homePaneTop strong{color:#ffe3a1;font-size:.96rem}
+main.roomMode .homePaneTop button{min-height:39px;background:#1b5474;color:#fff2cd;border:1px solid #b7c7cc}
+main.roomMode #homeApprovalPanel iframe{display:block;flex:1 1 auto;min-height:0;width:100%;height:100%;overflow:auto}
+main.roomMode #homeMoreTools{display:flex;flex-direction:column;flex:none}
+#homeMoreTools > #relayPanel:not([hidden]),
+#homeMoreTools > #handoffPanel:not([hidden]),
+#homeMoreTools > #originalChatPanel:not([hidden]){order:-1;max-height:none!important;overflow-y:visible}
+main.roomMode #homeWorkspaceItems > #threeRoomLivePanel,
+main.roomMode #homeWorkspaceItems > #reportsPanel{min-height:0;max-height:none}
+@media (prefers-reduced-motion:no-preference){
+ #homeApprovalBtn{transition:box-shadow .2s ease,filter .2s ease}
+ #homeApprovalBtn:active{filter:brightness(1.16)}
+}
 </style>
 </head>
 <body>
@@ -509,7 +597,8 @@ function homeView(which){
  $('homeWorkspace').hidden=!active;
  $('homeMorePanel').hidden=which!=='more';
  $('homeApprovalPanel').hidden=which!=='approval';
- document.querySelector('main').classList.toggle('approvalMode',which==='approval');
+ var root=document.querySelector('main');
+ root.classList.toggle('roomMode',which!=='home');
  $('homeApprovalBtn').setAttribute('aria-expanded',String(which==='approval'));
  if(which==='approval'){
    var frame=$('homeApprovalFrame');
@@ -532,7 +621,23 @@ function homeView(which){
  if(which==='live'&&token)threeRoomRefresh();
  if(which==='reports'&&token)refreshV7Reports();
  if(which==='more')$('homeMorePanel').scrollTop=0;
+ if(which==='live'||which==='reports'){
+   $('homeWorkspace').scrollTop=0;
+   $('homeWorkspaceItems').scrollTop=0;
+ }
+ // Return every opened internal room to its first visible line.
+ try{window.scrollTo(0,0);}catch(e){}
+ document.documentElement.scrollTop=0;
+ document.body.scrollTop=0;
 }
+function showMoreDetailFromTop(panelId){
+ var selected=$(panelId),more=$('homeMorePanel');
+ if(!selected||!more)return;
+ selected.scrollTop=0;
+ more.scrollTop=0;
+ window.requestAnimationFrame(function(){more.scrollTop=0;});
+}
+
 $('homeApprovalBtn').addEventListener('click',function(){homeView(HOME_SELECTED==='approval'?'home':'approval');});
 $('homeApprovalBackBtn').addEventListener('click',function(){homeView('home');});
 $('homeLiveBtn').addEventListener('click',function(){homeView('live');});
@@ -666,7 +771,8 @@ function editOriginalRole(role){
  $('originalChatUrl').value=roleUrl(role);
  updateOriginalRolePicker();
  status('originalChatNotice','새 채팅방으로 이사한 경우, 새방의 첫 메시지를 보낸 뒤 브라우저 주소창의 새 URL을 붙여넣고 저장하세요. 이 기기의 예전 주소는 이전방 기록으로 보존합니다.');
- $('originalChatUrl').focus();
+ try{$('originalChatUrl').focus({preventScroll:true});}catch(e){$('originalChatUrl').focus();}
+ showMoreDetailFromTop('originalChatPanel');
 }
 async function refreshOriginalLinks(){
  if(!token)return;
@@ -770,7 +876,8 @@ function chooseHandoffRole(role){
 $('handoffOpen').addEventListener('click',function(){
  $('handoffPanel').hidden=false;$('originalChatPanel').hidden=true;
  chooseHandoffRole(HANDOFF_ROLE);
- $('handoffText').focus();
+ try{$('handoffText').focus({preventScroll:true});}catch(e){$('handoffText').focus();}
+ showMoreDetailFromTop('handoffPanel');
 });
 $('handoffRolePicker').querySelectorAll('button').forEach(function(btn){
  btn.addEventListener('click',function(){chooseHandoffRole(btn.getAttribute('data-handoff-role'));});
@@ -930,7 +1037,8 @@ relayRender();
 $('relayOpen').addEventListener('click',function(){
  $('relayPanel').hidden=false;$('handoffPanel').hidden=true;$('originalChatPanel').hidden=true;
  relayRender();
- $('relayDraft').focus();
+ try{$('relayDraft').focus({preventScroll:true});}catch(e){$('relayDraft').focus();}
+ showMoreDetailFromTop('relayPanel');
 });
 $('relayClose').addEventListener('click',function(){$('relayPanel').hidden=true;});
 $('relayCreate').addEventListener('click',function(){
