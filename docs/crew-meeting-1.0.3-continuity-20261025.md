@@ -1,3 +1,13 @@
+## 2026-10-26 / 1.0.7 홈 V3·V7 실행 버튼 복원 및 Drive 같은 링크 업데이트
+
+- 선장 39111.jpg 현장 스크린샷 지시: "항해사앱과 V7 은 홈화면에 있어야죠. 연결변경은 삭제 하고요." 기존 선장 요청 "APK를 드라이브에 올려서 바로 업데이트"와 함께 처리.
+- **홈 UI**: `crew-meeting.html`에 기존 실제 Native Launcher 버튼 `openInstalledV3` (V3 항해사앱 실행), `openInstalledV7` (V7 중앙통제실 실행)을 "실시간 공유·보고서·업데이트·더보기" 바로 아래 **홈 화면**으로 이동. 더보기로 숨기던 `arrangeHome()`의 `installedAppBar` DOM 이동 제거. `changeInstalledV3`, `changeInstalledV7` 버튼 2개와 JS 클릭 리스너를 실제로 제거. V3·V7 Native Launcher의 기존 `requestInstalledLaunch('v3',false)`, `requestInstalledLaunch('v7',false)`는 보존. SharedPreferences `crew_meeting_installed_app_links_v1` 보존하여 기존 연결/등록 무효화 없음. 홈 버튼 7개 공통 높이 70px도 유지; V3/V7 실행 버튼은 별도 59px (작은 화면 48px)로 2열 배치.
+- **GitHub main 수정 commit** `8577b51c56b0907a370507cbc8dca9671bbf7198` / `crew-meeting.html` blob SHA `5b415e7dc17668c9c3161a26effa8a5ff93c55a1`. GitHub Pages run `#40258994140` `completed/success`으로 **홈 배포 성공**. HTML JS 구문, 중복 ID, 두 Launch Buttons/역할 버튼/7개 높이/Drive 링크 및 Login 보호 확인 11/11 PASS.
+- **공동회의 APK 정본**: Android versionCode 107, versionName `1.0.7-HOME70`, applicationId `kr.hanghae.crewmeeting.compact`, Google Actions build run `#40257490441` `completed/success`. 기존 1.0.3~1.0.6 인증서 SHA256 `e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be`와 고정 서명 검증 통과, 원본 키 없거나 버전/패키지 불일치 시 빌드 중단 정책 유지. Android 본체는 변경하지 않고 기존 remote WebView `?app_version=107`로 최신 main HTML 로드.
+- **APK 파일 증빙:** GitHub workflow artifact ID `12622908273` 다운로드, ZIP CRC 0 error, APK `15674` bytes, SHA256 `e5e338c28fdf18c8a42d1790634723c4916c782e8ad964247cb94637c0225cec`. 사용자가 이 대화방에서도 바로 받을 수 있게 `/mnt/data/항행의자유_공동회의_1.0.7_홈수정_업데이트.apk` 제공.
+- **Google Drive 같은 파일에 업데이트 성공**: 기존 파일 ID `1Ddg-fGo2q3JfowTjRTNUxmXPQ46CkUZL`, 파일명 `항행의자유_공동회의_최신업데이트.apk`, 실제 기존 Drive ID를 `Google_Drive.update_file(file_uri)`로 교체함 (새 파일 생성/공유설정 변경/ID 변경 없음). 링크 `https://drive.google.com/file/d/1Ddg-fGo2q3JfowTjRTNUxmXPQ46CkUZL/view?usp=drivesdk`. **Drive 원본 다운로드 재검증**: 15,674 bytes SHA256 `e5e338c28fdf18c8a42d1790634723c4916c782e8ad964247cb94637c0225cec` 및 source 1.0.7 APK와 byte-for-byte identical PASS. ZIP CRC PASS. 공개 설치 페이지 `crew-meeting-releases/index.html`도 현재 1.0.7 버전·SHA 및 동일 Drive ID 표기 확인.
+- **중요 미검증:** 실제 선장폰 1.0.6→1.0.7 정상 덮어 설치 및 홈 V3/V7 두 버튼 동작, 기존 기기 연결 보존, 수정화면 장치 반영은 아직 선장 확인 전. 기존 V3/V7 APK, 채팅 원본, 승인 기록, 분석 엔진/자료/누적DB는 수정하지 않음. 세 원본 AI ChatGPT 방의 실시간 자동 송수신은 별도 HOLD.
+
 ## ⚓ 2026-10-26 / 선장 요청 — 1.0.7 HOME70 APK Google Drive 고정 파일 배포 확정
 
 - **선장 지시:** "APK 올려주세요" → "드라이브에 올려주시고 드라이브에서 업데이트 하게 해 주세요." 기존 공동회의 APK 고정 파일 `항행의자유_공동회의_최신업데이트.apk`, Google Drive ID `1Ddg-fGo2q3JfowTjRTNUxmXPQ46CkUZL` **그대로 유지**하여 1.0.7 APK로 갱신한 상태 검증. 파일을 새로 생성하여 링크가 변경되지 않도록 보존.
