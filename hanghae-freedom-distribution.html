@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
 <meta name="theme-color" content="#082c46">
 <meta name="description" content="항행의자유 배포판 전용 새 설치 안내. 기존 이동아이콘과 V3/V7과 분리.">
-<meta name="freedom-distribution" content="HANGHAE-FREEDOM-DEDICATED-20261026-R1">
+<meta name="freedom-distribution" content="HANGHAE-FREEDOM-DEDICATED-20261026-R2-SEVEN-STEPS">
 <title>항행의자유 배포판 — 공식 전용 설치 및 안내</title>
 <style>
 *{box-sizing:border-box}
@@ -46,22 +46,34 @@ footer{font-size:12px;text-align:center;color:#a8bfcb;line-height:1.8}
 <section class="stage" id="step1">
 <h2>① 환영 두루마리</h2>
 <img src="./welcome_scroll_final.png" alt="항행의자유 환영 두루마리">
-<button type="button" id="go2">② 설치동영상 보기</button>
+<button type="button" id="go2">② 설치설명서 보기</button>
 </section>
 <section class="stage" id="step2" hidden>
-<h2>② 설치동영상</h2>
+<h2>② 설치설명서</h2>
 <video id="installMovie" playsinline controls preload="metadata"><source src="./freedom_guide_latest.mp4" type="video/mp4"></video>
-<p>설치동영상 시청 후 ③단계로 이동합니다.</p>
-<button type="button" class="alt" id="play2">▶ 설치동영상 재생</button>
+<p>설치설명서 영상을 끝까지 보면 ③ 설치 및 업데이트 화면으로 이동합니다.</p>
+<button type="button" class="alt" id="play2">▶ 설치설명서 재생</button>
 <small id="status2"></small>
 </section>
 <section class="stage" id="step3" hidden>
-<h2>③ 항행의자유 전용 APK · 구글 드라이브</h2>
+<h2>③ 항행의자유 설치 및 업데이트</h2>
 <div class="notice warn">새로운 안내영상·엔진을 포함한 <strong>업데이트 APK 검증 전</strong>입니다. 기존 V4.0.39 및 이동아이콘 APK를 다시 설치하지 마십시오.</div>
 <button disabled type="button">새 정식 APK 검증 후 구글 드라이브 다운로드 제공</button>
-<p>④ 승인요청·⑤ 승인확인은 설치된 <strong>항행의자유 앱 안에서</strong> 처리합니다. 기존 승인기록을 초기화하지 않습니다.</p>
-<button type="button" class="alt" id="go6">이미 설치·승인된 기기: ⑥ 안내영상 보기</button>
-<small>이 버튼은 안내영상 확인용이며 실제 승인 여부를 변경하거나 우회하지 않습니다.</small>
+<p>이미 설치된 항행의자유 앱은 삭제하지 마십시오. ④·⑤단계는 기존 앱의 승인기록을 사용합니다.</p>
+<button type="button" class="alt" id="go4">④ 승인요청·⑤ 승인확인 순서 안내</button>
+<small>이 설치 웹페이지 자체는 앱의 승인정보를 읽거나 변경하지 않습니다.</small>
+</section>
+<section class="stage" id="step4" hidden>
+<h2>④ 승인요청</h2>
+<div class="notice">새로 설치한 경우, <strong>설치된 항행의자유 앱</strong>에서 승인요청을 진행하십시오. 이미 승인된 기기는 재요청하지 마십시오.</div>
+<p>이 페이지에서는 승인요청을 보내지 않습니다. 사용 중인 앱과 선장의 기존 승인기록은 그대로 보존합니다.</p>
+<button type="button" class="alt" id="go5">⑤ 승인확인 단계 안내</button>
+</section>
+<section class="stage" id="step5" hidden>
+<h2>⑤ 승인확인</h2>
+<div class="notice">설치된 항행의자유 앱에서 <strong>승인이 완료됐는지 확인</strong>하십시오. 승인 전에는 기존 앱의 홈 화면을 우회할 수 없습니다.</div>
+<p>승인된 기기에서만 아래 ⑥ 동영상을 <strong>웹페이지 미리보기</strong>로 확인하십시오. 이 버튼은 실제 기기 승인확인이 아닙니다.</p>
+<button type="button" class="alt" id="go6">⑥ 올바른 안내동영상 미리보기</button>
 </section>
 <section class="stage" id="step6" hidden>
 <h2>⑥ 항행의자유 안내동영상</h2>
@@ -72,7 +84,7 @@ footer{font-size:12px;text-align:center;color:#a8bfcb;line-height:1.8}
 </section>
 <section class="stage" id="step7" hidden>
 <h2>⑦ 항행의자유 홈 화면</h2>
-<div class="notice">안내동영상 시청을 마쳤습니다. 선장폰에 이미 설치된 항행의자유 앱을 실행해 홈 화면으로 들어가십시오.</div>
+<div class="notice">안내동영상 시청을 마쳤습니다. 설치된 항행의자유 앱을 실행해 ⑦ 홈 화면을 확인하십시오. 실제 앱의 자동 홈 진입은 새 정식 APK가 배포된 뒤 검증해야 합니다.</div>
 <p>웹페이지는 설치된 앱의 승인 여부를 확인하거나 홈 화면을 강제 실행하지 않습니다.</p>
 <button type="button" class="alt" id="replay6">⑥ 안내동영상 다시 보기</button>
 </section>
@@ -81,7 +93,7 @@ footer{font-size:12px;text-align:center;color:#a8bfcb;line-height:1.8}
 <script>
 (function(){
 'use strict';
-const stages={1:document.getElementById('step1'),2:document.getElementById('step2'),3:document.getElementById('step3'),6:document.getElementById('step6'),7:document.getElementById('step7')};
+const stages={1:document.getElementById('step1'),2:document.getElementById('step2'),3:document.getElementById('step3'),4:document.getElementById('step4'),5:document.getElementById('step5'),6:document.getElementById('step6'),7:document.getElementById('step7')};
 const v2=document.getElementById('installMovie'),v6=document.getElementById('approvalMovie');
 let current=1;
 function show(n){if(!(n in stages))return;current=n;for(const [k,e] of Object.entries(stages))e.hidden=Number(k)!==n;for(const e of document.querySelectorAll('.steps [data-step]')){const active=Number(e.dataset.step)===n;e.classList.toggle('active',active);e.setAttribute('aria-current',active?'step':'false')}window.scrollTo(0,0);}
@@ -89,7 +101,9 @@ function play(video,status){try{const p=video.play();if(p&&p.catch)p.catch(()=>{
 document.getElementById('go2').addEventListener('click',()=>{if(current!==1)return;show(2);play(v2,'status2')});
 document.getElementById('play2').addEventListener('click',()=>{if(current===2)play(v2,'status2')});
 v2.addEventListener('ended',()=>{if(current===2)show(3)});
-document.getElementById('go6').addEventListener('click',()=>{if(current!==3)return;show(6);play(v6,'status6')});
+document.getElementById('go4').addEventListener('click',()=>{if(current===3)show(4)});
+document.getElementById('go5').addEventListener('click',()=>{if(current===4)show(5)});
+document.getElementById('go6').addEventListener('click',()=>{if(current!==5)return;show(6);play(v6,'status6')});
 document.getElementById('play6').addEventListener('click',()=>{if(current===6)play(v6,'status6')});
 document.getElementById('replay6').addEventListener('click',()=>{if(current!==7)return;show(6);v6.currentTime=0;play(v6,'status6')});
 v6.addEventListener('ended',()=>{if(current===6)show(7)});
