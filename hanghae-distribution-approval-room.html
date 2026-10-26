@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#092a43">
+<meta name="referrer" content="no-referrer">
+<title>🚢 항행의자유 배포용 승인관리방</title>
+<style>
+*{box-sizing:border-box}
+:root{font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;color-scheme:dark}
+body{margin:0;min-height:100vh;color:#eff8ff;background:linear-gradient(175deg,#051828,#0b4261 55%,#06192b);padding:20px 12px 40px}
+main{max-width:750px;margin:auto}
+h1{font-size:clamp(23px,5.8vw,32px);color:#ffda93;margin:8px 0 7px}
+h2{font-size:19px;color:#ffe3aa;margin:0 0 9px}
+p{line-height:1.65;color:#d7e9f4}
+.top{text-align:center;margin-bottom:18px}
+nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+a.nav{display:block;border:1px solid #7da8b9;border-radius:11px;padding:11px 6px;color:#fff3d2;text-decoration:none;text-align:center;background:#134864;font-weight:700}
+section{border:1px solid #59869f;border-radius:17px;background:#0a2b43ee;padding:17px 14px;margin:15px 0;box-shadow:0 10px 26px #00152255}
+.notice{border-left:4px solid #e2bc67;background:#173d51;border-radius:6px;padding:12px;font-size:13px;line-height:1.65}
+label{display:block;font-size:14px;font-weight:700;margin:12px 0 5px}
+input{width:100%;min-height:48px;background:#051c30;color:#fff;border:1px solid #779eb8;border-radius:10px;padding:10px;font:inherit}
+input:focus{outline:2px solid #f4cf85;outline-offset:1px}
+button{font:inherit;font-weight:800;color:#fff6e3;background:#9d752c;border:1px solid #e6be6f;border-radius:11px;padding:12px 11px;min-height:46px;cursor:pointer}
+button.secondary{background:#155975;border-color:#78afc8}
+button.danger{background:#5c3542;border-color:#d69cab}
+button:disabled{opacity:.6;cursor:wait}
+.buttons{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.buttons button{flex:1 1 125px}
+.status{color:#cfe8f5;font-size:14px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}
+.status.error{color:#ffccba}
+#rows{list-style:none;padding:0;margin:12px 0}
+#rows li{border:1px solid #416b86;border-radius:12px;padding:12px;background:#102f49;margin-bottom:9px}
+.rowTitle{display:flex;justify-content:space-between;gap:10px;align-items:center;font-weight:800}
+.pill{font-size:12px;padding:4px 7px;border-radius:6px;background:#214c6a;white-space:nowrap}
+.pill.pending{background:#705518}
+.pill.approved{background:#1a6547}
+.pill.rejected{background:#6a3744}
+.rowDetails{font-size:13px;line-height:1.65;color:#cae0ee;margin-top:7px;overflow-wrap:anywhere}
+small{font-size:12px;color:#b9d2e1;line-height:1.5}
+footer{text-align:center;font-size:12px;color:#b4cedc;line-height:1.7;margin-top:18px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<header class="top">
+<h1>🚢 항행의자유 배포용 승인관리방</h1>
+<p>② 항행의자유 배포판 전용 · 선장 승인기록을 보존하는 독립 관리 화면</p>
+<nav aria-label="관련 화면"><a class="nav" href="./index.html">⚓ 공식 연결 홈</a><a class="nav" href="./hanghae-central-control.html">📡 중앙통제실 홈</a></nav>
+</header>
+<section aria-labelledby="approvalAdminTitle">
+<h2 id="approvalAdminTitle">🔐 선장 전용 승인요청 관리</h2>
+<div class="notice">승인목록 열람 및 승인·거절은 <strong>기존 승인 서버의 관리 인증키</strong>가 있어야 가능합니다. 이 화면은 인증키를 URL이나 기기 저장소에 보관하지 않습니다. 승인·거절은 선장이 직접 버튼을 눌러 확인한 경우에만 처리됩니다.</div>
+<label for="adminKey">관리 인증키</label>
+<input id="adminKey" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="기존 관리 인증키를 입력하십시오">
+<div class="buttons"><button type="button" id="loadRequests">📋 승인요청 목록 조회</button><button type="button" class="secondary" id="clearKey">🔒 인증키 지우기</button></div>
+<p id="adminStatus" class="status" role="status" aria-live="polite">조회 버튼을 누르면 서버의 현재 승인목록을 확인합니다.</p>
+<ul id="rows" aria-label="배포판 승인요청 목록"></ul>
+</section>
+<section aria-labelledby="selfStatusTitle">
+<h2 id="selfStatusTitle">🔎 신청자 승인상태 조회</h2>
+<p>배포판 앱에서 발급된 <strong>요청 토큰</strong>으로 자신의 처리 상태만 확인합니다. 새 승인요청은 설치된 앱 안에서 진행해야 합니다.</p>
+<form id="checkStatusForm">
+<label for="requestToken">앱에서 받은 요청 토큰</label>
+<input id="requestToken" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" required placeholder="요청 토큰">
+<label for="deviceId">기기 번호 (선택 · 알고 있는 경우 입력)</label>
+<input id="deviceId" type="text" inputmode="numeric" autocomplete="off" maxlength="40" placeholder="기기 번호">
+<div class="buttons"><button type="submit" class="secondary" id="checkStatus">⑤ 승인상태 확인</button></div>
+</form>
+<p id="requestStatus" class="status" role="status" aria-live="polite"></p>
+</section>
+<section>
+<h2>📌 배포용 승인 운영 원칙</h2>
+<p>승인요청은 ② 배포판에서 수행하며, 이미 승인된 기기는 중복 승인요청을 하지 않습니다. 이 방은 배포판의 ④ 승인요청·⑤ 승인확인 관리를 돕지만 기존 설치 ①~⑦ 단계를 변경하지 않습니다.</p>
+<a class="nav" href="./hanghae-freedom-distribution.html">🚢 배포판 7단계 설치 안내로 이동</a>
+<small>V3 항해사앱, V7 통제관, 독립 중앙통제실, ⑤ 이동아이콘의 승인 체계와 혼동하지 않습니다.</small>
+</section>
+<footer>기존 승인요청 DB·앱 서명·설치기록 변경 없음 · 서버 인증을 통과한 관리자만 결정 가능</footer>
+</main>
+<script>
+(function(){
+"use strict";
+const ENDPOINT="https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/";
+const $=id=>document.getElementById(id);
+let busy=false;
+function say(id,message,error){const e=$(id);e.textContent=message;e.classList.toggle("error",!!error)}
+function explain(error){
+ const code=String(error&&error.message||error);
+ const messages={unauthorized:"관리 인증키가 올바르지 않습니다.",capacity_full:"승인 가능한 최대 기기 수에 도달했습니다.",no_pending_request:"이미 처리됐거나 대기 중인 신청이 없습니다.",not_found:"해당 요청 토큰의 기록이 없습니다.",invalid_request:"요청 토큰이나 입력값을 확인하십시오.",server_error:"승인 서버가 요청을 처리하지 못했습니다."};
+ return messages[code]||"조회/처리 실패: "+code;
+}
+async function call(slug,body,key){
+ const headers={"Content-Type":"application/json"};
+ if(key)headers["x-admin-token"]=key;
+ const response=await fetch(ENDPOINT+slug,{method:"POST",headers,body:JSON.stringify(body),cache:"no-store",referrerPolicy:"no-referrer"});
+ let payload;try{payload=await response.json()}catch(_){payload={}}
+ if(!response.ok||payload.error)throw new Error(payload.error||"HTTP_"+response.status);
+ return payload;
+}
+function tag(type){return type==="approved"?"승인 완료":type==="rejected"?"거절":"대기 중"}
+function date(value){if(!value)return "-";const d=new Date(value);return Number.isNaN(d.getTime())?"-":d.toLocaleString("ko-KR",{timeZone:"Asia/Seoul",hour12:false})}
+function mask(value){const s=String(value||"");return s.length>5?s.slice(0,2)+"***"+s.slice(-3):"비공개"}
+function el(name,cls,text){const n=document.createElement(name);if(cls)n.className=cls;if(text!=null)n.textContent=String(text);return n}
+function key(){return $("adminKey").value.trim()}
+function render(items){
+ $("rows").replaceChildren();
+ if(!Array.isArray(items)||!items.length){$("rows").append(el("li","","승인요청 내역이 없습니다."));return}
+ for(const row of items){
+   const li=el("li"),title=el("div","rowTitle"),name=el("span","",row.device_label||"이름 없는 기기"),status=el("span","pill "+(row.status||""),tag(row.status));
+   title.append(name,status);li.append(title);
+   const info=el("div","rowDetails","승인코드: "+(row.approval_code||"-")+" · 기기: "+mask(row.device_id)+"\n요청: "+date(row.requested_at)+" · 처리: "+date(row.decided_at)+"\n소개자: "+(row.referrer_name||"-"));
+   info.style.whiteSpace="pre-line";li.append(info);
+   if(row.status==="pending"){
+     const actions=el("div","buttons");
+     for(const choice of [{value:"approved",label:"✅ 승인",style:""},{value:"rejected",label:"⛔ 거절",style:"danger"}]){
+       const btn=el("button",choice.style,choice.label);btn.type="button";
+       btn.addEventListener("click",()=>decide(row,choice.value));actions.append(btn);
+     }
+     li.append(actions);
+   }
+   $("rows").append(li);
+ }
+}
+async function load(){
+ if(busy)return;
+ const secret=key();
+ if(!secret){say("adminStatus","관리 인증키를 입력하십시오.",true);return}
+ busy=true;$("loadRequests").disabled=true;
+ try{
+   const result=await call("approval-admin",{action:"list"},secret);
+   render(result.items);
+   say("adminStatus","조회 완료 · 승인 "+(result.approved_count||0)+"/"+(result.max_approved||100)+"명 · 목록 "+(result.items||[]).length+"건");
+ }catch(error){$("rows").replaceChildren();say("adminStatus",explain(error),true)}
+ finally{busy=false;$("loadRequests").disabled=false}
+}
+async function decide(row,decision){
+ if(busy)return;
+ const secret=key();
+ if(!secret){say("adminStatus","관리 인증키를 다시 입력하십시오.",true);return}
+ const label=decision==="approved"?"승인":"거절";
+ if(!window.confirm("기기 "+(row.device_label||mask(row.device_id))+" (승인코드 "+(row.approval_code||"-")+")의 요청을 "+label+"하시겠습니까?"))return;
+ busy=true;
+ try{
+   const result=await call("approval-admin",{action:"decide",id:row.id,decision},secret);
+   say("adminStatus","처리 완료: "+(result.approval_code||"-")+" · "+tag(result.status));
+ }catch(error){say("adminStatus",explain(error),true)}
+ finally{busy=false;await load()}
+}
+$("loadRequests").addEventListener("click",load);
+$("clearKey").addEventListener("click",()=>{$("adminKey").value="";$("rows").replaceChildren();say("adminStatus","인증키 및 화면 목록을 지웠습니다.");});
+$("checkStatusForm").addEventListener("submit",async event=>{
+ event.preventDefault();
+ const token=$("requestToken").value.trim(),device=$("deviceId").value.trim();
+ if(!token){say("requestStatus","요청 토큰을 입력하십시오.",true);return}
+ $("checkStatus").disabled=true;
+ try{
+   const result=await call("approval-status",{request_token:token,...(device?{device_id:device}:{})});
+   say("requestStatus","확인 결과: "+tag(result.status)+"\n신청시각: "+date(result.requested_at)+"\n처리시각: "+date(result.decided_at));
+ }catch(error){say("requestStatus",explain(error),true)}
+ finally{$("checkStatus").disabled=false}
+});
+})();
+</script>
+</body></html>
