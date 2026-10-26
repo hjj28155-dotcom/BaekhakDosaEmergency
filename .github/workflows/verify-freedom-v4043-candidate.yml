@@ -49,6 +49,34 @@ jobs:
         run: |
           set -euo pipefail
           node .github/scripts/verify_freedom_v4043_references.cjs
+      - name: Verify Android asset merge without creating or replacing signer
+        working-directory: build405/FREEDOM_V402_BUILD_THIS
+        shell: bash
+        run: |
+          set -euo pipefail
+          chmod +x ./gradlew
+          sed -i '/org.gradle.java.home/d' gradle.properties
+          ./gradlew :app:mergeDebugAssets --no-daemon
+          python3 - <<'PY'
+          import hashlib
+          from pathlib import Path
+          root=Path('app/build/intermediates/assets')
+          if not root.exists(): raise SystemExit('Android merged assets missing')
+          files=list(root.rglob('reference_sources/백학.txt'))
+          if not files: raise SystemExit('Original master absent from merged Android assets')
+          base=files[0].parent.parent
+          checks={
+              'reference_sources/백학.txt': '4f8059ee26987ac1482ac687ddbe4056e7215ccbd7e719e8377bff7eb097eb3a',
+              'reference_sources/백학 로또꿈해몽백과 2026 6월신버젼 (1).txt': '1842831fe89e7d413a3ae6ea46fafd774e333c084750d80e90aff4f880a8b722',
+          }
+          for name,h in checks.items():
+              p=base/name
+              if not p.is_file() or hashlib.sha256(p.read_bytes()).hexdigest()!=h:
+                  raise SystemExit('Android asset missing/hash mismatch: '+name)
+          for name in ('index.html','freedom_reference_v4043.js','reference_sources_manifest_v4043.json'):
+              if not (base/name).is_file(): raise SystemExit('Missing merged asset: '+name)
+          print('PASS: Android merge contains exact master SHA256 and UTF8 dream SHA256, index, engine adapter, manifest. No APK signing.')
+          PY
       - name: Restore original Freedom signer
         uses: actions/cache/restore@v4
         with:
