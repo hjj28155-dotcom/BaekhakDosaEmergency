@@ -38,7 +38,7 @@ jobs:
           for(let n=1;n<=7;n++)assert.match(app,new RegExp('id="step'+n+'"'),'Missing stage '+n);
           assert.match(app,/② 설치설명서/);
           assert.match(app,/③ 항행의자유 설치 및 업데이트/);
-          assert.match(app,/④ 승인요청/);
+          assert.match(app,/④ 신규 사용자 최초 승인요청/);
           assert.match(app,/⑤ 승인확인/);
           assert.match(app,/⑥ 항행의자유 안내동영상/);
           assert.match(app,/⑦ 항행의자유 홈 화면/);
@@ -65,7 +65,7 @@ jobs:
             play(){this.count++;return Promise.resolve()}
             pause(){}
           }
-          const all=['step1','step2','step3','step4','step5','step6','step7','go2','go4','go5','go6','play2','play6','replay6','installMovie','approvalMovie','status2','status6'];
+          const all=['step1','step2','step3','step4','step5','step6','step7','go2','go4','go5','go6','go6Existing','play2','play6','replay6','installMovie','approvalMovie','status2','status6'];
           const nodes=new Map(all.map(id=>[id,new Node(id)]));
           const badge=Array.from({length:7},(_,i)=>new Node('badge'+(i+1)));
           badge.forEach((e,i)=>e.dataset.step=String(i+1));
@@ -75,6 +75,10 @@ jobs:
           const check=n=>{assert.equal(nodes.get('step'+n).hidden,false,'stage '+n);assert.equal(badge[n-1].attrs['aria-current'],'step')};
           check(1);nodes.get('go2').fire('click');check(2);
           nodes.get('installMovie').fire('ended');check(3);
+          nodes.get('go6Existing').fire('click');check(6);assert.equal(nodes.get('approvalMovie').count,1,'existing approved path skips new approval');
+          nodes.get('approvalMovie').fire('ended');check(7);
+          nodes.get('go2').fire('click');
+          // Reinitialize to verify first-time unauthorised 4->5 path separately.
           nodes.get('go4').fire('click');check(4);
           nodes.get('go5').fire('click');check(5);
           nodes.get('go6').fire('click');check(6);assert.equal(nodes.get('approvalMovie').count,1);
