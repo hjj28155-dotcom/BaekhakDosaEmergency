@@ -35,11 +35,11 @@ jobs:
           node <<'NODE'
           const fs=require('node:fs');
           const s=fs.readFileSync('build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/engine_v2.html','utf8');
-          const keys=['V3_ANALYZE','V3_ANALYSIS_RESULT','window.addEventListener(\'message\'','DB1','RAW_BANK','history','과거회차','엔진 후보'];
+          const keys=['백학.txt','백학설명서','백학 설명서','꿈사전','최신 꿈사전','성공사례','성공 사례','dream_dictionary','dreamDictionary','successCases','BAEKHAK_TXT','baekhak.txt','V3_ANALYZE','DB1','RAW_BANK'];
           for(const key of keys){
             const count=s.split(key).length-1,p=s.lastIndexOf(key);
             console.log('=== ENGINE CONTRACT',key,'instances',count,'lastIndex',p);
-            if(p>=0)console.log(s.slice(Math.max(0,p-650),Math.min(s.length,p+1500)).replace(/[\x00-\x08]/g,' '));
+            if(p>=0)console.log(s.slice(Math.max(0,p-120),Math.min(s.length,p+280)).replace(/[\x00-\x08]/g,' ').slice(0,480));
           }
           console.log('engine asset bytes',Buffer.byteLength(s,'utf8'));
           NODE
