@@ -316,6 +316,13 @@ body{background:linear-gradient(180deg,rgba(2,15,34,.86),rgba(2,26,48,.58) 55%,r
 #homeApprovalPanel iframe{flex:1 1 auto;width:100%;min-height:0;border:0;border-radius:8px;background:#08283e}
 #homeApprovalPanel .approvalFallback{flex:none;color:#b9d6e9;text-align:center;font-size:.69rem;line-height:1.35;text-decoration:underline;padding:3px}
 @media(max-height:650px){#homeApprovalBtn{min-height:41px;padding:5px 8px;font-size:.82rem}}
+/* Full-height approval room: hide HOME dashboard while open, leaving the
+   ship header and the room itself. This prevents the room from being cut off
+   below the home buttons on narrow Android screens. */
+main.approvalMode > :not(header):not(#homeApprovalPanel){display:none!important}
+main.approvalMode #homeApprovalPanel{display:flex;flex:1 1 auto;min-height:0;height:auto;max-height:none;overflow:hidden}
+main.approvalMode #homeApprovalPanel .homePaneTop{align-items:center;min-height:44px}
+main.approvalMode #homeApprovalPanel iframe{display:block;flex:1 1 auto;min-height:0;width:100%;height:100%;overflow:auto}
 </style>
 </head>
 <body>
@@ -502,10 +509,17 @@ function homeView(which){
  $('homeWorkspace').hidden=!active;
  $('homeMorePanel').hidden=which!=='more';
  $('homeApprovalPanel').hidden=which!=='approval';
+ document.querySelector('main').classList.toggle('approvalMode',which==='approval');
  $('homeApprovalBtn').setAttribute('aria-expanded',String(which==='approval'));
  if(which==='approval'){
    var frame=$('homeApprovalFrame');
-   if(!frame.getAttribute('src'))frame.setAttribute('src',frame.getAttribute('data-src'));
+   if(!frame.getAttribute('src')){
+     frame.setAttribute('src',frame.getAttribute('data-src'));
+   }else{
+     // Keep the authenticated room intact; only return its viewport to the top.
+     try{frame.contentWindow.scrollTo(0,0);}catch(e){}
+   }
+   $('homeApprovalPanel').scrollTop=0;
  }
  $('homeMoreBtn').setAttribute('aria-expanded',String(which==='more'));
  $('homeLiveBtn').setAttribute('aria-pressed',String(which==='live'));
