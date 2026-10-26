@@ -16,15 +16,15 @@ jobs:
           set -euo pipefail
           test -s freedom_onboarding_latest.mp4
           file freedom_onboarding_latest.mp4
-          ffprobe -v error -show_entries format=duration,size:stream=codec_name,width,height -of json freedom_onboarding_latest.mp4 > guide_probe.json
+          wc -c freedom_onboarding_latest.mp4 > guide_probe.txt
           sha256sum freedom_onboarding_latest.mp4 > guide_sha256.txt
-          cat guide_probe.json
+          cat guide_probe.txt
       - uses: actions/upload-artifact@v4
         with:
           name: freedom_original_onboarding_latest_inspection
           path: |
             freedom_onboarding_latest.mp4
-            guide_probe.json
+            guide_probe.txt
             guide_sha256.txt
           retention-days: 3
           compression-level: 0
