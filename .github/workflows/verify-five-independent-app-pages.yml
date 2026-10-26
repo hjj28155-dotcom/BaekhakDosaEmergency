@@ -1,0 +1,80 @@
+name: Verify five independent app links and Freedom seven-stage flow
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'hanghae-navigator-app.html'
+      - 'hanghae-freedom-distribution.html'
+      - 'hanghae-v7-controller.html'
+      - 'hanghae-central-control.html'
+      - 'hanghae-moveicon.html'
+      - 'crew-meeting.html'
+      - 'mini-overlay/app/src/main/java/com/openai/hanghae/mini/OverlayService.java'
+      - '.github/workflows/verify-five-independent-app-pages.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check five app names, no cross-install, top-left MoveIcon and step continuity
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+          const read=(p)=>fs.readFileSync(p,'utf8');
+          const hub=read('index.html');
+          const links=['hanghae-moveicon.html','hanghae-freedom-distribution.html','hanghae-navigator-app.html','hanghae-v7-controller.html','hanghae-central-control.html'];
+          assert.equal(new Set(links).size,5);
+          for(const link of links) assert.match(hub,new RegExp('href="\\./'+link+'"'));
+          assert.match(hub,/id="homeMoveicon"/);
+          assert.ok(hub.indexOf('id="homeMoveicon"')<hub.indexOf('id="homeFreedom"'),'MoveIcon must be the first top-left tile');
+          assert.match(hub,/FIVE-INDEPENDENT-PROJECT-APPS-20261026/);
+          const app=read('hanghae-freedom-distribution.html');
+          for(let n=1;n<=7;n++)assert.match(app,new RegExp('id="step'+n+'"'),'Missing stage '+n);
+          assert.match(app,/② 설치설명서/);
+          assert.match(app,/③ 항행의자유 설치 및 업데이트/);
+          assert.match(app,/④ 승인요청/);
+          assert.match(app,/⑤ 승인확인/);
+          assert.match(app,/⑥ 항행의자유 안내동영상/);
+          assert.match(app,/⑦ 항행의자유 홈 화면/);
+          assert.match(app,/src="\.\/freedom_onboarding_latest.mp4"/);
+          assert.ok(!/href="[^"]+\.apk/.test(app),'Do not link unverified APK or MoveIcon from Freedom');
+          assert.ok(!app.includes('moveicon.html'),'No MoveIcon entry embedded');
+          assert.match(read('hanghae-v7-controller.html'),/v7-central-control-apk/);
+          assert.match(read('hanghae-central-control.html'),/crew-meeting.html/);
+          assert.match(read('hanghae-navigator-app.html'),/drive.google.com\/drive\/folders/);
+          assert.match(read('hanghae-moveicon.html'),/moveicon-download.html/);
+          const native=read('mini-overlay/app/src/main/java/com/openai/hanghae/mini/OverlayService.java');
+          assert.match(native,/lp.gravity=Gravity.TOP\|Gravity.START;lp.x=dp\(8\);lp.y=dp\(12\);/);
+          assert.ok(native.indexOf('menu.addView(freedom)')<native.indexOf('menu.addView(navigator)'));
+          assert.match(native,/hanghae-freedom-distribution.html/);
+          assert.match(native,/launchPackage\("com.navigator.freedom.v3final"/);
+          class Node {
+            constructor(id){this.id=id;this.hidden=true;this.listeners={};this.dataset={step:id.slice(-1)};this.attrs={};this.classList={toggle(){}};this.textContent='';this.count=0}
+            addEventListener(k,fn){this.listeners[k]=fn}
+            fire(k){this.listeners[k]?.()}
+            setAttribute(k,v){this.attrs[k]=v}
+            play(){this.count++;return Promise.resolve()}
+            pause(){}
+          }
+          const all=['step1','step2','step3','step4','step5','step6','step7','go2','go4','go5','go6','play2','play6','replay6','installMovie','approvalMovie','status2','status6'];
+          const nodes=new Map(all.map(id=>[id,new Node(id)]));
+          const badge=Array.from({length:7},(_,i)=>new Node('badge'+(i+1)));
+          badge.forEach((e,i)=>e.dataset.step=String(i+1));
+          const doc={getElementById(id){assert.ok(nodes.has(id),id);return nodes.get(id)},querySelectorAll(){return badge}};
+          const code=app.match(/<script>([\s\S]*?)<\/script>/)[1];
+          vm.runInNewContext(code,{document:doc,window:{scrollTo(){}},console},{timeout:10000});
+          const check=n=>{assert.equal(nodes.get('step'+n).hidden,false,'stage '+n);assert.equal(badge[n-1].attrs['aria-current'],'step')};
+          check(1);nodes.get('go2').fire('click');check(2);
+          nodes.get('installMovie').fire('ended');check(3);
+          nodes.get('go4').fire('click');check(4);
+          nodes.get('go5').fire('click');check(5);
+          nodes.get('go6').fire('click');check(6);assert.equal(nodes.get('approvalMovie').count,1);
+          nodes.get('approvalMovie').fire('ended');check(7);
+          console.log('PASS: five distinct pages, MoveIcon top-left, Freedom stages 1→2→3→4→5→6→7, original APK not linked');
+          NODE
