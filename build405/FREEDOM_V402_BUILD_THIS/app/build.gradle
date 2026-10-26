@@ -61,7 +61,7 @@ android {
 
     applicationVariants.all { variant ->
         variant.outputs.all {
-            outputFileName = "HANGHAE_FREEDOM_V4_0_42_FINAL.apk"
+            outputFileName = "HANGHAE_FREEDOM_V4_0_43_FINAL.apk"
         }
     }
 }
