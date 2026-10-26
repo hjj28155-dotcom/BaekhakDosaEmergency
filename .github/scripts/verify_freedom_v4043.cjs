@@ -2,9 +2,9 @@ const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/st
 const p='build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/';
 const html=fs.readFileSync(p+'index.html','utf8');
 const patch=fs.readFileSync(p+'db1_v1247_patch.js','utf8');
-const script=(html.match(/<script>\\s*const APP_BASE_VERSION[\\s\\S]*?<\\/script>/i)||[])[0];
+const script=(html.match(/<script>\s*const APP_BASE_VERSION[\s\S]*?<\/script>/i)||[])[0];
 assert(script,'app main JS exists');
-new vm.Script(script.replace(/^<script>/i,'').replace(/<\\/script>$/i,''));
+new vm.Script(script.replace(/^<script>/i,'').replace(/<\/script>$/i,''));
 assert(patch.includes("meta.count=1247"),'DB-1 update requires 1247 verified records');
 assert(html.includes('let raw=manual||db1'),'manual text may be absent; DB-1 fallback must drive the engine');
 assert(html.includes("status.status!=='PASS'"),'refuse incomplete DB-1');
@@ -14,7 +14,7 @@ assert(html.includes('R().analysisResearch=a'),'separate historical research dat
 assert(html.includes("if(!b.locked)"),'official purchased combinations remain protected if locked');
 const extract=(start,end)=>{const a=html.indexOf(start),b=html.indexOf(end,a+start.length);assert(a>=0&&b>a,start);return html.slice(a,b)};
 const db=extract('function v4043Db1Text(round){','let V4043_ANALYSIS_INPUT=null;');
-const bank={'1247':{text:'첫째\\n둘째\\n셋째\\n넷째\\n다섯째\\n여섯째'}};
+const bank={'1247':{text:'첫째\n둘째\n셋째\n넷째\n다섯째\n여섯째'}};
 const ctx={window:{V3_RAW_BANK:bank,DB1_UPDATE_1247:{status:'PASS'},V3_RAW_BANK_META:{count:1247}}};
 vm.createContext(ctx);vm.runInContext(db,ctx);
 assert.equal(ctx.v4043Db1Text(1247),bank[1247].text,'embedded DB-1 alone supplies six lines');
