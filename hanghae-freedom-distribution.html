@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
+<meta name="theme-color" content="#082c46">
+<meta name="description" content="항행의자유 배포판 전용 새 설치 안내. 기존 이동아이콘과 V3/V7과 분리.">
+<meta name="freedom-distribution" content="HANGHAE-FREEDOM-DEDICATED-20261026-R1">
+<title>항행의자유 배포판 — 공식 전용 설치 및 안내</title>
+<style>
+*{box-sizing:border-box}
+:root{color-scheme:dark}
+body{margin:0;min-height:100vh;color:#f1f7ff;font-family:system-ui,"Noto Sans KR",sans-serif;background:linear-gradient(180deg,#041626cc,#052b49a8 43%,#041626ed),radial-gradient(ellipse at 50% 48%,#3f95b1,#0c3858 55%,#02101f);padding:20px 12px 40px}
+main{width:min(100%,720px);margin:0 auto}
+header{text-align:center;margin:12px 0 18px}
+h1{font-size:clamp(22px,6vw,32px);color:#ffdb87;margin:4px 0}
+header p,.sub{color:#d5e7f4;line-height:1.6}
+.steps{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;padding:0;margin:16px 0}
+.steps span{display:block;text-align:center;padding:11px 0;background:#173c59;border:1px solid #52758c;border-radius:9px;color:#cedee9}
+.steps span.active{background:#9b7020;border-color:#e6c878;color:#fff3ce;font-weight:900}
+.stage{background:#08283ee6;border:1px solid #58829f;border-radius:20px;padding:18px 14px;margin:14px 0;text-align:center;box-shadow:0 12px 24px #00131a55}
+.stage h2{color:#ffe19b;font-size:clamp(19px,5vw,24px)}
+.stage p{line-height:1.7}
+.stage img{display:block;width:100%;max-height:62vh;object-fit:contain;margin:auto}
+.stage video{display:block;width:100%;max-height:65vh;min-height:180px;object-fit:contain;background:#000;border-radius:12px}
+button,.action{display:block;appearance:none;text-decoration:none;text-align:center;width:100%;min-height:54px;border:1px solid #dbb669;background:linear-gradient(180deg,#a17827,#72500f);color:#fff5d5;border-radius:12px;padding:13px 8px;font-size:17px;font-weight:800;font-family:inherit;margin:12px 0 0;cursor:pointer}
+button.alt,.action.alt{background:#16506b;border-color:#7ca9c3}
+button:disabled{filter:grayscale(.6);opacity:.7;cursor:not-allowed}
+.notice{background:#143c34;border:1px solid #659c88;border-radius:12px;padding:12px;margin:11px 0;line-height:1.7}
+.warn{background:#493315;border-color:#bc995d}
+small{display:block;color:#bfd9e5;line-height:1.6;margin-top:8px}
+[hidden]{display:none!important}
+footer{font-size:12px;text-align:center;color:#a8bfcb;line-height:1.8}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <h1>⚓ 항행의자유 배포판</h1>
+  <p>이동아이콘·항해사앱 V3·통제관 V7과 구분되는 항행의자유 전용 새 설치 안내</p>
+  <div class="steps" aria-label="설치 안내 고정 7단계">
+    <span data-step="1">①</span><span data-step="2">②</span><span data-step="3">③</span><span data-step="4">④</span><span data-step="5">⑤</span><span data-step="6">⑥</span><span data-step="7">⑦</span>
+  </div>
+</header>
+<section class="stage" id="step1">
+<h2>① 환영 두루마리</h2>
+<img src="./welcome_scroll_final.png" alt="항행의자유 환영 두루마리">
+<button type="button" id="go2">② 설치동영상 보기</button>
+</section>
+<section class="stage" id="step2" hidden>
+<h2>② 설치동영상</h2>
+<video id="installMovie" playsinline controls preload="metadata"><source src="./freedom_guide_latest.mp4" type="video/mp4"></video>
+<p>설치동영상 시청 후 ③단계로 이동합니다.</p>
+<button type="button" class="alt" id="play2">▶ 설치동영상 재생</button>
+<small id="status2"></small>
+</section>
+<section class="stage" id="step3" hidden>
+<h2>③ 항행의자유 전용 APK · 구글 드라이브</h2>
+<div class="notice warn">새로운 안내영상·엔진을 포함한 <strong>업데이트 APK 검증 전</strong>입니다. 기존 V4.0.39 및 이동아이콘 APK를 다시 설치하지 마십시오.</div>
+<button disabled type="button">새 정식 APK 검증 후 구글 드라이브 다운로드 제공</button>
+<p>④ 승인요청·⑤ 승인확인은 설치된 <strong>항행의자유 앱 안에서</strong> 처리합니다. 기존 승인기록을 초기화하지 않습니다.</p>
+<button type="button" class="alt" id="go6">이미 설치·승인된 기기: ⑥ 안내영상 보기</button>
+<small>이 버튼은 안내영상 확인용이며 실제 승인 여부를 변경하거나 우회하지 않습니다.</small>
+</section>
+<section class="stage" id="step6" hidden>
+<h2>⑥ 항행의자유 안내동영상</h2>
+<p>기존 V3 축하 포스터가 아닌 항행의자유 안내방송 원본입니다.</p>
+<video id="approvalMovie" playsinline controls preload="metadata"><source src="./freedom_onboarding_latest.mp4" type="video/mp4"></video>
+<button type="button" class="alt" id="play6">▶ 안내동영상 재생</button>
+<small id="status6"></small>
+</section>
+<section class="stage" id="step7" hidden>
+<h2>⑦ 항행의자유 홈 화면</h2>
+<div class="notice">안내동영상 시청을 마쳤습니다. 선장폰에 이미 설치된 항행의자유 앱을 실행해 홈 화면으로 들어가십시오.</div>
+<p>웹페이지는 설치된 앱의 승인 여부를 확인하거나 홈 화면을 강제 실행하지 않습니다.</p>
+<button type="button" class="alt" id="replay6">⑥ 안내동영상 다시 보기</button>
+</section>
+<footer>설치·업데이트의 상세 내용은 항행의자유 앱 홈 화면 공지사항에서 확인하십시오.<br>공식 새 배포판 페이지 · 기존 이동아이콘 추가 설치 없음</footer>
+</main>
+<script>
+(function(){
+'use strict';
+const stages={1:document.getElementById('step1'),2:document.getElementById('step2'),3:document.getElementById('step3'),6:document.getElementById('step6'),7:document.getElementById('step7')};
+const v2=document.getElementById('installMovie'),v6=document.getElementById('approvalMovie');
+let current=1;
+function show(n){if(!(n in stages))return;current=n;for(const [k,e] of Object.entries(stages))e.hidden=Number(k)!==n;for(const e of document.querySelectorAll('.steps [data-step]')){const active=Number(e.dataset.step)===n;e.classList.toggle('active',active);e.setAttribute('aria-current',active?'step':'false')}window.scrollTo(0,0);}
+function play(video,status){try{const p=video.play();if(p&&p.catch)p.catch(()=>{document.getElementById(status).textContent='휴대전화 동영상 ▶ 버튼을 눌러주세요.'})}catch(e){document.getElementById(status).textContent='동영상 ▶ 버튼을 눌러주세요.'}}
+document.getElementById('go2').addEventListener('click',()=>{if(current!==1)return;show(2);play(v2,'status2')});
+document.getElementById('play2').addEventListener('click',()=>{if(current===2)play(v2,'status2')});
+v2.addEventListener('ended',()=>{if(current===2)show(3)});
+document.getElementById('go6').addEventListener('click',()=>{if(current!==3)return;show(6);play(v6,'status6')});
+document.getElementById('play6').addEventListener('click',()=>{if(current===6)play(v6,'status6')});
+document.getElementById('replay6').addEventListener('click',()=>{if(current!==7)return;show(6);v6.currentTime=0;play(v6,'status6')});
+v6.addEventListener('ended',()=>{if(current===6)show(7)});
+show(1);
+})();
+</script>
+</body></html>
