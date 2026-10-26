@@ -1,0 +1,27 @@
+name: Probe Freedom V4.0.39 continuity signer (no key export)
+on:
+  push:
+    branches: [fix-freedom-v3-screen-1244-20261022]
+    paths: [.github/workflows/probe-freedom-v440-same-signer.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check_existing_signing_identity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore existing Freedom distribution keystore privately
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: freedom-v436-production-debug-signer-20261022
+          fail-on-cache-miss: true
+      - name: Verify publicly known certificate SHA256 only
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s ~/.android/debug.keystore
+          FINGERPRINT=$(keytool -list -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey | grep -m1 SHA256: | sed 's/.*SHA256: //' | tr -d ':' | tr '[:upper:]' '[:lower:]')
+          test "$FINGERPRINT" = "bf281903f422fe925a23a7e72e82d690eaef899236e6d10365143ff32d9beb00"
+          echo 'PASS: original V4.0.39 public certificate matches cached private signer; no private key exported'
