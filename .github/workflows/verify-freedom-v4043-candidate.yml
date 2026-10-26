@@ -27,6 +27,20 @@ jobs:
           set -euo pipefail
           node .github/scripts/validate_freedom_r14.cjs
           node .github/scripts/verify_freedom_v4043.cjs
+      - name: Inspect existing engine DB-1 and V3 analysis contract
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs=require('node:fs');
+          const s=fs.readFileSync('build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/engine_v2.html','utf8');
+          const keys=['V3_ANALYZE','V3_ANALYSIS_RESULT','window.addEventListener(\'message\'','DB1','RAW_BANK','history','과거회차','엔진 후보'];
+          for(const key of keys){
+            const count=s.split(key).length-1,p=s.lastIndexOf(key);
+            console.log('=== ENGINE CONTRACT',key,'instances',count,'lastIndex',p);
+            if(p>=0)console.log(s.slice(Math.max(0,p-650),Math.min(s.length,p+1500)).replace(/[\x00-\x08]/g,' '));
+          }
+          console.log('engine asset bytes',Buffer.byteLength(s,'utf8'));
+          NODE
       - name: Restore original Freedom signer
         uses: actions/cache/restore@v4
         with:
