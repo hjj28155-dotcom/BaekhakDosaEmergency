@@ -65,3 +65,21 @@
 - 공식 독립 중앙통제실 안내 페이지와 고정 업데이트 안내 페이지의 버전/링크/체크섬도 1.0.8로 교정 (`hanghae-central-control.html`, `crew-meeting-releases/index.html`). 사용자가 실제 파일을 새로 내려받아 '업데이트 설치'하도록 안내.
 - 현재 Drive APK 권한은 파일 소유자 전용. 선장 본인 다운로드 가능; 외부 사용자 공유는 미검증. 실제 선장 휴대전화의 APK 설치·새 승인방 표시/승인관리 기능 테스트는 **미완료**. 기존 승인요청 DB, V3/V7 APK 및 별도 ② 배포판을 수정하지 않았음.
 - 유의: 해당 `captain-central-release.p12`는 이 공동회의 APK의 서명에 쓰지 않았으므로, 이를 공동회의 1.0.8 서명키라고 인계하면 안 됨.
+
+
+## 선장 최종 요구 — 모든 버튼 최상단 시작 + 항공모함·바다 황금빛 배경 + Drive V1.0.9
+- 지시일: 2026-10-26 KST / 작업 담당 중앙연결관.
+- 선장 사진 증상: 중앙통제실 홈에서 '배포용 승인관리방' 누르면 홈의 각종 버튼 아래로 방이 길게 펼쳐져, 작은 휴대전화 화면에서 승인관리방의 맨 처음이 가려짐.
+- 추가 지시: **모든 버튼**에 최상단 표시 적용, 배경화면 최종판을 화려하게 제작.
+- 대상 파일: `main/crew-meeting.html`; 화면 최종 소스 커밋 `e2ec77a78d2681d72dc3449b6b7152a01472da6c`.
+- 모든 **중앙통제실 내부 방 버튼** (실시간 소통방·보고서·더보기·배포용 승인관리방·더보기 안의 원본링크/업무회람/인계 관리)이 기존 홈 아래로 펼쳐지지 않고, 홈을 잠시 감춘 뒤 화면 최상단 전체 높이에서 시작. 홈으로 누르면 원래 홈 복귀. 회차 조회/전체 목록은 기존 보고서 버튼 경로를 재사용하므로 동일한 최상단 표시.
+- **예외**: V3/V7 앱 직접 실행, 원본 ChatGPT방, 외부 배포판, Drive APK 다운로드 링크는 별도의 외부 앱/브라우저를 여는 버튼으로, **상대 앱의 스크롤 위치까지 이 중앙통제실에서 강제하지 않음**. 원래 URL과 기능 유지.
+- 새 배경 이미지 파일 `assets/central-control-flagship-final.svg`: 바다 파도·황금빛 수평선·항공모함·별/나침반 원형 문양. 다층 색상·금색 테두리 CSS로 홈 재구성. 승인관리방 자식 페이지 배경도 동일 통일 (`hanghae-distribution-approval-room.html` 커밋 `efedab165c22601421fed43fe46da5dbb278813c`).
+- 기존 주요 UI/연결 ID 20개 존재 및 변경 후 JavaScript `new Function` 구문 검사 통과. 기존 승인·DB/분석 엔진에 쓰기 없음. GitHub Pages `40331703472` 성공, 5앱·7단계 웹 회귀 `40331708221` 성공 (이후 안내 페이지·승인관리 페이지 CSS 변경 배포는 별도 다시 확인 필요).
+- 앱 업데이트 소스 분리 브랜치 `feature/crew-meeting-standalone-apk-20261025`; APK 신규 버전 `1.0.9-FLAGSHIP` / versionCode `109`. 기존 Android 패키지 `kr.hanghae.crewmeeting.compact` 및 인증서 SHA256 `e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be` 유지. WebView의 `crew-meeting.html?app_version=109` 캐시 갱신.
+- GitHub Actions 빌드 실행 `40332070229` 성공. 검증 APK artifact `12655725083`, 파일 `항행의자유_중앙통제실_최종항공모함_V1.0.9.apk`, 크기 `15734`바이트, SHA256 `a3dae4bb287f170f914e080d39581ccadfb6c2c6e11143deea35a30892e4aff4`. APK ZIP 무결성·signing metadata 확인 및 CI 실제 APK 서명인증서 확인 완료.
+- **기존 드라이브 업데이트 고정 파일 동일 ID `1Ddg-fGo2q3JfowTjRTNUxmXPQ46CkUZL` 유지, 신규 파일 내용으로 Drive files.update 교체 성공.** Drive에서 다시 다운로드한 원본 APK와 동일한 바이트 및 SHA256 확인.
+- 새 버전 독립 보관 Drive ID `1trfKPWLMFrTTLO7kWeNLZwTbFsa8uWTM`. 이전 V1.0.8 사본도 기존 ID `1j9fpvNwJQz9LwwPV5eLcsZZsF1JIuMUP`에 남김. 데이터·앱 삭제 없음.
+- `hanghae-central-control.html` 및 `crew-meeting-releases/index.html`에 새 버전·SHA256·변경내용 반영.
+- **미검증:** 선장폰 실제 1.0.9 설치, 새 바다/항공모함 화면 시각 품질 및 모든 버튼 동작 실기기 점검. 관리키를 이용한 실제 서버 승인·거절은 실행하지 않음. 공개 Drive 공유권한은 소유자 전용이며 승인 운영을 위해 무단 공개하지 않음.
+- **다음 순서:** GitHub Pages 최종 페이지 성공 확인 → 선장폰 기존 APK 삭제 없이 V1.0.9 업데이트 설치 → 4개 방 및 3개 더보기 하위 메뉴의 최상단 노출 확인 → 승인목록 조회와 홈복귀 확인.
