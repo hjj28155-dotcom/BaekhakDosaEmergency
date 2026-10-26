@@ -168,12 +168,56 @@ window.onSpecialApprovalState=function(payload){
   else msg.textContent='승인완료 전입니다. 승인 확인을 눌러주세요.';
  }
 };
+function checkFreedomInstalledVersion(){
+ const msg=document.getElementById('freedomVersionMessage');
+ const details=document.getElementById('freedomVersionDetails');
+ const dl=document.getElementById('freedomVersionDownload');
+ if(!msg||!details||!dl)return;
+ msg.textContent='현재 설치된 APK 버전을 확인하고 있습니다…';
+ details.textContent='';
+ dl.hidden=true;
+ try{
+  const h=native();
+  if(!h||typeof h.checkLatestFreedomVersion!=='function'){
+   msg.textContent='앱 버전 확인 기능을 이용할 수 없습니다.';
+   details.textContent='최신 여부를 확인할 수 없으므로 최신이라고 표시하지 않습니다.';
+   return;
+  }
+  h.checkLatestFreedomVersion();
+ }catch(e){
+  msg.textContent='버전 확인에 실패했습니다. 인터넷 연결을 확인한 뒤 다시 시도하세요.';
+ }
+}
+window.onFreedomVersionStatus=function(payload){
+ let q={};try{q=typeof payload==='string'?JSON.parse(payload||'{}'):(payload||{})}catch(e){}
+ const msg=document.getElementById('freedomVersionMessage');
+ const details=document.getElementById('freedomVersionDetails');
+ const dl=document.getElementById('freedomVersionDownload');
+ if(!msg||!details||!dl)return;
+ dl.hidden=true;
+ const installed=Number(q.installed_code)||0,latest=Number(q.latest_code)||0;
+ if(q.status==='latest'&&installed>=latest&&latest>=40041){
+  msg.textContent='✅ 최신 APK가 설치되어 있습니다. 업데이트할 필요가 없습니다.';
+  details.textContent='설치된 버전: '+String(q.installed_name||'')+' / 버전코드 '+installed+' · 공식 배포: '+latest;
+ }else if(q.status==='update'&&installed>0&&latest>installed){
+  msg.textContent='⬇️ 새로운 항행의자유 APK 업데이트가 있습니다.';
+  details.textContent='설치된 버전코드 '+installed+' → 최신 '+latest+'. 기존 앱은 삭제하지 말고 업데이트 설치하세요.';
+  dl.hidden=false;
+ }else{
+  msg.textContent='버전 확인이 되지 않았습니다.';
+  details.textContent='인터넷 연결을 확인하고 다시 확인하세요. 확인 전에는 최신이라고 단정할 수 없습니다.';
+ }
+};
 window.updatePage=function(){
- modal('항행의자유 업데이트','<div class="panel goldline"><h3>공식 설치 및 업데이트</h3><p>항행의자유 전용 APK 다운로드 페이지로 연결합니다.</p><button class="b gold" id="freedomR14Update" style="width:100%">공식 설치 및 업데이트 링크 열기</button></div>');
- const b=document.getElementById('freedomR14Update');
- if(b)b.onclick=()=>{
-  try{const h=native();if(h&&h.openOfficialUpdateLink){h.openOfficialUpdateLink();return}if(h&&h.openRadioPage){h.openRadioPage(HUB);return}window.open(HUB,'_blank')}catch(e){alert('업데이트 링크를 열지 못했습니다.')}
+ modal('항행의자유 업데이트','<div class="panel goldline"><h3>설치 및 업데이트 버전 확인</h3><p id="freedomVersionMessage" role="status">현재 설치 버전 확인 중…</p><p class="small" id="freedomVersionDetails"></p><button class="b green" id="freedomVersionRetry" style="width:100%">버전 다시 확인</button><button class="b gold" id="freedomVersionDownload" style="width:100%" hidden>구글 드라이브 최신 APK 업데이트</button></div>');
+ const retry=document.getElementById('freedomVersionRetry');
+ const dl=document.getElementById('freedomVersionDownload');
+ if(retry)retry.onclick=checkFreedomInstalledVersion;
+ if(dl)dl.onclick=()=>{
+  try{const h=native();if(h&&h.openOfficialUpdateLink){h.openOfficialUpdateLink();return}if(h&&h.openRadioPage){h.openRadioPage(HUB);return}window.open(HUB,'_blank')}
+  catch(e){alert('공식 업데이트 링크를 열지 못했습니다.')}
  };
+ checkFreedomInstalledVersion();
 };
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
 else boot();
