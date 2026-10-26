@@ -411,6 +411,108 @@ main.roomMode #homeWorkspaceItems > #reportsPanel{min-height:0;max-height:none}
  #homeApprovalBtn{transition:box-shadow .2s ease,filter .2s ease}
  #homeApprovalBtn:active{filter:brightness(1.16)}
 }
+
+/* Captain screen 39210 — COMPACT FINAL V1.0.10.
+   Only presentation shrinks. No JS buttons, device state, or report logic changed.
+   Essential visual repair: a clear open-air viewport shows the carrier itself. */
+:root{--captain-home-button-height:46px}
+body{
+ background-image:
+  linear-gradient(180deg,rgba(1,10,28,.18) 0%,rgba(0,23,48,.07) 35%,rgba(1,16,37,.08) 70%,rgba(0,9,31,.22) 100%),
+  url('./assets/central-control-flagship-final.svg?compact=20261026b')!important;
+ background-position:center center!important;
+ background-size:cover!important;
+ background-repeat:no-repeat!important;
+ background-attachment:scroll!important;
+ background-color:#062d50!important;
+}
+main:not(.roomMode){
+ gap:4px!important;
+ padding:5px 7px max(5px,env(safe-area-inset-bottom))!important;
+ background:transparent!important;
+}
+main:not(.roomMode) > header{
+ flex:none;height:43px!important;min-height:43px!important;max-height:43px!important;
+ padding:4px 8px!important;gap:5px!important;
+ background:linear-gradient(112deg,rgba(2,23,47,.8),rgba(7,54,84,.72))!important;
+ box-shadow:0 3px 11px #0005!important;
+}
+main:not(.roomMode) > header h1{font-size:.99rem!important;line-height:1.16!important}
+main:not(.roomMode) > header small{font-size:.58rem!important;line-height:1.16!important}
+main:not(.roomMode) > header button{min-height:33px!important;padding:3px 9px!important;font-size:.76rem!important}
+#originalChatBar,#homeQuickActions,#installedAppBar{gap:4px!important;flex:none!important}
+#originalChatBar > button{
+ box-sizing:border-box!important;height:46px!important;min-height:46px!important;max-height:46px!important;
+ font-size:.74rem!important;line-height:1.12!important;padding:3px 2px!important;
+ border-radius:10px!important;
+}
+#homeQuickActions > button,#homeQuickActions > a,#homeQuickActions > #crewUpdateOpen{
+ box-sizing:border-box!important;height:49px!important;min-height:49px!important;max-height:49px!important;
+ padding:3px 1px!important;font-size:.94rem!important;line-height:1.05!important;
+ gap:2px!important;border-radius:10px!important;
+}
+#homeQuickActions span{font-size:.66rem!important;line-height:1.08!important}
+#installedAppBar .installedAppUnit button,#installedAppBar .installedAppUnit a{
+ box-sizing:border-box!important;height:47px!important;min-height:47px!important;max-height:47px!important;
+ font-size:.71rem!important;line-height:1.1!important;padding:3px 3px!important;
+ border-radius:10px!important;
+}
+#homeApprovalBtn{
+ flex:none!important;box-sizing:border-box!important;height:42px!important;min-height:42px!important;max-height:42px!important;
+ font-size:.77rem!important;line-height:1.08!important;padding:4px 5px!important;
+ border-radius:10px!important;
+ background:linear-gradient(100deg,rgba(12,69,106,.79),rgba(25,117,142,.85) 55%,rgba(97,69,37,.87))!important;
+}
+#centralRoundPanel{
+ flex:none!important;min-height:0!important;max-height:none!important;
+ margin:1px 0!important;padding:6px 7px!important;border-radius:11px!important;
+ background:linear-gradient(125deg,rgba(3,27,58,.77),rgba(4,66,99,.70))!important;
+ box-shadow:0 2px 8px #00142d55!important;
+}
+#centralRoundPanel label{margin:0 0 3px!important;font-size:.74rem!important;line-height:1.16!important}
+.centralRoundRow{gap:4px!important}
+.centralRoundRow input,.centralRoundRow button{
+ box-sizing:border-box!important;min-height:34px!important;height:34px!important;max-height:34px!important;
+ padding:3px 6px!important;border-radius:8px!important;font-size:.75rem!important;
+}
+.centralRoundRow input{min-width:0!important;font-size:.82rem!important}
+#centralRoundPanel small{
+ display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;
+ overflow:hidden!important;margin-top:4px!important;
+ line-height:1.25!important;font-size:.59rem!important;color:#e0ecf3!important;
+}
+/* The former giant opaque home-overview blocked the entire ship artwork.
+   Keep its original DOM/content; restyle it as a transparent viewing deck. */
+#homeOverview:not([hidden]){
+ display:flex!important;flex:1 1 auto!important;min-height:75px!important;
+ align-items:center!important;justify-content:flex-end!important;
+ padding:0 4px 6px!important;gap:0!important;
+ background:transparent!important;border:0!important;box-shadow:none!important;
+ overflow:hidden!important;
+}
+#homeOverview .homeShip,#homeOverview p,#homeOverview small{display:none!important}
+#homeOverview strong{
+ display:block!important;flex:none!important;max-width:97%;
+ padding:7px 11px!important;border:1px solid rgba(242,209,138,.58)!important;
+ border-radius:20px!important;background:rgba(2,30,58,.59)!important;
+ color:#fff0bc!important;text-align:center!important;line-height:1.2!important;
+ font-size:.68rem!important;text-shadow:0 1px 3px #021021!important;
+}
+@media(max-width:360px){
+ #originalChatBar > button{font-size:.67rem!important}
+ #homeQuickActions span{font-size:.61rem!important}
+ #installedAppBar .installedAppUnit button,#installedAppBar .installedAppUnit a{font-size:.65rem!important}
+ #homeApprovalBtn{font-size:.72rem!important}
+}
+@media(max-height:620px){
+ main:not(.roomMode){gap:3px!important}
+ #originalChatBar > button{height:42px!important;min-height:42px!important;max-height:42px!important}
+ #homeQuickActions > button,#homeQuickActions > a,#homeQuickActions > #crewUpdateOpen{height:45px!important;min-height:45px!important;max-height:45px!important}
+ #installedAppBar .installedAppUnit button,#installedAppBar .installedAppUnit a{height:43px!important;min-height:43px!important;max-height:43px!important}
+ #homeApprovalBtn{height:39px!important;min-height:39px!important;max-height:39px!important}
+ #centralRoundPanel small{-webkit-line-clamp:1!important}
+}
+
 </style>
 </head>
 <body>
