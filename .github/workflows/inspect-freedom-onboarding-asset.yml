@@ -1,0 +1,30 @@
+name: Inspect original Freedom onboarding guide asset
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/inspect-freedom-onboarding-asset.yml]
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Examine video identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s freedom_onboarding_latest.mp4
+          file freedom_onboarding_latest.mp4
+          ffprobe -v error -show_entries format=duration,size:stream=codec_name,width,height -of json freedom_onboarding_latest.mp4 > guide_probe.json
+          sha256sum freedom_onboarding_latest.mp4 > guide_sha256.txt
+          cat guide_probe.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: freedom_original_onboarding_latest_inspection
+          path: |
+            freedom_onboarding_latest.mp4
+            guide_probe.json
+            guide_sha256.txt
+          retention-days: 3
+          compression-level: 0
