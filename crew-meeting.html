@@ -212,6 +212,10 @@ footer{display:none}
 #threeRoomCaptainForm textarea{font-size:.8rem;min-height:52px;padding:7px}
 #threeRoomCaptainForm button{font-size:.74rem;padding:7px}
 #threeRoomStatus{font-size:.69rem;color:#bed8e7;line-height:1.4;padding-bottom:7px}
+
+#threeRoomRoleStatus{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin:7px 0}
+#threeRoomRoleStatus>div{min-width:0;border:1px solid #476378;background:#091f31;border-radius:7px;padding:6px 4px;font-size:.65rem;color:#cfdeea;overflow-wrap:anywhere;line-height:1.3}
+@media(max-width:390px){#threeRoomRoleStatus{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -234,6 +238,11 @@ footer{display:none}
   <button type="button" class="secondary" id="threeRoomLinkofficerGuide">🔗 연결관 연결 안내 복사</button>
  </div>
  <textarea id="threeRoomGuideCopy" readonly rows="5" hidden aria-label="원본 대화방 한 번 전달할 연동 안내"></textarea>
+ <div id="threeRoomRoleStatus" aria-label="담당자별 실제 공유 메시지 최신 시각">
+  <div data-room-role="navigator">🧭 항해사 · 아직 공유 메시지 없음</div>
+  <div data-room-role="controller">🛡️ 통제관 · 아직 공유 메시지 없음</div>
+  <div data-room-role="linkofficer">🔗 중앙연결관 · 아직 공유 메시지 없음</div>
+ </div>
  <div id="threeRoomEvents" aria-label="공유 서버의 시간순 메시지" role="log"></div>
  <form id="threeRoomCaptainForm">
   <label for="threeRoomCaptainText">선장 지시를 공동 공유판에 등록</label>
@@ -742,8 +751,22 @@ async function threeRoomRequest(action,method,body){
  return data;
 }
 var threeRoomName={captain:'⚓ 선장',navigator:'🧭 항해사',controller:'🛡️ 통제관',linkofficer:'🔗 중앙연결관'};
+function threeRoomRoleSummary(rows){
+ var status={navigator:null,controller:null,linkofficer:null};
+ (rows||[]).forEach(function(e){
+  if(!Object.prototype.hasOwnProperty.call(status,e.author_role))return;
+  if(!status[e.author_role]||new Date(e.created_at)>new Date(status[e.author_role].created_at))status[e.author_role]=e;
+ });
+ Object.keys(status).forEach(function(role){
+  var node=$('threeRoomRoleStatus').querySelector('[data-room-role="'+role+'"]');
+  if(!node)return;
+  var item=status[role];
+  node.textContent=threeRoomName[role]+' · '+(item?'최근 공유 '+dateTime(item.created_at)+' (원본 세션 자동 인증 없음)':'공유 메시지 기록 없음');
+ });
+}
 function threeRoomRender(rows){
  var area=$('threeRoomEvents');area.replaceChildren();
+ threeRoomRoleSummary(rows);
  if(!rows||!rows.length){area.textContent='원본방에서 등록된 공유 메시지는 아직 없습니다.';return;}
  rows.forEach(function(e){
   var item=document.createElement('div');item.className='threeRoomEvent';
