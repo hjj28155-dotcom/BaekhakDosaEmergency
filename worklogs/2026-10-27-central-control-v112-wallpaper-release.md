@@ -1,0 +1,17 @@
+# 중앙연결관 — 실제 배경 교체 및 중앙통제실 V1.0.12 고정 Drive 업데이트
+- 기준일: 2026-10-27 (KST) · 대상: ④ 독립 중앙통제실.
+- 선장 확인: V1.0.11 배경화면은 그대로인 문제. 원인: `crew-meeting.html`의 두 CSS `background` URL이 계속 이전 `central-control-flagship-final.svg`를 참조했고, 1.0.11 Android 브랜치에도 이전 WebView URL만 있었음.
+- 해결: 버튼·문자 없는 사진형 항공모함 풍경 `central_control_real_carrier_r12.jpg` (1024×1920/190523B, 갑판/전투기/일몰/바다)을 선장 드라이브에 개별 보관; 사진을 자체 포함하는 `assets/central-carrier-photo-r12.svg` (SVG 내 JPEG base64)로 GitHub 동출, 외부 이미지 도메인 의존 없음.
+- 홈 `crew-meeting.html`: 기존 두 곳의 옛 SVG CSS 참조를 모두 교체하고 R12 고유 쿼리로 캐시 분리, HTML/body 배경 적용, 상단 패딩 소폭 조정. 승인관리방 `hanghae-distribution-approval-room.html` 배경도 R12로 동일 변경.
+- 변경 코드 검증: 새 R12 사진 SVG에 JPEG 254032자리 base64 실존, 이미지 데이터 완결; 기존 4원본방·통합자료방·승인관리·회차조회 등 9개 DOM ID 유지, 페이지 JS 문법 검사 통과. 로컬 CairoSVG R12 렌더 정상.
+- 인상 주의: 채팅에서 이미지 생성 도구가 보여 준 화려한 **UI 시안**은 앱에 넣지 않았음. 버튼 없는 별도 실제 배경 사진 파일만 사용했음.
+- Android 브랜치 `feature/crew-meeting-standalone-apk-20261025` 빌드 소스 커밋 `45342d98cc258785c5628e00b0aa929ea5d37273`, versionCode 112, versionName `1.0.12-WALLPAPER`, package `kr.hanghae.crewmeeting.compact`, 웹 주소 `crew-meeting.html?app_version=112`.
+- GitHub Actions run `40349486449` 성공, artifact `12661979164`. CI 원본 서명키 복원 및 SHA256 인증서 `e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be` 강제 검사, ZIP 무결성 및 버전 검증 통과.
+- 서명 APK `항행의자유_중앙통제실_새배경_V1.0.12.apk` 크기 15774 바이트, SHA256 `a908da665995bcf0b99b4381a09157e4f7634f4adfd6da469bae71ea1c5f3113`.
+- 새 버전 Drive 보존본: https://drive.google.com/file/d/1f5ZOqE7c1aJojkuwewMTo_eAi5t4VPoW/view
+- **기존 Drive 고정 업데이트 파일 ID `1Ddg-fGo2q3JfowTjRTNUxmXPQ46CkUZL` 동일하게 유지, 파일 내용만 v1.0.12로 교체 성공.** 재다운로드 바이트 비교 동일, SHA256 전부 일치.
+- 배경 소스 Drive 개별 보존: https://drive.google.com/file/d/1LGPp7_IDBBnV-BM2z0M24YI1MDpcetjQ/view
+- 공식 설치 안내 `hanghae-central-control.html`, `crew-meeting-releases/index.html` 새 버전명·길이·해시로 변경.
+- 기존 V3·V7·항해의자유 개별 배포판 APK, 승인기록, 원본서명, DB, 5회차 공개제한, 결과전/결과후 기록은 변경·삭제하지 않음.
+- 미검증: 선장 휴대전화 실제 v1.0.12 설치와 WebView 표시 상태, 모바일 최상단 검은 여백의 네이티브 원인, 최종 GitHub Pages 배포 성공 확인 필요. 외부 공유 권한 owner-only 유지.
+- 다음: 최종 Pages deploy 상태 확인 → 선장폰 기존 앱 삭제 없이 업데이트 설치 → 배경 실표시 및 원본방 4개·통합자료방·승인관리방 동작 실기기 점검.
