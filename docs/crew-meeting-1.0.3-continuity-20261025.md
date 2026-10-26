@@ -1,3 +1,15 @@
+## ⚓ 2026-10-26 / 선장 요청 — 1.0.7 HOME70 APK Google Drive 고정 파일 배포 확정
+
+- **선장 지시:** "APK 올려주세요" → "드라이브에 올려주시고 드라이브에서 업데이트 하게 해 주세요." 기존 공동회의 APK 고정 파일 `항행의자유_공동회의_최신업데이트.apk`, Google Drive ID `1Ddg-fGo2q3JfowTjRTNUxmXPQ46CkUZL` **그대로 유지**하여 1.0.7 APK로 갱신한 상태 검증. 파일을 새로 생성하여 링크가 변경되지 않도록 보존.
+- **신규 APK 실제 빌드:** `1.0.7-HOME70` / Android `versionCode 107` / applicationId `kr.hanghae.crewmeeting.compact` / WebView `?app_version=107`. 1.0.6 APK의 원본 서명 인증서 지문 `e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be` 고정 비교. 기존에 설치된 공동회의 1.0.6 위에 덮어 업데이트; 다른 V3/V7 APK·원본 DB·대화 연결·누적DB·기기 등록 유지.
+- **실제 Android CI 증거:** GitHub Actions build workflow `#40257490441` `completed/success`, commit `0ddd618449ce8bd8bcdadeb34cdbbbbcf85f5789`; original signer restore, signed APK build, `apksigner` 인증서 확인, `aapt` package/versionCode 확인, APK SHA-256 manifest 검증, artifact 업로드, 별도 압축 패키징 확인 전 단계 success.
+- **APK artifact:** ID `12622908273` / `HANGHAE-CREW-MEETING-1.0.7-APK`. ZIP에서 APK `15674`바이트 및 SHA-256 manifest `e5e338c28fdf18c8a42d1790634723c4916c782e8ad964247cb94637c0225cec` 확인. ZIP·APK CRC 오류 없음.
+- **구글드라이브 재다운로드 후 이진 검증:** 실제 Drive file ID `1Ddg-fGo2q3JfowTjRTNUxmXPQ46CkUZL`에서 다운로드한 `항행의자유_공동회의_최신업데이트.apk` 크기 `15674` 바이트 및 SHA256 `e5e338c28fdf18c8a42d1790634723c4916c782e8ad964247cb94637c0225cec` **CI artifact APK와 파일 내용 100% 동일**. 이전 1.0.6(15,618바이트)이 아닌 새 1.0.7(15,674바이트)임을 확인.
+- **정본 고정 링크:** `https://drive.google.com/file/d/1Ddg-fGo2q3JfowTjRTNUxmXPQ46CkUZL/view?usp=drivesdk`. 기존 공개 설치 페이지 `crew-meeting-releases/index.html`에 최신판 `1.0.7-HOME70`, 위 고정 링크, 최신 크기와 SHA가 정확히 반영되어 있음을 GitHub 재조회로 확인. 기존 구버전 파일 삭제 안 함.
+- **홈 변경 포함:** 공동회의 원격 `crew-meeting.html`에 7개 홈 버튼 공통 높이 `70px` CSS 포함 재조회 확인. 새 APK는 업데이트 버전 식별 `?app_version=107`으로 동일 웹 화면을 로드하므로 사용 시 최신 레이아웃 확인 가능.
+- **휴대전화 실기기 확인 미실시:** Drive 링크 다운로드→Android 설치(업데이트) 동작과 선장폰의 실제 홈 버튼 70px 시각 검증은 선장 확인 전. 세 원본 ChatGPT 대화의 진정한 무인 실시간 자동 송수신은 별도 미완료/HOLD.
+- **배포 진행:** GitHub Pages 현재 최신 run `#40257843878` (main commit `f397b538b7c0c4bbdc4a7631b949a6084d50119e`) 최종 성공 여부 확인 필요. 이전 HOME70 게시 `#40256915030`은 `completed/success`.
+
 - **웹 배포 최종 성공 (7버튼 높이 통일):** GitHub Pages run `#40256915030` `completed/success`; main SHA `a7caf7fc52e822bcd4c44051548471030057a194`. 세 원본방+4개 핵심 메뉴 버튼 높이 70px 통일 CSS를 공개 배포 완료. APK는 기존 1.0.6 그대로, Android 실기기 확인은 아직 선장 확인 필요.
 
 ## 2026-10-26 / 선장 홈 버튼 7개 동일 높이 70px
