@@ -98,6 +98,13 @@ jobs:
           }
           with zipfile.ZipFile(apk) as z:
             names=set(z.namelist())
+            print('CI ZIP reference paths:',sorted(n for n in names if ('reference' in n or '백학' in n))[:60])
+            print('CI ZIP assets count:',len([n for n in names if n.startswith('assets/')]))
+            for n in checks:
+              if n in names:
+                print('CI ZIP digest:',n,hashlib.sha256(z.read(n)).hexdigest())
+              else:
+                print('CI ZIP missing expected path:',n)
             assert 'classes.dex' in names, 'No Android dex classes'
             for name,digest in checks.items():
               if name not in names or hashlib.sha256(z.read(name)).hexdigest()!=digest:
