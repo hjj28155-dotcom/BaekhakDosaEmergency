@@ -1,8 +1,8 @@
 {
   "app_name": "항행의자유 공동회의",
   "package_name": "kr.hanghae.crewmeeting.compact",
-  "current_update_version": "1.0.12-WALLPAPER",
-  "old_version": "1.0.11-MATERIALS",
+  "current_update_version": "1.0.13-SCREEN",
+  "old_version": "1.0.12-WALLPAPER",
   "public_signing_certificate_sha256": "e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be",
   "signing_certificate_sha256_origin": "Certificate SHA-256 pinned in CI from verified 1.0.3–1.0.6 fixed signer; any mismatch blocks 1.0.7. The secret keystore is NOT included in the APK or repo.",
   "key_alias": "androiddebugkey",
@@ -12,6 +12,6 @@
   "secret_key_embedded_in_apk": false,
   "private_key_archived_externally": false,
   "currently_verified_signing_source": "GitHub Actions cache crew-meeting-independent-pilot-signing-v1",
-  "continuity_guarantee": "VersionCode 112, identical package kr.hanghae.crewmeeting.compact and original signing certificate e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be. Live crew-meeting home references self-hosted photographic carrier deck R12 SVG with embedded JPEG, new cache query. Original 4 ChatGPT room connections, integrated V7/V3/Freedom materials archive, approvals, DB and 5-round public access cap preserved.",
+  "continuity_guarantee": "VersionCode 113; same package kr.hanghae.crewmeeting.compact, same signing certificate e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be. R13 photographic carrier crop reduces empty lower viewport; native Android P+ screen-cutout short edges avoids unused black top band on compatible devices. Original linked ChatGPT conversation role URLs, offline histories, 3-app material panel, V3/V7, approval records, DB, distribution 5-round limit unchanged.",
   "recovery_requirements": "Captain-controlled private encrypted signing-keystore backup required before treating as durable release. Never embed keystore, P12, password or seed in app."
 }
