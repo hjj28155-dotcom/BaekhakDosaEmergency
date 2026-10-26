@@ -1,4 +1,4 @@
-name: Build signed compact flagship control APK v1.0.10
+name: Build signed three-app materials control APK v1.0.11
 on:
   push:
     branches:
@@ -61,23 +61,23 @@ jobs:
           test "$NEW_CERT" = "e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be"
           echo "Recovery app signer pinned: $NEW_CERT"
           "$AAPT" dump badging "$APK" | head -5
-          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting.compact' versionCode='110'"
+          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting.compact' versionCode='111'"
           ! "$AAPT" dump badging "$APK" | grep -q "package: name='com.baekhak.dosa.v4'"
           mkdir -p crew-meeting-android/releases
-          cp "$APK" crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.10.apk
-          (cd crew-meeting-android/releases && sha256sum HANGHAE_CREW_MEETING_1.0.10.apk > HANGHAE_CREW_MEETING_1.0.10.apk.sha256)
+          cp "$APK" crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.11.apk
+          (cd crew-meeting-android/releases && sha256sum HANGHAE_CREW_MEETING_1.0.11.apk > HANGHAE_CREW_MEETING_1.0.11.apk.sha256)
       - uses: actions/upload-artifact@v4
         with:
-          name: HANGHAE-CREW-MEETING-1.0.10-APK
+          name: HANGHAE-CREW-MEETING-1.0.11-APK
           path: |
-            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.10.apk
-            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.10.apk.sha256
+            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.11.apk
+            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.11.apk.sha256
           if-no-files-found: error
           retention-days: 30
       - name: Verify isolated APK artifact packaging
         run: |
           set -euo pipefail
-          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.10.apk
-          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.10.apk.sha256
-          (cd crew-meeting-android/releases && sha256sum --check HANGHAE_CREW_MEETING_1.0.10.apk.sha256)
+          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.11.apk
+          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.11.apk.sha256
+          (cd crew-meeting-android/releases && sha256sum --check HANGHAE_CREW_MEETING_1.0.11.apk.sha256)
           echo "Artifact is verified for existing fixed Google Drive APK replacement after independently checking signer."
