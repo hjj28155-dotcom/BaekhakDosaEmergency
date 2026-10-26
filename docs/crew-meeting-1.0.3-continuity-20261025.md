@@ -1,3 +1,12 @@
+## 2026-10-26 / 선장 홈 버튼 7개 동일 높이 70px
+
+- 선장 스크린샷 `39110.jpg` 빨간 표시: 공동회의 홈 상단 `🧭 항해사 / 🛡️ 통제관 / 🔗 중앙연결관` 버튼 3개와 두번째 줄 `📡 실시간 공유 / 📑 보고서 / ⬇️ 업데이트 / ☰ 더보기` 버튼 4개의 상자 높이가 달라 보이므로 "같은높이로 해주세요" → "진행하십시오".
+- **수정한 원본:** GitHub main `crew-meeting.html`; 기존 1.0.6 APK `kr.hanghae.crewmeeting.compact`는 원격 WebView 주소를 쓰므로 새 APK 빌드 불필요. 원본 V3·V7 Android 설치·DB/보고서/대화방 저장값/서명/승인 기록은 변경하지 않음.
+- **실제 변경:** CSS 마지막에 `--captain-home-button-height:70px`와 `#originalChatBar > button, #homeQuickActions > button, #homeQuickActions > a, #homeQuickActions > #crewUpdateOpen` 공통 셀렉터 추가. `height/min-height/max-height`를 **모두 70px**로 강제하여 윗줄 3개와 아랫줄 4개의 실제 버튼 박스 높이를 같게 함. `align-items:center;justify-content:center`로 내부 아이콘/문구 중앙정렬; 짧은 화면에서 기존 54px/49px media rules가 재적용되지 않도록 CSS 끝에 덮어씀. 한 줄 3/4 열의 **버튼 너비는 각 그리드 구조상 서로 다름**(요청은 높이만 동일).
+- **소스 커밋:** `a7caf7fc52e822bcd4c44051548471030057a194`, GitHub Blob SHA `cabc07d8ff60d0770daee48ee22043385bd2cac8`; 공용 70px CSS 외 JS/서버/DB 수정 없음.
+- **검증:** GitHub 소스 다시 읽어서 버튼 7개 공통 셀렉터, exact `height/min-height/max-height`, CSS 규칙 최하단 순서, 기존 세 원본방 버튼/실시간 공유·보고서·V3/V7 실행/Google Drive 고정 업데이트 링크/로그인 저장키 유지 8/8 PASS. `new Function`으로 embedded Javascript 구문 PASS, DOM ID 중복 없음.
+- **남은 검증:** GitHub Pages 배포 run `#40256915030` 최종 `completed/success` 확인 및 실제 선장폰에서 7개 높이가 시각적으로 동일한지 확인. 안드로이드 화면 스크린샷 기반 실기기 측정은 아직 미실시.
+
 ## ⚓ 2026-10-26 / 선장 홈화면 단순화 1차 — 공동회의 1.0.6
 
 - 선장 지시: "홈화면을 다시 한번 손보고 싶어요. 좀 어지려워요..원본방 이름은 굳이 쓰지말고요." 이어서 "진행하십시오". 대상은 **기존 독립 항행의자유 공동회의 앱 1.0.6 웹 홈**이며, V3 항해사 APK와 V7 중앙통제실 APK 홈화면을 개조하는 작업이 아님.
