@@ -1943,6 +1943,7 @@ function v4043AcceptEngineResult(m){
  const primary=session.responses.find(x=>x.task.role==='CURRENT');
  if(!primary){modal('DB-1 분석 오류','<div class="panel warn">현재 회차 엔진 결과가 없습니다.</div>');return}
  const historical=session.responses.filter(x=>x.task.role==='DB1_HISTORY');
+ if(session.historyCount>0&&!historical.length){modal('DB-1 과거분석 점검','<div class="panel warn">과거 회차 엔진 분석이 실패했습니다. 과거 자료를 이용했다고 표시하거나 번호를 임의로 보완하지 않습니다.</div>');return}
  const merged=v4043MergedRanks(primary.reply.rank,historical.map(x=>x.reply.rank));
  const reply=Object.assign({},primary.reply,{rank:merged,
  db1Evidence:{source:session.source,historySearched:session.historyCount,
