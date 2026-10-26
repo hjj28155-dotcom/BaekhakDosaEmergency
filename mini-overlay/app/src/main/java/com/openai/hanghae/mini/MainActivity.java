@@ -30,7 +30,7 @@ import java.util.Locale;
 
 public class MainActivity extends Activity {
     private static final int REQ_AUDIO=77;
-    private static final String PUBLIC_UPDATE_PAGE="https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/moveicon.html";
+    private static final String PUBLIC_UPDATE_PAGE="https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/hanghae-moveicon.html";
     private static final String NAVIGATOR_UPDATE_PAGE="https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/navigator-moveicon.html";
 
     private boolean pendingStart=false;
