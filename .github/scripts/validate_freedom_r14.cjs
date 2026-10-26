@@ -5,7 +5,7 @@ const path=require('node:path');
 const p='build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/';
 const html=fs.readFileSync(p+'index.html','utf8'),r14=fs.readFileSync(p+'freedom_onboarding_r14.js','utf8');
 assert.equal(html.split('src="freedom_onboarding_r14.js"').length-1,1,'R14 imported exactly once');
-assert.ok(r14.includes('https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/update.html'),'app update route must open Freedom-only official download');
+assert.ok(r14.includes('https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/hanghae-freedom-distribution.html'),'app update route must open Freedom-only official download');
 assert.ok(!r14.includes('moveicon.html'),'Freedom app must not navigate to MoveIcon distribution page');
 assert.ok(r14.includes('freedom_v439_guide_video_finished'),'V439 guide must play once even for already approved upgrades');
 assert.ok(r14.includes('approvalCheckRequested=true'),'explicit approval-confirm state required');
