@@ -216,20 +216,79 @@ footer{display:none}
 #threeRoomRoleStatus{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin:7px 0}
 #threeRoomRoleStatus>div{min-width:0;border:1px solid #476378;background:#091f31;border-radius:7px;padding:6px 4px;font-size:.65rem;color:#cfdeea;overflow-wrap:anywhere;line-height:1.3}
 @media(max-width:390px){#threeRoomRoleStatus{grid-template-columns:1fr}}
+
+/* Simple flagship home / 2026-10-26. Existing V3/V7 links and data unchanged. */
+#originalChatBar{gap:9px;padding:4px 0 8px;grid-template-columns:repeat(3,minmax(0,1fr))}
+#originalChatBar button{min-height:70px;display:flex;align-items:center;justify-content:center;background:#173c58;border:1px solid #7296aa;border-radius:13px;color:#f3e1b9;font-size:.93rem;font-weight:800;line-height:1.2;padding:10px 4px;box-shadow:0 5px 18px #0002}
+#originalChatBar button.ready{background:#244c65;color:#fff1cb;border-color:#d0ae70}
+#homeQuickActions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;flex:none}
+#homeQuickActions button,#homeQuickActions a{min-width:0;min-height:59px;padding:8px 3px;display:flex;flex-direction:column;gap:3px;align-items:center;justify-content:center;text-align:center;text-decoration:none;color:#ddecf6;background:#132e46;border:1px solid #466882;border-radius:12px;font-size:1rem;font-weight:750;line-height:1.2}
+#homeQuickActions span{font-size:.72rem}
+#homeQuickActions button[aria-pressed="true"],#homeQuickActions button[aria-expanded="true"]{border-color:#d5b374;background:#244a60;color:#ffe8ba}
+#homeQuickActions #crewUpdateOpen{font-size:1rem;min-height:59px;padding:8px 3px;background:#132e46;border-color:#466882;color:#ddecf6;line-height:1.2}
+#homeOverview{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:9px;border:1px solid #24435d;border-radius:16px;background:linear-gradient(160deg,#0e304c,#092039);padding:15px;overflow:auto}
+.homeShip{font-size:2.4rem;line-height:1.2}
+#homeOverview strong{font-size:.97rem;color:#ffe3a5;font-weight:800}
+#homeOverview p{font-size:.8rem;color:#d4e5f1;margin:0}
+#homeOverview small{font-size:.71rem;color:#a9c6d8}
+#homeWorkspace,#homeMorePanel{flex:1 1 auto;min-height:0;border:1px solid #385874;border-radius:13px;background:#0a243b;padding:8px;overflow-y:auto;overscroll-behavior:contain}
+#homeWorkspace[hidden],#homeMorePanel[hidden],#homeOverview[hidden]{display:none!important}
+.homePaneTop{display:flex;align-items:center;justify-content:space-between;gap:7px;padding:2px 2px 9px}
+.homePaneTop strong{font-size:.85rem;color:#f4d9a2}
+.homePaneTop button{padding:6px 11px;font-size:.73rem;min-height:28px}
+#homeWorkspaceItems{display:flex;flex-direction:column;min-height:0;gap:7px}
+#homeWorkspaceItems>#threeRoomLivePanel,#homeWorkspaceItems>#reportsPanel{display:block;flex:1 1 auto;max-height:none;padding:0 8px;min-height:80px}
+#homeWorkspaceItems>#threeRoomLivePanel[hidden],#homeWorkspaceItems>#reportsPanel[hidden],#homeWorkspaceItems>#loginArea[hidden]{display:none!important}
+#homeWorkspaceItems>#loginArea{margin:0;padding:10px;flex:none}
+#homeMoreTools{display:flex;flex-direction:column;gap:7px;padding:1px}
+#homeMoreTools>button{width:100%}
+#homeMoreTools>#relayPanel,#homeMoreTools>#handoffPanel{max-height:47dvh;overflow-y:auto}
+#homeMoreTools>#installedAppBar{margin:4px 0}
+#homeTrialDrawer{border:1px solid #456985;border-radius:10px;background:#142e43;padding:7px 9px;margin-top:9px}
+#homeTrialDrawer>summary{font-size:.78rem;font-weight:700;color:#f0dfc0;cursor:pointer}
+#homeTrialDock{min-height:0;padding-top:6px}
+#homeTrialDock>#chatArea{height:min(52dvh,490px);min-height:260px;flex:none}
+#homeTrialDock #messages{min-height:80px}
+#disconnectBtn{font-size:.72rem;min-height:29px}
+@media(max-height:650px){#originalChatBar button{min-height:54px;font-size:.84rem}#homeQuickActions button,#homeQuickActions a,#homeQuickActions #crewUpdateOpen{min-height:49px}#homeOverview{gap:5px;padding:9px}.homeShip{font-size:1.8rem}}
+@media(max-width:375px){#originalChatBar{gap:5px}#originalChatBar button{font-size:.81rem}#homeQuickActions{gap:4px}#homeQuickActions span{font-size:.64rem}#homeOverview strong{font-size:.88rem}}
+
 </style>
 </head>
 <body>
 <main>
-<header><div><h1>⚓ 항행의자유 공동회의</h1><small>선장 · 항해사 · 통제관 · 시험판</small></div><button id="disconnectBtn" class="secondary" type="button">퇴장</button></header>
-<div id="originalChatBar" role="navigation" aria-label="원본 ChatGPT 대화방 직접 열기">
-<button type="button" id="originalNavigator">🧭 원본 항해사</button>
-<button type="button" id="originalController">🛡️ 원본 통제관</button>
+<header><div><h1>⚓ 항행의자유 공동회의</h1><small>선장의 공동 업무 공간</small></div><button id="disconnectBtn" class="secondary" type="button">퇴장</button></header>
+<div id="originalChatBar" role="navigation" aria-label="담당자 대화방 바로가기">
+<button type="button" id="originalNavigator">🧭 항해사</button>
+<button type="button" id="originalController">🛡️ 통제관</button>
 <button type="button" id="originalLinkofficer">🔗 중앙연결관</button>
 </div>
-<a id="crewUpdateOpen" href="https://drive.google.com/file/d/1Ddg-fGo2q3JfowTjRTNUxmXPQ46CkUZL/view?usp=drivesdk" aria-label="구글드라이브 고정 링크에서 공동회의 최신 APK 업데이트">📥 공동회의 APK 업데이트 · 구글드라이브 바로가기</a>
+
+<nav id="homeQuickActions" aria-label="홈 주요 기능">
+ <button type="button" id="homeLiveBtn" aria-controls="homeWorkspace">📡<span>실시간 공유</span></button>
+ <button type="button" id="homeReportBtn" aria-controls="homeWorkspace">📑<span>보고서</span></button>
+ <a id="crewUpdateOpen" href="https://drive.google.com/file/d/1Ddg-fGo2q3JfowTjRTNUxmXPQ46CkUZL/view?usp=drivesdk" aria-label="구글드라이브 공동회의 최신 APK 업데이트">⬇️<span>업데이트</span></a>
+ <button type="button" id="homeMoreBtn" aria-controls="homeMorePanel" aria-expanded="false">☰<span>더보기</span></button>
+</nav>
+<div id="homeOverview">
+ <div class="homeShip">⚓</div>
+ <strong>함께 보고, 바로 소통하는 중앙회의실</strong>
+ <p>담당자를 선택하거나 아래 메뉴를 이용하세요.</p>
+ <small>실시간 기록은 공유 서버에서 확인합니다.</small>
+</div>
+<div id="homeWorkspace" hidden aria-label="선택한 기능">
+ <div class="homePaneTop"><strong id="homeWorkspaceTitle">업무 공유</strong><button id="homeBackBtn" type="button" class="secondary">홈으로</button></div>
+ <div id="homeWorkspaceItems"></div>
+</div>
+<div id="homeMorePanel" hidden aria-label="추가 기능">
+ <div class="homePaneTop"><strong>추가 기능</strong><button id="homeMoreBackBtn" type="button" class="secondary">홈으로</button></div>
+ <div id="homeMoreTools"></div>
+ <details id="homeTrialDrawer"><summary>시험 대화 · 파일 · 세부 점검</summary><div id="homeTrialDock"></div></details>
+</div>
+
 
 <details id="threeRoomLivePanel" aria-label="세 원본방 업무 공유 서버">
- <summary>📡 세 원본방 업무 공유판 <span id="threeRoomLiveState">원본방 자동 연결 전</span></summary>
+ <summary>📡 실시간 업무 공유 <span id="threeRoomLiveState">공유 기록 확인 전</span></summary>
  <p class="threeRoomWarning">이 화면은 <b>실제 공동 메시지 서버의 기록</b>을 보여줍니다. 선장 지시는 공유 서버에만 저장됩니다. <b>기존 ChatGPT 세 대화방으로 자동 전송되거나 원본 메시지를 자동 수집하지 않습니다.</b> 원본 AI의 참여는 각 원본방에서 연결된 Supabase 도구를 실제 호출할 때에만 발생합니다.</p>
  <div class="threeRoomActions">
   <button type="button" class="secondary" id="threeRoomRefresh">공유 기록 확인</button>
@@ -251,7 +310,7 @@ footer{display:none}
  </form>
  <div id="threeRoomStatus" role="status" aria-live="polite">공동회의 입장 후 목록을 읽을 수 있습니다. 화면을 펼친 동안 약 4초 간격으로 자동 확인합니다.</div>
 </details>
-<button id="relayOpen" type="button">⚓ 원본 3방 지시·답변 회람</button>
+<button id="relayOpen" type="button">업무 회람</button>
 <section id="relayPanel" hidden aria-label="기존 원본 대화방 수동 회람">
   <h2>⚓ 원본방 업무 회람</h2>
   <p class="relayNote">선장 지시를 원본 채팅방에 직접 전달하고, 받은 답변을 이 화면에 기록합니다. <b>원본 3방 자동 채팅이 아닌 수동 회람</b>입니다. 저장은 이 기기의 공동회의 앱에만 적용됩니다.</p>
@@ -280,7 +339,7 @@ footer{display:none}
   <button type="button" class="secondary" id="changeInstalledV7">연결 변경</button>
  </div>
 </div>
-<button id="handoffOpen" type="button">📋 새방 첫머리 필수 인계양식</button>
+<button id="handoffOpen" type="button">대화방 인계</button>
 <section id="handoffPanel" hidden aria-label="원본 새 대화방 첫머리 인계양식">
  <h2>⚓ 새 ChatGPT 방 첫머리 인계</h2>
  <small>① 담당 선택 → ② 양식 복사 → ③ 새 대화방 첫 메시지에 붙여넣기 → ④ 새 대화 주소를 기존 역할에 갱신</small>
@@ -297,7 +356,7 @@ footer{display:none}
  </div>
  <small id="handoffStatus">ChatGPT 새 대화방에 자동 입력되는 기능은 아닙니다. 첫 메시지로 직접 붙여넣어야 연속성이 확보됩니다.</small>
 </section>
-<button id="migrateChatLinks" type="button">🔄 원본방 이사 · 주소 변경</button>
+<button id="migrateChatLinks" type="button">대화방 연결 설정</button>
 <div id="originalChatPanel" hidden>
 <label id="originalChatLabel" for="originalChatUrl">원본 ChatGPT 대화방 주소</label>
 <input id="originalChatUrl" type="url" inputmode="url" autocomplete="url" placeholder="https://chatgpt.com/c/…">
@@ -309,8 +368,6 @@ footer{display:none}
 <div class="actions"><button id="originalChatSave" type="button">현재방 주소 저장</button><button id="previousOriginalChat" type="button" class="secondary" hidden>이전방 열기</button><button id="originalChatCancel" type="button" class="secondary">닫기</button></div>
 <small id="originalChatNotice">/share/ 읽기 전용 주소가 아닌, 실제 원본 대화방의 주소를 등록하세요. 입장키 없이 등록 가능합니다. 등록 뒤 원본 채팅방에서 직접 대화합니다.</small>
 </div>
-<div class="roles" aria-label="참여 역할"><div class="role"><div class="mark">⚓</div><b>선장</b><small>지시 및 결정</small></div><div class="role"><div class="mark">🧭</div><b>항해사</b><small>분석 의견</small></div><div class="role"><div class="mark">🛡️</div><b>통제관</b><small>검토 및 검증</small></div></div>
-<section class="notice">⚓ <b>원본 대화 바로 연결:</b> 위 버튼은 공동회의 입장키 없이 기존 ChatGPT 대화를 직접 엽니다. <b>아래 공동회의 채팅은 별도 AI API 시험방</b>이며 원본 대화에 자동 전송되지 않습니다.</section>
 <section id="loginArea"><h2>공동회의방 입장</h2><p class="muted">승인된 선장만 이용할 수 있습니다. 입장키를 한 번 확인한 뒤 같은 앱에서는 자동으로 입장할 수 있습니다.</p><form id="loginForm"><label for="secret">전용 입장키</label><input id="secret" type="password" autocomplete="off" spellcheck="false" inputmode="text" placeholder="입장키를 붙여넣으세요" required><label id="rememberLabel" for="rememberDevice"><input type="checkbox" id="rememberDevice" checked> 이 기기에서 다음부터 자동 입장</label><div class="actions"><small id="serverState">서버 상태 확인 중…</small><button type="submit" id="loginButton">입장</button></div></form><div id="loginError" role="alert" class="status"></div></section>
 <section id="chatArea"><details id="continuityPanel" aria-label="원본 업무 연속성"><summary>원본 업무 연속성 점검 <span id="continuityFlag">미연결 · 자료 보기</span></summary><div id="continuityContent"><div class="actions"><h2>원본 업무 연속성 점검</h2><button id="continuityRefresh" type="button" class="secondary">근거 다시 확인</button></div><p id="continuitySummary" class="notice">원본 세션 연결 상태를 확인 중입니다.</p><div id="continuitySources" class="muted"></div></div></details><details id="reportsPanel" aria-label="V3 V7 원본 자료 읽기전용 조회">
  <summary>📑 V3·V7 보고서·자료 확인 <span id="reportsCount">원본 보존 · 조회</span></summary>
@@ -345,6 +402,44 @@ footer{display:none}
 var BASE='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/crew-meeting';
 var token='';var timer=null;var sending=false;var lastFingerprint='';
 var $=function(id){return document.getElementById(id);};
+
+/* Home rearrangement: moves existing nodes, preserving every ID and listener. */
+(function arrangeHome(){
+ var tools=$('homeMoreTools'),dock=$('homeTrialDock'),workspace=$('homeWorkspaceItems');
+ function move(id,to){var el=$(id);if(!el||!to)throw Error('HOME_MODULE_MISSING_'+id);to.appendChild(el);}
+ move('threeRoomLivePanel',workspace);
+ move('reportsPanel',workspace);
+ move('loginArea',workspace);
+ ['relayOpen','relayPanel','installedAppBar','handoffOpen','handoffPanel',
+  'migrateChatLinks','originalChatPanel'].forEach(function(id){move(id,tools);});
+ move('chatArea',dock);
+})();
+var HOME_SELECTED='home';
+function homeView(which){
+ if(!['live','reports','more'].includes(which))which='home';
+ HOME_SELECTED=which;
+ var active=which==='live'||which==='reports';
+ $('homeOverview').hidden=which!=='home';
+ $('homeWorkspace').hidden=!active;
+ $('homeMorePanel').hidden=which!=='more';
+ $('homeMoreBtn').setAttribute('aria-expanded',String(which==='more'));
+ $('homeLiveBtn').setAttribute('aria-pressed',String(which==='live'));
+ $('homeReportBtn').setAttribute('aria-pressed',String(which==='reports'));
+ var live=$('threeRoomLivePanel'),reports=$('reportsPanel');
+ live.hidden=which!=='live';reports.hidden=which!=='reports';
+ live.open=which==='live';reports.open=which==='reports';
+ $('homeWorkspaceTitle').textContent=which==='live'?'실시간 업무 공유':'보고서 · 자료';
+ $('loginArea').hidden=!active||!!token;
+ if(which==='live'&&token)threeRoomRefresh();
+ if(which==='reports'&&token)refreshV7Reports();
+ if(which==='more')$('homeMorePanel').scrollTop=0;
+}
+$('homeLiveBtn').addEventListener('click',function(){homeView('live');});
+$('homeReportBtn').addEventListener('click',function(){homeView('reports');});
+$('homeMoreBtn').addEventListener('click',function(){homeView(HOME_SELECTED==='more'?'home':'more');});
+$('homeBackBtn').addEventListener('click',function(){homeView('home');});
+$('homeMoreBackBtn').addEventListener('click',function(){homeView('home');});
+
 function setAppHeight(){
  try{
    var h=window.visualViewport?window.visualViewport.height:window.innerHeight;
@@ -1063,7 +1158,10 @@ $('fileForm').addEventListener('submit',async function(event){
 });
 
 function enter(){
- $('loginArea').style.display='none';$('chatArea').style.display='flex';$('disconnectBtn').style.display='inline-block';$('draft').focus();
+ $('loginArea').style.display='none';$('loginArea').hidden=true;
+ $('chatArea').style.display='flex';$('disconnectBtn').style.display='inline-block';
+ if(HOME_SELECTED==='live')threeRoomRefresh();
+ if(HOME_SELECTED==='reports')refreshV7Reports();
  if(timer)clearInterval(timer);timer=setInterval(refresh,4000);refresh();showContinuity();refreshFiles();refreshOriginalLinks();
 }
 var PERSISTENT_AUTH_KEY='crew_meeting_persistent_auth_v1';
@@ -1081,7 +1179,7 @@ function saveConfirmedEntry(){
 function disconnect(){
  threeRoomStop();
  if(timer)clearInterval(timer);timer=null;token='';clearRememberedEntry();lastFingerprint='';
- $('loginArea').style.display='block';$('chatArea').style.display='none';$('disconnectBtn').style.display='none';$('secret').value='';$('fileList').replaceChildren();$('fileCount').textContent='0개 · 보기';
+ $('loginArea').style.display='block';$('loginArea').hidden=false; $('chatArea').style.display='none';$('disconnectBtn').style.display='none';$('secret').value='';$('fileList').replaceChildren();$('fileCount').textContent='0개 · 보기';
 }
 $('loginForm').addEventListener('submit',async function(event){
  event.preventDefault();status('loginError','확인 중입니다…');var key=$('secret').value.trim().toLowerCase();
