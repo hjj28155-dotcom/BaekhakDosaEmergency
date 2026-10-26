@@ -78,4 +78,23 @@ assert.deepEqual(Array.from(combined.rank.slice(0,6),x=>Number(x.n)),[1,2,3,4,5,
  'current raw has first-six candidate priority');
 assert.equal(modals.length,0,'successful co-analysis must not display a false error');
 
+
+// User-supplied current original takes precedence, but the validated DB-1 remains required.
+const launchAnalysis=extract('function runAnalysisFromHome(){','function runAnalysisFromRaw(){');
+const sends=[];
+const roundData={raw:{text:'사용자 제공 현재 회차 원문'}};
+const bctx={
+ window:{V3_RAW_BANK:historyBank,DB1_UPDATE_1247:{status:'PASS'},V3_RAW_BANK_META:{count:1247}},
+ R(){return roundData},cur(){return '1247'},V330_WIN:{},modal(){throw Error('valid DB-1 must not show error')},
+ sendAnalysisToEngine(round,text){sends.push({round,text})},setTimeout(){},console
+};
+vm.createContext(bctx);vm.runInContext(historyHelpers+launchAnalysis,bctx);
+bctx.runAnalysisFromHome();
+assert.equal(sends[0].text,roundData.raw.text,'current real original must be primary');
+assert.equal(vm.runInContext('V4043_ANALYSIS_INPUT.source',bctx),'사용자 저장 원문');
+roundData.raw.text='';
+bctx.runAnalysisFromHome();
+assert.equal(sends[1].text,historyBank['1247'].text,'no current original must use 1247 DB-1');
+assert.equal(vm.runInContext('V4043_ANALYSIS_INPUT.source',bctx),'내장 DB-1 1~1247');
+
 console.log('PASS: DB-1 six-line fallback, strict 1247 check, current auto20 route, historical 20-combo research isolation, locked purchase preservation');
