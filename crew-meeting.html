@@ -270,6 +270,27 @@ footer{display:none}
 }
 /* The same height wins over earlier mobile/short-screen min-height rules. */
 
+
+/* Captain-approved: existing V3/V7 native app launchers stay on HOME.
+ * Remove reconnect buttons, preserve existing per-device Android component mapping. */
+#installedAppBar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;flex:none;margin:0}
+#installedAppBar .installedAppUnit{display:flex;min-width:0;margin:0}
+#installedAppBar .installedAppUnit button,
+#installedAppBar .installedAppUnit button:first-child{
+ flex:1 1 0;width:100%;min-width:0;
+ min-height:59px;height:59px;max-height:59px;
+ padding:7px 8px;border:1px solid #6e99b0;border-radius:12px;
+ background:#224c65;color:#f1e3bd;font-size:.81rem;
+ font-weight:800;line-height:1.25;white-space:normal;overflow-wrap:anywhere;
+ text-align:center;display:flex;align-items:center;justify-content:center;
+}
+@media(max-height:650px){
+ #installedAppBar .installedAppUnit button,
+ #installedAppBar .installedAppUnit button:first-child{
+  min-height:48px;height:48px;max-height:48px;font-size:.75rem;
+ }
+}
+
 </style>
 </head>
 <body>
@@ -287,6 +308,14 @@ footer{display:none}
  <a id="crewUpdateOpen" href="https://drive.google.com/file/d/1Ddg-fGo2q3JfowTjRTNUxmXPQ46CkUZL/view?usp=drivesdk" aria-label="구글드라이브 공동회의 최신 APK 업데이트">⬇️<span>업데이트</span></a>
  <button type="button" id="homeMoreBtn" aria-controls="homeMorePanel" aria-expanded="false">☰<span>더보기</span></button>
 </nav>
+<div id="installedAppBar" aria-label="선장폰에 이미 설치된 독립 V3 V7 앱 실행">
+ <div class="installedAppUnit">
+  <button type="button" id="openInstalledV3">📲 V3 항해사앱 실행</button>
+ </div>
+ <div class="installedAppUnit">
+  <button type="button" id="openInstalledV7">📲 V7 중앙통제실 실행</button>
+ </div>
+</div>
 <div id="homeOverview">
  <div class="homeShip">⚓</div>
  <strong>함께 보고, 바로 소통하는 중앙회의실</strong>
@@ -346,16 +375,6 @@ footer{display:none}
   <textarea id="relayCopyPreview" readonly rows="4" hidden aria-label="원본방에 전달할 텍스트 미리보기"></textarea>
   <div id="relayStatus" role="status" aria-live="polite">기존 ChatGPT 원본방의 답변은 자동으로 수집되지 않습니다.</div>
 </section>
-<div id="installedAppBar" aria-label="선장폰에 이미 설치된 독립 V3 V7 앱 실행">
- <div class="installedAppUnit">
-  <button type="button" id="openInstalledV3">📲 V3 항해사앱 실행</button>
-  <button type="button" class="secondary" id="changeInstalledV3">연결 변경</button>
- </div>
- <div class="installedAppUnit">
-  <button type="button" id="openInstalledV7">📲 V7 중앙통제실 실행</button>
-  <button type="button" class="secondary" id="changeInstalledV7">연결 변경</button>
- </div>
-</div>
 <button id="handoffOpen" type="button">대화방 인계</button>
 <section id="handoffPanel" hidden aria-label="원본 새 대화방 첫머리 인계양식">
  <h2>⚓ 새 ChatGPT 방 첫머리 인계</h2>
@@ -427,7 +446,7 @@ var $=function(id){return document.getElementById(id);};
  move('threeRoomLivePanel',workspace);
  move('reportsPanel',workspace);
  move('loginArea',workspace);
- ['relayOpen','relayPanel','installedAppBar','handoffOpen','handoffPanel',
+ ['relayOpen','relayPanel','handoffOpen','handoffPanel',
   'migrateChatLinks','originalChatPanel'].forEach(function(id){move(id,tools);});
  move('chatArea',dock);
 })();
@@ -491,8 +510,8 @@ function requestInstalledLaunch(role,selectAgain){
 }
 $('openInstalledV3').addEventListener('click',function(){requestInstalledLaunch('v3',false);});
 $('openInstalledV7').addEventListener('click',function(){requestInstalledLaunch('v7',false);});
-$('changeInstalledV3').addEventListener('click',function(){requestInstalledLaunch('v3',true);});
-$('changeInstalledV7').addEventListener('click',function(){requestInstalledLaunch('v7',true);});
+
+
 
 var ORIGINAL_CHAT_KEY='crew_meeting_central_linkofficer_original_chat_url_v1';
 var ORIGINAL_ROLE_PREFIX='crew_meeting_direct_original_';
