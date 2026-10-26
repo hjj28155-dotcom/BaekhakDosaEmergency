@@ -513,15 +513,25 @@ main:not(.roomMode) > header button{min-height:33px!important;padding:3px 9px!im
  #centralRoundPanel small{-webkit-line-clamp:1!important}
 }
 
+
+/* Captain + 3 original ChatGPT rooms. Four equal buttons, no height inflation. */
+#originalChatBar{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:4px!important;padding:2px 0!important}
+#originalChatBar > button{
+ height:46px!important;min-height:46px!important;max-height:46px!important;
+ padding:3px 1px!important;font-size:.69rem!important;line-height:1.12!important;
+ box-sizing:border-box!important;
+}
+@media(max-width:365px){#originalChatBar > button{font-size:.60rem!important}}
 </style>
 </head>
 <body>
 <main>
 <header><div><h1>⚓ 항행의자유 중앙통제실</h1><small>선장의 공동 업무 공간</small></div><button id="disconnectBtn" class="secondary" type="button">퇴장</button></header>
-<div id="originalChatBar" role="navigation" aria-label="담당자 대화방 바로가기">
+<div id="originalChatBar" role="navigation" aria-label="선장·항해사·통제관·중앙연결관 원본 ChatGPT 대화방 바로가기">
+<button type="button" id="originalCaptain">⚓ 선장<br>원본방</button>
 <button type="button" id="originalNavigator">🧭 항해사<br>V3 전담</button>
 <button type="button" id="originalController">🛡️ 통제관<br>V7 전담</button>
-<button type="button" id="originalLinkofficer">🔗 중앙연락관<br>배포판 전담</button>
+<button type="button" id="originalLinkofficer">🔗 중앙연결관<br>원본방</button>
 </div>
 
 <nav id="homeQuickActions" aria-label="홈 주요 기능">
@@ -636,7 +646,8 @@ main:not(.roomMode) > header button{min-height:33px!important;padding:3px 9px!im
 <div id="originalChatPanel" hidden>
 <label id="originalChatLabel" for="originalChatUrl">원본 ChatGPT 대화방 주소</label>
 <input id="originalChatUrl" type="url" inputmode="url" autocomplete="url" placeholder="https://chatgpt.com/c/…">
-<div id="originalRolePicker" class="actions" aria-label="이사할 담당 원본방 선택">
+<div id="originalRolePicker" class="actions" aria-label="선장과 세 담당자 원본방 선택">
+<button type="button" data-original-role="captain" class="secondary">⚓ 선장</button>
 <button type="button" data-original-role="navigator" class="secondary">🧭 항해사</button>
 <button type="button" data-original-role="controller" class="secondary">🛡️ 통제관</button>
 <button type="button" data-original-role="linkofficer" class="secondary">🔗 중앙연결관</button>
@@ -808,8 +819,8 @@ var ORIGINAL_CHAT_KEY='crew_meeting_central_linkofficer_original_chat_url_v1';
 var ORIGINAL_ROLE_PREFIX='crew_meeting_direct_original_';
 var ORIGINAL_HISTORY_PREFIX='crew_meeting_original_history_v1_';
 var originalLinks={},editingRole=null;
-var origNames={navigator:'🧭 항해사',controller:'🛡️ 통제관',linkofficer:'🔗 중앙연결관'};
-var origButtons={navigator:'originalNavigator',controller:'originalController',linkofficer:'originalLinkofficer'};
+var origNames={captain:'⚓ 선장',navigator:'🧭 항해사',controller:'🛡️ 통제관',linkofficer:'🔗 중앙연결관'};
+var origButtons={captain:'originalCaptain',navigator:'originalNavigator',controller:'originalController',linkofficer:'originalLinkofficer'};
 function validOriginalUrl(input){
  var u=new URL(String(input||'').trim()),p=u.pathname.split('/').filter(Boolean),uid=/^[0-9a-f-]{36}$/i;
  var ok=(p.length===2&&p[0]==='c'&&uid.test(p[1]))||(p.length===4&&p[0]==='g'&&/^g-[a-z0-9-]+$/i.test(p[1])&&p[2]==='c'&&uid.test(p[3]));
