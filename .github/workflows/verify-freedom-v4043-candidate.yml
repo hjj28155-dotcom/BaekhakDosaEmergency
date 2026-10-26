@@ -3,10 +3,12 @@ on:
   push:
     branches:
       - fix/freedom-v4043-repeat-approval-round-combos-20261027
+      - fix/freedom-v4043-reference-pack-20261027
     paths:
       - 'build405/FREEDOM_V402_BUILD_THIS/app/**'
       - '.github/workflows/verify-freedom-v4043-candidate.yml'
       - '.github/scripts/verify_freedom_v4043.cjs'
+      - '.github/scripts/verify_freedom_v4043_references.cjs'
       - '.github/scripts/validate_freedom_r14.cjs'
   workflow_dispatch:
 permissions:
@@ -43,6 +45,10 @@ jobs:
           }
           console.log('engine asset bytes',Buffer.byteLength(s,'utf8'));
           NODE
+      - name: Validate embedded original reference materials and active dream bridge
+        run: |
+          set -euo pipefail
+          node .github/scripts/verify_freedom_v4043_references.cjs
       - name: Restore original Freedom signer
         uses: actions/cache/restore@v4
         with:
@@ -70,6 +76,9 @@ jobs:
           unzip -l "$APK" | grep -q 'assets/freedom_onboarding_r14.js'
           unzip -l "$APK" | grep -q 'assets/raw_bank.js'
           unzip -l "$APK" | grep -q 'assets/db1_v1247_patch.js'
+          unzip -l "$APK" | grep -q 'assets/freedom_reference_v4043.js'
+          unzip -l "$APK" | grep -q 'assets/reference_sources/백학.txt'
+          unzip -l "$APK" | grep -q 'assets/reference_sources_manifest_v4043.json'
           mkdir -p artifacts
           cp "$APK" artifacts/HanghaeFreedom_V4.0.43_candidate.apk
           (cd artifacts && sha256sum HanghaeFreedom_V4.0.43_candidate.apk > sha256.txt)

@@ -856,7 +856,7 @@ body:has(#modal[style*="display:block"]) .simpleHot{
   </div>
 </div>
 <div id="modal" class="modal"><div class="card"><button class="b close" onclick="closeM()">닫기</button><h2 id="mt"></h2><div id="mc"></div></div></div>
-<script src="raw_bank.js"></script><script src="db1_v1247_patch.js"></script>
+<script src="raw_bank.js"></script><script src="db1_v1247_patch.js"></script><script src="freedom_reference_v4043.js"></script>
 <script>
 const APP_BASE_VERSION='SHIPMATE_V3_FREEDOM_INTEGRATED_20260925'; const SHIPMATE_V3_UPDATE=true; const K='shipmate_v3_data';
 const GUIDE_VIDEO_URL_BASE='install_guide_final.mp4';
@@ -1949,6 +1949,35 @@ function v4043AcceptEngineResult(m){
  db1Evidence:{source:session.source,historySearched:session.historyCount,
  historyEngineAnalysed:historical.map(x=>x.task.round),currentWeight:historical.length?0.8:1,historyWeight:historical.length?0.2:0,
  comparedWithoutWinningNumbers:true}});
+ // The verified June 2026 dream index is the ONLY reference with a direct
+ // number-to-word mapping; original master/manual are preserved sources but
+ // not falsely promoted to unverified numeric rules. Past result-after
+ // success cases NEVER enter current-number scoring.
+ const referencePack=(typeof window!=='undefined'&&window.FREEDOM_REF_V4043)||null;
+ if(referencePack&&typeof referencePack.scoreRaw==='function'){
+  const refEvidence=referencePack.scoreRaw(primary.task.raw);
+  reply.db1Evidence.referenceEvidence={
+   status:refEvidence.status,mode:'RESEARCH_ONLY',
+   dreamLexiconEntries:referencePack.lexiconEntries,
+   dreamMatches:refEvidence.matches||[],
+   winningNumbersUsed:false,
+   master:'PRESERVED_NOT_NUMBER_SCORED',
+   officialManual:'UNAPPROVED_CANDIDATE_AUDIT_ONLY',
+   successCases:'POST_RESULT_EXCLUDED',
+   sourceIntegrity:referencePack.manifest.version
+  };
+  if(refEvidence.status==='OK'&&Object.keys(refEvidence.scores).length){
+   // Keep the original six current-source leaders. Within the existing
+   // engine candidate tail, allow grounded 1~45 dictionary hits to reorder
+   // the original candidate set; never invent candidates or use draw results.
+   const head=reply.rank.slice(0,6),tail=reply.rank.slice(6).sort(
+    (x,y)=>Number(refEvidence.scores[y.n]||0)-Number(refEvidence.scores[x.n]||0)
+   );
+   reply.rank=head.concat(tail);
+  }
+ }else{
+  reply.db1Evidence.referenceEvidence={status:'REFERENCE_SCRIPT_UNAVAILABLE',mode:'RESEARCH_ONLY',winningNumbersUsed:false};
+ }
  handleEngineResult(reply);
 }
 function v4043BeginAnalysis(round,raw){
