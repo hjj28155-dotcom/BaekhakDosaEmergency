@@ -9,8 +9,8 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: crew-meeting-pilot-apk
-  cancel-in-progress: true
+  group: crew-meeting-pilot-apk-${{ github.sha }}
+  cancel-in-progress: false
 jobs:
   build:
     runs-on: ubuntu-latest
