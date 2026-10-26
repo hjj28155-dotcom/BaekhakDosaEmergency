@@ -1,0 +1,57 @@
+name: Verify isolated Freedom V4.0.43 candidate
+on:
+  push:
+    branches:
+      - fix/freedom-v4043-repeat-approval-round-combos-20261027
+    paths:
+      - 'build405/FREEDOM_V402_BUILD_THIS/app/**'
+      - '.github/workflows/verify-freedom-v4043-candidate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Restore original Freedom signer
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: freedom-distribution-existing-signing-v1
+          fail-on-cache-miss: true
+      - name: Build signed candidate
+        working-directory: build405/FREEDOM_V402_BUILD_THIS
+        run: gradle :app:assembleDebug --no-daemon
+      - name: Verify same package and signer
+        run: |
+          set -euo pipefail
+          APK=build405/FREEDOM_V402_BUILD_THIS/app/build/outputs/apk/debug/app-debug.apk
+          test -s "$APK"
+          AAPT=$(find "$ANDROID_HOME/build-tools" -name aapt -type f | sort -V | tail -1)
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort -V | tail -1)
+          "$AAPT" dump badging "$APK" | tee /tmp/badging.txt
+          grep -q "package: name='com.navigator.freedom.v3final' versionCode='40043'" /tmp/badging.txt
+          "$APKSIGNER" verify --print-certs "$APK" | tee /tmp/signer.txt
+          grep -q 'certificate SHA-256 digest: bf281903f422fe925a23a7e72e82d690eaef899236e6d10365143ff32d9beb00' /tmp/signer.txt
+          unzip -l "$APK" | grep -q 'assets/index.html'
+          unzip -l "$APK" | grep -q 'assets/freedom_onboarding_r14.js'
+          unzip -l "$APK" | grep -q 'assets/raw_bank.js'
+          unzip -l "$APK" | grep -q 'assets/db1_v1247_patch.js'
+          mkdir -p artifacts
+          cp "$APK" artifacts/HanghaeFreedom_V4.0.43_candidate.apk
+          (cd artifacts && sha256sum HanghaeFreedom_V4.0.43_candidate.apk > sha256.txt)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HANGHAE-FREEDOM-V4.0.43-CANDIDATE
+          path: artifacts/
+          if-no-files-found: error
+          retention-days: 30

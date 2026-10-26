@@ -63,7 +63,7 @@ function showVideo(type){
  const g=panel();
  const videoSrc=pre?INTRO_INSTALL:INTRO_GUIDE;
  const heading=pre?'설치동영상':'승인완료 · 안내동영상';
- const message=pre?'설치동영상이 끝나면 승인요청 화면으로 이동합니다.':'안내동영상이 끝나면 홈화면으로 자동 이동합니다.';
+ const message=pre?'최초 미승인 사용자만 승인요청 화면으로 이동합니다.':'안내동영상이 끝나면 홈화면으로 자동 이동합니다.';
  g.innerHTML='<div style="position:absolute;inset:0;display:flex;flex-direction:column;background:linear-gradient(180deg,#07233e,#0c5675 48%,#02192f)"><div style="padding:12px;text-align:center;color:#ffe49e;font-size:17px;font-weight:900">'+heading+'</div><video id="freedomR14Video" controls playsinline webkit-playsinline preload="metadata" style="display:block;flex:1;min-height:0;width:100%;object-fit:contain;background:#000"></video><button id="freedomR14Play" type="button" style="margin:10px;padding:14px;border:1px solid #d9bc65;border-radius:12px;background:#75551b;color:#fff;font-weight:900">▶ 동영상 재생</button><div id="freedomR14Notice" style="text-align:center;padding:0 12px 14px;color:#d1e5f4;font-size:13px">'+message+'</div></div>';
  const v=g.querySelector('#freedomR14Video');
  const messageBox=g.querySelector('#freedomR14Notice');
@@ -147,13 +147,8 @@ window.showFinalScroll=function(){if(stage==='init')boot();};
 window.onSpecialApprovalState=function(payload){
  let q={};
  try{q=typeof payload==='string'?JSON.parse(payload||'{}'):(payload||{})}catch(e){}
- if(isApproved(q)||isApproved(approvalState())){
-  // 신규 설치는 승인확인 버튼을 거친 후 영상으로 진행한다.
-  if(stage===APPROVAL&&!approvalCheckRequested){
-   const msg=document.getElementById('freedomR14Status');
-   if(msg)msg.textContent='승인이 완료됐습니다. 승인 확인 버튼을 눌러주세요.';
-   return;
-  }
+ if((isApproved(q)&&q.round_policy_free!==true)||isApproved(approvalState())){
+  // 서버 또는 보존된 기기 승인 완료가 확인되면 추가 승인요청·수동 확인 없이 진행한다.
   approvedOnce=true;
   try{SPECIAL_APPROVED=true;D.specialApprovalUnlocked=true;save()}catch(e){}
   if(marked(DONE))goHome();else showVideo(GUIDE);

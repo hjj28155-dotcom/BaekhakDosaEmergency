@@ -1317,11 +1317,11 @@ function mergePage(){
 }
 function saveMergeAuto(){R().merge={cross:document.getElementById('mergeCross')?.value||'',final:document.getElementById('mergeFinal')?.value||'',updated:new Date().toISOString()};save()}
 function dbPage(){
- let bankKeys=Object.keys(window.V3_RAW_BANK||{}).filter(k=>Number(k)>=VISIBLE_ROUND_MIN&&Number(k)<=VISIBLE_ROUND_MAX),savedKeys=Object.keys(D.rounds||{}).filter(k=>Number(k)>=VISIBLE_ROUND_MIN&&Number(k)<=VISIBLE_ROUND_MAX);let all=[...new Set([...bankKeys,...savedKeys])].sort((a,b)=>Number(b)-Number(a));
+ let bankKeys=Object.keys(window.V3_RAW_BANK||{}).filter(k=>V330_RECENT.includes(Number(k))),savedKeys=Object.keys(D.rounds||{}).filter(k=>V330_RECENT.includes(Number(k)));let all=[...new Set([...bankKeys,...savedKeys])].sort((a,b)=>Number(b)-Number(a));
  let rows=all.slice(0,40).map(r=>{let x=D.rounds[r]||{},raw=rawHasData(x.raw,r),buy=buyHasData(x.buy),merge=mergeHasData(x.merge),score=scoreHasData(x.score);let btxt=x.buy?.locked?'잠금':(buy?'있음':'없음');return `<tr><td>${esc(r)}</td><td>${raw?'있음':'없음'}</td><td>${btxt}</td><td>${merge?'있음':'없음'}</td><td>${score?'있음':'없음'}</td></tr>`}).join('');
  let savedCount=savedKeys.filter(r=>{let x=D.rounds[r]||{};return userRawHasData(x.raw)||buyHasData(x.buy)||mergeHasData(x.merge)||scoreHasData(x.score)}).length;
  let lockedCount=savedKeys.filter(r=>!!D.rounds[r]?.buy?.locked).length;let scoreCount=savedKeys.filter(r=>scoreHasData(D.rounds[r]?.score)).length;
- modal('누적 DB · 회차별 데이터',`<div class="grid3"><div class="stat"><strong>${rawBankCount()}</strong><span>내장 원문</span></div><div class="stat"><strong>${savedCount}</strong><span>사용자 저장 회차</span></div><div class="stat"><strong>${lockedCount}</strong><span>공식 잠금</span></div><div class="stat"><strong>${scoreCount}</strong><span>성적 기록</span></div></div><div class="panel"><table class="table"><thead><tr><th>회차</th><th>원문</th><th>5조합</th><th>통합</th><th>성적</th></tr></thead><tbody>${rows}</tbody></table><p class="small">승객 화면에는 현재회차 포함 최근 5회(1240~1244)만 표시합니다. 내부 원본 데이터는 삭제하지 않습니다.</p></div>`)
+ modal('누적 DB · 회차별 데이터',`<div class="grid3"><div class="stat"><strong>${rawBankCount()}</strong><span>내장 원문</span></div><div class="stat"><strong>${savedCount}</strong><span>사용자 저장 회차</span></div><div class="stat"><strong>${lockedCount}</strong><span>공식 잠금</span></div><div class="stat"><strong>${scoreCount}</strong><span>성적 기록</span></div></div><div class="panel"><table class="table"><thead><tr><th>회차</th><th>원문</th><th>5조합</th><th>통합</th><th>성적</th></tr></thead><tbody>${rows}</tbody></table><p class="small">일반 배포판에서는 최근 5회(1243~1247) 기록만 표시합니다. 내부 원본 데이터는 삭제하지 않습니다.</p></div>`)
 }
 function approvalPage(){let log=D.approvalLog||[],c=approvalCounts();let rows=log.slice().reverse().slice(0,40).map(x=>`<tr><td>${esc(x.time?.slice(0,16).replace('T',' ')||'')}</td><td>${esc(x.name||'')}</td><td>${esc(x.status||'')}</td><td>${esc(x.note||'')}</td></tr>`).join('');modal('배포 승인관리',`<div class="panel goldline"><h3>✓ 업데이트 확인</h3><div class="small">업데이트 확인은 <b>이름 · 앱 버전 · 업데이트 날짜/시간</b>만 저장합니다. 전화번호·연락처·기기번호·위치는 저장하지 않습니다.</div><button class="b green" style="width:100%;margin-top:10px" onclick="updateCheckPage()">이름별 업데이트 현황 열기</button></div><div class="grid3"><button class="stat" onclick="showApprovalSubset('승인대기')"><strong>${c.pending}</strong><span>승인 대기</span></button><button class="stat" onclick="showApprovalSubset('승인완료')"><strong>${c.approved}</strong><span>승인 완료</span></button><button class="stat" onclick="showApprovalSubset('이력')"><strong>${c.history}</strong><span>배포 이력</span></button></div><div class="panel"><h3>V3 승인 기록</h3><div class="small">승인 기록은 기존 방식대로 유지합니다.</div><div class="grid2"><div><div class="label">신청자/지인 실명</div><input id="apName" placeholder="실명 입력"></div><div><div class="label">상태</div><select id="apStatus"><option>승인대기</option><option>승인완료</option><option>승인보류</option><option>배포완료</option><option>거절</option></select></div></div><div class="label">승인 메모</div><input id="apNote" placeholder="누구의 지인인지, 승인 사유 등"><div class="row"><button class="b gold" onclick="addApproval()">승인 기록 추가</button></div></div><div class="panel"><table class="table"><thead><tr><th>시간</th><th>실명</th><th>상태</th><th>메모</th></tr></thead><tbody>${rows||'<tr><td colspan="4">승인 기록이 없습니다.</td></tr>'}</tbody></table></div>`)}
 function loadUpdateStats(){let box=document.getElementById('updateOnlineMeta');if(box)box.textContent='서버 집계를 불러오는 중입니다...';try{if(window.AndroidHost&&AndroidHost.requestUpdateStats){AndroidHost.requestUpdateStats();return}}catch(e){}if(box)box.textContent='업데이트 집계 서버에 연결할 수 없습니다.'}
@@ -1707,9 +1707,28 @@ function v330Print(){
  w.document.open();w.document.write(content);w.document.close();
  setTimeout(()=>{try{w.print()}catch(e){}},250);
 }
+
+/* V4.0.43: display only actual per-round saved combinations, never reconstruct old tickets. */
+function v4043SavedFinal5(){
+ const buy=(R().buy||{}), values=Array.isArray(buy.combos)?buy.combos.slice(0,5):[];
+ return values.map(v=>{
+  const nums=String(v||'').split(/[^0-9]+/).filter(Boolean).map(Number);
+  return nums.length===6&&new Set(nums).size===6&&nums.every(n=>Number.isInteger(n)&&n>=1&&n<=45)?nums:[];
+ }).filter(v=>v.length===6);
+}
+function v4043DisplaySavedFive(round,mode){
+ const games=v4043SavedFinal5();
+ if(!games.length)return false;
+ const result=V330_WIN[round],w=result?new Set(result.nums):null;
+ const rows=games.map((g,i)=>'<div class="r5row purchase"><div class="r5no">'+(i+1)+'</div><div class="r5balls">'+g.map(v=>'<span class="r5ball '+(w&&w.has(v)?'hit':'')+'">'+v+'</span>').join('')+'</div></div>').join('');
+ const label=result?' · 당첨번호와 대조':' · 저장된 실제 구매번호';
+ modal('제'+round+'회 · 저장된 최종 조합', '<div class="analysisCompact v330print"><div class="panel goldline"><b>기기에 실제 보존된 최종 '+games.length+'조합'+label+'</b><p class="small">자동분석 20조합 원본이 없는 회차입니다. 과거 당첨결과로 조합을 새로 생성하지 않습니다.</p></div><div class="r5grid"><section class="r5group">'+rows+'</section></div><div class="r5actions"><button class="b" onclick="rawPage()">회차선택</button><button class="b" onclick="closeM()">닫기</button></div></div>');
+ return true;
+}
+
 function v330ResultPage(round){
  const w=V330_WIN[round],a=R().analysis||{},games=(a.auto20||[]).slice(0,20);
- if(games.length!==20){modal(`제${round}회 · 채점 자료 확인`,`<div class="panel warn"><strong>해당 회차에서 당첨 전에 저장한 자동분석 20조합 기록을 찾지 못했습니다.</strong><p>발표 후 당첨번호로 과거 조합을 새로 생성하거나 채점하지 않습니다. 원본 기록이 확인된 경우에만 결과를 표시합니다.</p><button class="b" onclick="rawPage()">이전</button></div>`);return}
+ if(games.length!==20){if(v4043DisplaySavedFive(round,'result'))return;modal(`제${round}회 · 채점 자료 확인`,`<div class="panel warn"><strong>해당 회차에서 당첨 전에 저장한 자동분석 20조합 기록을 찾지 못했습니다.</strong><p>발표 후 당첨번호로 과거 조합을 새로 생성하거나 채점하지 않습니다. 원본 기록이 확인된 경우에만 결과를 표시합니다.</p><button class="b" onclick="rawPage()">이전</button></div>`);return}
  const set=new Set(w.nums),scores=games.map(g=>g.filter(n=>set.has(Number(n))).length),best=Math.max(...scores),wins=scores.filter(x=>x>=3).length;
  const banner=best>=3?`<div class="scoreHero success"><strong>🎉 축하합니다!</strong><span>최고 ${best}/6 적중 · 3/6 이상 ${wins}조합</span></div>`:`<div class="scoreHero fail"><strong>이번 회차는 아쉽게 지나갔습니다.</strong><span>제${round}회 최고 ${best}/6 적중 · 다음 분석에 이어갑니다.</span></div>`;
  modal(`제${round}회 · 자동분석 20조합 결과`,`<div class="analysisCompact v330print">${banner}<div class="panel goldline centerTitle"><h3>당첨번호</h3><div class="r5winning">${w.nums.map(n=>`<span class="r5ball hit">${n}</span>`).join('')}</div><div style="font-weight:950;color:#ffe58a;font-size:19px">보너스 ${w.bonus}</div></div><div class="r5grid">${v330GroupsResult(games,w.nums)}</div><div class="r5actions"><button class="b gold" onclick="v330Print()">🖨 인쇄</button><button class="b" onclick="rawPage()">회차선택</button><button class="b" onclick="rawPage()">이전</button></div></div>`);
@@ -1722,10 +1741,10 @@ function v330ResultPage(round){
 }
 function v330PurchasePage(round){
  const a=R().analysis||{},games=(a.auto20||[]).slice(0,20);
- if(games.length!==20){V330_AFTER='purchase';runAnalysisFromHome();return}
+ if(games.length!==20){if(v4043DisplaySavedFive(round,'purchase'))return;if(round===1247){V330_AFTER='purchase';runAnalysisFromHome();return}modal('제'+round+'회 · 조합 원본 없음','<div class="panel warn">이 회차에 저장된 자동분석 20조합 또는 최종 구매 5조합 기록이 없습니다. 과거 번호를 임의 생성하지 않습니다.</div>');return}
  modal(`제${round}회 · 이번주 구매번호`,`<div class="analysisCompact v330print"><div class="scoreHero success"><strong>자동분석 20조합</strong><span>비상용 분석엔진 · 후보우주 기반 · 외부번호 자동추가 없음</span></div><div class="r5grid">${v330GroupsPurchase(games)}</div><div class="r5actions"><button class="b gold" onclick="v330Print()">🖨 인쇄</button><button class="b" onclick="rawPage()">회차선택</button><button class="b" onclick="rawPage()">이전</button></div></div>`);
 }
-function v330OpenRound(n){n=Number(n);if(!V330_RECENT.includes(n))n=1247;if(!setRound(n))return;if(n===1247){let b=rawBank(1247);modal('제1247회 · 백학도사 비법신서 원문',`<div class="panel goldline"><h3>원문 보관 자료 · 공식 당첨결과 아님</h3><div style="white-space:pre-wrap;line-height:1.9;text-align:left">${esc(b&&b.text||'원문 없음')}</div><p class="small">${esc(b&&b.source||'')}</p><button class="b" onclick="rawPage()">이전</button></div>`);return}if(V330_WIN[n])v330ResultPage(n);else v330PurchasePage(n)}
+function v330OpenRound(n){n=Number(n);if(!V330_RECENT.includes(n))n=1247;if(!setRound(n))return;if(n===1247){const a=R().analysis||{};if(Array.isArray(a.auto20)&&a.auto20.length===20){v330PurchasePage(n);return}if(v4043DisplaySavedFive(n,'purchase'))return;let b=rawBank(n);modal('제1247회 · 원문과 조합 상태',`<div class="panel goldline"><h3>원문 보관 자료 · 공식 당첨결과 아님</h3><div class="small status">이 기기에 저장된 제1247회 조합은 아직 없습니다. 원문과 엔진이 준비되면 현재 회차만 신규 분석할 수 있습니다.</div><div style="white-space:pre-wrap;line-height:1.9;text-align:left">${esc(b&&b.text||'원문 없음')}</div><p class="small">${esc(b&&b.source||'')}</p><div class="row"><button class="b gold" onclick="V330_AFTER='purchase';runAnalysisFromHome()">제1247회 자동분석 20조합 생성</button><button class="b" onclick="rawPage()">회차선택</button></div></div>`);return}if(V330_WIN[n])v330ResultPage(n);else v330PurchasePage(n)}
 
 function v124Round1243ResultPage(){
   if(!v126Ensure1243Auto20()){
