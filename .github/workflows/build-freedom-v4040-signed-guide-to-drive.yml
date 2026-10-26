@@ -1,0 +1,90 @@
+name: Build Freedom V4.0.40 signed correct onboard guide
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/build-freedom-v4040-signed-guide-to-drive.yml'
+permissions:
+  contents: read
+jobs:
+  build_signed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout isolated Freedom update source branch
+        uses: actions/checkout@v4
+        with:
+          ref: release/freedom-v4040-new-guide-20261026
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Restore matching existing production keystore (never export)
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: freedom-v436-production-debug-signer-20261022
+          fail-on-cache-miss: true
+      - name: Check original identity, source version and correct guide video
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s ~/.android/debug.keystore
+          KEY_SHA=$(keytool -list -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey | grep -m1 SHA256: | sed 's/.*SHA256: //' | tr -d ':' | tr '[:upper:]' '[:lower:]')
+          test "$KEY_SHA" = "bf281903f422fe925a23a7e72e82d690eaef899236e6d10365143ff32d9beb00"
+          SRC='build405/FREEDOM_V402_BUILD_THIS'
+          grep -q 'versionCode 40040' "$SRC/app/build.gradle"
+          grep -q "applicationId 'com.navigator.freedom.v3final'" "$SRC/app/build.gradle"
+          grep -q 'hanghae-freedom-distribution.html' "$SRC/app/src/freedom/assets/freedom_onboarding_r14.js"
+          test -s freedom_onboarding_latest.mp4
+          printf '%s  %s\n' 'a1649302edae23b8dd2fdc2f21a1bc678630519f8918ee29efa39d5994e86fd5' 'freedom_onboarding_latest.mp4' | sha256sum -c -
+          cp freedom_onboarding_latest.mp4 "$SRC/app/src/freedom/assets/freedom_onboarding_postscroll_20260928.mp4"
+          printf '%s  %s\n' 'a1649302edae23b8dd2fdc2f21a1bc678630519f8918ee29efa39d5994e86fd5' "$SRC/app/src/freedom/assets/freedom_onboarding_postscroll_20260928.mp4" | sha256sum -c -
+          echo 'PASS: Same signing identity, v4040, and correct H264/AAC instructional movie staged.'
+      - name: Validate original onboarding and DB regression tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          node .github/scripts/validate_freedom_r14.cjs
+      - name: Build with original signer
+        working-directory: build405/FREEDOM_V402_BUILD_THIS
+        shell: bash
+        run: |
+          set -euo pipefail
+          chmod +x gradlew
+          sed -i '/org.gradle.java.home/d' gradle.properties
+          ./gradlew assembleDebug --no-daemon
+      - name: Validate APK certificate, version, correct ⑥ guide and full DB
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK='build405/FREEDOM_V402_BUILD_THIS/app/build/outputs/apk/debug/HANGHAE_FREEDOM_V4_0_40_FINAL.apk'
+          test -s "$APK"
+          unzip -t "$APK" | tail -1
+          AAPT=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
+          "$AAPT" dump badging "$APK" | tee /tmp/freedom-v4040-badging.txt | head -10
+          grep -q "package: name='com.navigator.freedom.v3final' versionCode='40040'" /tmp/freedom-v4040-badging.txt
+          "$APKSIGNER" verify --print-certs "$APK" | tee /tmp/freedom-v4040-signature.txt
+          grep -q "certificate SHA-256 digest: bf281903f422fe925a23a7e72e82d690eaef899236e6d10365143ff32d9beb00" /tmp/freedom-v4040-signature.txt
+          unzip -p "$APK" assets/freedom_onboarding_postscroll_20260928.mp4 | sha256sum | grep -q '^a1649302edae23b8dd2fdc2f21a1bc678630519f8918ee29efa39d5994e86fd5 '
+          unzip -p "$APK" assets/freedom_onboarding_r14.js | grep -q 'hanghae-freedom-distribution.html'
+          unzip -p "$APK" assets/freedom_onboarding_r14.js | grep -q "else {mark(DONE);goHome()}"
+          unzip -l "$APK" | grep -q 'assets/raw_bank.js'
+          unzip -l "$APK" | grep -q 'assets/db1_v1247_patch.js'
+          unzip -l "$APK" | grep -q 'assets/install_guide_final.mp4'
+          mkdir -p handoff
+          cp "$APK" handoff/HanghaeFreedom_V4.0.40_CORRECT_GUIDE_SIGNED.apk
+          sha256sum handoff/HanghaeFreedom_V4.0.40_CORRECT_GUIDE_SIGNED.apk > handoff/sha256.txt
+          cp /tmp/freedom-v4040-signature.txt handoff/signature.txt
+          cp /tmp/freedom-v4040-badging.txt handoff/badging.txt
+          echo "VERIFIED_SIGNED_APK_SIZE=$(stat -c%s "$APK")"
+      - name: Upload verified APK only as private CI handoff
+        uses: actions/upload-artifact@v4
+        with:
+          name: Freedom_V4_0_40_Correct_Guide_Signed_Verified
+          path: handoff/
+          retention-days: 7
+          if-no-files-found: error
+          compression-level: 0
