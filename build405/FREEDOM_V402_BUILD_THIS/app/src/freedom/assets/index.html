@@ -1575,7 +1575,7 @@ window.addEventListener('message',function(ev){
     }
     return;
   }
-  if(m.type==='V3_ANALYSIS_RESULT')handleEngineResult(m);
+  if(m.type==='V3_ANALYSIS_RESULT'){if(V4043_ANALYSIS_SESSION)v4043AcceptEngineResult(m);else handleEngineResult(m);}
 });
 document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>v126BootEngine(false),180),{once:true});
 function sendAnalysisToEngine(round,raw){
@@ -1593,7 +1593,7 @@ function sendAnalysisToEngine(round,raw){
     return;
   }
   modal('분석 진행 중',`<div class="panel centerTitle"><h3>제${esc(round)}회 자동분석</h3><div class="small">보존된 원문과 비상용 엔진으로 자동구매 20조합을 계산합니다.</div><div style="font-size:32px;margin:18px">⚓</div><b>분석 중...</b></div>`);
-  f.contentWindow.postMessage({type:'V3_ANALYZE',round:Number(round),raw:String(raw||''),source:(V4043_ANALYSIS_INPUT||{}).source||'내장 DB-1',db1Rounds:1247},'*');
+  v4043BeginAnalysis(round,raw);
 }
 
 let V123_AFTER_ANALYSIS='';
@@ -1892,10 +1892,76 @@ function v4043Db1Text(round){
  return raw.split(/\r?\n/).filter(x=>x.trim()).length===6?raw:'';
 }
 let V4043_ANALYSIS_INPUT=null;
+let V4043_ANALYSIS_SESSION=null;
+/* DB-1 co-analysis: primary round text and three pre-draw historical texts use
+   the existing engine. No RESULT-AFTER / winning numbers enter this pipeline. */
+function v4043HistorySelection(round,currentText){
+ const n=Number(round),items=[];
+ const tokenize=t=>new Set((String(t||'').match(/[가-힣]{2,}|[A-Za-z]{2,}/g)||[])
+ .filter(x=>!['첫번째','두번째','세번째','네번째','다섯째','여섯째'].includes(x)));
+ const base=tokenize(currentText);
+ for(let i=1;i<n;i++){
+  const raw=v4043Db1Text(i);
+  if(!raw)continue;
+  const tok=tokenize(raw);
+  let shared=0;for(const word of tok)if(base.has(word))shared++;
+  items.push({round:i,raw,similarity:shared/Math.max(1,base.size+tok.size-shared)});
+ }
+ const selected=[],seen=new Set();
+ const choose=v=>{if(v&&!seen.has(v.round)){selected.push(v);seen.add(v.round)}};
+ choose(items.find(v=>v.round===n-1));
+ choose([...items].sort((a,b)=>b.similarity-a.similarity||b.round-a.round).find(v=>!seen.has(v.round)));
+ choose([...items].sort((a,b)=>Math.abs(a.round-Math.floor(n/2))-Math.abs(b.round-Math.floor(n/2))||a.round-b.round).find(v=>!seen.has(v.round)));
+ return {count:items.length,selected};
+}
+function v4043MergedRanks(current,previous){
+ const scores=new Map(),cr=(current||[]).filter(x=>Number.isInteger(Number(x.n))&&Number(x.n)>=1&&Number(x.n)<=45);
+ const add=(rank,weight)=>{const valid=(rank||[]).filter(x=>Number.isInteger(Number(x.n))&&Number(x.n)>=1&&Number(x.n)<=45);
+  const total=valid.length;valid.forEach((x,i)=>scores.set(Number(x.n),(scores.get(Number(x.n))||0)+weight*(total-i)/Math.max(1,total)));};
+ add(cr,previous.length?0.8:1);
+ previous.forEach(p=>add(p,0.2/previous.length));
+ const candidates=[...new Set(cr.slice(0,6).map(x=>Number(x.n)))];
+ for(const [n] of [...scores].sort((a,b)=>b[1]-a[1]||a[0]-b[0])){if(candidates.length>=10)break;if(!candidates.includes(n))candidates.push(n)}
+ return candidates.map(n=>({n,score:scores.get(n)||0,source:'CURRENT+DB1_PAST'}));
+}
+function v4043SendNextEngineTask(){
+ const session=V4043_ANALYSIS_SESSION;if(!session)return;
+ const task=session.tasks[session.index],f=document.getElementById('engineFrame');
+ if(!task||!f||!f.contentWindow){V4043_ANALYSIS_SESSION=null;modal('DB-1 연결 점검','<div class="panel warn">원문-과거자료 연결에 실패했습니다. 데이터는 변경하지 않았습니다.</div>');return}
+ f.contentWindow.postMessage({type:'V3_ANALYZE',round:task.round,raw:task.raw,source:task.role},'*');
+}
+function v4043AcceptEngineResult(m){
+ const session=V4043_ANALYSIS_SESSION;if(!session)return;
+ const task=session.tasks[session.index];if(!task||Number(m.round)!==task.round)return;
+ if(task.role==='CURRENT'&&(!m.ok||!(m.rank||[]).length)){
+  V4043_ANALYSIS_SESSION=null;handleEngineResult(m);return;
+ }
+ if(m.ok&&Array.isArray(m.rank)&&m.rank.length)session.responses.push({task,reply:m});
+ session.index++;
+ if(session.index<session.tasks.length){setTimeout(v4043SendNextEngineTask,60);return}
+ V4043_ANALYSIS_SESSION=null;
+ const primary=session.responses.find(x=>x.task.role==='CURRENT');
+ if(!primary){modal('DB-1 분석 오류','<div class="panel warn">현재 회차 엔진 결과가 없습니다.</div>');return}
+ const historical=session.responses.filter(x=>x.task.role==='DB1_HISTORY');
+ const merged=v4043MergedRanks(primary.reply.rank,historical.map(x=>x.reply.rank));
+ const reply=Object.assign({},primary.reply,{rank:merged,
+ db1Evidence:{source:session.source,historySearched:session.historyCount,
+ historyEngineAnalysed:historical.map(x=>x.task.round),currentWeight:historical.length?0.8:1,historyWeight:historical.length?0.2:0,
+ comparedWithoutWinningNumbers:true}});
+ handleEngineResult(reply);
+}
+function v4043BeginAnalysis(round,raw){
+ const history=v4043HistorySelection(round,raw);
+ V4043_ANALYSIS_SESSION={index:0,responses:[],historyCount:history.count,
+ source:(V4043_ANALYSIS_INPUT||{}).source||'내장 DB-1',
+ tasks:[{round:Number(round),raw:String(raw),role:'CURRENT'},...history.selected.map(h=>({round:h.round,raw:h.raw,role:'DB1_HISTORY'}))]};
+ v4043SendNextEngineTask();
+}
+
 function runAnalysisFromHome(){
  let r=cur(),saved=R().raw||{},manual=String(saved.text||'').trim(),db1=v4043Db1Text(r);
  let raw=manual||db1;
- if(!raw){
+ if(!db1){
   modal('DB-1 데이터 점검', '<div class="panel warn">수동 원문이 없어도 DB-1에서 6문장을 불러와 분석해야 합니다. 현재 내장 DB-1 검증이 되지 않아 번호를 임의 생성하지 않습니다. 앱의 DB-1 탑재 상태를 확인해 주세요.</div>');
   return;
  }
@@ -1905,10 +1971,10 @@ function runAnalysisFromHome(){
  sendAnalysisToEngine(r,raw);
  setTimeout(()=>{try{
    let now=String(((research?R().analysisResearch:R().analysis)||{}).analyzedAt||'');
-   if(now===before&&Number(cur())===Number(r)){
+   if(now===before&&Number(cur())===Number(r)){V4043_ANALYSIS_SESSION=null;
      modal('분석 엔진 확인',`<div class="panel"><div class="warn">분석 엔진 응답이 아직 없습니다.</div><div class="small">임의 번호는 생성하지 않습니다.</div><div class="row" style="margin-top:10px"><button class="b gold" onclick="runAnalysisFromHome()">다시 분석</button><button class="b" onclick="rawPage()">회차선택</button></div></div>`)
    }
- }catch(e){}},9000)
+ }catch(e){}},30000)
 }
 function runAnalysisFromRaw(){saveRawAuto();runAnalysisFromHome()}
 // STAGE4.48: 홈 핵심버튼 터치 안전장치. Android WebView에서 inline onclick 누락 시에도 동작합니다.
@@ -1938,7 +2004,7 @@ function storeAnalysisResult(m,pool,original,fallback,error){
    return
  }
  let autoGroup={name:'자동구매 20조합',rows:auto20.map((g,i)=>({slot:i+1,game:g}))};
- let a={round:Number(cur()),engine:String(m.engine||'V2_MASTER_ENGINE'),candidates:[...new Set(pool.map(Number))],rank:m.rank||[],groups:[autoGroup],originalGroup:{name:'원문분석 5조합',rows:gamesToRows(original5)},engineGames:original5,auto20,fallback:!!fallback,error:String(error||''),source:(V4043_ANALYSIS_INPUT||{}).source||'내장 DB-1',analyzedAt:new Date().toISOString()};
+ let a={round:Number(cur()),engine:String(m.engine||'V2_MASTER_ENGINE'),candidates:[...new Set(pool.map(Number))],rank:m.rank||[],groups:[autoGroup],originalGroup:{name:'원문분석 5조합',rows:gamesToRows(original5)},engineGames:original5,auto20,fallback:!!fallback,error:String(error||''),source:(V4043_ANALYSIS_INPUT||{}).source||'내장 DB-1',db1Evidence:m.db1Evidence||null,analyzedAt:new Date().toISOString()};
  // Past draw reanalysis is separate RESEARCH data. Never overwrite RESULT-BEFORE buy/locked records.
  if(V330_WIN[Number(cur())]){
    a.researchOnly=true;a.historicalResultExcluded=true;
