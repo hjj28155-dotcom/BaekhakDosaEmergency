@@ -1,3 +1,11 @@
+## 2026-10-26 / 선장 정정 — 중앙연결관 서버 등록 사실 반영
+
+- **선장 명시 정정:** "중앙연결관도 서버에 등록 되어 있습니다." 중앙연결관의 서버 등록은 선장 확인 사실로 접수하며, 이전 작업 보고서의 **'중앙연결관 서버 미등록'이라는 포괄적인 단정은 철회**한다. 기존 중앙연결관 등록을 삭제·초기화·중복 생성하지 않는다.
+- **이번 실측을 정확히 구분:** Supabase `jyqkohpeowkhuaohlezc`의 단일 테이블 `public.crew_meeting_original_links` 조회에는 `navigator`, `controller` 두 원본 ChatGPT URL 행만 존재; `linkofficer` 행은 **이 테이블에서는 아직 보이지 않음**. 이는 선장 진술의 타 서버·타 저장구조·기기 로컬 링크 등록을 반박하는 결과가 아니며, 원본 채팅 URL과 중앙연결관 역할 등록은 별개의 사항이다. `public.crew_continuity_sources`에는 항해사/통제관 원본 참조 정보만 있고, 새 `crew_meeting_bridge_events`는 아직 메시지 0건이다.
+- **다른 레지스트리 점검:** `v5_chatgpt_bridge_*`, `v4_sync_room_registry`, `v6_rooms` 등에서 동일 URL/등록 상태를 확정하지 못했으므로 등록 위치를 임의 추정하지 않는다.
+- **확인된 현실적 과제:** 세 원본방의 서버 등록 여부와 상관없이 ChatGPT 원본 대화 간 실시간 자동 송수신은 별도 미구현/HOLD. 기존 계정·키·서명·보고서/누적DB는 변경하지 않고 세 방 공유 로그 및 원본 세션별 도구 호출을 검증할 것.
+- **문구 통일:** 이후 '중앙연결관 서버 미등록' 금지. 정확히는 '선장 확인상 중앙연결관 서버 등록됨; `crew_meeting_original_links`의 `linkofficer` 원본 URL 행은 확인되지 않음'으로 표시한다.
+
 ### 최종 검증 보완 — 원본 3방 공유판
 - GitHub Pages workflow #40202568587 `completed/success` / main commit `997e1b89005b044c83897346dead2b355c7fa4fa`. 공동회의 원격 HTML 공용 공유판 버튼 배포 성공; 기존 APK 버전 `1.0.6-REPORTS`을 새로 빌드하거나 V3/V7 앱을 변경하지 않음.
 - 새 Edge server 업무 이벤트 경로 코드 단위 모의시험 8개 PASS: 인증 없는 GET 401, PATCH 405, 빈 POST 400, 정상 선장 POST 200, 임의 role navigator 사칭 POST 요청 시 서버가 저장 역할 captain으로 고정, 기록 출처는 `DECLARED_NOT_SESSION_VERIFIED`, 저장/조회 및 자동 원본 ChatGPT 연동 플래그 false. 실제 인증된 HTTP 요청의 종단간 시험은 아직 못했고 휴대폰에서 실제 새 공유판/메시지 표시 검증도 미실시.
