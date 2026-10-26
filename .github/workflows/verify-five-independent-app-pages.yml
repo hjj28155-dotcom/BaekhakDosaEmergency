@@ -43,6 +43,8 @@ jobs:
           assert.match(app,/⑥ 항행의자유 안내동영상/);
           assert.match(app,/⑦ 항행의자유 홈 화면/);
           assert.match(app,/src="\.\/freedom_onboarding_latest.mp4"/);
+          assert.ok(app.includes('id="freedomV4040DriveDownload" href="https://drive.google.com/file/d/1LRl6WS3aIOC0UL17ZT1AK5qau-oxMTK7/view'),'Stage 3 must show verified V4.0.40 Google Drive APK');
+          assert.ok(!app.includes('1-YadPjhG7J8cpA2-xFfi-WxjEVBvgEE5'),'Old V4.0.39 must not be the active download');
           assert.ok(!/href="[^"]+\.apk/.test(app),'Do not link unverified APK or MoveIcon from Freedom');
           assert.ok(!app.includes('moveicon.html'),'No MoveIcon entry embedded');
           assert.match(read('hanghae-v7-controller.html'),/v7-central-control-apk/);
