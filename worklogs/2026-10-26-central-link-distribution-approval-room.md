@@ -49,3 +49,19 @@
 - 기존 APK 재빌드·Drive 파일 변경·승인 DB 기록변경은 수행하지 않음.
 
 **차기 시작:** GitHub Pages 확인 후 실제 선장폰에서 중앙통제실 홈 버튼 → 방 내부 승인화면 입장 확인. 실기기에서 반영되지 않으면 독립 중앙통제실 APK 1.0.7 소스와 동일 서명키를 확보한 뒤 안전 업데이트할 것.
+
+## 최종 업데이트: 공동회의 1.0.8 APK 빌드·고정 Drive 업데이트 성공
+- 선장 지시: 별도 링크가 아닌 중앙통제실 앱의 기존 구글 드라이브 고정 업데이트 주소를 이용한다.
+- Drive의 신규 중앙통제실 개인서명 원본 `captain-central-release.p12` 실제 존재 및 PrivateKeyEntry 열람 검증: 성공. **단, 이 인증서는 `ef85c53d...`로 기존 공동회의 1.0.7 서명 `e24e9573...`와 달라 사용하지 않음.** 비공개키·암호 원문은 소스/보고서에 저장하지 않음.
+- 기존 1.0.7 APK의 ZIP Signing Block v2 서명 인증서를 원본 실물에서 검사: `e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be`.
+- 원본 공동회의 CI 서명 캐시 `crew-meeting-independent-pilot-signing-v1`에서 동일 서명키 복원 검증 후 신규 빌드.
+- GitHub 소스 브랜치: `feature/crew-meeting-standalone-apk-20261025`; 최신 빌드 커밋 `dc990a38bf1b6d8547a4fdc6325f440c21379718`.
+- 변경: `crew-meeting-android/app/src/main/java/kr/hanghae/crewmeeting/MainActivity.java`에서 기존 WebView가 중앙통제실 홈 외부화했던 승인관리방 자식 프레임 주소를 내부 허용하며 홈 캐시쿼리 108로 변경. `app/build.gradle` 버전코드 108 / 버전명 1.0.8-APPROVAL. 서명 identity 공개정보 버전 갱신, 빌드 Workflow 버전 검증 갱신.
+- GitHub Actions 성공: 실행 `40328701402`, artifact `12654180254` (HANGHAE-CREW-MEETING-1.0.8-APK).
+- 파일: `항행의자유_중앙통제실_승인관리방_V1.0.8.apk`, 15,718바이트. package `kr.hanghae.crewmeeting.compact`, code 108. SHA256: `886ad415006031dd83e83a2d864cc3e8000364168a8876d7d4f66d1076ce6244`.
+- APK 로컬 ZIP 무결성, `signing-identity.json` 버전, 실제 APK Signing Block v2 인증서 `e24e9573...`가 기존 1.0.7과 같음: 통과.
+- 새 버전 별도 Drive 보존 링크: `https://drive.google.com/file/d/1j9fpvNwJQz9LwwPV5eLcsZZsF1JIuMUP/view`.
+- **기존 고정 업데이트 Drive ID `1Ddg-fGo2q3JfowTjRTNUxmXPQ46CkUZL`를 동일 파일 ID 유지하면서 신규 APK bytes로 교체 성공.** Google Drive update_file `success=true`, 크기 15,718바이트 확인. 재다운로드한 1.0.8 APK의 SHA256 정확히 일치.
+- 공식 독립 중앙통제실 안내 페이지와 고정 업데이트 안내 페이지의 버전/링크/체크섬도 1.0.8로 교정 (`hanghae-central-control.html`, `crew-meeting-releases/index.html`). 사용자가 실제 파일을 새로 내려받아 '업데이트 설치'하도록 안내.
+- 현재 Drive APK 권한은 파일 소유자 전용. 선장 본인 다운로드 가능; 외부 사용자 공유는 미검증. 실제 선장 휴대전화의 APK 설치·새 승인방 표시/승인관리 기능 테스트는 **미완료**. 기존 승인요청 DB, V3/V7 APK 및 별도 ② 배포판을 수정하지 않았음.
+- 유의: 해당 `captain-central-release.p12`는 이 공동회의 APK의 서명에 쓰지 않았으므로, 이를 공동회의 1.0.8 서명키라고 인계하면 안 됨.
