@@ -2,6 +2,19 @@
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#06243c"><meta name="hanghae-links" content="FIVE-INDEPENDENT-PROJECT-APPS-20261026">
 <title>⚓ 항행의자유 · 다섯 앱 공식 연결</title>
+<script id="legacy-moveicon-to-freedom">
+/* Official v1.0.79 MoveIcon opens index.html?v=40033-r12-installvideo-v18.
+   Keep the general 5-app hub untouched; route ONLY that legacy deep link
+   to the dedicated Freedom installation/update seven-step page. */
+(function(){
+  try {
+    const route=new URLSearchParams(window.location.search).get('v');
+    if(route==='40033-r12-installvideo-v18'){
+      window.location.replace('./hanghae-freedom-distribution.html?from=moveicon-v1079');
+    }
+  } catch(e) {}
+})();
+</script>
 <style>
 *{box-sizing:border-box}body{margin:0;min-height:100vh;padding:18px 12px 40px;background:linear-gradient(180deg,#061b2aeb,#126381ce 57%,#061b2af0),radial-gradient(ellipse at 45% 35%,#4a99ab,#103752 61%,#061323);color:#f5f9fd;font-family:system-ui,"Noto Sans KR",sans-serif}
 main{max-width:820px;margin:0 auto}header{text-align:center;margin:7px 0 18px}h1{font-size:clamp(23px,6vw,32px);color:#ffdfa3;margin:0 0 8px}p{line-height:1.6;color:#dbecf4}
