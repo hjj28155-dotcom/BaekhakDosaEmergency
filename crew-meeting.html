@@ -321,7 +321,7 @@ body{background:linear-gradient(180deg,rgba(2,15,34,.86),rgba(2,26,48,.58) 55%,r
 body{
  background:
   linear-gradient(170deg,rgba(1,11,28,.44),rgba(1,18,37,.42) 42%,rgba(3,16,34,.58)),
-  url('./assets/central-carrier-photo-r12.svg?wallpaper=20261027-r12') center 54% / cover no-repeat fixed!important;
+  url('./assets/central-carrier-photo-r13.svg?wallpaper=20261027-r13') center 54% / cover no-repeat fixed!important;
  background-color:#041b30!important;
 }
 main{position:relative}
@@ -419,7 +419,7 @@ main.roomMode #homeWorkspaceItems > #reportsPanel{min-height:0;max-height:none}
 body{
  background-image:
   linear-gradient(180deg,rgba(1,10,28,.18) 0%,rgba(0,23,48,.07) 35%,rgba(1,16,37,.08) 70%,rgba(0,9,31,.22) 100%),
-  url('./assets/central-carrier-photo-r12.svg?wallpaper=20261027-r12')!important;
+  url('./assets/central-carrier-photo-r13.svg?wallpaper=20261027-r13')!important;
  background-position:center center!important;
  background-size:cover!important;
  background-repeat:no-repeat!important;
@@ -553,10 +553,10 @@ main.roomMode > #homeMaterialsPanel:not([hidden]){display:flex!important;flex:1 
 @media(max-width:360px){#homeSpecialRooms button{font-size:.67rem!important}.materialsGrid button{font-size:.64rem}}
 
 /* 2026-10-27 Captain wallpaper replacement R12: actual photo, not old drawn SVG. */
-html{background-color:#06172f!important;background-image:url('./assets/central-carrier-photo-r12.svg?wallpaper=20261027-r12')!important;background-position:center center!important;background-repeat:no-repeat!important;background-size:cover!important}
+html{background-color:#06172f!important;background-image:url('./assets/central-carrier-photo-r13.svg?wallpaper=20261027-r13')!important;background-position:center center!important;background-repeat:no-repeat!important;background-size:cover!important}
 body{
  background-color:#04172f!important;
- background-image:linear-gradient(180deg,rgba(1,9,24,.09) 0%,rgba(1,13,33,.07) 45%,rgba(1,14,39,.02) 70%,rgba(2,15,37,.05) 100%),url('./assets/central-carrier-photo-r12.svg?wallpaper=20261027-r12')!important;
+ background-image:linear-gradient(180deg,rgba(1,9,24,.09) 0%,rgba(1,13,33,.07) 45%,rgba(1,14,39,.02) 70%,rgba(2,15,37,.05) 100%),url('./assets/central-carrier-photo-r13.svg?wallpaper=20261027-r13')!important;
  background-position:center center,center center!important;
  background-size:cover,cover!important;
  background-repeat:no-repeat,no-repeat!important;
@@ -564,6 +564,12 @@ body{
 }
 main:not(.roomMode){padding-top:2px!important}
 main:not(.roomMode)>header{margin-top:0!important}
+
+
+/* 2026-10-27 R13: photo reframed to fill lower viewport; retain live navigation and stored original links.
+   Android device black sensor/cutout inset is addressed separately in native MainActivity. */
+main:not(.roomMode) {padding-top:0!important}
+html,body{overscroll-behavior:none}
 
 </style>
 </head>
