@@ -838,7 +838,7 @@ $('materialsRound').addEventListener('keydown',function(e){if(e.key==='Enter'){e
 async function loadIntegratedMaterials(){
  if(!token){$('materialsStatus').textContent='선장 인증 후에 원본 조회가 가능합니다.';$('materialsList').replaceChildren();return;}
  var round=String($('materialsRound').value||'').trim();
- if(round&&(!/^\\d{1,4}$/.test(round)||Number(round)<1||Number(round)>1247)){
+ if(round&&(!/^\d{1,4}$/.test(round)||Number(round)<1||Number(round)>1247)){
   $('materialsStatus').textContent='1~1247회차만 조회할 수 있습니다.';return;
  }
  var url='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/crew-three-app-materials?app='+encodeURIComponent(materialApp)+'&stage='+encodeURIComponent(materialStage)+(round?'&round='+round:'');
@@ -868,7 +868,7 @@ async function loadIntegratedMaterials(){
 $('materialsLocalFile').addEventListener('change',async function(){
  var file=this.files&&this.files[0],out=$('materialsLocalPreview');
  if(!file){out.hidden=true;return;}
- if(!/\\.(txt|json)$/i.test(file.name)||file.size>2097152){out.hidden=false;out.textContent='TXT/JSON 2MB 이하 파일만 임시 미리보기 가능합니다.';return;}
+ if(!/\.(txt|json)$/i.test(file.name)||file.size>2097152){out.hidden=false;out.textContent='TXT/JSON 2MB 이하 파일만 임시 미리보기 가능합니다.';return;}
  try{out.textContent=(await file.text()).slice(0,9000);out.hidden=false;}catch(e){out.hidden=false;out.textContent='파일을 읽을 수 없습니다.';}
 });
 $('materialsComparison').addEventListener('click',function(){
