@@ -699,6 +699,29 @@ body{
 #beforeRoomScope{font-size:.68rem!important;color:#f5d9a5!important}
 @media(max-width:365px){#beforeRoomGrid button{font-size:.65rem}}
 
+
+/* Captain V3 four-room dashboard, standalone research candidate v1.0.15. */
+#homeV3RoomsPanel{min-width:0;overflow:auto;padding:8px 4px 18px}
+#homeV3RoomsPanel[hidden]{display:none!important}
+.v3RoomsLead{border:2px solid #edcc85;border-radius:14px;background:linear-gradient(135deg,#0c5679,#09294a);
+ padding:12px 10px;display:flex;flex-direction:column;gap:5px;text-align:center;margin:7px 4px 12px}
+.v3RoomsLead strong{color:#ffe5a9;font-size:1.13rem}
+.v3RoomsLead span{color:#e8f4ff;font-size:.81rem;font-weight:750}
+.v3RoomsLead small{color:#c9ddec;font-size:.67rem;line-height:1.5}
+.v3RoomCards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;padding:0 4px}
+.v3RoomCard{min-width:0;border:1.5px solid #78b4d5;background:linear-gradient(155deg,#0b5078,#051e3b);
+ border-radius:13px;padding:10px 8px;box-shadow:inset 0 1px #ffffff33;display:flex;flex-direction:column;gap:7px}
+.v3RoomCard h3{margin:0;color:#ffe1a2;font-size:.83rem;line-height:1.2}
+.v3RoomCard p{margin:0;font-size:.65rem;line-height:1.4;color:#bad2df;flex:1}
+.v3RoomCard button{min-height:35px;border:1px solid #e6bd7b;border-radius:8px;color:#09243d;font-weight:850;
+ font-size:.71rem;background:linear-gradient(145deg,#ffe7ae,#dbb773);padding:7px 2px}
+.v3RoomsFoot{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 4px}
+.v3RoomsFoot button{min-height:42px;border:1px solid #78accb;border-radius:10px;color:#fff1be;font-weight:800;
+ font-size:.74rem;background:linear-gradient(130deg,#145a80,#0b3459)}
+#homeV3RoomsPanel .materialsNote{margin:6px 4px;color:#b8d9e9}
+#homeV3RoomsPanel button:focus-visible{outline:3px solid #ffdf93;outline-offset:2px}
+@media(max-width:370px){.v3RoomCards{gap:5px}.v3RoomCard{padding:8px 5px}.v3RoomCard h3{font-size:.74rem}.v3RoomCard button{font-size:.65rem}}
+
 </style>
 </head>
 <body>
@@ -732,8 +755,8 @@ body{
    <strong>항해사 V3</strong>
    <small>4개 방 · 원문15 + 자동5</small>
    <div class="deckCardActions">
-    <button type="button" id="openInstalledV3" class="deckAction" aria-label="설치된 항해사 V3 앱 열기">앱 열기</button>
-    <button type="button" class="deckAction deckSecondary" data-open-material="v3" aria-label="V3 원본 자료 관리방 열기">기록 보기</button>
+    <button type="button" id="openV3Rooms" class="deckAction" aria-controls="homeV3RoomsPanel" aria-label="V3 항해사 4개 방 관리 화면 열기">4개 방 관리</button>
+    <button type="button" id="openInstalledV3" class="deckAction deckSecondary" aria-label="기존 설치된 항해사 V3 앱 열기">V3 앱 열기</button>
    </div>
   </div>
   <div class="installedAppUnit appDeckCard" data-app-card="v7">
@@ -781,6 +804,23 @@ body{
  <iframe id="homeApprovalFrame" title="배포용 승인요청 조회·승인·거절·상태확인" loading="lazy" referrerpolicy="no-referrer" data-src="./hanghae-distribution-approval-room.html"></iframe>
  <a class="approvalFallback" href="./hanghae-distribution-approval-room.html" target="_self">승인관리 화면이 보이지 않으면 직접 열기</a>
 </div>
+<!-- V3 is not the install/download page; each room independently routes to its existing result-before source. -->
+<section id="homeV3RoomsPanel" hidden aria-label="항해사 V3 4개 방 관리">
+ <div class="homePaneTop"><strong>🧭 항해사 V3 · 4개 방 관리</strong><button id="homeV3RoomsBack" type="button" class="secondary">홈으로</button></div>
+ <div class="v3RoomsLead">
+  <strong>원문 15조합 + 자동 5조합</strong>
+  <span>네 방 합계 20조합 · 제1회차부터 재분석</span>
+  <small>과거 V3 350회 분석은 별도 보존합니다. 350개의 추첨 전 확정 보고서를 뜻하지 않습니다.</small>
+ </div>
+ <div class="v3RoomCards">
+  <article class="v3RoomCard" data-v3-room-card="v3-1"><h3>🧭 항해사 제1방</h3><p>결과전 원본: 자동연계 확인 전</p><button type="button" data-v3-report="v3-1">제1방 결과전 조회</button></article>
+  <article class="v3RoomCard" data-v3-room-card="v3-2"><h3>🧭 항해사 제2방</h3><p>결과전 원본: 자동연계 확인 전</p><button type="button" data-v3-report="v3-2">제2방 결과전 조회</button></article>
+  <article class="v3RoomCard" data-v3-room-card="v3-3"><h3>🧭 항해사 제3방</h3><p>결과전 원본: 자동연계 확인 전</p><button type="button" data-v3-report="v3-3">제3방 결과전 조회</button></article>
+  <article class="v3RoomCard" data-v3-room-card="v3-4"><h3>🧭 항해사 제4방</h3><p>결과전 원본: 자동연계 확인 전</p><button type="button" data-v3-report="v3-4">제4방 결과전 조회</button></article>
+ </div>
+ <div class="v3RoomsFoot"><button type="button" id="v3RoomsOpenNative">📱 기존 V3 설치 앱 열기</button><button type="button" id="v3RoomsOpenNavigator">🔗 항해사 전담 원본방 열기</button></div>
+ <p class="materialsNote">원문·자동조합의 생성 및 확정은 실제 V3 앱에서 수행합니다. 중앙통제실은 방별 원본보고서 자동조회만 담당하며, 인증되지 않은 결과를 추첨 전 공식 실적으로 표시하지 않습니다.</p>
+</section>
 <div id="homeMaterialsPanel" hidden aria-label="V7 V3 항행의자유 통합 자료방">
  <div class="homePaneTop"><strong>📚 V3 + V7 + V4 · 결과전 보고서</strong><button id="homeMaterialsBack" type="button" class="secondary">홈으로</button></div>
  <div id="materialsBody">
@@ -962,7 +1002,7 @@ var $=function(id){return document.getElementById(id);};
 })();
 var HOME_SELECTED='home';
 function homeView(which){
- if(!['live','reports','more','approval','materials'].includes(which))which='home';
+ if(!['live','reports','more','approval','materials','v3'].includes(which))which='home';
  HOME_SELECTED=which;
  var active=which==='live'||which==='reports';
  $('homeOverview').hidden=which!=='home';
@@ -970,6 +1010,7 @@ function homeView(which){
  $('homeMorePanel').hidden=which!=='more';
  $('homeApprovalPanel').hidden=which!=='approval';
  $('homeMaterialsPanel').hidden=which!=='materials';
+ $('homeV3RoomsPanel').hidden=which!=='v3';
  if(which!=='materials')stopMaterialsMonitor();
  $('homeMaterialsBtn').setAttribute('aria-expanded',String(which==='materials'));
  var root=document.querySelector('main');
@@ -1237,6 +1278,28 @@ function showMoreDetailFromTop(panelId){
 }
 
 $('homeApprovalBtn').addEventListener('click',function(){homeView(HOME_SELECTED==='approval'?'home':'approval');});
+
+// V3 management only. V7/V4 and the existing V3 native launch remain unchanged.
+$('openV3Rooms').addEventListener('click',function(){homeView('v3');});
+$('homeV3RoomsBack').addEventListener('click',function(){homeView('home');});
+$('v3RoomsOpenNative').addEventListener('click',function(){$('openInstalledV3').click();});
+$('v3RoomsOpenNavigator').addEventListener('click',function(){$('originalNavigator').click();});
+document.querySelectorAll('[data-v3-report]').forEach(function(button){
+ button.addEventListener('click',function(){
+  var id=button.getAttribute('data-v3-report');
+  if(!['v3-1','v3-2','v3-3','v3-4'].includes(id))return;
+  selectedBeforeRoom=id;
+  materialApp='v3';materialStage='before';
+  document.querySelectorAll('[data-before-room]').forEach(function(el){
+   var chosen=el.getAttribute('data-before-room')===id;
+   el.classList.toggle('selected',chosen);
+   el.setAttribute('aria-pressed',String(chosen));
+  });
+  $('materialsRound').value='1';
+  homeView('materials');
+  loadIntegratedMaterials();
+ });
+});
 $('homeMaterialsBtn').addEventListener('click',function(){homeView(HOME_SELECTED==='materials'?'home':'materials');if(HOME_SELECTED==='materials')loadIntegratedMaterials();});
 $('homeMaterialsBack').addEventListener('click',function(){homeView('home');});
 $('homeApprovalBackBtn').addEventListener('click',function(){homeView('home');});
