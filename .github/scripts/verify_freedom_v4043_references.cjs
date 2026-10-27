@@ -59,3 +59,13 @@ assert.ok(manifest.rule_precedence.includes('sentence relation/geometry first'))
 assert.ok(manifest.approved_four_originals_status.startsWith('PARTIAL_NOT_CERTIFIED'));
 for(const name of ['00_6대6_성공회차_마스터목록_20260818.txt','신서_1001_1033_6대6_성공패턴_기준판_V1.0.txt']) assert.ok(manifest.files[name].runtime_role.includes('RESULT_AFTER'));
 console.log('PASS: extra exact official-rule candidate and two success archives preserved ONLY for retrospective audit; not certified as signed official scorer.');
+
+for(const [filename,record] of Object.entries(manifest.files)){
+ const p=record.android_runtime_asset;
+ assert.ok(/^reference_runtime\/[a-z0-9_]+\.txt$/.test(p),'Safe ASCII runtime asset path: '+filename);
+ const src=fs.readFileSync(source+filename),portable=fs.readFileSync(base+p);
+ assert.equal(sha(portable),record.android_runtime_sha256,'runtime SHA matched: '+filename);
+ if(filename.includes('로또꿈해몽백과'))assert.notEqual(sha(src),sha(portable),'CP949 source must not be mislabeled UTF8 original');
+ else assert.equal(sha(portable),sha(src),'runtime and original exact bytes: '+filename);
+}
+console.log('PASS: 9 portable ASCII Android assets have authentic source-name manifest SHA; source originals kept separately.');

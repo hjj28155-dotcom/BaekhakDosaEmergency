@@ -4,48 +4,67 @@
   "files": {
     "백학.txt": {
       "source_sha256": "4f8059ee26987ac1482ac687ddbe4056e7215ccbd7e719e8377bff7eb097eb3a",
-      "runtime_role": "SOURCE_PRESERVATION_AUDIT_ONLY"
+      "runtime_role": "SOURCE_PRESERVATION_AUDIT_ONLY",
+      "android_runtime_asset": "reference_runtime/baekhak_master_v2.txt",
+      "android_runtime_sha256": "4f8059ee26987ac1482ac687ddbe4056e7215ccbd7e719e8377bff7eb097eb3a"
     },
     "백학 로또꿈해몽백과 2026 6월신버젼 (1).txt": {
       "original_encoding": "CP949",
       "original_sha256": "6200195087f75e92389f247d81774a919e03e4be3170cc1969d97b45604b5f06",
       "app_encoding": "UTF-8",
       "app_sha256": "1842831fe89e7d413a3ae6ea46fafd774e333c084750d80e90aff4f880a8b722",
-      "runtime_role": "DREAM_LEXICON_1_TO_45_INDEX"
+      "runtime_role": "DREAM_LEXICON_1_TO_45_INDEX",
+      "android_runtime_asset": "reference_runtime/dream_dictionary_2026_06_utf8.txt",
+      "android_runtime_sha256": "1842831fe89e7d413a3ae6ea46fafd774e333c084750d80e90aff4f880a8b722"
     },
     "백학도사_197풀이_198-202신서_공식교본_원문보존_20260818.txt": {
       "source_sha256": "52769ee60f5d0346b97d1a51bbb37c2dc0b55651088551f53e4bd8ac8deeba7f",
-      "runtime_role": "MANUAL_CANDIDATE_AUDIT_ONLY_UNAPPROVED"
+      "runtime_role": "MANUAL_CANDIDATE_AUDIT_ONLY_UNAPPROVED",
+      "android_runtime_asset": "reference_runtime/official_manual_197_202_candidate.txt",
+      "android_runtime_sha256": "52769ee60f5d0346b97d1a51bbb37c2dc0b55651088551f53e4bd8ac8deeba7f"
     },
     "성공사례_분류기준_3분의6부터_V1.0_20260821.txt": {
       "source_sha256": "86b69c401570e3698397729ef8a48f405fc6ff551930b6c9cdccedace8c8dc7c",
-      "runtime_role": "SUCCESS_CASES_CLASSIFICATION_AUDIT_ONLY"
+      "runtime_role": "SUCCESS_CASES_CLASSIFICATION_AUDIT_ONLY",
+      "android_runtime_asset": "reference_runtime/success_classification_rule_3of6.txt",
+      "android_runtime_sha256": "86b69c401570e3698397729ef8a48f405fc6ff551930b6c9cdccedace8c8dc7c"
     },
     "백학신서_청명방_성공사례_재복기_학습메모_V1.0_20260821.txt": {
       "source_sha256": "89a665d0a4de0ae10121b5db3629a37dca70578066d6181aa23a695bd9c6be1b",
-      "runtime_role": "POST_RESULT_RESEARCH_ONLY"
+      "runtime_role": "POST_RESULT_RESEARCH_ONLY",
+      "android_runtime_asset": "reference_runtime/success_retrospective_learning.txt",
+      "android_runtime_sha256": "89a665d0a4de0ae10121b5db3629a37dca70578066d6181aa23a695bd9c6be1b"
     },
     "백학신서_청명방_혹독예행6_성공사례_3of6_결과후복기_V1.0_20260821.txt": {
       "source_sha256": "bcbc7ebe0dd272540892e52fcf7aef48189d2ba02428d4d987a4415e990e1b16",
-      "runtime_role": "POST_RESULT_RESEARCH_ONLY"
+      "runtime_role": "POST_RESULT_RESEARCH_ONLY",
+      "android_runtime_asset": "reference_runtime/success_retrospective_3of6.txt",
+      "android_runtime_sha256": "bcbc7ebe0dd272540892e52fcf7aef48189d2ba02428d4d987a4415e990e1b16"
     },
     "백학_공식해독규칙_V1.0.txt": {
       "source_sha256": "657e3a32b0b7be6bc9cc7d40a327232a4502706c05f8ae99ac53ae9478999ad1",
       "runtime_role": "SOURCE_RULE_REFERENCE_AUDIT_ONLY_NOT_MACHINE_INTERPRETED",
-      "note": "Official rule document favors sentence geometry, relational logic, and operations. Lexicon secondary."
+      "note": "Official rule document favors sentence geometry, relational logic, and operations. Lexicon secondary.",
+      "android_runtime_asset": "reference_runtime/official_decoding_rules_v1.txt",
+      "android_runtime_sha256": "657e3a32b0b7be6bc9cc7d40a327232a4502706c05f8ae99ac53ae9478999ad1"
     },
     "00_6대6_성공회차_마스터목록_20260818.txt": {
       "source_sha256": "53d38c03de30c08aee51422e5bd37cefcb40b6771cee8e67206e3a8b72e9c39f",
       "runtime_role": "RESULT_AFTER_REFERENCE_ONLY_EXCLUDED_FROM_NUMBER_SCORING",
-      "note": "Archived success claims have not been independently verified against contemporary immutable pre-draw records."
+      "note": "Archived success claims have not been independently verified against contemporary immutable pre-draw records.",
+      "android_runtime_asset": "reference_runtime/success_master_6of6_20260818.txt",
+      "android_runtime_sha256": "53d38c03de30c08aee51422e5bd37cefcb40b6771cee8e67206e3a8b72e9c39f"
     },
     "신서_1001_1033_6대6_성공패턴_기준판_V1.0.txt": {
       "source_sha256": "26b05caf362dd46b3e01e6ac0464bb4ff3419b954b0c1a97f78aa53ed1a8911e",
       "runtime_role": "RESULT_AFTER_PATTERN_REFERENCE_ONLY_EXCLUDED_FROM_NUMBER_SCORING",
-      "note": "Result-aware examples only. Do not use historical answers as forward-looking input."
+      "note": "Result-aware examples only. Do not use historical answers as forward-looking input.",
+      "android_runtime_asset": "reference_runtime/success_patterns_1001_1033.txt",
+      "android_runtime_sha256": "26b05caf362dd46b3e01e6ac0464bb4ff3419b954b0c1a97f78aa53ed1a8911e"
     }
   },
   "safety": "NOT_FOR_RESULT_BEFORE: past drawing outcomes from success-case evidence and the source master are not fed to scoring. Never label later analysis as sealed result-before. No signer/deployment modifications.",
   "rule_precedence": "백학_공식해독규칙_V1.0.txt: sentence relation/geometry first; dream lexicon secondary only, current scoreRaw is NOT full rule engine",
-  "approved_four_originals_status": "PARTIAL_NOT_CERTIFIED: exact standalone 백학설명서 and all success-case master sources require further authentication"
+  "approved_four_originals_status": "PARTIAL_NOT_CERTIFIED: exact standalone 백학설명서 and all success-case master sources require further authentication",
+  "android_asset_compatibility": "Source filenames remain original in reference_sources; byte-equivalent copies use ASCII-only paths in reference_runtime because AAPT packaging logs showed mangled Korean ZIP names. Runtime references MUST use android_runtime_asset paths; source names and hashes remain in manifest."
 }

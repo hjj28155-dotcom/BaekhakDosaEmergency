@@ -90,15 +90,19 @@ jobs:
           if len(apks)!=1: raise SystemExit(f'Expected exactly one unsigned internal release APK, found {len(apks)}')
           apk=apks[0]
           checks={
-            'assets/reference_sources/백학.txt':'4f8059ee26987ac1482ac687ddbe4056e7215ccbd7e719e8377bff7eb097eb3a',
-            'assets/reference_sources/백학 로또꿈해몽백과 2026 6월신버젼 (1).txt':'1842831fe89e7d413a3ae6ea46fafd774e333c084750d80e90aff4f880a8b722',
-            'assets/reference_sources/백학_공식해독규칙_V1.0.txt':'657e3a32b0b7be6bc9cc7d40a327232a4502706c05f8ae99ac53ae9478999ad1',
-            'assets/reference_sources/00_6대6_성공회차_마스터목록_20260818.txt':'53d38c03de30c08aee51422e5bd37cefcb40b6771cee8e67206e3a8b72e9c39f',
-            'assets/reference_sources/신서_1001_1033_6대6_성공패턴_기준판_V1.0.txt':'26b05caf362dd46b3e01e6ac0464bb4ff3419b954b0c1a97f78aa53ed1a8911e',
+            'assets/reference_runtime/baekhak_master_v2.txt':'4f8059ee26987ac1482ac687ddbe4056e7215ccbd7e719e8377bff7eb097eb3a',
+            'assets/reference_runtime/dream_dictionary_2026_06_utf8.txt':'1842831fe89e7d413a3ae6ea46fafd774e333c084750d80e90aff4f880a8b722',
+            'assets/reference_runtime/official_manual_197_202_candidate.txt':'52769ee60f5d0346b97d1a51bbb37c2dc0b55651088551f53e4bd8ac8deeba7f',
+            'assets/reference_runtime/success_classification_rule_3of6.txt':'86b69c401570e3698397729ef8a48f405fc6ff551930b6c9cdccedace8c8dc7c',
+            'assets/reference_runtime/success_retrospective_learning.txt':'89a665d0a4de0ae10121b5db3629a37dca70578066d6181aa23a695bd9c6be1b',
+            'assets/reference_runtime/success_retrospective_3of6.txt':'bcbc7ebe0dd272540892e52fcf7aef48189d2ba02428d4d987a4415e990e1b16',
+            'assets/reference_runtime/official_decoding_rules_v1.txt':'657e3a32b0b7be6bc9cc7d40a327232a4502706c05f8ae99ac53ae9478999ad1',
+            'assets/reference_runtime/success_master_6of6_20260818.txt':'53d38c03de30c08aee51422e5bd37cefcb40b6771cee8e67206e3a8b72e9c39f',
+            'assets/reference_runtime/success_patterns_1001_1033.txt':'26b05caf362dd46b3e01e6ac0464bb4ff3419b954b0c1a97f78aa53ed1a8911e',
           }
           with zipfile.ZipFile(apk) as z:
             names=set(z.namelist())
-            print('CI ZIP reference paths:',sorted(n for n in names if ('reference' in n or '백학' in n))[:60])
+            print('CI ZIP portable reference paths:',sorted(n for n in names if n.startswith('assets/reference_runtime/')))
             print('CI ZIP assets count:',len([n for n in names if n.startswith('assets/')]))
             for n in checks:
               if n in names:

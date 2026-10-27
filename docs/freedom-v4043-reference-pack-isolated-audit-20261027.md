@@ -32,3 +32,10 @@ No past saved combinations, approval data, DB rows, signature key or permanent D
 - Added all three files to `reference_sources` under their original names, with no changes to current scoring functions; result-after records are permanently excluded from current-round scoring.
 - Recorded the official-rule priority: sentence action/relationship/position before secondary dream-word matching. No claim that the old core engine fully implements the manual.
 - CI now compiles Android `assembleRelease` as internal unsigned APK, verifies manifest and asset hashes then destroys the unsigned APK before any artifact upload. This is NOT a production APK and does not bypass the existing original signer gate.
+
+## Android ZIP Hangul path correction (2026-10-27)
+- The Android `assembleRelease` compile completed successfully, but its APK ZIP names for Hangul-named assets appeared as garbled strings; Python ZipFile could not access those names in standard Unicode form. This was a packaging/filename issue, not a source byte-content failure.
+- Retain original-named files under `reference_sources` and add identical-byte, portable ASCII-named copies under `reference_runtime`. All mapping and SHA-256 pairs recorded in `reference_sources_manifest_v4043.json`.
+- Only the dictionary's UTF-8 copy is exposed as the runtime dictionary; its CP949 origin remains the authoritative original identified by explicit original SHA.
+- The official rules and retrospective archives remain non-predictive audit-only; attaching data alone does not show full engine use.
+- Candidate APK remains for internal unsigned CI inspection only; never install, advertise or replace original V4.0.41 APK until signed with original cert and regression tested.
