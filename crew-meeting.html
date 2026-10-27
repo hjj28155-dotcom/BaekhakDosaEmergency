@@ -677,6 +677,11 @@ body{
 .materialsUnverified{border:1px solid #d5b97f;border-radius:8px;background:rgba(59,43,14,.5);padding:9px;margin:4px 0;color:#ffe3a3;font-size:.74rem;line-height:1.45}
 @media(max-width:370px){.materialsAutoSync{font-size:.62rem;flex-wrap:wrap}}
 
+
+/* Retain the existing captain access key gate when materials opens without a session. */
+#materialsAuthGate{max-height:45dvh;overflow:auto}
+#materialsAuthGate #loginArea{margin:0!important;padding:12px!important}
+#materialsAuthGate #loginArea h2{font-size:.92rem}
 </style>
 </head>
 <body>
@@ -762,6 +767,7 @@ body{
 <div id="homeMaterialsPanel" hidden aria-label="V7 V3 항행의자유 통합 자료방">
  <div class="homePaneTop"><strong>📚 V3 + V7 + V4 · 결과전 보고서</strong><button id="homeMaterialsBack" type="button" class="secondary">홈으로</button></div>
  <div id="materialsBody">
+  <div id="materialsAuthGate" class="materialsAuthGate" hidden></div>
   <p class="materialsNote">초기 기준: <b>V3 분석 350회(선장 보고)</b>, V7·V4 분석 실적 미확인. 350회 분석과 350건의 결과전 보고서는 다릅니다. <b>원본에서 검증된 결과전 보고서만 자동 조회 대상으로 인정합니다.</b></p>
   <div class="materialsGrid" aria-label="세 앱 독립 자료 원본">
    <button type="button" class="matApp" data-material-app="v7">🛡️ V7 통제관</button>
@@ -959,7 +965,16 @@ function homeView(which){
  live.hidden=which!=='live';reports.hidden=which!=='reports';
  live.open=which==='live';reports.open=which==='reports';
  $('homeWorkspaceTitle').textContent=which==='live'?'실시간 업무 공유':'보고서 · 자료';
- $('loginArea').hidden=!active||!!token;
+ if(which==='materials'&&!token){
+   if($('loginArea').parentElement!==$('materialsAuthGate'))$('materialsAuthGate').appendChild($('loginArea'));
+   $('materialsAuthGate').hidden=false;
+   $('loginArea').hidden=false;
+   $('loginArea').style.display='block';
+ }else{
+   if($('loginArea').parentElement!==$('homeWorkspaceItems'))$('homeWorkspaceItems').appendChild($('loginArea'));
+   $('materialsAuthGate').hidden=true;
+   $('loginArea').hidden=!active||!!token;
+ }
  if(which==='live'&&token)threeRoomRefresh();
  if(which==='reports'&&token)refreshV7Reports();
  if(which==='materials')startMaterialsMonitor();
@@ -1881,6 +1896,7 @@ $('fileForm').addEventListener('submit',async function(event){
 
 function enter(){
  $('loginArea').style.display='none';$('loginArea').hidden=true;
+ $('materialsAuthGate').hidden=true;
  $('chatArea').style.display='flex';$('disconnectBtn').style.display='inline-block';
  if(HOME_SELECTED==='live')threeRoomRefresh();
  if(HOME_SELECTED==='materials'){startMaterialsMonitor();loadIntegratedMaterials();}
