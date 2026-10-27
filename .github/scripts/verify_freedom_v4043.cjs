@@ -78,6 +78,23 @@ assert.deepEqual(Array.from(combined.rank.slice(0,6),x=>Number(x.n)),[1,2,3,4,5,
  'current raw has first-six candidate priority');
 assert.equal(modals.length,0,'successful co-analysis must not display a false error');
 
+// Real effect regression: divergent historical DB-1 engine ranks must
+// contribute an actual purchased candidate, not only a provenance label.
+const primaryRanks=Array.from({length:10},(_,i)=>({n:i+1,score:10-i}));
+const historicalRanks=[11,12,13,14,15,16,17,18,19,20].map((n,i)=>({n,score:10-i}));
+const enriched=hctx.v4043MergedRanks(primaryRanks,[historicalRanks,historicalRanks,historicalRanks]);
+assert.deepEqual(Array.from(enriched.slice(0,6),x=>x.n),[1,2,3,4,5,6],'six current leaders may not be displaced');
+assert(enriched.slice(6).some(x=>x.n>10),'distinct historical DB-1 scores must occupy research tail');
+assert(enriched.filter(x=>x.source==='DB1_HISTORY_CANDIDATE').length>=1,'source must identify history-only candidates');
+const autoCode=extract('function v123Seeded(seedStr){','function v123Seed1243Result(){');
+vm.runInContext(autoCode,hctx);
+const baseGames=hctx.v123Auto20FromUniverse(primaryRanks.map(x=>x.n),1247,20);
+const combinedGames=hctx.v123Auto20FromUniverse(enriched.map(x=>x.n),1247,20);
+assert.equal(combinedGames.length,20);
+assert.notDeepEqual(combinedGames.map(x=>x.join(',')),baseGames.map(x=>x.join(',')),
+ 'different historical DB-1 evidence must actually change the auto-20 purchase candidates');
+
+
 
 // User-supplied current original takes precedence, but the validated DB-1 remains required.
 const launchAnalysis=extract('function runAnalysisFromHome(){','function runAnalysisFromRaw(){');
