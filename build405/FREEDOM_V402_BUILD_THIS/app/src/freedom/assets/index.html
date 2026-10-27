@@ -1649,25 +1649,16 @@ function v124Auto20Rows(games,result,bonus){
 
 const V126_1243_OFFICIAL_CANDIDATES=Object.freeze([21,17,18,12,36,16,9,25,26,8]);
 function v126Ensure1243Auto20(){
-  D.rounds=D.rounds||{};D.rounds["1243"]=D.rounds["1243"]||{};
-  const r=D.rounds["1243"],a=r.analysis||{};
-  if(Array.isArray(a.auto20)&&a.auto20.length===20)return true;
-  const games=v123Auto20FromUniverse([...V126_1243_OFFICIAL_CANDIDATES],1243,20);
-  if(games.length!==20)return false;
-  r.analysis={
-    ...a,
-    round:1243,
-    engine:a.engine||'1243_RESULT-BEFORE_LOCK + AUTO20',
-    candidates:[...V126_1243_OFFICIAL_CANDIDATES],
-    auto20:games,
-    groups:[{name:'자동구매 20조합',rows:games.map((g,i)=>({slot:i+1,game:g}))}],
-    analyzedAt:a.analyzedAt||new Date().toISOString()
-  };
-  v123Seed1243Result();
-  save();
-  return true;
+ // Historical RESULT-BEFORE combinations must come from an immutable
+ // recorded analysis or the actual locked purchase. Never synthesize a
+ // fresh 20-game list after the draw from hardcoded retrospective leaders.
+ const r=(D.rounds||{})["1243"]||{},a=r.analysis||{},b=r.buy||{};
+ if(b.locked===true){
+   const saved=Array.isArray(b.auto20)?b.auto20:[];
+   return saved.length===20&&saved.every(x=>x&&String(x).length>0);
+ }
+ return Array.isArray(a.auto20)&&a.auto20.length===20&&a.historicalResultExcluded!==true&&a.researchOnly!==true;
 }
-
 
 const V330_RECENT=[1243,1244,1245,1246,1247];
 const V330_WIN={
@@ -1750,8 +1741,13 @@ function v4043MissingHistoricalCombos(round){
 }
 
 function v330ResultPage(round){
- const w=V330_WIN[round],locked=v4043SavedLocked20(),a=R().analysis||{},games=(locked.length===20?locked:(a.auto20||[])).slice(0,20);
- if(games.length!==20){if(v4043DisplaySavedFive(round,'result'))return;v4043MissingHistoricalCombos(round);return}
+ const w=V330_WIN[round],savedLock=(R().buy||{}).locked===true;
+ const locked=v4043SavedLocked20(),a=R().analysis||{},games=(locked.length===20?locked:(savedLock?[]:(a.auto20||[]))).slice(0,20);
+ if(games.length!==20){
+   if(v4043DisplaySavedFive(round,'result'))return;
+   if(savedLock){modal('잠금 구매기록 점검','<div class="panel warn">실제 잠금된 구매번호를 확인하지 못했습니다. 새 분석 조합을 실제 구매번호로 대체하지 않습니다.</div>');return}
+   v4043MissingHistoricalCombos(round);return
+ }
  const set=new Set(w.nums),scores=games.map(g=>g.filter(n=>set.has(Number(n))).length),best=Math.max(...scores),wins=scores.filter(x=>x>=3).length;
  const banner=best>=3?`<div class="scoreHero success"><strong>🎉 축하합니다!</strong><span>최고 ${best}/6 적중 · 3/6 이상 ${wins}조합</span></div>`:`<div class="scoreHero fail"><strong>이번 회차는 아쉽게 지나갔습니다.</strong><span>제${round}회 최고 ${best}/6 적중 · 다음 분석에 이어갑니다.</span></div>`;
  modal(`제${round}회 · 자동분석 20조합 결과`,`<div class="analysisCompact v330print">${banner}<div class="panel goldline centerTitle"><h3>당첨번호</h3><div class="r5winning">${w.nums.map(n=>`<span class="r5ball hit">${n}</span>`).join('')}</div><div style="font-weight:950;color:#ffe58a;font-size:19px">보너스 ${w.bonus}</div></div><div class="r5grid">${v330GroupsResult(games,w.nums)}</div><div class="r5actions"><button class="b gold" onclick="v330Print()">🖨 인쇄</button><button class="b" onclick="rawPage()">회차선택</button><button class="b" onclick="rawPage()">이전</button></div></div>`);
@@ -1781,6 +1777,7 @@ function v330OpenRound(n){
  if(!setRound(n))return;
  const a=R().analysis||{};
  if(n===1247){
+  if((R().buy||{}).locked===true){v330PurchasePage(n);return}
   if(Array.isArray(a.auto20)&&a.auto20.length===20){v330PurchasePage(n);return}
   if(v4043DisplaySavedFive(n,'purchase'))return;
   // Current round: DB-1 already holds six sentences. Start the engine without requiring manual raw.
@@ -1791,80 +1788,19 @@ function v330OpenRound(n){
 }
 
 function v124Round1243ResultPage(){
-  if(!v126Ensure1243Auto20()){
-    modal('제1243회 결과','<div class="panel warn">보존된 1243회 자동분석 자료를 불러오지 못했습니다.</div>');
-    return;
-  }
-  const a=R().analysis||{},games=(a.auto20||[]).slice(0,20);
-  v123Seed1243Result();
-  const result=[9,18,24,38,43,44],bonus=35,w=new Set(result);
-  let best=0,wins=0;
-  games.forEach(g=>{
-    const h=(g||[]).filter(n=>w.has(Number(n))).length;
-    if(h>best)best=h;
-    if(h>=3)wins++;
-  });
-  const banner=best>=3
-    ? `<div class="scoreHero success"><strong>🎉 축하합니다! 제1243회 자동분석 결과</strong><span>최고 ${best}/6 적중 · 3/6 이상 ${wins}조합</span></div>`
-    : `<div class="scoreHero fail"><strong>제1243회는 아쉽게 지나갔습니다.</strong><span>최고 ${best}/6 적중 · 결과를 다음 분석에 이어갑니다.</span></div>`;
-  modal('제1243회 · 자동분석 20조합 결과',
-    `<div class="analysisCompact">
-      ${banner}
-      <div class="panel goldline centerTitle">
-        <h3>당첨번호</h3>
-        <div class="scoreBalls" style="justify-content:center;margin:10px 0">
-          ${result.map(n=>`<span class="scoreBall hit">${n}</span>`).join('')}
-        </div>
-        <div style="font-weight:900;color:#ffe58a">보너스 ${bonus}</div>
-      </div>
-      <div class="scorePack">
-        <h4>자동분석 20조합 · 당첨/낙첨 결과</h4>
-        ${v124Auto20Rows(games,result,bonus)}
-      </div>
-      <div class="row" style="margin-top:12px">
-        <button class="b" onclick="rawPage()">회차선택</button>
-        <button class="b" onclick="closeM()">닫기</button>
-      </div>
-    </div>`);
-  document.getElementById('modal')?.classList.add('scoreOneScreen');
-  if(best>=3)setTimeout(()=>showFanfare(1243,best,wins),220);
-  else setTimeout(()=>showComfort(1243,best),220);
+ if(!v126Ensure1243Auto20()){
+   if(v4043DisplaySavedFive(1243,'result'))return;
+   v4043MissingHistoricalCombos(1243);
+   return;
+ }
+ v330ResultPage(1243);
 }
-function v124Round1244PurchasePage(){
-  const a=R().analysis||{},games=(a.auto20||[]).slice(0,20);
-  if(games.length!==20){
-    V123_AFTER_ANALYSIS='v124purchase20';
-    runAnalysisFromHome();
-    return;
-  }
-  const rows=games.map((g,i)=>`
-    <div class="scoreGame" style="grid-template-columns:30px 1fr">
-      <b>${i+1}</b>
-      <div class="scoreBalls">${g.map(n=>`<span class="scoreBall">${n}</span>`).join('')}</div>
-    </div>`).join('');
-  modal('제1244회 · 이번주 구매번호',
-    `<div class="analysisCompact">
-      <div class="scoreHero success">
-        <strong>자동분석 20조합</strong>
-        <span>비상용 분석엔진 · 후보우주 기반 · 외부번호 자동추가 없음</span>
-      </div>
-      <div class="scorePack">
-        <h4>이번주 구매번호 20조합</h4>
-        ${rows}
-      </div>
-      <div class="row" style="margin-top:12px">
-        <button class="b" onclick="rawPage()">회차선택</button>
-        <button class="b" onclick="closeM()">닫기</button>
-      </div>
-    </div>`);
-}
+function v124Round1244PurchasePage(){ v330PurchasePage(1244); }
 function v124OpenVisibleRound(n){
   n=Number(n);
   if(n!==1243&&n!==1244)n=1244;
   if(!setRound(n))return;
   if(n===1243){
-    v123Seed1243Result();
-    v126Ensure1243Auto20();
     v124Round1243ResultPage();
     return;
   }
@@ -1968,13 +1904,26 @@ function v4043SendNextEngineTask(){
  if(!task||!f||!f.contentWindow){V4043_ANALYSIS_SESSION=null;modal('DB-1 연결 점검','<div class="panel warn">원문-과거자료 연결에 실패했습니다. 데이터는 변경하지 않았습니다.</div>');return}
  f.contentWindow.postMessage({type:'V3_ANALYZE',round:task.round,raw:task.raw,source:task.role},'*');
 }
+function v4043TaskMatchesEngineReply(m,task){
+ if(!m||m.ok!==true||!task||Number(m.round)!==Number(task.round))return false;
+ const expected=String(task.raw||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+ const evidence=Array.isArray(m.decoded)?m.decoded:[];
+ if(expected.length!==6||evidence.length!==6)return false;
+ if(!evidence.every((d,i)=>String(d&&d.raw||'').trim()===expected[i]))return false;
+ const ranked=Array.isArray(m.rank)?m.rank.map(x=>Number(x.n)):[];
+ return ranked.length>=8&&new Set(ranked).size===ranked.length
+  &&ranked.every(n=>Number.isInteger(n)&&n>=1&&n<=45);
+}
 function v4043AcceptEngineResult(m){
  const session=V4043_ANALYSIS_SESSION;if(!session)return;
  const task=session.tasks[session.index];if(!task||Number(m.round)!==task.round)return;
- if(task.role==='CURRENT'&&(!m.ok||!(m.rank||[]).length)){
-  V4043_ANALYSIS_SESSION=null;handleEngineResult(m);return;
+ const verified=v4043TaskMatchesEngineReply(m,task);
+ if(task.role==='CURRENT'&&!verified){
+  V4043_ANALYSIS_SESSION=null;
+  handleEngineResult({ok:false,round:task.round,error:'ENGINE_REPLY_SOURCE_MISMATCH_OR_INCOMPLETE'});
+  return;
  }
- if(m.ok&&Array.isArray(m.rank)&&m.rank.length)session.responses.push({task,reply:m});
+ if(verified)session.responses.push({task,reply:m});
  session.index++;
  if(session.index<session.tasks.length){setTimeout(v4043SendNextEngineTask,60);return}
  V4043_ANALYSIS_SESSION=null;

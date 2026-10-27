@@ -6,6 +6,7 @@ on:
       - fix/freedom-v4043-reference-pack-20261027
       - fix/freedom-v4043-history-effective-20261027
       - fix/freedom-v4043-locked-purchase-message-guard-20261027
+      - fix/freedom-v4043-engine-stale-result-guard-20261027
     paths:
       - 'build405/FREEDOM_V402_BUILD_THIS/app/**'
       - '.github/workflows/verify-freedom-v4043-candidate.yml'

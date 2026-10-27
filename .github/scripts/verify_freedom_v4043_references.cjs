@@ -37,7 +37,8 @@ assert.equal(pack.scoreRaw('one line').status,'SIX_RAW_REQUIRED');
 assert.ok(!lex.includes('당첨번호: 7 · 9 · 11 · 21 · 30 · 35'),'result-after numbers not embedded in scoring module');
 const start=html.indexOf('function v4043AcceptEngineResult('),end=html.indexOf('function v4043BeginAnalysis(',start);
 assert.ok(start>=0&&end>start,'engine callback markers');
-const callback=html.slice(start,end);new vm.Script(callback);
+const verifyStart=html.indexOf('function v4043TaskMatchesEngineReply(');assert.ok(verifyStart>=0&&verifyStart<start);
+const callback=html.slice(verifyStart,end);new vm.Script(callback);
 let delivered=null;
 const state={
  window:{FREEDOM_REF_V4043:{manifest:{version:'test'},lexiconEntries:123,scoreRaw:()=>({status:'OK',scores:{10:100,9:20},matches:[{number:10,term:'test'}]})}},
@@ -47,7 +48,7 @@ const state={
  setTimeout:()=>{},v4043SendNextEngineTask:()=>{throw Error('unexpected extra job')},
  Number,Array,Object,String
 };vm.createContext(state);vm.runInContext(callback,state);
-state.v4043AcceptEngineResult({ok:true,round:1247,rank:Array.from({length:10},(_,i)=>({n:i+1}))});
+state.v4043AcceptEngineResult({ok:true,round:1247,decoded:raw.split('\n').map(raw=>({raw})),rank:Array.from({length:10},(_,i)=>({n:i+1}))});
 assert.ok(delivered);assert.deepEqual(Array.from(delivered.rank.slice(0,6),v=>v.n),[1,2,3,4,5,6]);
 assert.deepEqual(Array.from(delivered.rank.slice(6),v=>v.n),[10,9,7,8]);
 assert.equal(delivered.db1Evidence.referenceEvidence.successCases,'POST_RESULT_EXCLUDED');

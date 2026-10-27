@@ -67,7 +67,7 @@ let processed=0;
 while(processed<posted.length&&processed<8){
  const call=posted[processed++];
  const first=call.round===1247?[1,2,3,4,5,6,7,8,9,10]:[3,4,5,6,7,8,9,10,11,12];
- hctx.v4043AcceptEngineResult({ok:true,round:call.round,rank:first.map(n=>({n}))});
+ hctx.v4043AcceptEngineResult({ok:true,round:call.round,decoded:call.raw.split('\n').map(raw=>({raw})),rank:first.map(n=>({n}))});
 }
 assert.equal(processed,4,'three historical calls plus current call');
 assert(combined&&combined.db1Evidence,'combined engine response must include provenance');
@@ -77,6 +77,14 @@ assert.equal(combined.db1Evidence.comparedWithoutWinningNumbers,true);
 assert.deepEqual(Array.from(combined.rank.slice(0,6),x=>Number(x.n)),[1,2,3,4,5,6],
  'current raw has first-six candidate priority');
 assert.equal(modals.length,0,'successful co-analysis must not display a false error');
+assert.equal(hctx.v4043TaskMatchesEngineReply(
+ {ok:true,round:1247,decoded:lines('다른원문').split('\n').map(raw=>({raw})),rank:Array.from({length:10},(_,i)=>({n:i+1}))},
+ {round:1247,raw:historyBank['1247'].text}),false,
+ 'stale engine evidence must never match new current source');
+assert.equal(hctx.v4043TaskMatchesEngineReply(
+ {ok:true,round:1247,decoded:historyBank['1247'].text.split('\n').map(raw=>({raw})),rank:Array.from({length:10},(_,i)=>({n:i+1}))},
+ {round:1247,raw:historyBank['1247'].text}),true,'authentic six-line evidence accepted');
+
 
 // Real effect regression: divergent historical DB-1 engine ranks must
 // contribute an actual purchased candidate, not only a provenance label.
@@ -170,3 +178,23 @@ msgCtx.V4043_ANALYSIS_SESSION=null;
 cb({source:trusted,data:{type:'V3_ANALYSIS_RESULT',round:1247,rank:[{n:1}]}});
 assert.equal(rawReceived,0,'orphan engine reply must not overwrite results');
 console.log('PASS: unique20 gating, locked purchase rendering priority, analysis immutability, 6-line manual guard and source-bound engine messages.');
+
+/* Do not regenerate hypothetical 1243 result-before combinations after draw. */
+const historicalSeed=extract('function v126Ensure1243Auto20(){','const V330_RECENT=');
+const oldRoundRecord={analysis:{},buy:{}},allRounds={'1243':oldRoundRecord};
+const historyState={D:{rounds:allRounds}};
+vm.createContext(historyState);vm.runInContext(historicalSeed,historyState);
+assert.equal(historyState.v126Ensure1243Auto20(),false,'no synthesized 1243 20-combo results');
+assert.equal(Object.keys(oldRoundRecord.analysis).length,0,'no historical analysis overwrite');
+assert.equal(oldRoundRecord.buy.auto20,undefined,'no historical buy rewrite');
+const currentOpen=extract('function v330OpenRound(n){','function v124Round1243ResultPage(){');
+let openedLocked=false,calledRound=0;
+const currentState={V330_RECENT:[1243,1244,1245,1246,1247],R(){return {buy:{locked:true},analysis:{}}},
+ setRound(n){calledRound=n;return true},v330PurchasePage(n){openedLocked=n===1247},
+ V330_WIN:{},v4043DisplaySavedFive(){throw Error('must prioritize original locked purchase')},
+ runAnalysisFromHome(){throw Error('must not generate new locked purchase')}};
+vm.createContext(currentState);vm.runInContext(currentOpen,currentState);
+currentState.v330OpenRound(1247);
+assert.equal(openedLocked,true);
+assert.equal(calledRound,1247);
+console.log('PASS: 1243 synthetic history disabled, 1247 locked round reads original purchase, engine raw evidence anti-stale verified.');
