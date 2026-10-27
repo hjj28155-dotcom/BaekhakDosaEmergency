@@ -58,7 +58,7 @@ type Entry={room_id:string;app:string;round_no:number;record_id:string;source:st
  verification:string;official_eligible:false;record_type:'RESULT-BEFORE';};
 async function loadV7(round:number|null){
  let q=db.from('v7_documents').select('id,round_no,room_key,document_type,stage,filename,source_sha256,created_at,received_before_draw')
- .eq('document_type','V7_PURCHASE_5').eq('stage','RESULT-BEFORE')
+ .eq('document_type','V7_PURCHASE_5').eq('stage','RESULT-BEFORE').eq('room_key','controller')
  .gte('round_no',1).lte('round_no',MAX_ROUND)
  .order('round_no',{ascending:false}).limit(80);
  if(round!==null)q=q.eq('round_no',round);
@@ -104,6 +104,7 @@ Deno.serve(async req=>{
  if(round!==null&&!validRound(round))return send(req,{error:'ROUND_OUT_OF_RANGE'},400);
  // Only pull from source stores. V3 four rooms have NO verified server sender yet:
  // do not misattribute v6_room_assets or other app's results as V3.
+ // V7 captain-room's historical documents must NEVER be attributed to the V7 controller room.
  const needsV7=room==='all'||room==='v7',needsV4=room==='all'||room==='v4';
  const loaded=await Promise.allSettled([
   needsV7?loadV7(round):Promise.resolve([]),
@@ -120,7 +121,7 @@ Deno.serve(async req=>{
  const roomStates=ROOMS.filter(r=>room==='all'||r.id===room).map(r=>{
   const found=entries.filter(x=>x.room_id===r.id);
   const linked=r.app==='v7'?loaded[0].status==='fulfilled':r.app==='v4'?loaded[1].status==='fulfilled':false;
-  return {...r,source_readable:linked,source_submission_connected:r.app==='v7'?true:r.app==='v4'?true:false,
+  return {...r,source_readable:linked,source_submission_connected:false, // No source app E2E automatic sender has been verified.
    actual_app_auto_push_verified:false,received_candidates:found.length,
    official_before_count:0,state:r.app==='v3'?'SOURCE_CONNECTOR_REQUIRED':
      !linked?'SOURCE_READ_FAILED':found.length?'UNVERIFIED_SOURCE_RECORDS':'NO_REPORTS_RECEIVED'};
