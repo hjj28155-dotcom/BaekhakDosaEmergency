@@ -682,6 +682,23 @@ body{
 #materialsAuthGate{max-height:45dvh;overflow:auto}
 #materialsAuthGate #loginArea{margin:0!important;padding:12px!important}
 #materialsAuthGate #loginArea h2{font-size:.92rem}
+
+/* V3 4방 + V7 + V4 central-result-before source routing controls. */
+#beforeRoomGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:9px 0 6px}
+#beforeRoomGrid[hidden]{display:none!important}
+#beforeRoomGrid button{
+ display:block;min-height:44px;border:1.5px solid #78abc0;border-radius:10px;
+ background:linear-gradient(130deg,rgba(12,65,90,.96),rgba(5,31,59,.98));
+ color:#e9f4fb;font-weight:800;font-size:.72rem;line-height:1.1;padding:6px;
+}
+#beforeRoomGrid button.selected{
+ border-color:#f4ca75;color:#ffecb9;background:linear-gradient(135deg,#125d7b,#235879);
+}
+#beforeRoomGrid button:focus-visible{outline:3px solid #ffe19c;outline-offset:1px}
+#materialsAppSelector[hidden]{display:none!important}
+#beforeRoomScope{font-size:.68rem!important;color:#f5d9a5!important}
+@media(max-width:365px){#beforeRoomGrid button{font-size:.65rem}}
+
 </style>
 </head>
 <body>
@@ -704,16 +721,16 @@ body{
 <section id="appCommandDeck" aria-label="선장 전용 3앱 통합 관리본부">
  <div class="commandDeckTop"><strong>⚓ 3앱 통합 관리본부</strong><small>선장 전용 · 원본 보존</small></div>
  <div id="captainAnalysisBaseline" class="analysisBaseline" role="status" aria-label="선장이 확인한 분석 진행 현황">
-  <strong>분석 현황 초기 기준</strong>
-  <span><b>V3</b> 350회 분석 <em>선장 보고</em></span>
-  <span><b>V7</b> 실적 미확인</span>
-  <span><b>V4</b> 실적 미확인</span>
+  <strong>🔁 제1회차부터 재분석 · 새 연구 시작 기준</strong>
+  <span><b>V3</b> 기존 누적 350회 <em>과거 연구자료</em></span>
+  <span><b>V7</b> 새 연구 1회차부터 <em>시작 전</em></span>
+  <span><b>V4</b> 새 연구 1회차부터 <em>시작 전</em></span>
  </div>
  <div id="installedAppBar" aria-label="세 앱의 독립 관리 카드">
   <div class="installedAppUnit appDeckCard" data-app-card="v3">
    <div class="deckAppIcon" aria-hidden="true">🧭</div>
    <strong>항해사 V3</strong>
-   <small>분석 350회 · 선장 보고</small>
+   <small>4개 방 · 원문15 + 자동5</small>
    <div class="deckCardActions">
     <button type="button" id="openInstalledV3" class="deckAction" aria-label="설치된 항해사 V3 앱 열기">앱 열기</button>
     <button type="button" class="deckAction deckSecondary" data-open-material="v3" aria-label="V3 원본 자료 관리방 열기">기록 보기</button>
@@ -722,7 +739,7 @@ body{
   <div class="installedAppUnit appDeckCard" data-app-card="v7">
    <div class="deckAppIcon" aria-hidden="true">🛡️</div>
    <strong>통제관 V7</strong>
-   <small>분석 실적 미확인</small>
+   <small>원문 5조합 · 제1회차부터</small>
    <div class="deckCardActions">
     <button type="button" id="openInstalledV7" class="deckAction" aria-label="설치된 통제관 V7 앱 열기">앱 열기</button>
     <button type="button" class="deckAction deckSecondary" data-open-material="v7" aria-label="V7 읽기 전용 자료 관리방 열기">기록 보기</button>
@@ -731,7 +748,7 @@ body{
   <div class="installedAppUnit appDeckCard" data-app-card="freedom">
    <div class="deckAppIcon" aria-hidden="true">🚢</div>
    <strong>항해의자유</strong>
-   <small>V4 · 분석 실적 미확인</small>
+   <small>원문 10조합 · 제1회차부터</small>
    <div class="deckCardActions">
     <button type="button" class="deckAction" data-open-material="freedom" aria-label="항해의자유 자료 관리방 열기">자료 관리</button>
     <button type="button" id="openFreedomApprovalShortcut" class="deckAction deckSecondary" aria-label="기존 일반판 승인관리방 열기">승인관리</button>
@@ -768,12 +785,22 @@ body{
  <div class="homePaneTop"><strong>📚 V3 + V7 + V4 · 결과전 보고서</strong><button id="homeMaterialsBack" type="button" class="secondary">홈으로</button></div>
  <div id="materialsBody">
   <div id="materialsAuthGate" class="materialsAuthGate" hidden></div>
-  <p class="materialsNote">초기 기준: <b>V3 분석 350회(선장 보고)</b>, V7·V4 분석 실적 미확인. 350회 분석과 350건의 결과전 보고서는 다릅니다. <b>원본에서 검증된 결과전 보고서만 자동 조회 대상으로 인정합니다.</b></p>
-  <div class="materialsGrid" aria-label="세 앱 독립 자료 원본">
+  <p class="materialsNote"><b>새 분석 기준: 제1회차부터 3앱 공동 재분석.</b> V3 4개 방에서 원문 15·자동 5조합, V7 원문 5조합, V4 원문 10조합으로 구분합니다. <b>V3의 과거 350회 누적 분석은 별도 보존</b>하며, 과거 재분석 결과는 추첨 전에 확정한 공식 결과전과 구분합니다.</p>
+  <div id="materialsAppSelector" class="materialsGrid" aria-label="세 앱 독립 자료 원본" hidden>
    <button type="button" class="matApp" data-material-app="v7">🛡️ V7 통제관</button>
    <button type="button" class="matApp selected" data-material-app="v3">🧭 V3 항해사앱</button>
    <button type="button" class="matApp" data-material-app="freedom">🚢 V4 항해의자유</button>
   </div>
+  <div id="beforeRoomGrid" class="beforeRoomGrid" role="group" aria-label="6개 방 결과전 보고서 자동수신">
+   <button type="button" data-before-room="all" class="selected" aria-pressed="true">🌐 전체 6개 방</button>
+   <button type="button" data-before-room="v3-1" aria-pressed="false">🧭 V3 제1방</button>
+   <button type="button" data-before-room="v3-2" aria-pressed="false">🧭 V3 제2방</button>
+   <button type="button" data-before-room="v3-3" aria-pressed="false">🧭 V3 제3방</button>
+   <button type="button" data-before-room="v3-4" aria-pressed="false">🧭 V3 제4방</button>
+   <button type="button" data-before-room="v7" aria-pressed="false">🛡️ V7 통제관방</button>
+   <button type="button" data-before-room="v4" aria-pressed="false">🚢 V4 항해의자유방</button>
+  </div>
+  <p id="beforeRoomScope" class="materialsNote">V3는 4개 방을 합쳐 원문 15조합 + 자동 5조합의 구성 기준을 사용합니다. 각 방에 20조합씩 확정되었다는 뜻은 아닙니다.</p>
   <div id="materialsLinkStatus" class="materialsLinkStatus" role="status" aria-live="polite">인증 후 V3·V7·V4 원본을 자동 점검합니다. 추첨 전 원본 증빙이 없는 기록은 공식 집계에서 제외합니다.</div>
   <div id="materialsAutoSync" class="materialsAutoSync"><span>🔄 자동 조회 · 자료실 열림 동안 60초마다</span><small id="materialsAutoUpdated">마지막 조회: 대기</small></div>
   <details class="materialsExtraStages"><summary>결과후·누적DB 별도 조회</summary>
@@ -992,6 +1019,36 @@ function homeView(which){
 /* Captain-only original ledger links for three independent apps.
  * No leakage of raw combinations or retrospective fabricated 'result-before' entries. */
 var materialApp='v3',materialStage='before',materialLast=null;
+var selectedBeforeRoom='all';
+var SIX_ROOM_FEED='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/crew-six-room-before-feed';
+var SIX_ROOMS=['v3-1','v3-2','v3-3','v3-4','v7','v4'];
+function isRoomValid(r){return r==='all'||SIX_ROOMS.includes(r);}
+async function fetchSixRoomFeed(room,round){
+ if(!isRoomValid(room))throw Error('INVALID_ROOM_FILTER');
+ var target=SIX_ROOM_FEED+'?room='+encodeURIComponent(room)+(round?'&round='+encodeURIComponent(round):'');
+ var resp=await fetch(target,{method:'GET',headers:{Authorization:'Bearer '+token,Accept:'application/json'},cache:'no-store'});
+ var data=await resp.json();
+ if(!resp.ok||data.error||!data.ok)throw Error(data.error||'FEED_HTTP_'+resp.status);
+ if(data.scope!==room||data.stage!=='RESULT-BEFORE'||data.read_only!==true||
+   data.raw_predictions_included!==false||!Array.isArray(data.items)||!Array.isArray(data.source_rooms)||
+   data.items.length>160||data.items.some(function(x){
+    return !x||!SIX_ROOMS.includes(x.room_id)||!Number.isInteger(x.round_no)||
+    x.round_no<1||x.round_no>1247||typeof x.record_id!=='string'||
+    x.record_type!=='RESULT-BEFORE'||x.official_eligible!==false;
+   }))throw Error('SOURCE_CONTRACT_REJECTED');
+ return data;
+}
+document.querySelectorAll('[data-before-room]').forEach(function(btn){
+ btn.addEventListener('click',function(){
+  selectedBeforeRoom=btn.getAttribute('data-before-room')||'all';
+  document.querySelectorAll('[data-before-room]').forEach(function(x){
+   var sel=x.getAttribute('data-before-room')===selectedBeforeRoom;
+   x.classList.toggle('selected',sel);x.setAttribute('aria-pressed',String(sel));
+  });
+  loadIntegratedMaterials();
+ });
+});
+
 var materialsMonitorTimer=null,materialsMonitorSerial=0,materialsListSerial=0;
 var MATERIALS_REFRESH_MS=60000;
 var THREE_APP_READ_ENDPOINT='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/crew-three-app-materials';
@@ -1020,19 +1077,23 @@ async function fetchThreeAppMetadata(app,stage,round){
 }
 async function refreshThreeAppConnections(){
  if(HOME_SELECTED!=='materials'||!token)return;
- var serial=++materialsMonitorSerial,apps=['v3','v7','freedom'];
- var results=await Promise.allSettled(apps.map(function(app){return fetchThreeAppMetadata(app,'before',null);}));
- if(serial!==materialsMonitorSerial||HOME_SELECTED!=='materials'||!token)return;
- $('materialsLinkStatus').textContent=apps.map(function(app,i){
-  var r=results[i],label=app==='freedom'?'V4':app.toUpperCase();
-  if(r.status!=='fulfilled')return label+' 조회 실패';
-  var data=r.value;
-  if(!data.linked)return label+' 원본 자동연계 대기';
-  var verified=data.items.filter(verifiedBeforeReport).length;
-  return label+' 서버 메타 '+data.total+'건 · 결과전 증빙확인 '+verified+'건 (전체 감사 별도)';
- }).join(' | ');
- $('materialsAutoUpdated').textContent='마지막 조회: '+new Date().toLocaleTimeString('ko-KR');
+ var serial=++materialsMonitorSerial;
+ try{
+  var result=await fetchSixRoomFeed('all',null);
+  if(serial!==materialsMonitorSerial||HOME_SELECTED!=='materials'||!token)return;
+  $('materialsLinkStatus').textContent=result.source_rooms.map(function(room){
+   return room.name+': '+(room.state==='SOURCE_CONNECTOR_REQUIRED'?'원본 송신 연결 대기':
+      room.state==='NO_REPORTS_RECEIVED'?'원본 조회 연결 · 결과전 수신 대기':
+      room.state==='UNVERIFIED_SOURCE_RECORDS'?'과거 결과전 후보 '+room.received_candidates+'건 (검증 전)':
+      '원본 조회 실패');
+  }).join(' | ');
+  $('materialsAutoUpdated').textContent='마지막 확인: '+new Date().toLocaleTimeString('ko-KR');
+ }catch(e){
+  if(serial!==materialsMonitorSerial||HOME_SELECTED!=='materials'||!token)return;
+  $('materialsLinkStatus').textContent='각 방 원본 자동 조회 실패 · 이전 자료는 변경되지 않았습니다 ('+String(e.message||e).slice(0,60)+')';
+ }
 }
+
 function startMaterialsMonitor(){
  if(materialsMonitorTimer){clearInterval(materialsMonitorTimer);materialsMonitorTimer=null;}
  if(HOME_SELECTED!=='materials'||!token)return;
@@ -1049,6 +1110,9 @@ function stopMaterialsMonitor(){
 function materialsLabel(stage){return {before:'결과전',after:'결과후',db:'누적DB'}[stage]||stage;}
 function materialsSelect(kind,value){
  if(kind==='app')materialApp=value; else materialStage=value;
+ $('beforeRoomGrid').hidden=materialStage!=='before';
+ $('beforeRoomScope').hidden=materialStage!=='before';
+ $('materialsAppSelector').hidden=materialStage==='before';
  var selector=kind==='app'?'data-material-app':'data-material-stage';
  document.querySelectorAll('['+selector+']').forEach(function(el){el.classList.toggle('selected',el.getAttribute(selector)===value);});
  $('materialsLocal').hidden=materialApp==='v7';
@@ -1070,6 +1134,10 @@ async function loadIntegratedMaterials(){
  var round=String($('materialsRound').value||'').trim();
  if(round&&(!/^\d{1,4}$/.test(round)||Number(round)<1||Number(round)>1247)){
   $('materialsStatus').textContent='1~1247회차만 조회할 수 있습니다.';return;
+ }
+ if(materialStage==='before'){
+  await loadSixRoomResultBefore(serial,round||null);
+  return;
  }
  var app=materialApp,stage=materialStage;
  $('materialsStatus').textContent='원본 조회 중…';
@@ -1111,6 +1179,45 @@ async function loadIntegratedMaterials(){
   $('materialsStatus').textContent='원본 조회 실패 · 기존 DB 불변 ('+String(e.message||e).slice(0,90)+')';$('materialsList').replaceChildren();
  }
 }
+/* Six captain report rooms. Metadata is read only from the app's existing source server.
+ * In a retrospective replay, the word RESULT-BEFORE is a report stage, not proof of a
+ * contemporaneous lottery forecast. No artificial reports are created. */
+async function loadSixRoomResultBefore(serial,round){
+ $('materialsStatus').textContent='V3 4방 + V7 + V4 · 결과전 수신현황 조회 중…';
+ try{
+  var scope=selectedBeforeRoom;
+  var result=await fetchSixRoomFeed(scope,round);
+  if(serial!==materialsListSerial||HOME_SELECTED!=='materials'||materialStage!=='before')return;
+  $('materialsList').replaceChildren();
+  var selected=result.source_rooms;
+  var meta=document.createElement('p');meta.className='materialsNote';
+  meta.textContent='🔁 제1회차부터 재분석 · 원본 보고서 수신 확인: '+result.items.length+'건 (공식 결과전 인증 0건). 각 방의 자동송신은 실기기 검증 전입니다.';
+  $('materialsList').append(meta);
+  selected.forEach(function(room){
+   var tile=document.createElement('div');tile.className='matRecord';
+   var note=room.state==='SOURCE_CONNECTOR_REQUIRED'?'결과전 원본 송신 연결 대기':
+       room.state==='NO_REPORTS_RECEIVED'?'원본 서버 조회 가능 · 등록된 결과전 없음':
+       room.state==='UNVERIFIED_SOURCE_RECORDS'?'과거 등록 후보 '+room.received_candidates+'건 · 사전잠금 미검증':
+       '원본 조회 상태 점검 필요';
+   tile.textContent=room.name+' · '+note;
+   $('materialsList').append(tile);
+  });
+  result.items.forEach(function(item){
+   var tile=document.createElement('div');tile.className='matRecord';
+   tile.textContent=item.room_id.toUpperCase()+' · 제'+item.round_no+'회 · 결과전 형식 · '+item.filename+
+     ' · '+(item.verification==='PRE_DRAW_METADATA_ONLY'?'추첨 전 등록 메타(독립 감사 대기)':'과거 재분석/시점 미검증')+
+     ' · '+(item.created_at||'등록시각 확인 전');
+   $('materialsList').append(tile);
+  });
+  $('materialsStatus').textContent='✅ 방별 자동 조회 완료 · 등록 후보 '+result.items.length+'건 · 실제 결과전 자동송신 '+(result.source_rooms.every(function(x){return x.actual_app_auto_push_verified})?'검증됨':'미검증')+
+  ' · 모든 과거 재분석은 연구용으로 분리';
+ }catch(e){
+  if(serial!==materialsListSerial||HOME_SELECTED!=='materials')return;
+  $('materialsStatus').textContent='자동 조회 실패 · 원본자료 불변: '+String(e.message||e).slice(0,85);
+  $('materialsList').replaceChildren();
+ }
+}
+
 $('materialsLocalFile').addEventListener('change',async function(){
  var file=this.files&&this.files[0],out=$('materialsLocalPreview');
  if(!file){out.hidden=true;return;}
