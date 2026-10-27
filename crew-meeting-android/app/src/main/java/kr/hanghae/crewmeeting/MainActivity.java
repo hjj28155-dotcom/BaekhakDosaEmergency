@@ -18,10 +18,13 @@ import android.webkit.ValueCallback;
 import android.webkit.SslErrorHandler;
 import android.net.http.SslError;
 import android.widget.Toast;
+import java.io.InputStream;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 
 public final class MainActivity extends Activity {
     private static final String ROOM_URL =
-        "https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/crew-meeting.html?app_version=113";
+        "https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/crew-meeting.html?app_version=114";
     private static final int FILE_CHOOSER_CODE = 502;
     private static final int PICK_V3_APP = 503;
     private static final int PICK_V7_APP = 504;
@@ -95,7 +98,35 @@ public final class MainActivity extends Activity {
             try { startActivity(view); }
             catch (Exception e) { Toast.makeText(this,"다운로드용 브라우저를 열 수 없습니다.",Toast.LENGTH_LONG).show(); }
         });
-        web.loadUrl(ROOM_URL);
+        loadCaptainDashboard();
+    }
+
+    /**
+     * The captain-only research dashboard is bundled into this APK, so the existing
+     * public main-branch Pages HTML cannot silently replace the candidate build.
+     * The trusted base URL preserves the original Pages paths and approval room.
+     * This does NOT install/update V3, V7 or the public V4 application.
+     */
+    private void loadCaptainDashboard() {
+        try (InputStream input = getAssets().open("captain_home_v114.html");
+             ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+            byte[] buffer = new byte[8192];
+            int length;
+            while ((length = input.read(buffer)) != -1) {
+                if (output.size() + length > 1048576)
+                    throw new java.io.IOException("Invalid embedded dashboard size");
+                output.write(buffer, 0, length);
+            }
+            String html = new String(output.toByteArray(), StandardCharsets.UTF_8);
+            if (!html.contains("id=\"beforeRoomGrid\"")
+                    || !html.contains("id=\"homeApprovalBtn\"")
+                    || !html.contains("id=\"appCommandDeck\""))
+                throw new java.io.IOException("Required captain dashboard modules missing");
+            web.loadDataWithBaseURL(ROOM_URL, html, "text/html", "UTF-8", ROOM_URL);
+        } catch (java.io.IOException e) {
+            Toast.makeText(this, "중앙통제실 홈화면을 검증할 수 없습니다. 기존 설치본을 보존하세요.",
+                Toast.LENGTH_LONG).show();
+        }
     }
 
 
