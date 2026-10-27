@@ -667,6 +667,16 @@ body{
  #homeSpecialRooms #homeMaterialsBtn{font-size:.63rem!important}
 }
 
+
+/* RESULT-BEFORE automatic authenticated READ-ONLY metadata refresh. */
+#homeLiveBtn{display:none!important}
+#homeQuickActions{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+#homeSpecialRooms #homeMaterialsBtn{border:2px solid #f4d78b!important;background:linear-gradient(110deg,rgba(19,100,124,.94),rgba(11,60,95,.97))!important}
+.materialsAutoSync{display:flex;align-items:center;justify-content:space-between;gap:7px;font-size:.68rem;color:#b9dfef;padding:3px 0 6px}
+.materialsAutoSync small{font-size:.61rem;color:#cbdce6}
+.materialsUnverified{border:1px solid #d5b97f;border-radius:8px;background:rgba(59,43,14,.5);padding:9px;margin:4px 0;color:#ffe3a3;font-size:.74rem;line-height:1.45}
+@media(max-width:370px){.materialsAutoSync{font-size:.62rem;flex-wrap:wrap}}
+
 </style>
 </head>
 <body>
@@ -725,9 +735,9 @@ body{
  </div>
  <p class="deckIntegrityNote">배포판 설치·업데이트는 별도 공식 링크에서 진행합니다. 이 화면은 앱 실행 및 검증된 자료 조회·기존 승인관리만 연결하며, 각 앱 DB를 변경하지 않습니다.</p>
 </section>
-<div id="homeSpecialRooms" aria-label="승인관리방과 통합자료방">
+<div id="homeSpecialRooms" aria-label="기존 승인관리와 결과전 자료실">
 <button id="homeApprovalBtn" type="button" aria-expanded="false" aria-controls="homeApprovalPanel">🔐 일반판 승인관리</button>
-<button id="homeMaterialsBtn" type="button" aria-expanded="false" aria-controls="homeMaterialsPanel">📚 V3·V7·V4 결과전 자료실</button>
+<button id="homeMaterialsBtn" type="button" aria-expanded="false" aria-controls="homeMaterialsPanel">📚 V3 + V7 + V4 결과전 보고서</button>
 </div>
 <div id="centralRoundPanel" aria-label="중앙통제실 전회차 조회">
  <label for="centralRoundInput">🔎 중앙통제실 · 제1회부터 현회차까지 조회</label>
@@ -758,7 +768,8 @@ body{
    <button type="button" class="matApp selected" data-material-app="v3">🧭 V3 항해사앱</button>
    <button type="button" class="matApp" data-material-app="freedom">🚢 V4 항해의자유</button>
   </div>
-  <div id="materialsLinkStatus" class="materialsLinkStatus" role="status" aria-live="polite">원본 자동연계 확인: V3 원본 미연결 · V7 서버 메타 조회 가능(결과전 증빙 별도 확인) · V4 원본 미연결</div>
+  <div id="materialsLinkStatus" class="materialsLinkStatus" role="status" aria-live="polite">인증 후 V3·V7·V4 원본을 자동 점검합니다. 추첨 전 원본 증빙이 없는 기록은 공식 집계에서 제외합니다.</div>
+  <div id="materialsAutoSync" class="materialsAutoSync"><span>🔄 자동 조회 · 자료실 열림 동안 60초마다</span><small id="materialsAutoUpdated">마지막 조회: 대기</small></div>
   <details class="materialsExtraStages"><summary>결과후·누적DB 별도 조회</summary>
   <div class="materialsGrid" aria-label="자료 구분">
    <button type="button" class="matStage selected" data-material-stage="before">📄 결과전</button>
@@ -926,6 +937,7 @@ function homeView(which){
  $('homeMorePanel').hidden=which!=='more';
  $('homeApprovalPanel').hidden=which!=='approval';
  $('homeMaterialsPanel').hidden=which!=='materials';
+ if(which!=='materials')stopMaterialsMonitor();
  $('homeMaterialsBtn').setAttribute('aria-expanded',String(which==='materials'));
  var root=document.querySelector('main');
  root.classList.toggle('roomMode',which!=='home');
@@ -950,6 +962,7 @@ function homeView(which){
  $('loginArea').hidden=!active||!!token;
  if(which==='live'&&token)threeRoomRefresh();
  if(which==='reports'&&token)refreshV7Reports();
+ if(which==='materials')startMaterialsMonitor();
  if(which==='more')$('homeMorePanel').scrollTop=0;
  if(which==='live'||which==='reports'){
    $('homeWorkspace').scrollTop=0;
@@ -964,6 +977,58 @@ function homeView(which){
 /* Captain-only original ledger links for three independent apps.
  * No leakage of raw combinations or retrospective fabricated 'result-before' entries. */
 var materialApp='v3',materialStage='before',materialLast=null;
+var materialsMonitorTimer=null,materialsMonitorSerial=0,materialsListSerial=0;
+var MATERIALS_REFRESH_MS=60000;
+var THREE_APP_READ_ENDPOINT='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/crew-three-app-materials';
+/* Metadata without independently verified prior-to-draw lock remains PENDING.
+ * A received date or RESULT-BEFORE label alone is never proof. */
+function verifiedBeforeReport(row){
+ return !!row&&row.pre_draw_proof==='VERIFIED_PRE_DRAW'&&
+  typeof row.source_sha256==='string'&&/^[a-f0-9]{64}$/i.test(row.source_sha256)&&
+  typeof row.locked_at==='string'&&Number.isFinite(Date.parse(row.locked_at))&&
+  Number.isInteger(row.round_no)&&row.round_no>=1&&row.round_no<=1247&&
+  typeof row.record_id==='string'&&row.record_id.length>0;
+}
+async function fetchThreeAppMetadata(app,stage,round){
+ if(!['v3','v7','freedom'].includes(app)||!['before','after','db'].includes(stage))throw Error('INVALID_SOURCE_SELECTION');
+ var url=THREE_APP_READ_ENDPOINT+'?app='+encodeURIComponent(app)+'&stage='+encodeURIComponent(stage)+(round?'&round='+encodeURIComponent(round):'');
+ var resp=await fetch(url,{method:'GET',headers:{Authorization:'Bearer '+token,Accept:'application/json'},cache:'no-store'});
+ var result=await resp.json();
+ if(!resp.ok||result.error)throw Error(result.error||'READ_HTTP_'+resp.status);
+ if(result.app!==app||result.stage!==stage||result.read_only!==true||result.raw_predictions_included!==false||
+   typeof result.linked!=='boolean'||!Array.isArray(result.items)||result.items.length>80||
+   result.items.some(function(x){return !x||!Number.isInteger(x.round_no)||x.round_no<1||x.round_no>1247;}))
+   throw Error('UNVERIFIED_SERVER_CONTRACT');
+ return result;
+}
+async function refreshThreeAppConnections(){
+ if(HOME_SELECTED!=='materials'||!token)return;
+ var serial=++materialsMonitorSerial,apps=['v3','v7','freedom'];
+ var results=await Promise.allSettled(apps.map(function(app){return fetchThreeAppMetadata(app,'before',null);}));
+ if(serial!==materialsMonitorSerial||HOME_SELECTED!=='materials'||!token)return;
+ $('materialsLinkStatus').textContent=apps.map(function(app,i){
+  var r=results[i],label=app==='freedom'?'V4':app.toUpperCase();
+  if(r.status!=='fulfilled')return label+' 조회 실패';
+  var data=r.value;
+  if(!data.linked)return label+' 원본 자동연계 대기';
+  var verified=data.items.filter(verifiedBeforeReport).length;
+  return label+' 서버 메타 '+data.total+'건 · 결과전 증빙확인 '+verified+'건 (전체 감사 별도)';
+ }).join(' | ');
+ $('materialsAutoUpdated').textContent='마지막 조회: '+new Date().toLocaleTimeString('ko-KR');
+}
+function startMaterialsMonitor(){
+ if(materialsMonitorTimer){clearInterval(materialsMonitorTimer);materialsMonitorTimer=null;}
+ if(HOME_SELECTED!=='materials'||!token)return;
+ refreshThreeAppConnections();
+ materialsMonitorTimer=setInterval(function(){
+  if(HOME_SELECTED==='materials'&&token){refreshThreeAppConnections();loadIntegratedMaterials();}
+ },MATERIALS_REFRESH_MS);
+}
+function stopMaterialsMonitor(){
+ if(materialsMonitorTimer){clearInterval(materialsMonitorTimer);materialsMonitorTimer=null;}
+ ++materialsMonitorSerial;++materialsListSerial;
+}
+
 function materialsLabel(stage){return {before:'결과전',after:'결과후',db:'누적DB'}[stage]||stage;}
 function materialsSelect(kind,value){
  if(kind==='app')materialApp=value; else materialStage=value;
@@ -983,34 +1048,51 @@ document.querySelectorAll('[data-material-stage]').forEach(function(button){
 $('materialsRefresh').addEventListener('click',loadIntegratedMaterials);
 $('materialsRound').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();loadIntegratedMaterials();}});
 async function loadIntegratedMaterials(){
+ var serial=++materialsListSerial;
  if(!token){$('materialsStatus').textContent='선장 인증 후에 원본 조회가 가능합니다.';$('materialsList').replaceChildren();return;}
  var round=String($('materialsRound').value||'').trim();
  if(round&&(!/^\d{1,4}$/.test(round)||Number(round)<1||Number(round)>1247)){
   $('materialsStatus').textContent='1~1247회차만 조회할 수 있습니다.';return;
  }
- var url='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/crew-three-app-materials?app='+encodeURIComponent(materialApp)+'&stage='+encodeURIComponent(materialStage)+(round?'&round='+round:'');
+ var app=materialApp,stage=materialStage;
  $('materialsStatus').textContent='원본 조회 중…';
  try{
-  const resp=await fetch(url,{method:'GET',headers:{'Authorization':'Bearer '+token,'Accept':'application/json'},cache:'no-store'});
-  const result=await resp.json();
-  if(!resp.ok||result.error)throw Error(result.error||String(resp.status));
-  materialLast=result;
-  $('materialsList').replaceChildren();
+  var result=await fetchThreeAppMetadata(app,stage,round||null);
+  if(serial!==materialsListSerial||HOME_SELECTED!=='materials')return;
+  materialLast=result;$('materialsList').replaceChildren();
   if(!result.linked){
-   $('materialsStatus').textContent=materialApp==='v3'?'V3 분석 350회(선장 보고). 검증된 결과전 보고서 원본 자동 연계 대기 · 내보낸 파일은 임시 미리보기만 가능합니다.':'V4 항해의자유 결과전 보고서 원본 자동 연동 대기 · 일반 사용자 기존 최근 5회차 제한 유지.';
+   $('materialsStatus').textContent=app==='v3'?'V3 누적 분석 350회(선장 보고) · 결과전 확정 원본 자동 연계 대기':
+   'V4 항해의자유 · 결과전 확정 원본 자동 연계 대기 (일반판 기존 정책 유지)';
    return;
   }
-  $('materialsStatus').textContent='🛡️ V7 서버 '+materialsLabel(materialStage)+' 등록 메타 '+result.total+'건 · 현재 분석 수행 실적이나 추첨 전 사전잠금 증명이 아닙니다.';
-  if(!result.items||!result.items.length){
-   var none=document.createElement('p');none.className='materialsNote';none.textContent='이 조건에 검증된 등록 자료가 없습니다. 0점이나 0조합으로 간주하지 않습니다.';$('materialsList').append(none);return;
+  var rows=result.items;
+  if(stage==='before'){
+   var verified=rows.filter(verifiedBeforeReport);
+   $('materialsStatus').textContent='서버 등록 메타 '+result.total+'건 · 이번 조회 결과전 증빙 확인 '+verified.length+'건 · 미검증 메타는 공식 목록에서 제외';
+   if(!verified.length){
+    var pending=document.createElement('p');pending.className='materialsUnverified';
+    pending.textContent='조회된 '+rows.length+'개 자료는 추첨 전 원본 잠금 증빙이 없어 공식 결과전 보고서로 집계하지 않습니다. 기존 원본은 보존합니다.';
+    $('materialsList').append(pending);return;
+   }
+   rows=verified;
+  }else{
+   $('materialsStatus').textContent='별도 '+materialsLabel(stage)+' 서버 기록 메타 '+result.total+'건 · 결과전 정본과 구분합니다.';
   }
-  result.items.forEach(function(row){
+  if(!rows.length){
+   var none=document.createElement('p');none.className='materialsNote';
+   none.textContent='이 조건에 검증된 자료가 없습니다. 분석 0회 또는 적중 0건이라는 뜻이 아닙니다.';
+   $('materialsList').append(none);return;
+  }
+  rows.forEach(function(row){
    var item=document.createElement('div');item.className='matRecord';
    var date=row.locked_at||row.graded_at||row.created_at||'일시 미확인';
-   item.textContent='제'+row.round_no+'회 · '+materialsLabel(materialStage)+' · '+(row.room_key||'')+' · '+(row.status||'')+' · '+date;
+   item.textContent='제'+row.round_no+'회 · '+materialsLabel(stage)+' · '+(row.room_key||'')+' · '+(row.status||'')+' · '+date;
    $('materialsList').append(item);
   });
- }catch(e){$('materialsStatus').textContent='자료 연동 실패 · 기존 원본은 변경되지 않았습니다. ('+String(e.message||e).slice(0,90)+')';$('materialsList').replaceChildren();}
+ }catch(e){
+  if(serial!==materialsListSerial||HOME_SELECTED!=='materials')return;
+  $('materialsStatus').textContent='원본 조회 실패 · 기존 DB 불변 ('+String(e.message||e).slice(0,90)+')';$('materialsList').replaceChildren();
+ }
 }
 $('materialsLocalFile').addEventListener('change',async function(){
  var file=this.files&&this.files[0],out=$('materialsLocalPreview');
@@ -1799,6 +1881,7 @@ function enter(){
  $('loginArea').style.display='none';$('loginArea').hidden=true;
  $('chatArea').style.display='flex';$('disconnectBtn').style.display='inline-block';
  if(HOME_SELECTED==='live')threeRoomRefresh();
+ if(HOME_SELECTED==='materials'){startMaterialsMonitor();loadIntegratedMaterials();}
  if(HOME_SELECTED==='reports')refreshV7Reports();
  if(timer)clearInterval(timer);timer=setInterval(refresh,4000);refresh();showContinuity();refreshFiles();refreshOriginalLinks();
 }
@@ -1815,6 +1898,7 @@ function saveConfirmedEntry(){
  }catch(e){status('loginError','기기 저장이 제한되어 이번 앱 사용 중에만 입장이 유지될 수 있습니다.');}
 }
 function disconnect(){
+ stopMaterialsMonitor();
  threeRoomStop();
  if(timer)clearInterval(timer);timer=null;token='';clearRememberedEntry();lastFingerprint='';
  $('loginArea').style.display='block';$('loginArea').hidden=false; $('chatArea').style.display='none';$('disconnectBtn').style.display='none';$('secret').value='';$('fileList').replaceChildren();$('fileCount').textContent='0개 · 보기';
