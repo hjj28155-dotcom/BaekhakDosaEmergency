@@ -987,6 +987,8 @@ function verifiedBeforeReport(row){
   typeof row.source_sha256==='string'&&/^[a-f0-9]{64}$/i.test(row.source_sha256)&&
   typeof row.locked_at==='string'&&Number.isFinite(Date.parse(row.locked_at))&&
   Number.isInteger(row.round_no)&&row.round_no>=1&&row.round_no<=1247&&
+  row.received_before_draw===true&&
+  Date.parse(row.locked_at)<Date.UTC(2002,11,7,11,35)+(row.round_no-1)*604800000&&
   typeof row.record_id==='string'&&row.record_id.length>0;
 }
 async function fetchThreeAppMetadata(app,stage,round){
