@@ -1,0 +1,2073 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+<title>선장 · 항해사 · 통제관 공동회의</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,-apple-system,"Malgun Gothic",sans-serif;--ink:#ecf6ff;--dim:#a8bdd0;--line:#36506b;--panel:#11293fcc}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -30%,#2e648c 0%,#102a43 47%,#061624 100%);color:var(--ink);min-height:100dvh}
+main{max-width:840px;margin:0 auto;padding:17px 15px 35px}header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}h1{font-size:1.42rem;margin:0;line-height:1.35}h2{font-size:1rem;margin:0 0 9px}small,.muted{color:var(--dim);font-size:.8rem}p{line-height:1.5}section{border:1px solid var(--line);border-radius:16px;background:var(--panel);padding:16px;margin:12px 0;box-shadow:0 9px 30px #0002}.notice{font-size:.84rem;color:#cfe4f5;background:#18344c;border-left:3px solid #8ab8d5;padding:10px 12px;border-radius:4px}
+.roles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.role{border:1px solid var(--line);border-radius:12px;padding:10px 8px;text-align:center;background:#16334d}.role b{display:block;margin:3px 0}.role small{display:block}.role .mark{font-size:1.36rem}
+label{display:block;font-size:.88rem;font-weight:650;margin:10px 0 5px}input,textarea,button{font:inherit}input,textarea{color:var(--ink);background:#081b2d;border:1px solid #54708d;border-radius:10px;padding:12px;width:100%;font-size:1rem}input:focus,textarea:focus{outline:2px solid #66b8ec;outline-offset:1px}textarea{min-height:90px;max-height:170px;resize:vertical}button{border:0;border-radius:10px;padding:11px 15px;background:#c9e6fa;color:#092438;font-weight:750;cursor:pointer}button:disabled{opacity:.45;cursor:default}.secondary{background:#274660;color:#e4f4ff;border:1px solid #5b7890}.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.row button{flex:0 0 auto}.stretch{flex:1 1 180px}.message-list{min-height:150px;max-height:62dvh;overflow-y:auto;border:1px solid #36506b;border-radius:12px;padding:12px;background:#071a2a;display:flex;flex-direction:column;gap:10px}.message{max-width:90%;padding:11px 13px;border-radius:13px;border:1px solid #36516d;background:#15344e;line-height:1.5;overflow-wrap:anywhere;white-space:pre-wrap}.message.mine{align-self:flex-end;background:#254966;border-color:#6286aa}.message.meta{align-self:center;background:#13283b;color:#b4c8d8;font-size:.85rem}.who{font-weight:800;font-size:.88rem;margin-bottom:3px}.when{font-size:.7rem;color:#a8bdce;margin-top:6px}.message.mine .who{color:#d4ecff}.message.navigator .who{color:#9de1ff}.message.controller .who{color:#f9e3aa}.actions{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:9px 0}.status{font-size:.84rem;color:#b7d9ef}footer{margin-top:15px;text-align:center;font-size:.79rem;color:#99b0c1}#chatArea,#disconnectBtn{display:none}#sendMsg{width:100%}@media(max-width:440px){.role{padding:8px 4px}.role small{font-size:.69rem}main{padding-left:11px;padding-right:11px}.message{max-width:97%}h1{font-size:1.18rem}}
+
+/* v1.0.1: single-screen phone layout, preserve embedded V3/V7 state */
+html,body{height:100%;width:100%;overflow:hidden}
+body{height:100dvh}
+main{
+  height:100dvh;height:var(--app-height,100dvh);max-height:100dvh;
+  padding:max(6px,env(safe-area-inset-top)) 9px max(6px,env(safe-area-inset-bottom));
+  display:flex;flex-direction:column;gap:5px;overflow:hidden;min-height:0;
+}
+header{flex:none;margin:0;min-height:35px}
+h1{font-size:1.08rem;line-height:1.18}
+header small{font-size:.68rem}
+header button{padding:6px 10px}
+.roles{flex:none;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+.role{display:flex;align-items:center;justify-content:center;gap:4px;min-width:0;padding:5px 3px;border-radius:9px}
+.role .mark{font-size:1.05rem;line-height:1.2}
+.role b{font-size:.82rem;line-height:1.2;margin:0;white-space:nowrap}
+.role small{display:none}
+section{margin:0;box-shadow:none}
+section.notice{flex:none;padding:6px 9px;font-size:.72rem;line-height:1.28;max-height:45px;overflow:auto}
+#loginArea{flex:none;margin-top:min(7dvh,40px);padding:14px}
+#loginArea h2{font-size:1rem}
+#loginArea .muted{font-size:.83rem;margin:5px 0}
+#chatArea{flex:1 1 auto;min-height:0;min-width:0;padding:0;border:0;background:transparent;box-shadow:none;flex-direction:column;overflow:hidden;gap:5px}
+#chatArea>.actions{flex:none;margin:0 0 1px;min-height:27px}
+#chatArea>.actions button{padding:6px 10px;font-size:.75rem}
+#chatArea>.actions h2{margin:0;font-size:.93rem}
+#continuityPanel{flex:none;padding:0 8px;background:#132d41;border-radius:9px;max-height:34dvh;overflow-y:auto;scrollbar-width:thin}
+#continuityPanel summary{cursor:pointer;list-style:none;padding:8px 0;display:flex;align-items:center;justify-content:space-between;gap:5px;line-height:1.2;font-size:.79rem;font-weight:700}
+#continuityPanel summary::-webkit-details-marker{display:none}
+#continuityPanel summary:before{content:"▸";color:#a6d7f7;flex:none}
+#continuityPanel[open] summary:before{content:"▾"}
+#continuityFlag{font-size:.72rem;color:#ffdeb1;margin-left:auto;font-weight:600}
+#continuityContent{padding-bottom:6px}
+#continuityContent>.actions{margin:1px 0 4px}
+#continuityContent>.actions h2{font-size:.83rem;margin:0}
+#continuityContent>.actions button{font-size:.74rem;padding:5px 8px}
+#continuityContent .notice{max-height:none}
+#continuitySources{font-size:.76rem}
+#continuitySources p{margin:5px 0}
+#messages.message-list{flex:1 1 auto;min-height:0;max-height:none;padding:8px;gap:7px;overscroll-behavior:contain}
+.message{padding:8px 10px;font-size:.84rem;border-radius:10px}
+.who{font-size:.78rem}
+.when{font-size:.66rem;margin-top:3px}
+#connectionState{flex:none;min-height:12px;font-size:.69rem;line-height:1.2}
+#sendForm{flex:none;min-height:0;display:flex;flex-direction:column;gap:4px}
+#sendForm label{margin:0;font-size:.8rem}
+#sendForm textarea{min-height:54px;height:60px;max-height:105px;padding:8px 10px;line-height:1.3;font-size:.88rem}
+#sendForm .actions{margin:0}
+#sendForm .actions small{font-size:.69rem}
+#sendMsg{padding:10px 12px;min-height:38px;font-size:.88rem}
+#sendError{flex:none;min-height:0;max-height:34px;overflow-y:auto;font-size:.7rem}
+footer{display:none}
+@media(max-width:440px){
+ main{padding-left:7px;padding-right:7px}
+ h1{font-size:.98rem}
+ header small{font-size:.64rem}
+ .role{padding:5px 1px}
+ .role b{font-size:.78rem}
+ #loginArea{margin-top:8px}
+}
+@media(max-height:630px){
+ main{gap:3px}
+ header{min-height:28px}
+ header small{display:none}
+ section.notice{font-size:.68rem;max-height:32px;padding:4px 8px}
+ .role{padding:3px 1px}
+ #continuityPanel summary{padding:5px 0}
+ #sendForm textarea{height:45px;min-height:40px}
+ #sendMsg{padding:7px 12px;min-height:33px}
+ #chatArea>.actions{min-height:23px}
+}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+/* Flagship 1.0.3: private attachments live inside a collapsible panel to retain one-screen layout */
+#filePanel{flex:none;max-height:43dvh;overflow-y:auto;scrollbar-width:thin;padding:0 8px;border-radius:9px;background:#132d41}
+#filePanel summary{display:flex;justify-content:space-between;gap:8px;align-items:center;cursor:pointer;font-size:.79rem;font-weight:750;padding:7px 0;color:#f3d698}
+#filePanel summary:before{content:"▸";color:#efc577}
+#filePanel[open] summary:before{content:"▾"}
+#filePanel form{margin:5px 0;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+#filePanel input[type=file]{flex:1 1 170px;min-width:0;width:auto;max-width:100%;font-size:.73rem;padding:6px}
+#filePanel button{font-size:.76rem;min-height:32px;padding:6px 8px}
+#fileList{padding-bottom:6px}
+#fileList .fileRow{display:flex;justify-content:space-between;align-items:center;gap:5px;border-top:1px solid #36506b;padding:5px 0}
+#fileList .fileLabel{flex:1;min-width:0;overflow-wrap:anywhere;font-size:.73rem}
+#fileList .fileLabel small{display:block;margin-top:2px;font-size:.67rem}
+#fileStatus{font-size:.7rem;color:#cbe3f1;margin:4px 0}
+#filePanel .pilotNotice{font-size:.67rem;line-height:1.2;color:#a8bbcd;margin:4px 0}
+@media(max-height:630px){#filePanel summary{padding:4px 0}}
+
+
+/* Three ORIGINAL ChatGPT conversation launchers. Separate from pilot API actors. */
+#originalChatBar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;flex:none}
+#originalChatBar button{min-width:0;min-height:38px;border:1px solid #b18d54;background:#17344d;color:#ffe0ad;font-size:.73rem;line-height:1.18;font-weight:750;padding:5px 4px;white-space:normal;overflow-wrap:anywhere}
+#originalChatBar button.ready{background:#e1bd7b;color:#142c3d}
+#originalChatPanel{flex:none;padding:9px;border:1px solid #b18d54;border-radius:10px;background:#102b43;max-height:35dvh;overflow-y:auto}
+#originalChatPanel[hidden]{display:none!important}
+#originalChatPanel label{margin:0 0 4px;font-size:.78rem}
+#originalChatPanel input{height:37px;padding:7px;font-size:.8rem}
+#originalChatPanel .actions{margin:5px 0}
+#originalChatPanel button{font-size:.77rem;min-height:29px;padding:5px 10px}
+#originalChatNotice{font-size:.67rem;line-height:1.25}
+@media(max-height:630px){#originalChatBar button{min-height:31px;padding:3px;font-size:.68rem}}
+
+/* One-time captain login: optional persistent login for the same private handset. */
+#rememberLabel{display:flex;align-items:center;gap:8px;margin:9px 0 5px;font-size:.78rem;font-weight:500;color:#d7e7f1;cursor:pointer}
+#rememberLabel input[type=checkbox]{width:19px;height:19px;flex:none;accent-color:#e1bd7b;margin:0}
+
+/* Stable role buttons, rotating ChatGPT thread addresses when rooms migrate. */
+#migrateChatLinks{flex:none;align-self:stretch;min-height:24px;padding:3px 9px;font-size:.7rem;text-align:center;background:#284862;border:1px solid #6d8ca1;color:#ecf2f7}
+#originalRolePicker{display:flex;justify-content:space-between;gap:5px;flex-wrap:nowrap}
+#originalRolePicker button{flex:1 1 auto;min-width:0;font-size:.7rem;padding:5px 2px;white-space:nowrap}
+#originalRolePicker button.selected{background:#dfbc79;color:#14293a}
+#previousOriginalChat[hidden]{display:none!important}
+@media(max-height:630px){#migrateChatLinks{min-height:20px;padding:2px 6px}}
+
+/* Copy-first migration handshake, independent of pilot room login. */
+#handoffOpen{flex:none;align-self:stretch;min-height:30px;padding:5px 9px;font-size:.77rem;background:#e0be7d;color:#11293a}
+#handoffPanel{display:block;border:1px solid #b18d54;background:#132f49;margin:0;padding:10px;border-radius:12px;flex:none}
+#handoffPanel[hidden]{display:none!important}
+#handoffPanel h2{margin-bottom:5px}
+#handoffPanel small{font-size:.72rem;line-height:1.36}
+#handoffRolePicker{display:flex;gap:4px;flex-wrap:nowrap}
+#handoffRolePicker button{flex:1;min-width:0;padding:6px 3px;font-size:.71rem}
+#handoffRolePicker button.selected{background:#e0be7d;color:#11293a}
+#handoffText{font-size:.75rem;line-height:1.4;min-height:145px;max-height:190px;resize:vertical;margin-top:7px}
+#handoffPanel>.actions{display:flex;flex-wrap:wrap;gap:5px}
+#handoffPanel>.actions button{flex:1 1 120px;min-height:34px;padding:7px;font-size:.73rem}
+@media(max-height:630px){#handoffOpen{min-height:25px;padding:3px 7px}}
+
+#relayCopyPreview[hidden]{display:none!important}
+/* Original-room MANUAL relay: never imply a separate API AI is the ChatGPT original. */
+#relayOpen{flex:none;min-height:30px;padding:5px 8px;background:#e1bd7b;color:#142b3d;font-size:.76rem}
+#relayPanel{flex:none;padding:10px;background:#112c43;border:1px solid #bb9768;border-radius:11px;max-height:65dvh;overflow-y:auto;overscroll-behavior:contain}
+#relayPanel[hidden]{display:none!important}
+#relayPanel h2{font-size:.92rem;margin:0 0 4px}
+#relayPanel .relayNote{font-size:.73rem;line-height:1.35;color:#bfd7e9;margin:5px 0 9px}
+#relayPanel label{margin:5px 0 3px;font-size:.75rem}
+#relayPanel textarea{font-size:.81rem;min-height:67px;max-height:160px;padding:8px;border-radius:7px}
+#relayPanel select{width:100%;color:#edf5fb;background:#081b2d;border:1px solid #54708d;border-radius:7px;padding:7px;font-size:.78rem}
+#relayPanel .relayActions{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0}
+#relayPanel .relayActions button{flex:1 1 108px;min-height:30px;padding:5px;font-size:.73rem}
+#relayPanel .relayCard{margin:7px 0;padding:8px;border:1px solid #365775;background:#19354d;border-radius:9px}
+#relayPanel .relayCard b{font-size:.8rem}
+#relayPanel .relayCard .relaySmall{font-size:.7rem;color:#bcd0e3;white-space:pre-wrap;overflow-wrap:anywhere}
+#relayPanel .relayCard .relayActions button{flex:1 1 88px;font-size:.71rem}
+#relayPanel .relayCard textarea{min-height:65px}
+#relayStatus{font-size:.72rem;color:#d9e8f5;line-height:1.3}
+@media(max-height:630px){#relayOpen{min-height:26px;padding:3px 5px}#relayPanel{max-height:70dvh}}
+
+/* Android 1.0.5+: installed-app launch is native, not a WebView ChatGPT/API session. */
+#installedAppBar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;flex:none}
+.installedAppUnit{display:flex;gap:3px;min-width:0}
+.installedAppUnit button{font-size:.7rem;min-width:0;min-height:32px;padding:5px 3px;line-height:1.15;border:1px solid #6798ab}
+.installedAppUnit button:first-child{background:#245674;color:#f7f0d5;flex:1}
+.installedAppUnit button:last-child{flex:0 0 auto;font-size:.61rem;background:#29425c;color:#dbe9f2}
+@media(max-height:630px){.installedAppUnit button{min-height:26px;padding:3px 2px;font-size:.65rem}.installedAppUnit button:last-child{font-size:.59rem}}
+
+/* V3 export-only local preview and authenticated V7 server read-only catalog. */
+#reportsPanel{flex:none;max-height:48dvh;overflow-y:auto;scrollbar-width:thin;padding:0 8px;border-radius:9px;background:#132d41}
+#reportsPanel summary{display:flex;gap:6px;align-items:center;justify-content:space-between;cursor:pointer;padding:7px 0;color:#f2dea9;font-size:.78rem;font-weight:800}
+#reportsCount{font-size:.68rem;color:#bad7ea;font-weight:500}
+#reportsPanel .reportDisclaimer{font-size:.71rem;color:#b8d2e2;line-height:1.35;margin:5px 0}
+#reportsPanel .reportGroup{border-top:1px solid #38516b;padding:7px 0}
+#reportsPanel .reportGroup>b{font-size:.78rem}
+#reportsPanel .reportControls{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0}
+#reportsPanel select,#reportsPanel input{font-size:.75rem;border:1px solid #56768b;border-radius:8px;min-width:0;background:#092036;color:#eff9ff;padding:6px}
+#reportsPanel .reportControls select{flex:3 1 170px}
+#reportsPanel .reportControls input{flex:1 1 70px;width:80px}
+#reportsPanel .reportControls button{font-size:.72rem;flex:0 0 auto;padding:6px 9px}
+#reportsPanel #v3ReportFile{width:100%;max-width:100%;font-size:.73rem;margin:5px 0}
+#reportStatus,#v3ReportStatus{font-size:.72rem;color:#c5e0f3;margin:5px 0}
+#reportList .reportRow{display:flex;justify-content:space-between;align-items:center;gap:5px;border-top:1px solid #35556e;padding:5px 0;font-size:.74rem;overflow-wrap:anywhere}
+#reportList .reportRow button{flex:none;font-size:.71rem;padding:5px 7px}
+#reportsPanel pre{white-space:pre-wrap;overflow-wrap:anywhere;overflow-y:auto;max-height:22dvh;background:#071f32;color:#e6f2ff;border:1px solid #47637a;border-radius:8px;padding:8px;font-size:.72rem;line-height:1.4}
+#reportsPanel pre[hidden]{display:none!important}
+
+/* Fixed Google Drive APK update from the existing 1.0.5+ WebView screen.
+ * This does not auto-install and never touches V3/V7 APK data. */
+#crewUpdateOpen{display:block;flex:none;background:#25496a;border:1px solid #8bbbd1;color:#e1f5ff;border-radius:9px;text-align:center;text-decoration:none;font-size:.73rem;font-weight:750;padding:5px 7px;min-height:28px;line-height:1.4}
+#crewUpdateOpen:focus-visible{outline:3px solid #ffe3a5;outline-offset:2px}
+@media(max-height:630px){#crewUpdateOpen{font-size:.68rem;padding:3px 4px;min-height:23px}}
+
+/* Genuine shared-event log; no claim of real-time original ChatGPT API bridging. */
+#threeRoomLivePanel{flex:none;max-height:46dvh;overflow-y:auto;overscroll-behavior:contain;padding:0 8px;border:1px solid #5b7790;border-radius:9px;background:#132d41}
+#threeRoomLivePanel summary{font-size:.76rem;padding:7px 0;font-weight:750;cursor:pointer;color:#d8f0ff;display:flex;justify-content:space-between;gap:6px}
+#threeRoomLiveState{font-size:.64rem;color:#f2d99f;font-weight:400}
+#threeRoomLivePanel .threeRoomWarning{font-size:.7rem;line-height:1.34;margin:4px 0 8px;color:#d0dce7}
+#threeRoomLivePanel .threeRoomActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;margin:6px 0}
+#threeRoomLivePanel .threeRoomActions button{font-size:.67rem;padding:6px 4px;min-height:30px}
+#threeRoomGuideCopy{font-size:.73rem;min-height:95px;max-height:170px}
+#threeRoomGuideCopy[hidden]{display:none!important}
+#threeRoomEvents{border:1px solid #476378;padding:6px;background:#081d2e;border-radius:8px;font-size:.74rem;max-height:23dvh;overflow-y:auto}
+.threeRoomEvent{border-top:1px solid #334c66;padding:6px 1px;white-space:pre-wrap;overflow-wrap:anywhere}
+.threeRoomEvent:first-child{border-top:0}
+.threeRoomEvent b{color:#ffe2a1}
+.threeRoomEvent small{display:block;font-size:.63rem;color:#a8c4d7}
+#threeRoomCaptainForm{display:flex;flex-direction:column;gap:5px;padding:6px 0}
+#threeRoomCaptainForm label{font-size:.74rem;margin:0}
+#threeRoomCaptainForm textarea{font-size:.8rem;min-height:52px;padding:7px}
+#threeRoomCaptainForm button{font-size:.74rem;padding:7px}
+#threeRoomStatus{font-size:.69rem;color:#bed8e7;line-height:1.4;padding-bottom:7px}
+
+#threeRoomRoleStatus{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin:7px 0}
+#threeRoomRoleStatus>div{min-width:0;border:1px solid #476378;background:#091f31;border-radius:7px;padding:6px 4px;font-size:.65rem;color:#cfdeea;overflow-wrap:anywhere;line-height:1.3}
+@media(max-width:390px){#threeRoomRoleStatus{grid-template-columns:1fr}}
+
+/* Simple flagship home / 2026-10-26. Existing V3/V7 links and data unchanged. */
+#originalChatBar{gap:9px;padding:4px 0 8px;grid-template-columns:repeat(3,minmax(0,1fr))}
+#originalChatBar button{min-height:70px;display:flex;align-items:center;justify-content:center;background:#173c58;border:1px solid #7296aa;border-radius:13px;color:#f3e1b9;font-size:.93rem;font-weight:800;line-height:1.2;padding:10px 4px;box-shadow:0 5px 18px #0002}
+#originalChatBar button.ready{background:#244c65;color:#fff1cb;border-color:#d0ae70}
+#homeQuickActions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;flex:none}
+#homeQuickActions button,#homeQuickActions a{min-width:0;min-height:59px;padding:8px 3px;display:flex;flex-direction:column;gap:3px;align-items:center;justify-content:center;text-align:center;text-decoration:none;color:#ddecf6;background:#132e46;border:1px solid #466882;border-radius:12px;font-size:1rem;font-weight:750;line-height:1.2}
+#homeQuickActions span{font-size:.72rem}
+#homeQuickActions button[aria-pressed="true"],#homeQuickActions button[aria-expanded="true"]{border-color:#d5b374;background:#244a60;color:#ffe8ba}
+#homeQuickActions #crewUpdateOpen{font-size:1rem;min-height:59px;padding:8px 3px;background:#132e46;border-color:#466882;color:#ddecf6;line-height:1.2}
+#homeOverview{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:9px;border:1px solid #24435d;border-radius:16px;background:linear-gradient(160deg,#0e304c,#092039);padding:15px;overflow:auto}
+.homeShip{font-size:2.4rem;line-height:1.2}
+#homeOverview strong{font-size:.97rem;color:#ffe3a5;font-weight:800}
+#homeOverview p{font-size:.8rem;color:#d4e5f1;margin:0}
+#homeOverview small{font-size:.71rem;color:#a9c6d8}
+#homeWorkspace,#homeMorePanel{flex:1 1 auto;min-height:0;border:1px solid #385874;border-radius:13px;background:#0a243b;padding:8px;overflow-y:auto;overscroll-behavior:contain}
+#homeWorkspace[hidden],#homeMorePanel[hidden],#homeOverview[hidden]{display:none!important}
+.homePaneTop{display:flex;align-items:center;justify-content:space-between;gap:7px;padding:2px 2px 9px}
+.homePaneTop strong{font-size:.85rem;color:#f4d9a2}
+.homePaneTop button{padding:6px 11px;font-size:.73rem;min-height:28px}
+#homeWorkspaceItems{display:flex;flex-direction:column;min-height:0;gap:7px}
+#homeWorkspaceItems>#threeRoomLivePanel,#homeWorkspaceItems>#reportsPanel{display:block;flex:1 1 auto;max-height:none;padding:0 8px;min-height:80px}
+#homeWorkspaceItems>#threeRoomLivePanel[hidden],#homeWorkspaceItems>#reportsPanel[hidden],#homeWorkspaceItems>#loginArea[hidden]{display:none!important}
+#homeWorkspaceItems>#loginArea{margin:0;padding:10px;flex:none}
+#homeMoreTools{display:flex;flex-direction:column;gap:7px;padding:1px}
+#homeMoreTools>button{width:100%}
+#homeMoreTools>#relayPanel,#homeMoreTools>#handoffPanel{max-height:47dvh;overflow-y:auto}
+#homeMoreTools>#installedAppBar{margin:4px 0}
+#homeTrialDrawer{border:1px solid #456985;border-radius:10px;background:#142e43;padding:7px 9px;margin-top:9px}
+#homeTrialDrawer>summary{font-size:.78rem;font-weight:700;color:#f0dfc0;cursor:pointer}
+#homeTrialDock{min-height:0;padding-top:6px}
+#homeTrialDock>#chatArea{height:min(52dvh,490px);min-height:260px;flex:none}
+#homeTrialDock #messages{min-height:80px}
+#disconnectBtn{font-size:.72rem;min-height:29px}
+@media(max-height:650px){#originalChatBar button{min-height:54px;font-size:.84rem}#homeQuickActions button,#homeQuickActions a,#homeQuickActions #crewUpdateOpen{min-height:49px}#homeOverview{gap:5px;padding:9px}.homeShip{font-size:1.8rem}}
+@media(max-width:375px){#originalChatBar{gap:5px}#originalChatBar button{font-size:.81rem}#homeQuickActions{gap:4px}#homeQuickActions span{font-size:.64rem}#homeOverview strong{font-size:.88rem}}
+
+
+/* Captain-approved seven-home-button same-height rule 2026-10-26 */
+:root{--captain-home-button-height:70px}
+#originalChatBar > button,
+#homeQuickActions > button,
+#homeQuickActions > a,
+#homeQuickActions > #crewUpdateOpen{
+ box-sizing:border-box;
+ height:var(--captain-home-button-height);
+ min-height:var(--captain-home-button-height);
+ max-height:var(--captain-home-button-height);
+ align-items:center;
+ justify-content:center;
+ flex-shrink:0;
+}
+/* The same height wins over earlier mobile/short-screen min-height rules. */
+
+
+/* Captain-approved: existing V3/V7 native app launchers stay on HOME.
+ * Remove reconnect buttons, preserve existing per-device Android component mapping. */
+#installedAppBar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;flex:none;margin:0}
+#installedAppBar .installedAppUnit{display:flex;min-width:0;margin:0}
+#installedAppBar .installedAppUnit button,
+#installedAppBar .installedAppUnit button:first-child{
+ flex:1 1 0;width:100%;min-width:0;
+ min-height:59px;height:59px;max-height:59px;
+ padding:7px 8px;border:1px solid #6e99b0;border-radius:12px;
+ background:#224c65;color:#f1e3bd;font-size:.81rem;
+ font-weight:800;line-height:1.25;white-space:normal;overflow-wrap:anywhere;
+ text-align:center;display:flex;align-items:center;justify-content:center;
+}
+@media(max-height:650px){
+ #installedAppBar .installedAppUnit button,
+ #installedAppBar .installedAppUnit button:first-child{
+  min-height:48px;height:48px;max-height:48px;font-size:.75rem;
+ }
+}
+
+
+/* INDEPENDENT CENTRAL CONTROL HOME — 2026-10-26. Web-only changes; original app/DB preserved. */
+#installedAppBar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;align-items:stretch}
+#installedAppBar .installedAppUnit{min-width:0;width:100%}
+#installedAppBar .installedAppUnit button,#installedAppBar .installedAppUnit a{display:flex;align-items:center;justify-content:center;width:100%;height:65px;min-height:65px;max-height:65px;padding:5px;font-size:.79rem;font-weight:800;line-height:1.3;text-align:center;text-decoration:none;border:1px solid #7aa8c5;border-radius:12px;background:linear-gradient(160deg,#16476b,#0e3154);color:#fff0ce;box-sizing:border-box}
+#installedAppBar .installedAppUnit a{border-color:#e3b66d;background:linear-gradient(150deg,#1e5b73,#113b5b)}
+#centralRoundPanel{padding:9px 10px;margin:6px 0;border:1px solid #4c7595;border-radius:13px;background:linear-gradient(135deg,rgba(3,27,50,.95),rgba(9,63,83,.90))}
+#centralRoundPanel label{display:block;font-weight:800;font-size:.82rem;color:#fbe4b2;margin-bottom:6px}
+.centralRoundRow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px}
+.centralRoundRow input{width:100%;min-width:0;padding:6px 8px;min-height:40px}
+.centralRoundRow button{min-width:0;min-height:40px;padding:5px 9px;font-size:.79rem}
+#centralRoundPanel small{display:block;line-height:1.36;font-size:.69rem;color:#d0e0ef;margin-top:6px}
+@media(max-width:390px){#installedAppBar .installedAppUnit button,#installedAppBar .installedAppUnit a{font-size:.70rem;padding:3px}#centralRoundPanel{padding:7px}.centralRoundRow button{font-size:.7rem;padding:4px 6px}}
+body{background:linear-gradient(180deg,rgba(2,15,34,.86),rgba(2,26,48,.58) 55%,rgba(2,16,38,.96)),radial-gradient(ellipse at 50% 46%,#397e9d 0%,#104669 55%,#041629 100%)}
+
+
+/* Central-link officer: dedicated Freedom distribution approval room in the ACTUAL central HOME. */
+#homeApprovalBtn{display:block;flex:none;width:100%;box-sizing:border-box;min-height:50px;border:2px solid #dfbb79;border-radius:12px;background:linear-gradient(155deg,#85601e,#664915);color:#fff4d4;font-size:.91rem;font-weight:850;line-height:1.25;padding:9px 10px;text-align:center}
+#homeApprovalBtn[aria-expanded="true"]{background:#265775;border-color:#f0dba1}
+#homeApprovalPanel{flex:1 1 auto;min-height:0;min-width:0;display:flex;flex-direction:column;gap:5px;overflow:hidden;border:1px solid #6f9db4;border-radius:13px;background:#071f34;padding:6px}
+#homeApprovalPanel[hidden]{display:none!important}
+#homeApprovalPanel .homePaneTop{flex:none;padding:3px 3px 5px}
+#homeApprovalPanel iframe{flex:1 1 auto;width:100%;min-height:0;border:0;border-radius:8px;background:#08283e}
+#homeApprovalPanel .approvalFallback{flex:none;color:#b9d6e9;text-align:center;font-size:.69rem;line-height:1.35;text-decoration:underline;padding:3px}
+@media(max-height:650px){#homeApprovalBtn{min-height:41px;padding:5px 8px;font-size:.82rem}}
+/* CAPTAIN'S FLAGSHIP FINAL HOME: cinematic gold + sapphire + sea.
+   Wallpaper stays behind existing buttons and preserves their readability. */
+body{
+ background:
+  linear-gradient(170deg,rgba(1,11,28,.44),rgba(1,18,37,.42) 42%,rgba(3,16,34,.58)),
+  url('./assets/central-carrier-photo-r13.svg?wallpaper=20261027-r13') center 54% / cover no-repeat fixed!important;
+ background-color:#041b30!important;
+}
+main{position:relative}
+main:not(.roomMode) header{
+ padding:7px 9px;border:1px solid rgba(232,198,129,.65);border-radius:12px;
+ background:linear-gradient(110deg,rgba(3,24,48,.91),rgba(17,73,95,.82),rgba(7,29,55,.91));
+ box-shadow:inset 0 1px 0 rgba(255,241,191,.21),0 3px 13px rgba(0,17,34,.25);
+}
+main:not(.roomMode) header h1{
+ color:#ffe6a8;text-shadow:0 1px 1px #071523,0 0 16px rgba(247,204,119,.31);
+}
+#originalChatBar button{
+ border:1.5px solid #d7b574!important;
+ background:linear-gradient(145deg,rgba(19,72,100,.97),rgba(8,36,68,.98))!important;
+ box-shadow:inset 0 1px 0 #ffffff33,0 3px 11px #06192c55;
+ color:#fff1c3!important;
+}
+#originalChatBar button.ready{background:linear-gradient(135deg,#d6b374,#f9e1a1)!important;color:#0a2941!important}
+#homeQuickActions button,#homeQuickActions a{
+ background:linear-gradient(140deg,rgba(15,55,89,.97),rgba(6,31,63,.97))!important;
+ border:1.5px solid #78bfd1!important;
+ box-shadow:inset 0 1px 0 #d7f7ff22,0 4px 12px #0010224f;
+ color:#f2faff!important;
+}
+#homeQuickActions #crewUpdateOpen{background:linear-gradient(135deg,#0e6879,#1d3d70)!important}
+#homeQuickActions button[aria-pressed="true"],#homeQuickActions button[aria-expanded="true"]{
+ border-color:#f9d68a!important;color:#ffe6a9!important;
+ background:linear-gradient(120deg,#12647a,#1a4b75)!important;
+}
+#installedAppBar .installedAppUnit button,#installedAppBar .installedAppUnit a{
+ border:1.8px solid #e9c47b!important;
+ background:linear-gradient(155deg,rgba(25,96,127,.96),rgba(5,43,77,.98))!important;
+ box-shadow:inset 0 1px 0 #ffffff38,0 5px 15px #05152655;
+ color:#ffedb8!important;text-shadow:0 1px 2px #041523;
+}
+#homeApprovalBtn{
+ border:2px solid #ffe29c!important;
+ background:linear-gradient(115deg,#16476d 0%,#217f9a 31%,#145477 62%,#825e2f 100%)!important;
+ color:#fff6d1!important;text-shadow:0 2px 4px #04162b;
+ box-shadow:inset 0 1px 0 #ffffff66,0 5px 20px rgba(249,192,84,.24),0 0 0 1px #f6cb6a36;
+}
+#centralRoundPanel{
+ border:1.5px solid #d6c17b!important;
+ background:linear-gradient(125deg,rgba(3,27,59,.97),rgba(12,68,98,.96))!important;
+ box-shadow:0 5px 18px #00172a66,inset 0 1px 0 #ffffff26;
+}
+#homeOverview{
+ border:1.5px solid rgba(230,202,136,.8)!important;
+ background:linear-gradient(160deg,rgba(3,30,58,.91),rgba(7,70,91,.76),rgba(2,24,50,.94))!important;
+ box-shadow:inset 0 0 22px #63ced115,0 4px 22px #00182c66;
+}
+#homeOverview .homeShip{
+ color:#f9de9a;text-shadow:0 0 24px rgba(255,220,129,.5);
+}
+#homeWorkspace,#homeMorePanel,#homeApprovalPanel{
+ border:1.5px solid #d5b77b!important;
+ background:linear-gradient(160deg,rgba(4,31,54,.96),rgba(3,17,42,.98))!important;
+ box-shadow:inset 0 1px 0 #ffffff30,0 4px 20px #00162977;
+}
+/* Every INTERNAL room must replace the home dashboard from the TOP.
+   External app launchers/download links keep their original navigation. */
+main.roomMode > :not(#homeWorkspace):not(#homeMorePanel):not(#homeApprovalPanel):not(#homeMaterialsPanel){
+ display:none!important;
+}
+main.roomMode > #homeWorkspace:not([hidden]),
+main.roomMode > #homeMorePanel:not([hidden]),
+main.roomMode > #homeApprovalPanel:not([hidden]){
+ display:flex!important;flex-direction:column;flex:1 1 auto;
+ min-width:0;min-height:0;height:100%;max-height:none;margin:0;
+ overflow:hidden;
+}
+main.roomMode #homeWorkspaceItems{
+ flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+}
+main.roomMode #homeMorePanel{overflow-y:auto;overscroll-behavior:contain}
+main.roomMode .homePaneTop{flex:none;min-height:44px;padding:4px 4px 9px;border-bottom:1px solid #a99b7066}
+main.roomMode .homePaneTop strong{color:#ffe3a1;font-size:.96rem}
+main.roomMode .homePaneTop button{min-height:39px;background:#1b5474;color:#fff2cd;border:1px solid #b7c7cc}
+main.roomMode #homeApprovalPanel iframe{display:block;flex:1 1 auto;min-height:0;width:100%;height:100%;overflow:auto}
+main.roomMode #homeMoreTools{display:flex;flex-direction:column;flex:none}
+#homeMoreTools > #relayPanel:not([hidden]),
+#homeMoreTools > #handoffPanel:not([hidden]),
+#homeMoreTools > #originalChatPanel:not([hidden]){order:-1;max-height:none!important;overflow-y:visible}
+main.roomMode #homeWorkspaceItems > #threeRoomLivePanel,
+main.roomMode #homeWorkspaceItems > #reportsPanel{min-height:0;max-height:none}
+@media (prefers-reduced-motion:no-preference){
+ #homeApprovalBtn{transition:box-shadow .2s ease,filter .2s ease}
+ #homeApprovalBtn:active{filter:brightness(1.16)}
+}
+
+/* Captain screen 39210 — COMPACT FINAL V1.0.10.
+   Only presentation shrinks. No JS buttons, device state, or report logic changed.
+   Essential visual repair: a clear open-air viewport shows the carrier itself. */
+:root{--captain-home-button-height:46px}
+body{
+ background-image:
+  linear-gradient(180deg,rgba(1,10,28,.18) 0%,rgba(0,23,48,.07) 35%,rgba(1,16,37,.08) 70%,rgba(0,9,31,.22) 100%),
+  url('./assets/central-carrier-photo-r13.svg?wallpaper=20261027-r13')!important;
+ background-position:center center!important;
+ background-size:cover!important;
+ background-repeat:no-repeat!important;
+ background-attachment:scroll!important;
+ background-color:#062d50!important;
+}
+main:not(.roomMode){
+ gap:4px!important;
+ padding:5px 7px max(5px,env(safe-area-inset-bottom))!important;
+ background:transparent!important;
+}
+main:not(.roomMode) > header{
+ flex:none;height:43px!important;min-height:43px!important;max-height:43px!important;
+ padding:4px 8px!important;gap:5px!important;
+ background:linear-gradient(112deg,rgba(2,23,47,.8),rgba(7,54,84,.72))!important;
+ box-shadow:0 3px 11px #0005!important;
+}
+main:not(.roomMode) > header h1{font-size:.99rem!important;line-height:1.16!important}
+main:not(.roomMode) > header small{font-size:.58rem!important;line-height:1.16!important}
+main:not(.roomMode) > header button{min-height:33px!important;padding:3px 9px!important;font-size:.76rem!important}
+#originalChatBar,#homeQuickActions,#installedAppBar{gap:4px!important;flex:none!important}
+#originalChatBar > button{
+ box-sizing:border-box!important;height:46px!important;min-height:46px!important;max-height:46px!important;
+ font-size:.74rem!important;line-height:1.12!important;padding:3px 2px!important;
+ border-radius:10px!important;
+}
+#homeQuickActions > button,#homeQuickActions > a,#homeQuickActions > #crewUpdateOpen{
+ box-sizing:border-box!important;height:49px!important;min-height:49px!important;max-height:49px!important;
+ padding:3px 1px!important;font-size:.94rem!important;line-height:1.05!important;
+ gap:2px!important;border-radius:10px!important;
+}
+#homeQuickActions span{font-size:.66rem!important;line-height:1.08!important}
+#installedAppBar .installedAppUnit button,#installedAppBar .installedAppUnit a{
+ box-sizing:border-box!important;height:47px!important;min-height:47px!important;max-height:47px!important;
+ font-size:.71rem!important;line-height:1.1!important;padding:3px 3px!important;
+ border-radius:10px!important;
+}
+#homeApprovalBtn{
+ flex:none!important;box-sizing:border-box!important;height:42px!important;min-height:42px!important;max-height:42px!important;
+ font-size:.77rem!important;line-height:1.08!important;padding:4px 5px!important;
+ border-radius:10px!important;
+ background:linear-gradient(100deg,rgba(12,69,106,.79),rgba(25,117,142,.85) 55%,rgba(97,69,37,.87))!important;
+}
+#centralRoundPanel{
+ flex:none!important;min-height:0!important;max-height:none!important;
+ margin:1px 0!important;padding:6px 7px!important;border-radius:11px!important;
+ background:linear-gradient(125deg,rgba(3,27,58,.77),rgba(4,66,99,.70))!important;
+ box-shadow:0 2px 8px #00142d55!important;
+}
+#centralRoundPanel label{margin:0 0 3px!important;font-size:.74rem!important;line-height:1.16!important}
+.centralRoundRow{gap:4px!important}
+.centralRoundRow input,.centralRoundRow button{
+ box-sizing:border-box!important;min-height:34px!important;height:34px!important;max-height:34px!important;
+ padding:3px 6px!important;border-radius:8px!important;font-size:.75rem!important;
+}
+.centralRoundRow input{min-width:0!important;font-size:.82rem!important}
+#centralRoundPanel small{
+ display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;
+ overflow:hidden!important;margin-top:4px!important;
+ line-height:1.25!important;font-size:.59rem!important;color:#e0ecf3!important;
+}
+/* The former giant opaque home-overview blocked the entire ship artwork.
+   Keep its original DOM/content; restyle it as a transparent viewing deck. */
+#homeOverview:not([hidden]){
+ display:flex!important;flex:1 1 auto!important;min-height:75px!important;
+ align-items:center!important;justify-content:flex-end!important;
+ padding:0 4px 6px!important;gap:0!important;
+ background:transparent!important;border:0!important;box-shadow:none!important;
+ overflow:hidden!important;
+}
+#homeOverview .homeShip,#homeOverview p,#homeOverview small{display:none!important}
+#homeOverview strong{
+ display:block!important;flex:none!important;max-width:97%;
+ padding:7px 11px!important;border:1px solid rgba(242,209,138,.58)!important;
+ border-radius:20px!important;background:rgba(2,30,58,.59)!important;
+ color:#fff0bc!important;text-align:center!important;line-height:1.2!important;
+ font-size:.68rem!important;text-shadow:0 1px 3px #021021!important;
+}
+@media(max-width:360px){
+ #originalChatBar > button{font-size:.67rem!important}
+ #homeQuickActions span{font-size:.61rem!important}
+ #installedAppBar .installedAppUnit button,#installedAppBar .installedAppUnit a{font-size:.65rem!important}
+ #homeApprovalBtn{font-size:.72rem!important}
+}
+@media(max-height:620px){
+ main:not(.roomMode){gap:3px!important}
+ #originalChatBar > button{height:42px!important;min-height:42px!important;max-height:42px!important}
+ #homeQuickActions > button,#homeQuickActions > a,#homeQuickActions > #crewUpdateOpen{height:45px!important;min-height:45px!important;max-height:45px!important}
+ #installedAppBar .installedAppUnit button,#installedAppBar .installedAppUnit a{height:43px!important;min-height:43px!important;max-height:43px!important}
+ #homeApprovalBtn{height:39px!important;min-height:39px!important;max-height:39px!important}
+ #centralRoundPanel small{-webkit-line-clamp:1!important}
+}
+
+
+/* Captain + 3 original ChatGPT rooms. Four equal buttons, no height inflation. */
+#originalChatBar{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:4px!important;padding:2px 0!important}
+#originalChatBar > button{
+ height:46px!important;min-height:46px!important;max-height:46px!important;
+ padding:3px 1px!important;font-size:.69rem!important;line-height:1.12!important;
+ box-sizing:border-box!important;
+}
+@media(max-width:365px){#originalChatBar > button{font-size:.60rem!important}}
+
+/* New independent 3-app integrated library, without changing any report archive. */
+#homeSpecialRooms{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;flex:none!important}
+#homeSpecialRooms button{width:100%!important;height:42px!important;max-height:42px!important;min-height:42px!important;box-sizing:border-box!important;border-radius:10px!important;font-size:.76rem!important;line-height:1.1!important;padding:4px!important}
+#homeMaterialsBtn{border:1.7px solid #eac783!important;background:linear-gradient(130deg,rgba(5,63,91,.88),rgba(25,95,114,.9))!important;color:#ffedbd!important;font-weight:800}
+#homeMaterialsPanel{flex-direction:column;gap:7px;border:1.5px solid #e4c181;border-radius:12px;padding:8px;background:rgba(3,26,50,.96);min-width:0;min-height:0}
+#homeMaterialsPanel[hidden]{display:none!important}
+main.roomMode > :not(#homeWorkspace):not(#homeMorePanel):not(#homeApprovalPanel):not(#homeMaterialsPanel){display:none!important}
+main.roomMode > #homeMaterialsPanel:not([hidden]){display:flex!important;flex:1 1 auto;height:100%;min-height:0;overflow:hidden;margin:0}
+#materialsBody{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:4px}
+.materialsNote{font-size:.72rem;line-height:1.45;color:#d5e6f0;margin:8px 0}
+.materialsGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:7px 0}
+.materialsGrid button{min-height:42px;border:1px solid #6caabe;border-radius:9px;background:#143d60;color:#ffecce;padding:5px 2px;font-size:.74rem;font-weight:750}
+.materialsGrid button.selected{background:#9b712e;color:#fff;border-color:#f5d591}
+.materialsFind{border:1px solid #4f8298;border-radius:9px;padding:8px;background:#052a49}
+.materialsFind label,#materialsLocal label{display:block;color:#ffda98;font-weight:800;font-size:.76rem;margin:3px 0}
+.materialsFindRow{display:grid;grid-template-columns:1fr auto;gap:5px}
+.materialsFindRow input{min-height:40px;min-width:0}
+.materialsFindRow button{min-height:40px;padding:5px 12px;background:#97712d;border:1px solid #dabe84;border-radius:8px}
+#materialsList{display:grid;gap:5px;font-size:.75rem;margin:5px 0}
+.matRecord{border:1px solid #406d86;background:#082d4a;border-radius:9px;padding:9px;line-height:1.45;overflow-wrap:anywhere}
+#materialsLocal{border:1px solid #658799;border-radius:9px;padding:8px}
+#materialsLocal input{width:100%}
+#materialsLocalPreview{max-height:200px;overflow:auto;font-size:.68rem;background:#041b30;padding:9px;white-space:pre-wrap;overflow-wrap:anywhere}
+.materialsCompare{margin-top:9px;border:1px solid #d9bb83;border-radius:10px;padding:11px;background:rgba(7,51,74,.8)}
+.materialsCompare strong{color:#ffe5ab}
+.materialsCompare p{font-size:.72rem;line-height:1.5}
+.materialsCompare button{border:1px solid #efc581;background:#926729;color:#fff1d4;border-radius:8px;padding:9px}
+@media(max-width:360px){#homeSpecialRooms button{font-size:.67rem!important}.materialsGrid button{font-size:.64rem}}
+
+/* 2026-10-27 Captain wallpaper replacement R12: actual photo, not old drawn SVG. */
+html{background-color:#06172f!important;background-image:url('./assets/central-carrier-photo-r13.svg?wallpaper=20261027-r13')!important;background-position:center center!important;background-repeat:no-repeat!important;background-size:cover!important}
+body{
+ background-color:#04172f!important;
+ background-image:linear-gradient(180deg,rgba(1,9,24,.09) 0%,rgba(1,13,33,.07) 45%,rgba(1,14,39,.02) 70%,rgba(2,15,37,.05) 100%),url('./assets/central-carrier-photo-r13.svg?wallpaper=20261027-r13')!important;
+ background-position:center center,center center!important;
+ background-size:cover,cover!important;
+ background-repeat:no-repeat,no-repeat!important;
+ background-attachment:fixed,fixed!important;
+}
+main:not(.roomMode){padding-top:2px!important}
+main:not(.roomMode)>header{margin-top:0!important}
+
+
+/* 2026-10-27 R13: photo reframed to fill lower viewport; retain live navigation and stored original links.
+   Android device black sensor/cutout inset is addressed separately in native MainActivity. */
+main:not(.roomMode) {padding-top:0!important}
+html,body{overscroll-behavior:none}
+
+
+/* CAPTAIN CONTROL HOME R14 (2026-10-27): three independent app management cards.
+ * UI-only: no APK publishing, no DB/approval changes, no new app permissions. */
+#appCommandDeck{
+  flex:none;min-width:0;margin:1px 0 0;padding:8px 8px 6px;
+  border:1.5px solid rgba(248,209,139,.9);border-radius:14px;
+  background:linear-gradient(135deg,rgba(3,27,54,.88),rgba(7,54,85,.82));
+  box-shadow:0 6px 20px rgba(0,14,36,.33),inset 0 1px 0 #ffffff34;
+}
+#appCommandDeck .commandDeckTop{
+  display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:7px;
+}
+#appCommandDeck .commandDeckTop strong{color:#ffe4a6;font-weight:850;font-size:.81rem}
+#appCommandDeck .commandDeckTop small{color:#c8e1ed;font-size:.59rem;text-align:right}
+#installedAppBar{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:7px!important;margin:0!important}
+#installedAppBar .installedAppUnit.appDeckCard{
+  display:flex!important;flex-direction:column!important;justify-content:center;align-items:center;
+  gap:4px;width:auto;min-width:0;margin:0;padding:8px 5px 7px;min-height:133px;
+  border:1.4px solid #93bbd0;border-radius:13px;
+  background:linear-gradient(160deg,rgba(25,83,113,.95),rgba(5,29,58,.98));
+  box-shadow:inset 0 1px 0 #ffffff39,0 4px 10px #00182d66;
+  text-align:center;
+}
+#installedAppBar .appDeckCard[data-app-card="freedom"]{
+  border-color:#f4cd7c;background:linear-gradient(155deg,rgba(23,104,125,.97),rgba(4,47,80,.97));
+}
+#appCommandDeck .deckAppIcon{font-size:1.31rem;line-height:1.12}
+#appCommandDeck .appDeckCard>strong{display:block;color:#ffe9b0;font-size:.79rem;line-height:1.13;white-space:nowrap}
+#appCommandDeck .appDeckCard>small{color:#cce2ee;font-size:.58rem;line-height:1.12;white-space:nowrap}
+#appCommandDeck .deckCardActions{display:flex;flex-direction:column;gap:4px;width:100%;margin-top:3px}
+#installedAppBar .appDeckCard .deckAction,
+#installedAppBar .appDeckCard .deckAction:first-child{
+  display:flex!important;width:100%!important;flex:0 0 auto!important;
+  align-items:center!important;justify-content:center!important;
+  height:29px!important;min-height:29px!important;max-height:29px!important;
+  padding:3px 1px!important;margin:0!important;border:1px solid #86c8da!important;
+  border-radius:7px!important;background:linear-gradient(135deg,#1b6683,#12456d)!important;
+  color:#fff9dc!important;text-shadow:none!important;font-size:.69rem!important;line-height:1.05!important;
+  font-weight:800!important;white-space:nowrap!important;cursor:pointer;
+}
+#installedAppBar .appDeckCard .deckAction.deckSecondary{
+  background:rgba(6,36,62,.92)!important;border-color:#d9bb7c!important;color:#f4dba5!important;
+}
+#appCommandDeck .deckIntegrityNote{
+  margin:7px 0 0;color:#bdd6e4;font-size:.58rem;line-height:1.3;text-align:center;
+}
+#appCommandDeck button:focus-visible{outline:3px solid #ffebaa!important;outline-offset:2px}
+#homeOverview strong{font-size:.69rem!important}
+body{
+  background-image:
+    linear-gradient(180deg,rgba(1,14,32,.28) 0%,rgba(1,26,50,.11) 34%,rgba(0,12,32,.06) 65%,rgba(0,13,35,.26) 100%),
+    url('./assets/central-carrier-photo-r13.svg?wallpaper=20261027-r13')!important;
+  background-position:center center,center 61%!important;
+}
+@media(max-width:370px){
+ #appCommandDeck{padding:7px 5px 5px}
+ #installedAppBar{gap:4px!important}
+ #installedAppBar .installedAppUnit.appDeckCard{padding:7px 2px 6px;min-height:127px}
+ #appCommandDeck .appDeckCard>strong{font-size:.71rem}
+ #appCommandDeck .appDeckCard>small{font-size:.51rem}
+ #installedAppBar .appDeckCard .deckAction,#installedAppBar .appDeckCard .deckAction:first-child{font-size:.63rem!important}
+ #appCommandDeck .commandDeckTop small{font-size:.54rem}
+}
+@media(max-height:700px){
+ #appCommandDeck .deckIntegrityNote{display:none}
+ #installedAppBar .installedAppUnit.appDeckCard{min-height:120px;padding-top:5px;padding-bottom:5px}
+ #appCommandDeck .deckAppIcon{font-size:1.16rem}
+ #appCommandDeck .deckCardActions{gap:3px;margin-top:1px}
+ #installedAppBar .appDeckCard .deckAction,#installedAppBar .appDeckCard .deckAction:first-child{height:25px!important;min-height:25px!important;max-height:25px!important}
+}
+
+
+/* 2026-10-27 materials baseline RESET (display only, never database wipe).
+   350 = captain-reported V3 analyses; NOT 350 verified result-before files. */
+#captainAnalysisBaseline.analysisBaseline{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:7px;
+ border:1px solid #a0c4d3;border-radius:10px;background:rgba(3,24,48,.68);
+ color:#ecf6ff;text-align:center;margin-bottom:7px;font-size:.66rem;line-height:1.35;
+}
+#captainAnalysisBaseline>strong{grid-column:1/-1;color:#ffe2a6;font-size:.73rem}
+#captainAnalysisBaseline span{min-width:0;padding:3px 1px}
+#captainAnalysisBaseline span b{display:block;color:#ffe2ac;font-size:.72rem}
+#captainAnalysisBaseline em{font-style:normal;color:#b9cbd5;font-size:.57rem}
+.materialsLinkStatus{
+ border:1px solid #6e9bb3;border-radius:9px;padding:8px;color:#ffe2a7;
+ background:rgba(12,49,74,.72);font-size:.73rem;line-height:1.35;margin:7px 0;
+}
+.materialsExtraStages{border:1px solid #406c84;border-radius:9px;padding:5px 7px;margin:8px 0}
+.materialsExtraStages summary{color:#d0e4f0;font-size:.72rem;font-weight:750;cursor:pointer}
+.materialsExtraStages .materialsGrid{margin-top:8px}
+#homeSpecialRooms #homeMaterialsBtn{font-size:.72rem!important}
+@media(max-width:360px){
+ #captainAnalysisBaseline.analysisBaseline{font-size:.61rem;padding:5px;gap:2px}
+ #homeSpecialRooms #homeMaterialsBtn{font-size:.63rem!important}
+}
+
+
+/* RESULT-BEFORE automatic authenticated READ-ONLY metadata refresh. */
+#homeLiveBtn{display:none!important}
+#homeQuickActions{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+#homeSpecialRooms #homeMaterialsBtn{border:2px solid #f4d78b!important;background:linear-gradient(110deg,rgba(19,100,124,.94),rgba(11,60,95,.97))!important}
+.materialsAutoSync{display:flex;align-items:center;justify-content:space-between;gap:7px;font-size:.68rem;color:#b9dfef;padding:3px 0 6px}
+.materialsAutoSync small{font-size:.61rem;color:#cbdce6}
+.materialsUnverified{border:1px solid #d5b97f;border-radius:8px;background:rgba(59,43,14,.5);padding:9px;margin:4px 0;color:#ffe3a3;font-size:.74rem;line-height:1.45}
+@media(max-width:370px){.materialsAutoSync{font-size:.62rem;flex-wrap:wrap}}
+
+
+/* Retain the existing captain access key gate when materials opens without a session. */
+#materialsAuthGate{max-height:45dvh;overflow:auto}
+#materialsAuthGate #loginArea{margin:0!important;padding:12px!important}
+#materialsAuthGate #loginArea h2{font-size:.92rem}
+
+/* V3 4방 + V7 + V4 central-result-before source routing controls. */
+#beforeRoomGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:9px 0 6px}
+#beforeRoomGrid[hidden]{display:none!important}
+#beforeRoomGrid button{
+ display:block;min-height:44px;border:1.5px solid #78abc0;border-radius:10px;
+ background:linear-gradient(130deg,rgba(12,65,90,.96),rgba(5,31,59,.98));
+ color:#e9f4fb;font-weight:800;font-size:.72rem;line-height:1.1;padding:6px;
+}
+#beforeRoomGrid button.selected{
+ border-color:#f4ca75;color:#ffecb9;background:linear-gradient(135deg,#125d7b,#235879);
+}
+#beforeRoomGrid button:focus-visible{outline:3px solid #ffe19c;outline-offset:1px}
+#materialsAppSelector[hidden]{display:none!important}
+#beforeRoomScope{font-size:.68rem!important;color:#f5d9a5!important}
+@media(max-width:365px){#beforeRoomGrid button{font-size:.65rem}}
+
+</style>
+</head>
+<body>
+<main>
+<header><div><h1>⚓ 항행의자유 중앙통제실</h1><small>선장 전용 · 일반 배포판 아님</small></div><button id="disconnectBtn" class="secondary" type="button">퇴장</button></header>
+<div id="originalChatBar" role="navigation" aria-label="선장·항해사·통제관·중앙연결관 원본 ChatGPT 대화방 바로가기">
+<button type="button" id="originalCaptain">⚓ 선장<br>원본방</button>
+<button type="button" id="originalNavigator">🧭 항해사<br>V3 전담</button>
+<button type="button" id="originalController">🛡️ 통제관<br>V7 전담</button>
+<button type="button" id="originalLinkofficer">🔗 중앙연결관<br>원본방</button>
+</div>
+
+<nav id="homeQuickActions" aria-label="홈 주요 기능">
+ <button type="button" id="homeLiveBtn" aria-controls="homeWorkspace">📡<span>실시간 소통방</span></button>
+ <button type="button" id="homeReportBtn" aria-controls="homeWorkspace">📑<span>보고서</span></button>
+ <a id="crewUpdateOpen" href="https://drive.google.com/file/d/1Ddg-fGo2q3JfowTjRTNUxmXPQ46CkUZL/view?usp=drivesdk" aria-label="구글드라이브 공동회의 최신 APK 업데이트">⬇️<span>업데이트</span></a>
+ <button type="button" id="homeMoreBtn" aria-controls="homeMorePanel" aria-expanded="false">☰<span>더보기</span></button>
+</nav>
+<!-- Captain-only three-app management deck. Public Freedom APK is distributed elsewhere. -->
+<section id="appCommandDeck" aria-label="선장 전용 3앱 통합 관리본부">
+ <div class="commandDeckTop"><strong>⚓ 3앱 통합 관리본부</strong><small>선장 전용 · 원본 보존</small></div>
+ <div id="captainAnalysisBaseline" class="analysisBaseline" role="status" aria-label="선장이 확인한 분석 진행 현황">
+  <strong>🔁 제1회차부터 재분석 · 새 연구 시작 기준</strong>
+  <span><b>V3</b> 기존 누적 350회 <em>과거 연구자료</em></span>
+  <span><b>V7</b> 새 연구 1회차부터 <em>시작 전</em></span>
+  <span><b>V4</b> 새 연구 1회차부터 <em>시작 전</em></span>
+ </div>
+ <div id="installedAppBar" aria-label="세 앱의 독립 관리 카드">
+  <div class="installedAppUnit appDeckCard" data-app-card="v3">
+   <div class="deckAppIcon" aria-hidden="true">🧭</div>
+   <strong>항해사 V3</strong>
+   <small>4개 방 · 원문15 + 자동5</small>
+   <div class="deckCardActions">
+    <button type="button" id="openInstalledV3" class="deckAction" aria-label="설치된 항해사 V3 앱 열기">앱 열기</button>
+    <button type="button" class="deckAction deckSecondary" data-open-material="v3" aria-label="V3 원본 자료 관리방 열기">기록 보기</button>
+   </div>
+  </div>
+  <div class="installedAppUnit appDeckCard" data-app-card="v7">
+   <div class="deckAppIcon" aria-hidden="true">🛡️</div>
+   <strong>통제관 V7</strong>
+   <small>원문 5조합 · 제1회차부터</small>
+   <div class="deckCardActions">
+    <button type="button" id="openInstalledV7" class="deckAction" aria-label="설치된 통제관 V7 앱 열기">앱 열기</button>
+    <button type="button" class="deckAction deckSecondary" data-open-material="v7" aria-label="V7 읽기 전용 자료 관리방 열기">기록 보기</button>
+   </div>
+  </div>
+  <div class="installedAppUnit appDeckCard" data-app-card="freedom">
+   <div class="deckAppIcon" aria-hidden="true">🚢</div>
+   <strong>항해의자유</strong>
+   <small>원문 10조합 · 제1회차부터</small>
+   <div class="deckCardActions">
+    <button type="button" class="deckAction" data-open-material="freedom" aria-label="항해의자유 자료 관리방 열기">자료 관리</button>
+    <button type="button" id="openFreedomApprovalShortcut" class="deckAction deckSecondary" aria-label="기존 일반판 승인관리방 열기">승인관리</button>
+   </div>
+  </div>
+ </div>
+ <p class="deckIntegrityNote">배포판 설치·업데이트는 별도 공식 링크에서 진행합니다. 이 화면은 앱 실행 및 검증된 자료 조회·기존 승인관리만 연결하며, 각 앱 DB를 변경하지 않습니다.</p>
+</section>
+<div id="homeSpecialRooms" aria-label="기존 승인관리와 결과전 자료실">
+<button id="homeApprovalBtn" type="button" aria-expanded="false" aria-controls="homeApprovalPanel">🔐 일반판 승인관리</button>
+<button id="homeMaterialsBtn" type="button" aria-expanded="false" aria-controls="homeMaterialsPanel">📚 V3 + V7 + V4 결과전 보고서</button>
+</div>
+<div id="centralRoundPanel" aria-label="중앙통제실 전회차 조회">
+ <label for="centralRoundInput">🔎 중앙통제실 · 제1회부터 현회차까지 조회</label>
+ <div class="centralRoundRow">
+  <input id="centralRoundInput" type="number" min="1" max="9999" inputmode="numeric" placeholder="조회 회차">
+  <button id="centralRoundLookup" type="button">회차 조회</button>
+  <button id="centralRoundAll" type="button" class="secondary">전체 목록</button>
+ </div>
+ <small>세 앱의 원본은 각 앱에 보존합니다. V7은 인증된 읽기 전용 조회, V3는 내보낸 자료 조회입니다. 배포판은 현회차 포함 최근 5회차만 이용합니다.</small>
+</div>
+<div id="homeOverview">
+ <div class="homeShip">⚓</div>
+ <strong>V3 350회 분석 보고 · V7/V4 원본 연결 점검</strong>
+ <p>담당자를 선택하거나 아래 메뉴를 이용하세요.</p>
+ <small>실시간 기록은 공유 서버에서 확인합니다.</small>
+</div>
+<div id="homeApprovalPanel" hidden aria-label="항행의자유 배포용 승인관리방">
+ <div class="homePaneTop"><strong>🔐 일반판 사용자 승인관리 · 선장 전용</strong><button id="homeApprovalBackBtn" type="button" class="secondary">홈으로</button></div>
+ <iframe id="homeApprovalFrame" title="배포용 승인요청 조회·승인·거절·상태확인" loading="lazy" referrerpolicy="no-referrer" data-src="./hanghae-distribution-approval-room.html"></iframe>
+ <a class="approvalFallback" href="./hanghae-distribution-approval-room.html" target="_self">승인관리 화면이 보이지 않으면 직접 열기</a>
+</div>
+<div id="homeMaterialsPanel" hidden aria-label="V7 V3 항행의자유 통합 자료방">
+ <div class="homePaneTop"><strong>📚 V3 + V7 + V4 · 결과전 보고서</strong><button id="homeMaterialsBack" type="button" class="secondary">홈으로</button></div>
+ <div id="materialsBody">
+  <div id="materialsAuthGate" class="materialsAuthGate" hidden></div>
+  <p class="materialsNote"><b>새 분석 기준: 제1회차부터 3앱 공동 재분석.</b> V3 4개 방에서 원문 15·자동 5조합, V7 원문 5조합, V4 원문 10조합으로 구분합니다. <b>V3의 과거 350회 누적 분석은 별도 보존</b>하며, 과거 재분석 결과는 추첨 전에 확정한 공식 결과전과 구분합니다.</p>
+  <div id="materialsAppSelector" class="materialsGrid" aria-label="세 앱 독립 자료 원본" hidden>
+   <button type="button" class="matApp" data-material-app="v7">🛡️ V7 통제관</button>
+   <button type="button" class="matApp selected" data-material-app="v3">🧭 V3 항해사앱</button>
+   <button type="button" class="matApp" data-material-app="freedom">🚢 V4 항해의자유</button>
+  </div>
+  <div id="beforeRoomGrid" class="beforeRoomGrid" role="group" aria-label="6개 방 결과전 보고서 자동수신">
+   <button type="button" data-before-room="all" class="selected" aria-pressed="true">🌐 전체 6개 방</button>
+   <button type="button" data-before-room="v3-1" aria-pressed="false">🧭 V3 제1방</button>
+   <button type="button" data-before-room="v3-2" aria-pressed="false">🧭 V3 제2방</button>
+   <button type="button" data-before-room="v3-3" aria-pressed="false">🧭 V3 제3방</button>
+   <button type="button" data-before-room="v3-4" aria-pressed="false">🧭 V3 제4방</button>
+   <button type="button" data-before-room="v7" aria-pressed="false">🛡️ V7 통제관방</button>
+   <button type="button" data-before-room="v4" aria-pressed="false">🚢 V4 항해의자유방</button>
+  </div>
+  <p id="beforeRoomScope" class="materialsNote">V3는 4개 방을 합쳐 원문 15조합 + 자동 5조합의 구성 기준을 사용합니다. 각 방에 20조합씩 확정되었다는 뜻은 아닙니다.</p>
+  <div id="materialsLinkStatus" class="materialsLinkStatus" role="status" aria-live="polite">인증 후 V3·V7·V4 원본을 자동 점검합니다. 추첨 전 원본 증빙이 없는 기록은 공식 집계에서 제외합니다.</div>
+  <div id="materialsAutoSync" class="materialsAutoSync"><span>🔄 자동 조회 · 자료실 열림 동안 60초마다</span><small id="materialsAutoUpdated">마지막 조회: 대기</small></div>
+  <details class="materialsExtraStages"><summary>결과후·누적DB 별도 조회</summary>
+  <div class="materialsGrid" aria-label="자료 구분">
+   <button type="button" class="matStage selected" data-material-stage="before">📄 결과전</button>
+   <button type="button" class="matStage" data-material-stage="after">📑 결과후</button>
+   <button type="button" class="matStage" data-material-stage="db">🗄️ 누적DB</button>
+  </div></details>
+  <div class="materialsFind">
+   <label for="materialsRound">회차 선택 (1~1247, 빈칸은 전체 등록내역)</label>
+   <div class="materialsFindRow"><input id="materialsRound" type="number" min="1" max="1247" inputmode="numeric" placeholder="1~1247">
+   <button id="materialsRefresh" type="button">🔎 조회</button></div>
+  </div>
+  <p id="materialsStatus" class="materialsNote" role="status" aria-live="polite">V3 분석 350회는 선장 보고값입니다. 원본 결과전 보고서 자동연계는 아직 확인되지 않았습니다.</p>
+  <div id="materialsList" aria-label="확인된 실제 자료 기록"></div>
+  <div id="materialsLocal" hidden>
+   <label for="materialsLocalFile">📎 독립 앱에서 내보낸 결과전·결과후·누적DB TXT/JSON 임시 미리보기</label>
+   <input type="file" id="materialsLocalFile" accept=".txt,.json,text/plain,application/json">
+   <p class="materialsNote">원본 파일은 이 휴대전화에서만 미리 보며 서버에 자동 전송·DB 등록하지 않습니다. 결과전 최초 기록으로 소급 인정하지 않습니다.</p>
+   <pre id="materialsLocalPreview" hidden></pre>
+  </div>
+  <div class="materialsCompare">
+   <strong>⚙️ 3앱 엔진 동일조건 비교</strong>
+   <p>동일 원문·동일 회차, 대상 회차 정답 블라인드, 결과전 1회 잠금, SHA-256 원본 검증, 결과 발표 후 별도 채점, 3/6 이상 비율과 0~6 적중분포를 비교합니다. 250회차마다 원본/버전 고정. 자료가 미등록인 회차는 0점 처리하지 않습니다.</p>
+   <button type="button" id="materialsComparison">📊 현재 비교 가능 여부 확인</button>
+   <p id="materialsComparisonStatus" class="materialsNote">세 앱의 동일 회차 검증자료가 연결될 때만 순위를 산출합니다.</p>
+  </div>
+  <p class="materialsNote">⚠️ 항해의자유 V4 일반 사용자 화면은 기존 최근 5회차만 열람하도록 유지합니다. 이 선장 전용 자료실과 구분됩니다.</p>
+ </div>
+</div>
+<div id="homeWorkspace" hidden aria-label="선택한 기능">
+ <div class="homePaneTop"><strong id="homeWorkspaceTitle">업무 공유</strong><button id="homeBackBtn" type="button" class="secondary">홈으로</button></div>
+ <div id="homeWorkspaceItems"></div>
+</div>
+<div id="homeMorePanel" hidden aria-label="추가 기능">
+ <div class="homePaneTop"><strong>추가 기능</strong><button id="homeMoreBackBtn" type="button" class="secondary">홈으로</button></div>
+ <div id="homeMoreTools"></div>
+ <details id="homeTrialDrawer"><summary>시험 대화 · 파일 · 세부 점검</summary><div id="homeTrialDock"></div></details>
+</div>
+
+
+<details id="threeRoomLivePanel" aria-label="세 원본방 업무 공유 서버">
+ <summary>📡 실시간 업무 공유 <span id="threeRoomLiveState">공유 기록 확인 전</span></summary>
+ <p class="threeRoomWarning">이 화면은 <b>실제 공동 메시지 서버의 기록</b>을 보여줍니다. 선장 지시는 공유 서버에만 저장됩니다. <b>기존 ChatGPT 세 대화방으로 자동 전송되거나 원본 메시지를 자동 수집하지 않습니다.</b> 원본 AI의 참여는 각 원본방에서 연결된 Supabase 도구를 실제 호출할 때에만 발생합니다.</p>
+ <div class="threeRoomActions">
+  <button type="button" class="secondary" id="threeRoomRefresh">공유 기록 확인</button>
+  <button type="button" class="secondary" id="threeRoomNavigatorGuide">🧭 항해사 연결 안내 복사</button>
+  <button type="button" class="secondary" id="threeRoomControllerGuide">🛡️ 통제관 연결 안내 복사</button>
+  <button type="button" class="secondary" id="threeRoomLinkofficerGuide">🔗 연결관 연결 안내 복사</button>
+ </div>
+ <textarea id="threeRoomGuideCopy" readonly rows="5" hidden aria-label="원본 대화방 한 번 전달할 연동 안내"></textarea>
+ <div id="threeRoomRoleStatus" aria-label="담당자별 실제 공유 메시지 최신 시각">
+  <div data-room-role="navigator">🧭 항해사 · 아직 공유 메시지 없음</div>
+  <div data-room-role="controller">🛡️ 통제관 · 아직 공유 메시지 없음</div>
+  <div data-room-role="linkofficer">🔗 중앙연결관 · 아직 공유 메시지 없음</div>
+ </div>
+ <div id="threeRoomEvents" aria-label="공유 서버의 시간순 메시지" role="log"></div>
+ <form id="threeRoomCaptainForm">
+  <label for="threeRoomCaptainText">선장 지시를 공동 공유판에 등록</label>
+  <textarea id="threeRoomCaptainText" rows="2" maxlength="1200" placeholder="세 원본방이 연결 도구를 사용해 확인할 선장 지시"></textarea>
+  <button id="threeRoomSend" type="submit">공유 서버에 지시 기록</button>
+ </form>
+ <div id="threeRoomStatus" role="status" aria-live="polite">공동회의 입장 후 목록을 읽을 수 있습니다. 화면을 펼친 동안 약 4초 간격으로 자동 확인합니다.</div>
+</details>
+<button id="relayOpen" type="button">업무 회람</button>
+<section id="relayPanel" hidden aria-label="기존 원본 대화방 수동 회람">
+  <h2>⚓ 원본방 업무 회람</h2>
+  <p class="relayNote">선장 지시를 원본 채팅방에 직접 전달하고, 받은 답변을 이 화면에 기록합니다. <b>원본 3방 자동 채팅이 아닌 수동 회람</b>입니다. 저장은 이 기기의 공동회의 앱에만 적용됩니다.</p>
+  <label for="relayDraft">모두에게 전달할 선장 지시</label>
+  <textarea id="relayDraft" maxlength="1200" rows="3" placeholder="원본 항해사·통제관·중앙연결관에게 전달할 같은 지시를 작성하세요."></textarea>
+  <div class="relayActions">
+    <button id="relayCreate" type="button">① 새 회람 지시 저장</button>
+    <button id="relayExport" type="button" class="secondary">회람록 복사</button>
+    <button id="relayClose" type="button" class="secondary">접기</button>
+  </div>
+  <label for="relaySessionSelect">저장된 회람 선택</label>
+  <select id="relaySessionSelect" aria-label="저장된 회람 지시"></select>
+  <div id="relaySessionNotice" class="relayNote">회람을 시작하면 담당자별 복사와 답변 기록이 표시됩니다.</div>
+  <div id="relayRoleCards"></div>
+  <label for="relayCopyPreview">전달문·회람록 미리보기 (복사 실패 시 길게 눌러 직접 복사)</label>
+  <textarea id="relayCopyPreview" readonly rows="4" hidden aria-label="원본방에 전달할 텍스트 미리보기"></textarea>
+  <div id="relayStatus" role="status" aria-live="polite">기존 ChatGPT 원본방의 답변은 자동으로 수집되지 않습니다.</div>
+</section>
+<button id="handoffOpen" type="button">대화방 인계</button>
+<section id="handoffPanel" hidden aria-label="원본 새 대화방 첫머리 인계양식">
+ <h2>⚓ 새 ChatGPT 방 첫머리 인계</h2>
+ <small>① 담당 선택 → ② 양식 복사 → ③ 새 대화방 첫 메시지에 붙여넣기 → ④ 새 대화 주소를 기존 역할에 갱신</small>
+ <div id="handoffRolePicker" class="actions" aria-label="인계 양식의 담당자 선택">
+  <button type="button" data-handoff-role="navigator" class="secondary">🧭 항해사</button>
+  <button type="button" data-handoff-role="controller" class="secondary">🛡️ 통제관</button>
+  <button type="button" data-handoff-role="linkofficer" class="secondary">🔗 연결관</button>
+ </div>
+ <textarea id="handoffText" readonly aria-label="새방 첫 메시지 복사용 양식" rows="7"></textarea>
+ <div class="actions">
+  <button id="handoffCopy" type="button">① 강제양식 복사</button>
+  <button id="handoffNewChat" type="button" class="secondary">② 새 ChatGPT 방 열기</button>
+  <button id="handoffClose" type="button" class="secondary">닫기</button>
+ </div>
+ <small id="handoffStatus">ChatGPT 새 대화방에 자동 입력되는 기능은 아닙니다. 첫 메시지로 직접 붙여넣어야 연속성이 확보됩니다.</small>
+</section>
+<button id="migrateChatLinks" type="button">대화방 연결 설정</button>
+<div id="originalChatPanel" hidden>
+<label id="originalChatLabel" for="originalChatUrl">원본 ChatGPT 대화방 주소</label>
+<input id="originalChatUrl" type="url" inputmode="url" autocomplete="url" placeholder="https://chatgpt.com/c/…">
+<div id="originalRolePicker" class="actions" aria-label="선장과 세 담당자 원본방 선택">
+<button type="button" data-original-role="captain" class="secondary">⚓ 선장</button>
+<button type="button" data-original-role="navigator" class="secondary">🧭 항해사</button>
+<button type="button" data-original-role="controller" class="secondary">🛡️ 통제관</button>
+<button type="button" data-original-role="linkofficer" class="secondary">🔗 중앙연결관</button>
+</div>
+<div class="actions"><button id="originalChatSave" type="button">현재방 주소 저장</button><button id="previousOriginalChat" type="button" class="secondary" hidden>이전방 열기</button><button id="originalChatCancel" type="button" class="secondary">닫기</button></div>
+<small id="originalChatNotice">/share/ 읽기 전용 주소가 아닌, 실제 원본 대화방의 주소를 등록하세요. 입장키 없이 등록 가능합니다. 등록 뒤 원본 채팅방에서 직접 대화합니다.</small>
+</div>
+<section id="loginArea"><h2>공동회의방 입장</h2><p class="muted">승인된 선장만 이용할 수 있습니다. 입장키를 한 번 확인한 뒤 같은 앱에서는 자동으로 입장할 수 있습니다.</p><form id="loginForm"><label for="secret">전용 입장키</label><input id="secret" type="password" autocomplete="off" spellcheck="false" inputmode="text" placeholder="입장키를 붙여넣으세요" required><label id="rememberLabel" for="rememberDevice"><input type="checkbox" id="rememberDevice" checked> 이 기기에서 다음부터 자동 입장</label><div class="actions"><small id="serverState">서버 상태 확인 중…</small><button type="submit" id="loginButton">입장</button></div></form><div id="loginError" role="alert" class="status"></div></section>
+<section id="chatArea"><details id="continuityPanel" aria-label="원본 업무 연속성"><summary>원본 업무 연속성 점검 <span id="continuityFlag">미연결 · 자료 보기</span></summary><div id="continuityContent"><div class="actions"><h2>원본 업무 연속성 점검</h2><button id="continuityRefresh" type="button" class="secondary">근거 다시 확인</button></div><p id="continuitySummary" class="notice">원본 세션 연결 상태를 확인 중입니다.</p><div id="continuitySources" class="muted"></div></div></details><details id="reportsPanel" aria-label="V3 V7 원본 자료 읽기전용 조회">
+ <summary>📑 V3·V7 보고서·자료 확인 <span id="reportsCount">원본 보존 · 조회</span></summary>
+ <p class="reportDisclaimer">V7: 선장 고정키로 인증한 서버 기록의 <b>읽기 전용 조회</b>. V3: 선장폰에서 내보낸 TXT/JSON 보고서를 선택해 <b>이 기기에서만 미리보기</b>. 두 앱의 원본 DB와 보고서는 수정하거나 동기화하지 않습니다.</p>
+ <div class="reportGroup">
+  <b>🛡️ V7 중앙통제실 · 서버 원본 기록</b>
+  <div class="reportControls">
+   <select id="reportKind" aria-label="V7 자료 종류">
+    <option value="v7-purchase">선장방 5조합 기록 (V7_PURCHASE_5)</option>
+    <option value="v7-source">원문 6문장 (V7_SOURCE)</option>
+   </select>
+   <input id="reportRound" aria-label="조회할 회차" inputmode="numeric" type="number" min="1" max="9999" placeholder="전체 회차">
+   <button id="reportRefresh" type="button">목록 조회</button>
+  </div>
+  <div id="reportStatus" role="status" aria-live="polite">고정 입장키로 인증한 뒤 목록 조회를 누르세요.</div>
+  <div id="reportList"></div>
+  <pre id="reportDetail" hidden aria-label="선택한 V7 원본 기록 내용"></pre>
+ </div>
+ <div class="reportGroup">
+  <b>🧭 V3 항해사앱 · 휴대폰 내보내기 파일</b>
+  <p class="reportDisclaimer">V3 앱에서 저장·내보낸 결과전/후 TXT·JSON만 선택할 수 있습니다. 앱 내부 비공개 파일은 자동으로 열 수 없습니다. 파일을 공동회의 서버로 업로드하지 않습니다.</p>
+  <input id="v3ReportFile" type="file" accept=".txt,.json,text/plain,application/json" aria-label="V3 원본 TXT 또는 JSON 선택">
+  <div id="v3ReportStatus" role="status">아직 선택한 파일이 없습니다.</div>
+  <pre id="v3ReportPreview" hidden aria-label="선택한 V3 파일 미리보기"></pre>
+ </div>
+</details><details id="filePanel" aria-label="공동회의 파일 교환"><summary>📎 회의 파일 주고받기 <span id="fileCount">0개 · 보기</span></summary><p class="pilotNotice">이 시험방의 별도 비공개 보관소입니다. 10MB 이하 파일만 가능하며, V3·V7 정식 자료실이나 기존 원본 AI 대화방과 자동 동기화되지 않습니다.</p><form id="fileForm"><input id="meetingFile" type="file" aria-label="올릴 파일 선택" accept=".pdf,.txt,.md,.json,.csv,.tsv,.js,.mjs,.ts,.html,.css,.png,.jpg,.jpeg,.webp,.zip,.apk" required><button id="fileUploadBtn" type="submit">파일 올리기</button></form><div id="fileStatus" role="status">입장 후 파일 목록을 확인합니다.</div><div id="fileList"></div></details><div class="actions"><h2>공동회의 대화록</h2><button class="secondary" id="refreshBtn" type="button">새로고침</button></div><div id="connectionState" class="status" aria-live="polite"></div><div id="messages" class="message-list" role="log" aria-label="회의 기록"><div class="muted">메시지를 불러오는 중입니다.</div></div><form id="sendForm"><label for="draft">별도 시험 AI(API)에게 보내는 선장 지시</label><textarea id="draft" maxlength="1200" placeholder="예: 항해사는 분석 의견을, 통제관은 검증 의견을 차례로 보고하세요." required></textarea><div class="actions"><small>하루 최대 8회 지시 · 응답은 순서대로 표시됩니다</small><small id="charCount">0 / 1200</small></div><button type="submit" id="sendMsg">시험 AI(API)에만 전달</button></form><div id="sendError" class="status" role="status"></div></section>
+<footer>서버 저장형 시범방 · 기존 V3/V7 데이터와 별도 · 다른 AI 담당자 없음</footer>
+</main>
+<script>
+(function(){
+'use strict';
+var BASE='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/crew-meeting';
+var token='';var timer=null;var sending=false;var lastFingerprint='';
+var $=function(id){return document.getElementById(id);};
+
+/* Home rearrangement: moves existing nodes, preserving every ID and listener. */
+(function arrangeHome(){
+ var tools=$('homeMoreTools'),dock=$('homeTrialDock'),workspace=$('homeWorkspaceItems');
+ function move(id,to){var el=$(id);if(!el||!to)throw Error('HOME_MODULE_MISSING_'+id);to.appendChild(el);}
+ move('threeRoomLivePanel',workspace);
+ move('reportsPanel',workspace);
+ move('loginArea',workspace);
+ ['relayOpen','relayPanel','handoffOpen','handoffPanel',
+  'migrateChatLinks','originalChatPanel'].forEach(function(id){move(id,tools);});
+ move('chatArea',dock);
+})();
+var HOME_SELECTED='home';
+function homeView(which){
+ if(!['live','reports','more','approval','materials'].includes(which))which='home';
+ HOME_SELECTED=which;
+ var active=which==='live'||which==='reports';
+ $('homeOverview').hidden=which!=='home';
+ $('homeWorkspace').hidden=!active;
+ $('homeMorePanel').hidden=which!=='more';
+ $('homeApprovalPanel').hidden=which!=='approval';
+ $('homeMaterialsPanel').hidden=which!=='materials';
+ if(which!=='materials')stopMaterialsMonitor();
+ $('homeMaterialsBtn').setAttribute('aria-expanded',String(which==='materials'));
+ var root=document.querySelector('main');
+ root.classList.toggle('roomMode',which!=='home');
+ $('homeApprovalBtn').setAttribute('aria-expanded',String(which==='approval'));
+ if(which==='approval'){
+   var frame=$('homeApprovalFrame');
+   if(!frame.getAttribute('src')){
+     frame.setAttribute('src',frame.getAttribute('data-src'));
+   }else{
+     // Keep the authenticated room intact; only return its viewport to the top.
+     try{frame.contentWindow.scrollTo(0,0);}catch(e){}
+   }
+   $('homeApprovalPanel').scrollTop=0;
+ }
+ $('homeMoreBtn').setAttribute('aria-expanded',String(which==='more'));
+ $('homeLiveBtn').setAttribute('aria-pressed',String(which==='live'));
+ $('homeReportBtn').setAttribute('aria-pressed',String(which==='reports'));
+ var live=$('threeRoomLivePanel'),reports=$('reportsPanel');
+ live.hidden=which!=='live';reports.hidden=which!=='reports';
+ live.open=which==='live';reports.open=which==='reports';
+ $('homeWorkspaceTitle').textContent=which==='live'?'실시간 업무 공유':'보고서 · 자료';
+ if(which==='materials'&&!token){
+   if($('loginArea').parentElement!==$('materialsAuthGate'))$('materialsAuthGate').appendChild($('loginArea'));
+   $('materialsAuthGate').hidden=false;
+   $('loginArea').hidden=false;
+   $('loginArea').style.display='block';
+ }else{
+   if($('loginArea').parentElement!==$('homeWorkspaceItems'))$('homeWorkspaceItems').appendChild($('loginArea'));
+   $('materialsAuthGate').hidden=true;
+   $('loginArea').hidden=!active||!!token;
+ }
+ if(which==='live'&&token)threeRoomRefresh();
+ if(which==='reports'&&token)refreshV7Reports();
+ if(which==='materials')startMaterialsMonitor();
+ if(which==='more')$('homeMorePanel').scrollTop=0;
+ if(which==='live'||which==='reports'){
+   $('homeWorkspace').scrollTop=0;
+   $('homeWorkspaceItems').scrollTop=0;
+ }
+ // Return every opened internal room to its first visible line.
+ try{window.scrollTo(0,0);}catch(e){}
+ document.documentElement.scrollTop=0;
+ document.body.scrollTop=0;
+}
+
+/* Captain-only original ledger links for three independent apps.
+ * No leakage of raw combinations or retrospective fabricated 'result-before' entries. */
+var materialApp='v3',materialStage='before',materialLast=null;
+var selectedBeforeRoom='all';
+var SIX_ROOM_FEED='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/crew-six-room-before-feed';
+var SIX_ROOMS=['v3-1','v3-2','v3-3','v3-4','v7','v4'];
+function isRoomValid(r){return r==='all'||SIX_ROOMS.includes(r);}
+async function fetchSixRoomFeed(room,round){
+ if(!isRoomValid(room))throw Error('INVALID_ROOM_FILTER');
+ var target=SIX_ROOM_FEED+'?room='+encodeURIComponent(room)+(round?'&round='+encodeURIComponent(round):'');
+ var resp=await fetch(target,{method:'GET',headers:{Authorization:'Bearer '+token,Accept:'application/json'},cache:'no-store'});
+ var data=await resp.json();
+ if(!resp.ok||data.error||!data.ok)throw Error(data.error||'FEED_HTTP_'+resp.status);
+ if(data.scope!==room||data.stage!=='RESULT-BEFORE'||data.read_only!==true||
+   data.raw_predictions_included!==false||!Array.isArray(data.items)||!Array.isArray(data.source_rooms)||
+   data.items.length>160||data.items.some(function(x){
+    return !x||!SIX_ROOMS.includes(x.room_id)||!Number.isInteger(x.round_no)||
+    x.round_no<1||x.round_no>1247||typeof x.record_id!=='string'||
+    x.record_type!=='RESULT-BEFORE'||x.official_eligible!==false;
+   }))throw Error('SOURCE_CONTRACT_REJECTED');
+ return data;
+}
+document.querySelectorAll('[data-before-room]').forEach(function(btn){
+ btn.addEventListener('click',function(){
+  selectedBeforeRoom=btn.getAttribute('data-before-room')||'all';
+  document.querySelectorAll('[data-before-room]').forEach(function(x){
+   var sel=x.getAttribute('data-before-room')===selectedBeforeRoom;
+   x.classList.toggle('selected',sel);x.setAttribute('aria-pressed',String(sel));
+  });
+  loadIntegratedMaterials();
+ });
+});
+
+var materialsMonitorTimer=null,materialsMonitorSerial=0,materialsListSerial=0;
+var MATERIALS_REFRESH_MS=60000;
+var THREE_APP_READ_ENDPOINT='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/crew-three-app-materials';
+/* Metadata without independently verified prior-to-draw lock remains PENDING.
+ * A received date or RESULT-BEFORE label alone is never proof. */
+function verifiedBeforeReport(row){
+ return !!row&&row.pre_draw_proof==='VERIFIED_PRE_DRAW'&&
+  typeof row.source_sha256==='string'&&/^[a-f0-9]{64}$/i.test(row.source_sha256)&&
+  typeof row.locked_at==='string'&&Number.isFinite(Date.parse(row.locked_at))&&
+  Number.isInteger(row.round_no)&&row.round_no>=1&&row.round_no<=1247&&
+  row.received_before_draw===true&&
+  Date.parse(row.locked_at)<Date.UTC(2002,11,7,11,35)+(row.round_no-1)*604800000&&
+  typeof row.record_id==='string'&&row.record_id.length>0;
+}
+async function fetchThreeAppMetadata(app,stage,round){
+ if(!['v3','v7','freedom'].includes(app)||!['before','after','db'].includes(stage))throw Error('INVALID_SOURCE_SELECTION');
+ var url=THREE_APP_READ_ENDPOINT+'?app='+encodeURIComponent(app)+'&stage='+encodeURIComponent(stage)+(round?'&round='+encodeURIComponent(round):'');
+ var resp=await fetch(url,{method:'GET',headers:{Authorization:'Bearer '+token,Accept:'application/json'},cache:'no-store'});
+ var result=await resp.json();
+ if(!resp.ok||result.error)throw Error(result.error||'READ_HTTP_'+resp.status);
+ if(result.app!==app||result.stage!==stage||result.read_only!==true||result.raw_predictions_included!==false||
+   typeof result.linked!=='boolean'||!Array.isArray(result.items)||result.items.length>80||
+   result.items.some(function(x){return !x||!Number.isInteger(x.round_no)||x.round_no<1||x.round_no>1247;}))
+   throw Error('UNVERIFIED_SERVER_CONTRACT');
+ return result;
+}
+async function refreshThreeAppConnections(){
+ if(HOME_SELECTED!=='materials'||!token)return;
+ var serial=++materialsMonitorSerial;
+ try{
+  var result=await fetchSixRoomFeed('all',null);
+  if(serial!==materialsMonitorSerial||HOME_SELECTED!=='materials'||!token)return;
+  $('materialsLinkStatus').textContent=result.source_rooms.map(function(room){
+   return room.name+': '+(room.state==='SOURCE_CONNECTOR_REQUIRED'?'원본 송신 연결 대기':
+      room.state==='NO_REPORTS_RECEIVED'?'원본 조회 연결 · 결과전 수신 대기':
+      room.state==='UNVERIFIED_SOURCE_RECORDS'?'과거 결과전 후보 '+room.received_candidates+'건 (검증 전)':
+      '원본 조회 실패');
+  }).join(' | ');
+  $('materialsAutoUpdated').textContent='마지막 확인: '+new Date().toLocaleTimeString('ko-KR');
+ }catch(e){
+  if(serial!==materialsMonitorSerial||HOME_SELECTED!=='materials'||!token)return;
+  $('materialsLinkStatus').textContent='각 방 원본 자동 조회 실패 · 이전 자료는 변경되지 않았습니다 ('+String(e.message||e).slice(0,60)+')';
+ }
+}
+
+function startMaterialsMonitor(){
+ if(materialsMonitorTimer){clearInterval(materialsMonitorTimer);materialsMonitorTimer=null;}
+ if(HOME_SELECTED!=='materials'||!token)return;
+ refreshThreeAppConnections();
+ materialsMonitorTimer=setInterval(function(){
+  if(HOME_SELECTED==='materials'&&token){refreshThreeAppConnections();loadIntegratedMaterials();}
+ },MATERIALS_REFRESH_MS);
+}
+function stopMaterialsMonitor(){
+ if(materialsMonitorTimer){clearInterval(materialsMonitorTimer);materialsMonitorTimer=null;}
+ ++materialsMonitorSerial;++materialsListSerial;
+}
+
+function materialsLabel(stage){return {before:'결과전',after:'결과후',db:'누적DB'}[stage]||stage;}
+function materialsSelect(kind,value){
+ if(kind==='app')materialApp=value; else materialStage=value;
+ $('beforeRoomGrid').hidden=materialStage!=='before';
+ $('beforeRoomScope').hidden=materialStage!=='before';
+ $('materialsAppSelector').hidden=materialStage==='before';
+ var selector=kind==='app'?'data-material-app':'data-material-stage';
+ document.querySelectorAll('['+selector+']').forEach(function(el){el.classList.toggle('selected',el.getAttribute(selector)===value);});
+ $('materialsLocal').hidden=materialApp==='v7';
+ $('materialsList').replaceChildren();
+ $('materialsStatus').textContent='자료를 조회하면 확인된 기록만 표시합니다.';
+ loadIntegratedMaterials();
+}
+document.querySelectorAll('[data-material-app]').forEach(function(button){
+ button.addEventListener('click',function(){materialsSelect('app',button.getAttribute('data-material-app'));});
+});
+document.querySelectorAll('[data-material-stage]').forEach(function(button){
+ button.addEventListener('click',function(){materialsSelect('stage',button.getAttribute('data-material-stage'));});
+});
+$('materialsRefresh').addEventListener('click',loadIntegratedMaterials);
+$('materialsRound').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();loadIntegratedMaterials();}});
+async function loadIntegratedMaterials(){
+ var serial=++materialsListSerial;
+ if(!token){$('materialsStatus').textContent='선장 인증 후에 원본 조회가 가능합니다.';$('materialsList').replaceChildren();return;}
+ var round=String($('materialsRound').value||'').trim();
+ if(round&&(!/^\d{1,4}$/.test(round)||Number(round)<1||Number(round)>1247)){
+  $('materialsStatus').textContent='1~1247회차만 조회할 수 있습니다.';return;
+ }
+ if(materialStage==='before'){
+  await loadSixRoomResultBefore(serial,round||null);
+  return;
+ }
+ var app=materialApp,stage=materialStage;
+ $('materialsStatus').textContent='원본 조회 중…';
+ try{
+  var result=await fetchThreeAppMetadata(app,stage,round||null);
+  if(serial!==materialsListSerial||HOME_SELECTED!=='materials')return;
+  materialLast=result;$('materialsList').replaceChildren();
+  if(!result.linked){
+   $('materialsStatus').textContent=app==='v3'?'V3 누적 분석 350회(선장 보고) · 결과전 확정 원본 자동 연계 대기':
+   'V4 항해의자유 · 결과전 확정 원본 자동 연계 대기 (일반판 기존 정책 유지)';
+   return;
+  }
+  var rows=result.items;
+  if(stage==='before'){
+   var verified=rows.filter(verifiedBeforeReport);
+   $('materialsStatus').textContent='서버 등록 메타 '+result.total+'건 · 이번 조회 결과전 증빙 확인 '+verified.length+'건 · 미검증 메타는 공식 목록에서 제외';
+   if(!verified.length){
+    var pending=document.createElement('p');pending.className='materialsUnverified';
+    pending.textContent='조회된 '+rows.length+'개 자료는 추첨 전 원본 잠금 증빙이 없어 공식 결과전 보고서로 집계하지 않습니다. 기존 원본은 보존합니다.';
+    $('materialsList').append(pending);return;
+   }
+   rows=verified;
+  }else{
+   $('materialsStatus').textContent='별도 '+materialsLabel(stage)+' 서버 기록 메타 '+result.total+'건 · 결과전 정본과 구분합니다.';
+  }
+  if(!rows.length){
+   var none=document.createElement('p');none.className='materialsNote';
+   none.textContent='이 조건에 검증된 자료가 없습니다. 분석 0회 또는 적중 0건이라는 뜻이 아닙니다.';
+   $('materialsList').append(none);return;
+  }
+  rows.forEach(function(row){
+   var item=document.createElement('div');item.className='matRecord';
+   var date=row.locked_at||row.graded_at||row.created_at||'일시 미확인';
+   item.textContent='제'+row.round_no+'회 · '+materialsLabel(stage)+' · '+(row.room_key||'')+' · '+(row.status||'')+' · '+date;
+   $('materialsList').append(item);
+  });
+ }catch(e){
+  if(serial!==materialsListSerial||HOME_SELECTED!=='materials')return;
+  $('materialsStatus').textContent='원본 조회 실패 · 기존 DB 불변 ('+String(e.message||e).slice(0,90)+')';$('materialsList').replaceChildren();
+ }
+}
+/* Six captain report rooms. Metadata is read only from the app's existing source server.
+ * In a retrospective replay, the word RESULT-BEFORE is a report stage, not proof of a
+ * contemporaneous lottery forecast. No artificial reports are created. */
+async function loadSixRoomResultBefore(serial,round){
+ $('materialsStatus').textContent='V3 4방 + V7 + V4 · 결과전 수신현황 조회 중…';
+ try{
+  var scope=selectedBeforeRoom;
+  var result=await fetchSixRoomFeed(scope,round);
+  if(serial!==materialsListSerial||HOME_SELECTED!=='materials'||materialStage!=='before')return;
+  $('materialsList').replaceChildren();
+  var selected=result.source_rooms;
+  var meta=document.createElement('p');meta.className='materialsNote';
+  meta.textContent='🔁 제1회차부터 재분석 · 원본 보고서 수신 확인: '+result.items.length+'건 (공식 결과전 인증 0건). 각 방의 자동송신은 실기기 검증 전입니다.';
+  $('materialsList').append(meta);
+  selected.forEach(function(room){
+   var tile=document.createElement('div');tile.className='matRecord';
+   var note=room.state==='SOURCE_CONNECTOR_REQUIRED'?'결과전 원본 송신 연결 대기':
+       room.state==='NO_REPORTS_RECEIVED'?'원본 서버 조회 가능 · 등록된 결과전 없음':
+       room.state==='UNVERIFIED_SOURCE_RECORDS'?'과거 등록 후보 '+room.received_candidates+'건 · 사전잠금 미검증':
+       '원본 조회 상태 점검 필요';
+   tile.textContent=room.name+' · '+note;
+   $('materialsList').append(tile);
+  });
+  result.items.forEach(function(item){
+   var tile=document.createElement('div');tile.className='matRecord';
+   tile.textContent=item.room_id.toUpperCase()+' · 제'+item.round_no+'회 · 결과전 형식 · '+item.filename+
+     ' · '+(item.verification==='PRE_DRAW_METADATA_ONLY'?'추첨 전 등록 메타(독립 감사 대기)':'과거 재분석/시점 미검증')+
+     ' · '+(item.created_at||'등록시각 확인 전');
+   $('materialsList').append(tile);
+  });
+  $('materialsStatus').textContent='✅ 방별 자동 조회 완료 · 등록 후보 '+result.items.length+'건 · 실제 결과전 자동송신 '+(result.source_rooms.every(function(x){return x.actual_app_auto_push_verified})?'검증됨':'미검증')+
+  ' · 모든 과거 재분석은 연구용으로 분리';
+ }catch(e){
+  if(serial!==materialsListSerial||HOME_SELECTED!=='materials')return;
+  $('materialsStatus').textContent='자동 조회 실패 · 원본자료 불변: '+String(e.message||e).slice(0,85);
+  $('materialsList').replaceChildren();
+ }
+}
+
+$('materialsLocalFile').addEventListener('change',async function(){
+ var file=this.files&&this.files[0],out=$('materialsLocalPreview');
+ if(!file){out.hidden=true;return;}
+ if(!/\.(txt|json)$/i.test(file.name)||file.size>2097152){out.hidden=false;out.textContent='TXT/JSON 2MB 이하 파일만 임시 미리보기 가능합니다.';return;}
+ try{out.textContent=(await file.text()).slice(0,9000);out.hidden=false;}catch(e){out.hidden=false;out.textContent='파일을 읽을 수 없습니다.';}
+});
+$('materialsComparison').addEventListener('click',function(){
+ $('materialsComparisonStatus').textContent='1~1247회차 동일원문·동일회차 결과전 잠금 및 결과후 채점이 V7/V3/항해의자유 3개 앱 모두에서 확인되어야 합니다. 현재 V3·항행의자유 원본 자동 연동이 미검증이므로 순위를 계산하지 않습니다. 승격 HOLD.';
+});
+
+function showMoreDetailFromTop(panelId){
+ var selected=$(panelId),more=$('homeMorePanel');
+ if(!selected||!more)return;
+ selected.scrollTop=0;
+ more.scrollTop=0;
+ window.requestAnimationFrame(function(){more.scrollTop=0;});
+}
+
+$('homeApprovalBtn').addEventListener('click',function(){homeView(HOME_SELECTED==='approval'?'home':'approval');});
+$('homeMaterialsBtn').addEventListener('click',function(){homeView(HOME_SELECTED==='materials'?'home':'materials');if(HOME_SELECTED==='materials')loadIntegratedMaterials();});
+$('homeMaterialsBack').addEventListener('click',function(){homeView('home');});
+$('homeApprovalBackBtn').addEventListener('click',function(){homeView('home');});
+$('homeLiveBtn').addEventListener('click',function(){homeView('live');});
+$('homeReportBtn').addEventListener('click',function(){homeView('reports');});
+$('homeMoreBtn').addEventListener('click',function(){homeView(HOME_SELECTED==='more'?'home':'more');});
+$('homeBackBtn').addEventListener('click',function(){homeView('home');});
+$('homeMoreBackBtn').addEventListener('click',function(){homeView('home');});
+/* R14: Route card shortcuts into the EXISTING read-only three-app materials room.
+ * Keep the native V3/V7 launcher handlers and the existing approval authorization intact. */
+document.querySelectorAll('#appCommandDeck [data-open-material]').forEach(function(button){
+ button.addEventListener('click',function(){
+  var app=button.getAttribute('data-open-material');
+  if(!['v3','v7','freedom'].includes(app))return;
+  homeView('materials');
+  materialsSelect('app',app);
+ });
+});
+$('openFreedomApprovalShortcut').addEventListener('click',function(){
+ $('homeApprovalBtn').click();
+});
+
+
+function setAppHeight(){
+ try{
+   var h=window.visualViewport?window.visualViewport.height:window.innerHeight;
+   var usable=Math.max(280,Math.min(window.innerHeight,h));
+   document.documentElement.style.setProperty('--app-height',Math.round(usable)+'px');
+ }catch(e){}
+}
+setAppHeight();
+if(window.visualViewport)window.visualViewport.addEventListener('resize',setAppHeight);
+window.addEventListener('resize',setAppHeight);
+
+
+
+/* Open the ACTUAL ChatGPT original conversation; not an API clone or message forwarder.
+ * One-time link registration does NOT require entering the pilot meeting-room key.
+ * Direct-link state is stored locally on this device; authenticated server registry remains optional.
+ */
+/*
+ * APK v1.0.5 native-launch bridge. Opens only an installed activity chosen by
+ * the captain, never installs/modifies V3 or V7. Does not share chat/DB context.
+ */
+function requestInstalledLaunch(role,selectAgain){
+ try{
+  if(!window.CrewInstalledApps||typeof window.CrewInstalledApps.openInstalled!=='function'){
+   window.alert('설치된 V3/V7 앱 직접 실행은 공동회의 APK 1.0.5 이상에서 사용할 수 있습니다. 웹 브라우저에서는 실행되지 않습니다.');
+   return;
+  }
+  window.CrewInstalledApps.openInstalled(role,!!selectAgain);
+ }catch(err){
+  window.alert('설치 앱 실행을 시작하지 못했습니다. 1.0.5 업데이트와 앱 선택 상태를 확인해 주세요.');
+ }
+}
+$('openInstalledV3').addEventListener('click',function(){requestInstalledLaunch('v3',false);});
+$('openInstalledV7').addEventListener('click',function(){requestInstalledLaunch('v7',false);});
+/* Central-control lookup uses existing read-only reports; no report duplication or edits. */
+(function(){
+ var input=$('centralRoundInput'),lookup=$('centralRoundLookup'),all=$('centralRoundAll');
+ function maxRound(){return Math.max(1,Math.floor((Date.now()-Date.UTC(2002,11,7,11,35))/604800000)+2)}
+ function lookupRound(showAll){
+  var text=showAll?'':input.value.trim(),n=Number(text);
+  if(!showAll&&(!/^[1-9][0-9]*$/.test(text)||!Number.isInteger(n)||n>maxRound())){
+   window.alert('제1회부터 현회차('+maxRound()+'회)까지 입력해 주세요.');return;
+  }
+  if(!showAll)input.value=String(n);
+  $('reportRound').value=showAll?'':String(n);
+  $('homeReportBtn').click();
+  if(typeof token!=='undefined'&&token)$('reportRefresh').click();
+ }
+ lookup.addEventListener('click',function(){lookupRound(false)});
+ all.addEventListener('click',function(){lookupRound(true)});
+ input.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();lookupRound(false)}});
+})();
+
+
+
+
+var ORIGINAL_CHAT_KEY='crew_meeting_central_linkofficer_original_chat_url_v1';
+var ORIGINAL_ROLE_PREFIX='crew_meeting_direct_original_';
+var ORIGINAL_HISTORY_PREFIX='crew_meeting_original_history_v1_';
+var originalLinks={},editingRole=null;
+var origNames={captain:'⚓ 선장',navigator:'🧭 항해사',controller:'🛡️ 통제관',linkofficer:'🔗 중앙연결관'};
+var origButtons={captain:'originalCaptain',navigator:'originalNavigator',controller:'originalController',linkofficer:'originalLinkofficer'};
+function validOriginalUrl(input){
+ var u=new URL(String(input||'').trim()),p=u.pathname.split('/').filter(Boolean),uid=/^[0-9a-f-]{36}$/i;
+ var ok=(p.length===2&&p[0]==='c'&&uid.test(p[1]))||(p.length===4&&p[0]==='g'&&/^g-[a-z0-9-]+$/i.test(p[1])&&p[2]==='c'&&uid.test(p[3]));
+ if(u.protocol!=='https:'||u.hostname!=='chatgpt.com'||u.port||u.username||u.password||!ok)throw Error('INVALID_CHAT_URL');
+ u.hash='';u.search='';return u.href;
+}
+function roleUrl(role){
+ try{
+  var locally=localStorage.getItem(ORIGINAL_ROLE_PREFIX+role);
+  if(locally)return validOriginalUrl(locally);
+  if(role==='linkofficer'){
+   var old=localStorage.getItem(ORIGINAL_CHAT_KEY);
+   if(old)return validOriginalUrl(old);
+  }
+ }catch(e){}
+ return originalLinks[role]||'';
+}
+
+function priorRoleUrls(role){
+ try{
+  var val=JSON.parse(localStorage.getItem(ORIGINAL_HISTORY_PREFIX+role)||'[]');
+  return Array.isArray(val)?val.map(function(item){return validOriginalUrl(item);}).filter(Boolean).slice(0,6):[];
+ }catch(e){return [];}
+}
+function archivePriorRoleUrl(role,newUrl){
+ var old=roleUrl(role);
+ if(!old||old===newUrl)return;
+ try{
+  var history=priorRoleUrls(role).filter(function(x){return x!==old&&x!==newUrl;});
+  history.unshift(old);
+  localStorage.setItem(ORIGINAL_HISTORY_PREFIX+role,JSON.stringify(history.slice(0,6)));
+ }catch(e){}
+}
+function updateOriginalRolePicker(){
+ var all=$('originalRolePicker').querySelectorAll('button');
+ all.forEach(function(btn){btn.classList.toggle('selected',btn.getAttribute('data-original-role')===editingRole);});
+ var past=editingRole?priorRoleUrls(editingRole):[];
+ $('previousOriginalChat').hidden=past.length===0;
+ $('originalChatSave').textContent=roleUrl(editingRole)?'새방 주소로 갱신':'현재방 주소 저장';
+}
+function rememberRoleUrl(role,url){
+ try{
+  localStorage.setItem(ORIGINAL_ROLE_PREFIX+role,url);
+  if(role==='linkofficer')localStorage.setItem(ORIGINAL_CHAT_KEY,url);
+  return true;
+ }catch(e){return false;}
+}
+function redrawOriginalButtons(){
+ Object.keys(origButtons).forEach(function(role){
+  var btn=$(origButtons[role]),ready=!!roleUrl(role);
+  btn.textContent=origNames[role];
+  btn.classList.toggle('ready',ready);
+  btn.title=ready?'기존 ChatGPT 대화방에서 직접 대화':'원본 채팅방 주소를 한 번 등록';
+ });
+}
+function editOriginalRole(role){
+ // A role without a saved URL must reveal its existing setting panel from the compact home.
+ if(HOME_SELECTED!=='more')homeView('more');
+ editingRole=role;$('originalChatPanel').hidden=false;
+ $('originalChatLabel').textContent=origNames[role]+' · 현재 대화방 주소';
+ $('originalChatUrl').value=roleUrl(role);
+ updateOriginalRolePicker();
+ status('originalChatNotice','새 채팅방으로 이사한 경우, 새방의 첫 메시지를 보낸 뒤 브라우저 주소창의 새 URL을 붙여넣고 저장하세요. 이 기기의 예전 주소는 이전방 기록으로 보존합니다.');
+ try{$('originalChatUrl').focus({preventScroll:true});}catch(e){$('originalChatUrl').focus();}
+ showMoreDetailFromTop('originalChatPanel');
+}
+async function refreshOriginalLinks(){
+ if(!token)return;
+ try{
+  var data=await api('original-links');
+  (data.links||[]).forEach(function(rec){if(origButtons[rec.role])try{
+   originalLinks[rec.role]=validOriginalUrl(rec.chat_url);
+  }catch(e){}});
+  redrawOriginalButtons();
+ }catch(e){status('connectionState','원본 대화 주소 동기화를 확인할 수 없습니다. 저장한 바로가기는 계속 사용 가능합니다.');}
+}
+Object.keys(origButtons).forEach(function(role){
+ $(origButtons[role]).addEventListener('click',function(){
+  var saved=roleUrl(role);
+  if(!saved){editOriginalRole(role);return;}
+  try{window.location.assign(validOriginalUrl(saved));}
+  catch(e){editOriginalRole(role);}
+ });
+});
+$('migrateChatLinks').addEventListener('click',function(){editOriginalRole('navigator');});
+$('originalRolePicker').querySelectorAll('button').forEach(function(btn){
+ btn.addEventListener('click',function(){editOriginalRole(btn.getAttribute('data-original-role'));});
+});
+$('previousOriginalChat').addEventListener('click',function(){
+ if(!editingRole)return;
+ var previous=priorRoleUrls(editingRole)[0];
+ if(!previous)return;
+ try{window.location.assign(validOriginalUrl(previous));}
+ catch(e){status('originalChatNotice','이전 원본방 주소를 열지 못했습니다.');}
+});
+$('originalChatCancel').addEventListener('click',function(){$('originalChatPanel').hidden=true;});
+$('originalChatSave').addEventListener('click',async function(){
+ var role=editingRole,url,btn=$('originalChatSave');
+ if(!origButtons[role])return;
+ try{url=validOriginalUrl($('originalChatUrl').value);}
+ catch(e){status('originalChatNotice','정확한 ChatGPT 원본 채팅 주소를 입력해 주세요. 공유(/share/) 주소는 원본 대화를 계속할 수 없습니다.');return;}
+ // Preserve earlier real conversation URL before switching this stable role button.
+ archivePriorRoleUrl(role,url);
+ var remembered=rememberRoleUrl(role,url);
+ originalLinks[role]=url;
+ $('originalChatPanel').hidden=true;
+ redrawOriginalButtons();
+ if(token){
+  btn.disabled=true;
+  try{await api('original-link','POST',{role:role,chat_url:url});}
+  catch(e){status('connectionState','원본 링크 서버 동기화 실패 · 이 기기의 원본 바로가기는 보존됩니다.');}
+  finally{btn.disabled=false;}
+ }
+ if(!remembered)status('loginError','기기 저장을 사용할 수 없어 다음 실행 시 주소를 다시 등록해야 할 수 있습니다.');
+});
+redrawOriginalButtons();
+
+
+/* NEW CHAT FIRST-MESSAGE handoff. Explicit copy + paste is required because an
+ * external webview cannot write into another ChatGPT conversation's composer.
+ * No room access key, session bearer token, original URL or device token included. */
+var HANDOFF_ROLE='navigator';
+var HANDOFF_SHARED='https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/blob/feature/crew-meeting-standalone-apk-20261025/docs/crew-meeting-1.0.3-continuity-20261025.md';
+var HANDOFF_PROTOCOL='https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/blob/main/docs/crew-meeting-migration-first-message-v1.md';
+var HANDOFF_V3='https://docs.google.com/document/d/1PpJ-2mVDygCd-1UVqSVUB0o4mfEBWkj9J5yMW9i4K0Y/edit';
+var HANDOFF_V7='https://docs.google.com/document/d/17ilFpSr5fRADfmG0rORPNhfxDoekUHRc-oglfPe_qGg/edit';
+var HANDOFF_ROLE_DETAILS={
+ navigator:['V3 원본 항해사','V3 항해사앱 원본 작업과 V33 연구를 이어받으십시오. V32·V33·V7 및 배포판을 혼동하지 말고, 원본 25조합·결과전 잠금·실전구매 기록을 보존하십시오.',HANDOFF_V3],
+ controller:['V7 원본 통제관','V7 중앙통제실 원본 작업을 이어받으십시오. 운영 7.9.0·E100-R2 연구·AI1~AI5·최초등록 잠금을 구분하고, 연구 성능을 공식 성능으로 승격하지 마십시오.',HANDOFF_V7],
+ linkofficer:['중앙연결관','공동회의 앱 1.0.3과 V3·V7 작업의 연속성·링크·검증을 조정하십시오. 세 원본 ChatGPT 대화방은 서로 별도 세션임을 유지하고, 실시간 자동송수신을 검증 없이 주장하지 마십시오.',HANDOFF_SHARED]
+};
+function handoffMessage(role){
+ var detail=HANDOFF_ROLE_DETAILS[role]||HANDOFF_ROLE_DETAILS.navigator;
+ return [
+ '⚓ 항행의자유 중앙통제실 — 새방 첫머리 강제 인계양식 V1',
+ '담당 역할: '+detail[0],
+ '',
+ '선장의 최우선 지시: 이곳은 기존 항행의자유 프로젝트의 연속 작업방입니다. 새로운 프로젝트로 시작하거나 완료 작업을 반복하지 마십시오.',
+ '반드시 이 첫 메시지를 기준으로 정본 작업대장과 최근 변경 이력을 직접 조회한 다음, 확인된 최신 지점의 다음 안전한 단계부터 진행하십시오.',
+ '해당 담당 핵심 지시: '+detail[1],
+ '',
+ '반드시 확인할 정본:',
+ '1) 담당 작업대장: '+detail[2],
+ '2) 공동회의 중앙연결 작업대장: '+HANDOFF_SHARED,
+ '3) 새방 강제 인계 표준: '+HANDOFF_PROTOCOL,
+ '4) V3 별도 정본: '+HANDOFF_V3,
+ '5) V7 별도 정본: '+HANDOFF_V7,
+ '',
+ '절대 보존: 기존 V3·V7·공동회의 앱과 채팅, 원본 파일, APK, 결과전/후, 실전구매, 최초등록 잠금, 누적DB, 기기승인, 서명키. 선장 지시 없이 삭제·초기화·기록 덮어쓰기를 금지합니다.',
+ '연결 상태: 선장은 두 원본방의 현재방 대화 가능 구현을 보고하였으며 서버의 두 담당 원본 URL 등록도 확인됐습니다. 하지만 세 원본방 사이의 자동 메시지 송수신 종단간 검증은 별도로 필요합니다.',
+ '새 채팅방 URL은 기존 방과 달라집니다. 새방에서 이 첫 메시지를 보낸 후, 공동회의 앱 「🔄 원본방 이사 · 주소 변경」에서 담당자의 새 ChatGPT 대화 주소를 갱신하고 기존 대화방을 보존하십시오.',
+ '실제 확인한 것만 완료로 표시하고 최신 버전·변경 근거·검증 결과·미완료 사항·다음 작업 1개를 보고하십시오.',
+ '',
+ '지금부터 최신 정본을 확인하고 기존 진행 지점의 다음 단계부터 진행하십시오.'
+ ].join('\n');
+}
+function chooseHandoffRole(role){
+ if(!HANDOFF_ROLE_DETAILS[role])return;
+ HANDOFF_ROLE=role;
+ $('handoffText').value=handoffMessage(role);
+ $('handoffRolePicker').querySelectorAll('button').forEach(function(btn){
+  btn.classList.toggle('selected',btn.getAttribute('data-handoff-role')===role);
+ });
+ $('handoffStatus').textContent='① 양식 복사 후 ② 새 ChatGPT 방을 열고 반드시 첫 메시지에 붙여넣으세요.';
+}
+$('handoffOpen').addEventListener('click',function(){
+ $('handoffPanel').hidden=false;$('originalChatPanel').hidden=true;
+ chooseHandoffRole(HANDOFF_ROLE);
+ try{$('handoffText').focus({preventScroll:true});}catch(e){$('handoffText').focus();}
+ showMoreDetailFromTop('handoffPanel');
+});
+$('handoffRolePicker').querySelectorAll('button').forEach(function(btn){
+ btn.addEventListener('click',function(){chooseHandoffRole(btn.getAttribute('data-handoff-role'));});
+});
+$('handoffClose').addEventListener('click',function(){$('handoffPanel').hidden=true;});
+$('handoffCopy').addEventListener('click',async function(){
+ var text=$('handoffText').value,ok=false;
+ try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(text);ok=true;}}catch(e){}
+ if(!ok){
+  try{$('handoffText').focus();$('handoffText').select();ok=document.execCommand('copy')===true;}catch(e){}
+ }
+ $('handoffStatus').textContent=ok?'인계양식을 복사했습니다. 새 대화방 첫 메시지로 붙여넣으십시오.':'자동 복사가 차단되었습니다. 위 내용을 길게 눌러 직접 복사한 뒤 새 방에 붙여넣으십시오.';
+});
+$('handoffNewChat').addEventListener('click',function(){
+ // Direct user interaction only. Opening a chat never auto-sends a message.
+ window.location.assign('https://chatgpt.com/');
+});
+chooseHandoffRole(HANDOFF_ROLE);
+
+
+/* The original ChatGPT rooms have NO external read/write API.
+ * Manual relay is local, opt-in and copies text only on direct user presses.
+ * No automatic chatbot simulation, server upload, credential or room link in exported text.
+ */
+var RELAY_STORAGE_KEY='crew_meeting_original_manual_relay_v1';
+var RELAY_ROLES=['navigator','controller','linkofficer'];
+var relayData=[],relayActive='',relayUnavailable=false;
+function relayClean(raw){
+ if(!Array.isArray(raw))throw Error('RELAY_STORAGE_INVALID');
+ return raw.map(function(v){
+  if(!v||typeof v.id!=='string'||typeof v.text!=='string'||!v.replies||typeof v.replies!=='object')throw Error('RELAY_ITEM_INVALID');
+  return v;
+ });
+}
+function relayLoad(){
+ try{
+  var saved=localStorage.getItem(RELAY_STORAGE_KEY);
+  relayData=saved?relayClean(JSON.parse(saved)):[];
+  relayActive=relayData.length?relayData[0].id:'';
+ }catch(e){
+  relayData=[];relayUnavailable=true;
+  $('relayCreate').disabled=true;$('relayStatus').textContent='기존 회람 저장소를 읽지 못했습니다. 데이터 보호를 위해 새 회람 저장을 중단했습니다. 앱 데이터를 삭제하지 마십시오.';
+ }
+}
+function relayPersist(next){
+ if(relayUnavailable)return false;
+ try{localStorage.setItem(RELAY_STORAGE_KEY,JSON.stringify(next));relayData=next;return true;}
+ catch(e){$('relayStatus').textContent='기기 저장 실패. 기존 회람은 삭제하지 않았습니다. 저장공간을 확인하십시오.';return false;}
+}
+function relayCurrent(){return relayData.find(function(v){return v.id===relayActive;})||null;}
+function relayTimestamp(date){try{return new Date(date).toLocaleString('ko-KR');}catch(e){return '';}}
+function relayInstructionFor(role,record){
+ var label=origNames[role]||role;
+ var lines=[
+  '⚓ 항행의자유 공동회의 — 선장 원본방 회람 '+record.id,
+  '대상: '+label,
+  '원본 대화방에서 기존 작업 연속성을 유지해 주세요.',
+  '선장 지시:',
+  record.text,
+  ''
+ ];
+ var count=0;
+ RELAY_ROLES.forEach(function(other){
+  if(other===role)return;
+  var ans=record.replies[other];
+  if(ans&&typeof ans.text==='string'&&ans.text.trim()){
+   count++;
+   lines.push('【'+origNames[other]+'의 답변 — 선장이 수동으로 옮긴 내용, 원본 자동검증 아님】');
+   lines.push(ans.text);
+   lines.push('');
+  }
+ });
+ if(count)lines.push('다른 담당자의 의견을 참고하여 해당 담당자의 검토 또는 후속 답변을 부탁합니다.');
+ else lines.push('위 지시에 답해 주시면 선장이 공동회의에 답변을 옮기겠습니다.');
+ return lines.join('\n');
+}
+function relayTranscript(record){
+ var out=['⚓ 공동회의 원본방 수동 회람록','기록번호: '+record.id,'기록일시: '+relayTimestamp(record.created_at),'상태: 선장 수동 전사 / 원본 자동 검증·자동 동기화 없음','', '【선장 지시】',record.text];
+ RELAY_ROLES.forEach(function(role){
+  var ans=record.replies[role];
+  out.push('','【'+origNames[role]+'】');
+  out.push(ans&&ans.text?ans.text:'답변 미기록');
+  if(ans&&ans.recorded_at)out.push('수동 기록: '+relayTimestamp(ans.recorded_at));
+ });
+ return out.join('\n');
+}
+async function relayCopyText(text,statusElement){
+ $('relayCopyPreview').hidden=false;
+ $('relayCopyPreview').value=text;
+ var ok=false;
+ try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(text);ok=true;}}catch(e){}
+ if(!ok){
+  var helper=document.createElement('textarea');
+  try{helper.value=text;helper.setAttribute('readonly','');helper.style.position='fixed';helper.style.left='-9999px';document.body.appendChild(helper);helper.select();ok=document.execCommand('copy')===true;}
+  catch(e){}finally{if(helper.parentNode)helper.parentNode.removeChild(helper);}
+ }
+ statusElement.textContent=ok?'복사했습니다. 원본 ChatGPT 대화방에 직접 붙여넣어 전송하세요.':'자동 복사가 제한됩니다. 텍스트를 길게 눌러 복사해 주세요.';
+ return ok;
+}
+function relaySessionOptions(){
+ var select=$('relaySessionSelect');
+ select.replaceChildren();
+ if(!relayData.length){var opt=document.createElement('option');opt.value='';opt.textContent='저장된 회람 없음';select.appendChild(opt);return;}
+ relayData.forEach(function(v){
+  var opt=document.createElement('option');
+  opt.value=v.id;opt.textContent=relayTimestamp(v.created_at)+' · '+v.text.slice(0,33);
+  select.appendChild(opt);
+ });
+ select.value=relayActive;
+}
+function relayRoleCard(role,record){
+ var el=document.createElement('article');el.className='relayCard';
+ var heading=document.createElement('b');heading.textContent=origNames[role]+' · 실제 원본 대화방';
+ var note=document.createElement('div');note.className='relaySmall';note.textContent='원본방 답변 수집: 자동 아님 · 선장 수동 복사';
+ var controls=document.createElement('div');controls.className='relayActions';
+ var copy=document.createElement('button');copy.type='button';copy.textContent='② 전달문 복사';
+ var open=document.createElement('button');open.type='button';open.className='secondary';open.textContent='③ 원본방 열기';
+ controls.append(copy,open);
+ var response=document.createElement('textarea');response.maxLength=4000;response.rows=3;
+ response.placeholder='원본 대화방에서 받은 답변을 선장님이 여기에 직접 붙여넣으십시오 (4,000자 이내).';
+ var old=record.replies[role];
+ if(old&&typeof old.text==='string')response.value=old.text;
+ var save=document.createElement('button');save.type='button';save.textContent='④ 답변 기록';save.className='secondary';
+ var state=document.createElement('div');state.className='relaySmall';state.textContent=old&&old.recorded_at?'선장 수동 기록: '+relayTimestamp(old.recorded_at):'원본방 답변 미기록';
+ copy.addEventListener('click',function(){
+  relayCopyText(relayInstructionFor(role,record),$('relayStatus'));
+ });
+ open.addEventListener('click',function(){
+  var url=roleUrl(role);
+  if(!url){$('relayStatus').textContent=origNames[role]+' 원본 주소가 없습니다. 위 원본방 주소 등록 버튼으로 먼저 등록하십시오.';editOriginalRole(role);return;}
+  try{window.location.assign(validOriginalUrl(url));}
+  catch(e){$('relayStatus').textContent='원본 대화방 주소 형식에 오류가 있습니다.';}
+ });
+ save.addEventListener('click',function(){
+  var reply=response.value.trim();
+  if(!reply){$('relayStatus').textContent='원본방에서 받은 실제 답변을 붙여넣으십시오. 공백 답변은 기록할 수 없습니다.';return;}
+  if(reply.length>4000){$('relayStatus').textContent='답변은 4000자 이하로 기록하세요.';return;}
+  var updated=Object.assign({},record,{replies:Object.assign({},record.replies)});
+  updated.replies[role]={text:reply,recorded_at:new Date().toISOString(),manual:true};
+  var next=relayData.map(function(v){return v.id===record.id?updated:v;});
+  if(!relayPersist(next))return;
+  relayRender();
+  $('relayStatus').textContent=origNames[role]+' 답변을 선장 수동 회람록에 저장했습니다. 원본 서버 자동 확인 결과가 아닙니다.';
+ });
+ el.append(heading,note,controls,response,save,state);return el;
+}
+function relayRender(){
+ relaySessionOptions();
+ var record=relayCurrent(),cards=$('relayRoleCards');
+ cards.replaceChildren();
+ $('relayExport').disabled=!record;
+ $('relaySessionNotice').textContent=record?'선장 지시: '+record.text+' / 현재 담당자별 답변 '+RELAY_ROLES.filter(function(role){return record.replies[role]&&record.replies[role].text;}).length+'/3건':'먼저 새 지시를 저장하면 V3·V7·중앙연결관으로 보내는 버튼이 생깁니다.';
+ if(record)RELAY_ROLES.forEach(function(role){cards.appendChild(relayRoleCard(role,record));});
+}
+relayLoad();
+relayRender();
+$('relayOpen').addEventListener('click',function(){
+ $('relayPanel').hidden=false;$('handoffPanel').hidden=true;$('originalChatPanel').hidden=true;
+ relayRender();
+ try{$('relayDraft').focus({preventScroll:true});}catch(e){$('relayDraft').focus();}
+ showMoreDetailFromTop('relayPanel');
+});
+$('relayClose').addEventListener('click',function(){$('relayPanel').hidden=true;});
+$('relayCreate').addEventListener('click',function(){
+ var text=$('relayDraft').value.trim();
+ if(!text||text.length>1200){$('relayStatus').textContent='선장 지시는 1~1200자로 입력하세요.';return;}
+ if(relayData.length>=50){$('relayStatus').textContent='저장된 회람이 50건입니다. 기존 기록을 자동 삭제하지 않습니다. 회람록을 백업하고 별도 정리를 계획하십시오.';return;}
+ var time=new Date().toISOString();
+ var record={id:'R-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7),created_at:time,text:text,replies:{}};
+ if(!relayPersist([record].concat(relayData)))return;
+ relayActive=record.id;
+ $('relayDraft').value='';
+ relayRender();
+ $('relayStatus').textContent='새 선장 지시를 이 기기에 보관했습니다. 각 원본방에 복사해 직접 전송하세요.';
+});
+$('relaySessionSelect').addEventListener('change',function(){relayActive=this.value;relayRender();});
+$('relayExport').addEventListener('click',function(){
+ var record=relayCurrent();if(!record)return;
+ relayCopyText(relayTranscript(record),$('relayStatus'));
+});
+
+
+/* Three-room shared EVENT server. This is not an API to read/act on original
+ * ChatGPT conversations. Original-thread tools must publish explicitly. */
+var THREE_ROOM_BASE='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/crew-three-room-bridge';
+var THREE_ROOM_ID='96774ce6-c34f-4505-bbcc-c62e07d3ef3a';
+var threeRoomTimer=null,threeRoomBusy=false;
+function threeRoomHeaders(){return {Authorization:'Bearer '+token,Accept:'application/json'};}
+async function threeRoomRequest(action,method,body){
+ if(!token)throw Error('입장키 인증이 필요합니다.');
+ var headers=threeRoomHeaders(),opts={method:method||'GET',headers:headers,cache:'no-store'};
+ if(body){headers['Content-Type']='application/json';opts.body=JSON.stringify(body);}
+ var res=await fetch(THREE_ROOM_BASE+'/'+action,opts);
+ var data=await res.json().catch(function(){return {error:'INVALID_SERVER_RESPONSE'};});
+ if(!res.ok||data.error)throw Error(String(data.error||res.status));
+ return data;
+}
+var threeRoomName={captain:'⚓ 선장',navigator:'🧭 항해사',controller:'🛡️ 통제관',linkofficer:'🔗 중앙연결관'};
+function threeRoomRoleSummary(rows){
+ var status={navigator:null,controller:null,linkofficer:null};
+ (rows||[]).forEach(function(e){
+  if(!Object.prototype.hasOwnProperty.call(status,e.author_role))return;
+  if(!status[e.author_role]||new Date(e.created_at)>new Date(status[e.author_role].created_at))status[e.author_role]=e;
+ });
+ Object.keys(status).forEach(function(role){
+  var node=$('threeRoomRoleStatus').querySelector('[data-room-role="'+role+'"]');
+  if(!node)return;
+  var item=status[role];
+  node.textContent=threeRoomName[role]+' · '+(item?'최근 공유 '+dateTime(item.created_at)+' (원본 세션 자동 인증 없음)':'공유 메시지 기록 없음');
+ });
+}
+function threeRoomRender(rows){
+ var area=$('threeRoomEvents');area.replaceChildren();
+ threeRoomRoleSummary(rows);
+ if(!rows||!rows.length){area.textContent='원본방에서 등록된 공유 메시지는 아직 없습니다.';return;}
+ rows.forEach(function(e){
+  var item=document.createElement('div');item.className='threeRoomEvent';
+  var title=document.createElement('b');title.textContent=threeRoomName[e.author_role]||'출처 불명';
+  var meta=document.createElement('small');
+  meta.textContent=(e.source_kind==='captain_app'?'공동회의 앱에서 입력':'연결 도구를 통한 역할 선언 · 원본 세션 자동 인증 없음')+
+   ' · '+dateTime(e.created_at);
+  var body=document.createElement('div');body.textContent=String(e.body||'');
+  item.append(title,meta,body);area.appendChild(item);
+ });
+}
+async function threeRoomRefresh(){
+ if(!token||!$('threeRoomLivePanel').open)return;
+ if(threeRoomBusy)return;
+ threeRoomBusy=true;
+ try{
+  var x=await threeRoomRequest('events');
+  threeRoomRender(x.items||[]);
+  $('threeRoomLiveState').textContent='공유 서버 조회됨 · 자동 세션 연동 없음';
+  $('threeRoomStatus').textContent='공유 서버 메시지 '+(x.items||[]).length+'건 조회 · 약 4초 간격 자동 확인. 역할 표시는 본인 주장 정보이며 실제 원본 ChatGPT 세션 자동 인증은 아닙니다.';
+ }catch(err){
+  $('threeRoomStatus').textContent='공유판 조회 실패: '+String(err.message||err);
+  $('threeRoomLiveState').textContent='서버 확인 필요';
+ }finally{threeRoomBusy=false;}
+}
+function threeRoomStop(){if(threeRoomTimer)clearInterval(threeRoomTimer);threeRoomTimer=null;}
+$('threeRoomLivePanel').addEventListener('toggle',function(){
+ threeRoomStop();
+ if(this.open){threeRoomRefresh();threeRoomTimer=setInterval(threeRoomRefresh,4000);}
+});
+$('threeRoomRefresh').addEventListener('click',threeRoomRefresh);
+$('threeRoomCaptainForm').addEventListener('submit',async function(ev){
+ ev.preventDefault();
+ if(!token){$('threeRoomStatus').textContent='입장키로 공동회의에 먼저 입장하십시오.';return;}
+ var body=$('threeRoomCaptainText').value.trim();
+ if(!body||body.length>1200){$('threeRoomStatus').textContent='선장 지시는 1~1200자 이내로 작성하십시오.';return;}
+ var btn=$('threeRoomSend');btn.disabled=true;
+ try{
+  var out=await threeRoomRequest('captain','POST',{body:body});
+  if(!out.saved)throw Error('저장 결과 확인 실패');
+  $('threeRoomCaptainText').value='';
+  $('threeRoomStatus').textContent='공유 서버에 저장되었습니다. 원본 세 대화방에 자동 전송한 것은 아닙니다.';
+  await threeRoomRefresh();
+ }catch(e){$('threeRoomStatus').textContent='저장 실패: '+String(e.message||e);}
+ finally{btn.disabled=false;}
+});
+function threeRoomGuide(role){
+ var label=threeRoomName[role];
+ return [
+  '⚓ 항행의자유 중앙통제실 — '+label+' 원본 채팅방용 공동 업무기록 연결 지시',
+  '',
+  '원래 대화방·역할·기존 작업의 연속성을 그대로 유지하십시오. 별도의 새 AI나 모의 응답으로 대체하지 마십시오.',
+  '연결된 Supabase 도구를 사용할 수 있는 경우, 선장이 업무 공유를 요청하거나 이 원본방이 응답을 작성할 때 아래 공용 메시지 기록을 확인하십시오.',
+  '프로젝트 ID: jyqkohpeowkhuaohlezc',
+  '조회 SQL:',
+  "SELECT author_role, body, source_kind, created_at FROM public.crew_meeting_bridge_events WHERE room_id = '"+THREE_ROOM_ID+"' ORDER BY created_at DESC LIMIT 30;",
+  '',
+  '원본방이 직접 검토한 새 업무 답변을 공유할 때만 아래 형식으로 INSERT하십시오. 원본 채팅의 전체 대화 내역을 자동 복사하지 마십시오.',
+  '저장 SQL 예시 (보고문 안에 작은따옴표가 있으면 SQL용으로 두 번 써야 합니다):',
+  "INSERT INTO public.crew_meeting_bridge_events(room_id,author_role,body,source_kind,provenance) VALUES ('"+THREE_ROOM_ID+"','"+role+"','<검토한 업무 보고문>','original_chat_connector','DECLARED_NOT_SESSION_VERIFIED') RETURNING id, created_at;",
+  '원본방 자체에서 사용 가능한 연결 도구가 없으면 이 절차는 수행할 수 없으며, 연결됐다고 보고하지 마십시오.',
+  '계정 비밀번호, 토큰, 키, 개인 대화 원문을 자동 복제하거나 노출하지 마십시오.',
+  '중요: 이 공유 기록만으로 원본 ChatGPT 방의 자동 메시지 수신·송신이 완료되지는 않습니다. 각 대화 턴에서 연결 도구 호출이 필요한 방식입니다.',
+  '업로드 여부와 함께 새로 등록된 행 ID를 확인한 뒤 선장에게 보고하십시오.'
+ ].join('\n');
+}
+async function threeRoomCopyGuide(role){
+ var guide=threeRoomGuide(role);
+ $('threeRoomGuideCopy').hidden=false;$('threeRoomGuideCopy').value=guide;
+ var copied=false;
+ try{if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(guide);copied=true;}}catch(e){}
+ if(!copied){
+  try{$('threeRoomGuideCopy').focus();$('threeRoomGuideCopy').select();copied=document.execCommand('copy')===true;}catch(e){}
+ }
+ $('threeRoomStatus').textContent=copied?'원본 '+threeRoomName[role]+' 대화방용 연결 지시 복사 완료. 해당 원본방에 첫 메시지로 직접 전달하십시오.':'자동 복사가 제한됩니다. 아래 문구를 길게 눌러 복사한 후 원본방에 전달하십시오.';
+}
+$('threeRoomNavigatorGuide').addEventListener('click',function(){threeRoomCopyGuide('navigator');});
+$('threeRoomControllerGuide').addEventListener('click',function(){threeRoomCopyGuide('controller');});
+$('threeRoomLinkofficerGuide').addEventListener('click',function(){threeRoomCopyGuide('linkofficer');});
+
+function status(id,text){$(id).textContent=text;}
+
+/* Read-only V7 catalog is a separate permissioned service; V3 is a local
+ * file-picker preview. Neither path writes the original app database. */
+var REPORT_ENDPOINT='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/crew-reports-readonly';
+async function reportGet(action,params){
+ if(!token)throw Error('UNAUTHORIZED');
+ var u=new URL(REPORT_ENDPOINT+'/'+action);
+ Object.keys(params||{}).forEach(function(k){if(params[k]!==null&&params[k]!==undefined&&params[k]!=='')u.searchParams.set(k,String(params[k]));});
+ var response=await fetch(u.href,{method:'GET',headers:{Authorization:'Bearer '+token,Accept:'application/json'},cache:'no-store'});
+ var payload=await response.json().catch(function(){return {error:'REPORT_SERVER_INVALID'};});
+ if(!response.ok||payload.error)throw Error(payload.error||'HTTP_'+response.status);
+ return payload;
+}
+function reportSummary(row){
+ return '제'+row.round_no+'회 · '+(row.document_type==='V7_SOURCE'?'원문 자료':'선장방 5조합 기록')+' · '+(row.filename||'서버 원본');
+}
+function reportContent(doc){
+ var lines=[
+  '출처: V7 중앙통제실 서버 / 읽기 전용',
+  '종류: '+doc.document_type,
+  '회차: '+doc.round_no,
+  '파일명: '+(doc.filename||'미표기'),
+  '작성일: '+(doc.created_at||'미표기'),
+  '엔진: '+(doc.engine||'미표기'),
+  '단계: '+(doc.stage||'미표기'),
+  '결과전 추첨 전 수신 여부: '+(doc.received_before_draw?'예':'아니오/미확인'),
+  '원문 SHA-256: '+(doc.source_sha256||'미표기'),
+  '---'
+ ];
+ if(doc.document_type==='V7_SOURCE')lines.push('【원문】',String(doc.source_text||''));
+ else lines.push('【조합 기록】',JSON.stringify(doc.combinations||[],null,2));
+ return lines.join('\n');
+}
+function reportRows(items,kind){
+ var list=$('reportList');list.replaceChildren();
+ if(!items.length){list.textContent='조건에 맞는 V7 서버 원본 기록이 없습니다.';return;}
+ items.forEach(function(doc){
+  var row=document.createElement('div');row.className='reportRow';
+  var label=document.createElement('span');label.textContent=reportSummary(doc);
+  var button=document.createElement('button');button.className='secondary';button.type='button';button.textContent='원본 내용';
+  button.addEventListener('click',async function(){
+   button.disabled=true;$('reportStatus').textContent='해당 기록을 읽는 중입니다…';
+   try{
+    var result=await reportGet('detail',{kind:kind,id:doc.id});
+    $('reportDetail').textContent=reportContent(result.report);
+    $('reportDetail').hidden=false;
+    $('reportStatus').textContent='서버 원본을 읽기 전용으로 표시했습니다. 다운로드·누적DB 쓰기 없음.';
+   }catch(e){$('reportStatus').textContent='상세 조회 실패: '+String(e.message||e);}
+   finally{button.disabled=false;}
+  });
+  row.append(label,button);list.appendChild(row);
+ });
+}
+async function refreshV7Reports(){
+ if(!token){$('reportStatus').textContent='V7 서버 조회는 공동회의 고정키로 입장한 뒤 이용할 수 있습니다.';return;}
+ var kind=$('reportKind').value;
+ if(kind!=='v7-source'&&kind!=='v7-purchase')return;
+ var round=$('reportRound').value.trim();
+ if(round&&!/^[1-9][0-9]{0,3}$/.test(round)){$('reportStatus').textContent='회차는 1~9999 숫자만 입력하세요.';return;}
+ var button=$('reportRefresh');button.disabled=true;$('reportStatus').textContent='V7 서버 기록을 확인하는 중…';
+ try{
+  var result=await reportGet('list',{kind:kind,round:round||null});
+  $('reportDetail').hidden=true;$('reportDetail').textContent='';
+  reportRows(result.items||[],kind);
+  $('reportStatus').textContent='V7 서버에서 읽기 전용 '+(result.items||[]).length+'건 확인 · 출처: '+(kind==='v7-source'?'공용 원문':'선장방 5조합');
+  $('reportsCount').textContent='V7 '+(result.items||[]).length+'건 · 자료 보기';
+ }catch(err){$('reportStatus').textContent='V7 조회 실패: '+String(err.message||err);}
+ finally{button.disabled=false;}
+}
+$('reportRefresh').addEventListener('click',refreshV7Reports);
+$('reportKind').addEventListener('change',function(){$('reportDetail').hidden=true;$('reportDetail').textContent='';$('reportList').replaceChildren();$('reportStatus').textContent='자료 종류가 변경됐습니다. 목록 조회를 누르세요.';});
+$('reportsPanel').addEventListener('toggle',function(){
+ if(this.open&&token)refreshV7Reports();
+});
+$('v3ReportFile').addEventListener('change',async function(){
+ var file=this.files&&this.files[0],out=$('v3ReportPreview'),statusNode=$('v3ReportStatus');
+ out.hidden=true;out.textContent='';
+ if(!file){statusNode.textContent='선택한 파일이 없습니다.';return;}
+ if(!/\.(txt|json)$/i.test(file.name)||file.size<1||file.size>1024*1024){
+  statusNode.textContent='TXT/JSON 파일 1MB 이하만 미리보기 가능합니다. 선택한 파일은 전송되지 않았습니다.';return;
+ }
+ try{
+  var buffer=await file.arrayBuffer();
+  var text=new TextDecoder('utf-8',{fatal:false}).decode(buffer);
+  var digest=await crypto.subtle.digest('SHA-256',buffer);
+  var sha=Array.from(new Uint8Array(digest)).map(function(x){return x.toString(16).padStart(2,'0');}).join('');
+  var warning='';
+  if(/\.json$/i.test(file.name))try{JSON.parse(text);}catch(e){warning=' · JSON 구문을 확인하세요';}
+  out.textContent='출처: 선장폰에서 직접 선택한 V3 내보내기 파일\n파일: '+file.name+'\n크기: '+file.size+' bytes\nSHA-256: '+sha+'\n주의: 공동회의 서버에 업로드되지 않았습니다.\n---\n'+text.slice(0,30000)+(text.length>30000?'\n... (미리보기 30,000자까지만 표시)':'');
+  out.hidden=false;
+  statusNode.textContent='휴대폰 로컬 파일 미리보기 완료'+warning+' · V3 저장원본 변경 없음';
+ }catch(e){statusNode.textContent='파일을 읽을 수 없습니다. Android 파일 선택기와 파일 저장 위치를 확인하세요.';}
+});
+
+async function api(endpoint,method,payload){
+ var options={method:method||'GET',headers:{'Accept':'application/json'},cache:'no-store'};
+ if(token)options.headers.Authorization='Bearer '+token;
+ if(payload){options.headers['Content-Type']='application/json';options.body=JSON.stringify(payload);}
+ var reply=await fetch(BASE+'/'+endpoint,options);
+ var data=await reply.json().catch(function(){return {error:'SERVER_RESPONSE_ERROR'};});
+ if(!reply.ok||data.error){var e=new Error(data.error||'HTTP_'+reply.status);e.status=reply.status;throw e;}
+ return data;
+}
+function readableError(err){
+ var key=String(err.message||err);
+ var known={UNAUTHORIZED:'입장키가 올바르지 않습니다.',DAILY_LIMIT_REACHED:'오늘의 시범 지시 한도(8회)에 도달했습니다.',WAIT_15_SECONDS:'15초 간격으로 전송해 주세요.',INVALID_MESSAGE_LENGTH:'메시지는 1~1200자여야 합니다.',MESSAGE_SAVE_FAILED:'메시지 저장에 실패했습니다. 다시 확인해 주세요.',FILE_TOO_LARGE:'10MB 이하 파일만 올릴 수 있습니다.',INVALID_FILE_SIZE:'파일 크기를 확인해 주세요.',FILE_TYPE_OR_NAME_REJECTED:'지원되지 않는 파일 이름 또는 형식입니다.',ROOM_FILE_LIMIT_REACHED:'시범 회의방 파일 한도(60개)에 도달했습니다.',FILE_STORAGE_FAILED:'파일 저장소 오류입니다.',FILE_LIST_FAILED:'파일 목록을 읽을 수 없습니다.',FILE_LINK_FAILED:'다운로드 링크를 만들지 못했습니다.'};
+ return known[key]||'연결 오류: '+key;
+}
+function dateTime(value){try{return new Date(value).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});}catch{return '';}}
+function render(rows){
+ var sig=JSON.stringify(rows.map(function(m){return m.id;}));if(sig===lastFingerprint)return;
+ var el=$('messages');var stick=el.scrollHeight-el.scrollTop-el.clientHeight<85;
+ lastFingerprint=sig;el.replaceChildren();
+ if(!rows.length){var empty=document.createElement('div');empty.className='muted';empty.textContent='아직 대화가 없습니다. 선장님이 첫 지시를 보내실 수 있습니다.';el.appendChild(empty);return;}
+ rows.forEach(function(m){
+  var card=document.createElement('article');card.className='message '+(m.actor==='captain'?'mine':(m.actor==='system'?'meta':m.actor));
+  var name=document.createElement('div');name.className='who';name.textContent={captain:'⚓ 선장',navigator:'🧭 항해사 · API',controller:'🛡️ 통제관 · API',system:'시스템 안내'}[m.actor]||'알 수 없음';
+  var body=document.createElement('div');body.textContent=m.body;
+  var when=document.createElement('div');when.className='when';when.textContent=dateTime(m.created_at);
+  card.append(name,body,when);el.appendChild(card);
+ });
+ if(stick)el.scrollTop=el.scrollHeight;
+}
+async function refresh(){if(!token)return;try{var r=await api('messages');render(r.messages||[]);status('connectionState','연결됨 · 기록 자동 확인 중 (4초 간격)');}catch(err){status('connectionState',readableError(err));if(err.status===401)disconnect();}}
+async function showContinuity(){
+ var summary=$('continuitySummary'),list=$('continuitySources');
+ summary.textContent='원본 출처 점검 중입니다…';$('continuityFlag').textContent='확인 중';
+ try{
+   var data=await api('continuity');
+   summary.textContent='정식 연속성 미인증 · 기존 원본 ChatGPT 2개 세션 미연결 · 출처 참조만 가능. V3/V7 엔진 자동 연동 없음.';$('continuityFlag').textContent='미연결 · 근거 보기';
+   list.replaceChildren();
+   var p=document.createElement('p');
+   p.textContent='서버 V7 배포: '+(data.v7_deployment?String(data.v7_deployment.version_name)+' (게시 기록 확인)':'조회 미확인')+' · 이 목록은 실시간 문서 자동 동기화가 아닙니다.';
+   list.appendChild(p);
+   (data.sources||[]).forEach(function(entry){
+     var item=document.createElement('div');
+     item.style.cssText='border-top:1px solid #36506b;padding:10px 0';
+     var title=document.createElement('strong');
+     title.textContent=(entry.role==='navigator'?'🧭 항해사':'🛡️ 통제관')+' · '+entry.source_title;
+     item.appendChild(title);
+     var detail=document.createElement('p');
+     detail.className='muted';
+     detail.textContent=entry.source_summary;
+     item.appendChild(detail);
+     var status=document.createElement('small');
+     status.textContent=entry.evidence_status==='NOT_CONNECTED'?'원본 세션 직접 연결 없음':(entry.evidence_status==='SERVER_VERIFIED'?'서버 기록 읽기 확인 · 참조 전용':'문서 읽기 확인 · 참조 전용');
+     item.appendChild(status);
+     if(entry.source_url){
+       try{var u=new URL(entry.source_url);if(u.protocol==='https:'){
+         var link=document.createElement('a');
+         link.href=u.href;link.target='_blank';link.rel='noopener noreferrer';
+         link.style.cssText='display:inline-block;margin-left:10px;color:#a9daff';
+         link.textContent='근거 원문 열기';
+         item.appendChild(link);
+       }}catch(e){}
+     }
+     list.appendChild(item);
+   });
+ }catch(err){
+   summary.textContent='연속성 근거를 확인할 수 없습니다. 정식방으로 사용하지 마십시오. '+readableError(err);$('continuityFlag').textContent='확인 오류 · 보기';
+   list.replaceChildren();
+ }
+}
+
+async function refreshFiles(){
+ if(!token)return;
+ try{
+  var data=await api('files'),items=data.files||[],el=$('fileList');
+  $('fileCount').textContent=items.length+'개 · 보기';el.replaceChildren();
+  if(!items.length){el.textContent='아직 등록된 파일이 없습니다.';}
+  items.forEach(function(item){
+   var row=document.createElement('div');row.className='fileRow';
+   var label=document.createElement('div');label.className='fileLabel';
+   label.textContent=item.filename;
+   var small=document.createElement('small');small.textContent=Math.ceil(item.byte_count/1024)+'KB · '+dateTime(item.created_at)+' · 선장 등록';
+   label.appendChild(small);
+   var download=document.createElement('button');download.type='button';download.className='secondary';download.textContent='받기';download.setAttribute('aria-label',item.filename+' 다운로드');
+   download.addEventListener('click',async function(){
+    download.disabled=true;status('fileStatus','보안 다운로드 링크 확인 중…');
+    try{
+      var r=await api('file-link?id='+encodeURIComponent(item.id));
+      var u=new URL(r.url);
+      if(u.protocol!=='https:'||u.hostname!=='jyqkohpeowkhuaohlezc.supabase.co')throw Error('UNSAFE_FILE_LINK');
+      status('fileStatus','브라우저에서 다운로드를 시작합니다.');
+      window.location.assign(u.href);
+    }catch(err){status('fileStatus',readableError(err));}
+    finally{download.disabled=false;}
+   });
+   row.append(label,download);el.appendChild(row);
+  });
+  status('fileStatus','서버에 저장된 회의 파일 '+items.length+'개');
+ }catch(err){status('fileStatus',readableError(err));}
+}
+$('filePanel').addEventListener('toggle',function(){if(this.open&&token)refreshFiles();});
+$('fileForm').addEventListener('submit',async function(event){
+ event.preventDefault();
+ if(!token)return;
+ var file=$('meetingFile').files[0];
+ if(!file)return;
+ if(file.size<1||file.size>10*1024*1024){status('fileStatus','파일은 1바이트 이상, 10MB 이하여야 합니다.');return;}
+ var btn=$('fileUploadBtn');btn.disabled=true;status('fileStatus','파일을 비공개 저장소에 저장하는 중…');
+ try{
+   var body=new FormData();body.append('file',file,file.name);
+   var reply=await fetch(BASE+'/file-upload',{method:'POST',headers:{Authorization:'Bearer '+token},body:body,cache:'no-store'});
+   var data=await reply.json().catch(function(){return {error:'FILE_UPLOAD_RESPONSE_INVALID'};});
+   if(!reply.ok||data.error)throw Error(data.error||'HTTP_'+reply.status);
+   if(!data.saved||!data.file?.sha256)throw Error('FILE_SAVE_NOT_CONFIRMED');
+   $('meetingFile').value='';
+   await refreshFiles();
+   status('fileStatus','저장 확인: '+data.file.filename+' · SHA-256 '+data.file.sha256.slice(0,12)+'…');
+ }catch(err){status('fileStatus',readableError(err));}
+ finally{btn.disabled=false;}
+});
+
+function enter(){
+ $('loginArea').style.display='none';$('loginArea').hidden=true;
+ $('materialsAuthGate').hidden=true;
+ $('chatArea').style.display='flex';$('disconnectBtn').style.display='inline-block';
+ if(HOME_SELECTED==='live')threeRoomRefresh();
+ if(HOME_SELECTED==='materials'){startMaterialsMonitor();loadIntegratedMaterials();}
+ if(HOME_SELECTED==='reports')refreshV7Reports();
+ if(timer)clearInterval(timer);timer=setInterval(refresh,4000);refresh();showContinuity();refreshFiles();refreshOriginalLinks();
+}
+var PERSISTENT_AUTH_KEY='crew_meeting_persistent_auth_v1';
+function clearRememberedEntry(){
+ try{localStorage.removeItem(PERSISTENT_AUTH_KEY);}catch(e){}
+ try{sessionStorage.removeItem('crew_meeting_auth');}catch(e){}
+}
+function saveConfirmedEntry(){
+ try{
+  sessionStorage.setItem('crew_meeting_auth',token);
+  if($('rememberDevice').checked)localStorage.setItem(PERSISTENT_AUTH_KEY,token);
+  else localStorage.removeItem(PERSISTENT_AUTH_KEY);
+ }catch(e){status('loginError','기기 저장이 제한되어 이번 앱 사용 중에만 입장이 유지될 수 있습니다.');}
+}
+function disconnect(){
+ stopMaterialsMonitor();
+ threeRoomStop();
+ if(timer)clearInterval(timer);timer=null;token='';clearRememberedEntry();lastFingerprint='';
+ $('loginArea').style.display='block';$('loginArea').hidden=false; $('chatArea').style.display='none';$('disconnectBtn').style.display='none';$('secret').value='';$('fileList').replaceChildren();$('fileCount').textContent='0개 · 보기';
+}
+$('loginForm').addEventListener('submit',async function(event){
+ event.preventDefault();status('loginError','확인 중입니다…');var key=$('secret').value.trim().toLowerCase();
+ if(!/^[0-9a-f]{48,64}$/.test(key)){status('loginError','입장키의 형식을 확인해 주세요.');return;}
+ token=key;$('loginButton').disabled=true;
+ try{await api('messages');status('loginError','');saveConfirmedEntry();enter();}
+ catch(err){token='';status('loginError',readableError(err));}
+ finally{$('loginButton').disabled=false;}
+});
+$('disconnectBtn').addEventListener('click',disconnect);
+$('refreshBtn').addEventListener('click',refresh);
+$('continuityRefresh').addEventListener('click',showContinuity);
+$('draft').addEventListener('input',function(){status('charCount',$('draft').value.length+' / 1200');});
+$('sendForm').addEventListener('submit',async function(event){
+ event.preventDefault();if(sending||!token)return;
+ var body=$('draft').value.trim();if(!body)return;
+ sending=true;$('sendMsg').disabled=true;status('sendError','전송 중입니다…');
+ try{var r=await api('message','POST',{text:body});$('draft').value='';status('charCount','0 / 1200');status('sendError',r.ai_reply_requested?'저장되었습니다. 항해사 의견 후 통제관 검증이 표시됩니다.':'저장되었습니다. 현재 AI 응답 연결은 설정되지 않았습니다.');await refresh();}
+ catch(err){status('sendError',readableError(err));}
+ finally{sending=false;$('sendMsg').disabled=false;}
+});
+api('health').then(function(r){status('serverState',r.ai_api_configured||r.api_ai_configured?'서버 준비됨 · API 역할 사용 가능':'서버 준비됨 · API 역할은 연결 확인 필요');}).catch(function(){status('serverState','서버 연결 확인에 실패했습니다.');});
+try{
+ var saved=localStorage.getItem(PERSISTENT_AUTH_KEY)||sessionStorage.getItem('crew_meeting_auth');
+ if(saved&&/^[0-9a-f]{48,64}$/.test(saved)){
+  token=saved;
+  status('loginError','기존 인증 확인 중…');
+  api('messages').then(function(){
+   status('loginError','');
+   enter();
+  }).catch(function(err){
+   token='';
+   if(err.status===401){
+    clearRememberedEntry();
+    status('loginError','기존 입장키가 만료되거나 변경되었습니다. 새 키를 한 번 입력해 주세요.');
+   }else{
+    status('loginError','서버에 연결되지 않았습니다. 연결이 복구되면 앱을 다시 열어 자동으로 입장할 수 있습니다.');
+   }
+  });
+ }
+}catch(e){status('loginError','인증 저장소 확인 오류가 있습니다.');}
+})();
+</script>
+</body></html>
