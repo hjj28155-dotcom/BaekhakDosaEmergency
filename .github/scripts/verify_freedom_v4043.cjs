@@ -6,7 +6,7 @@ const script=(html.match(/<script>\s*const APP_BASE_VERSION[\s\S]*?<\/script>/i)
 assert(script,'app main JS exists');
 new vm.Script(script.replace(/^<script>/i,'').replace(/<\/script>$/i,''));
 assert(patch.includes("meta.count=1247"),'DB-1 update requires 1247 verified records');
-assert(html.includes('let raw=manual||db1'),'manual text may be absent; DB-1 fallback must drive the engine');
+assert(html.includes('const raw=manual||db1'),'manual text may be absent; DB-1 fallback must drive the engine');
 assert(html.includes("status.status!=='PASS'"),'refuse incomplete DB-1');
 assert(html.includes("V330_AFTER='purchase';runAnalysisFromHome()"),'current 1247 auto analysis route');
 assert(html.includes("a.historicalResultExcluded=true"),'past research cannot masquerade as first-locked historical result');
