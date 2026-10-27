@@ -642,6 +642,31 @@ body{
  #installedAppBar .appDeckCard .deckAction,#installedAppBar .appDeckCard .deckAction:first-child{height:25px!important;min-height:25px!important;max-height:25px!important}
 }
 
+
+/* 2026-10-27 materials baseline RESET (display only, never database wipe).
+   350 = captain-reported V3 analyses; NOT 350 verified result-before files. */
+#captainAnalysisBaseline.analysisBaseline{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:7px;
+ border:1px solid #a0c4d3;border-radius:10px;background:rgba(3,24,48,.68);
+ color:#ecf6ff;text-align:center;margin-bottom:7px;font-size:.66rem;line-height:1.35;
+}
+#captainAnalysisBaseline>strong{grid-column:1/-1;color:#ffe2a6;font-size:.73rem}
+#captainAnalysisBaseline span{min-width:0;padding:3px 1px}
+#captainAnalysisBaseline span b{display:block;color:#ffe2ac;font-size:.72rem}
+#captainAnalysisBaseline em{font-style:normal;color:#b9cbd5;font-size:.57rem}
+.materialsLinkStatus{
+ border:1px solid #6e9bb3;border-radius:9px;padding:8px;color:#ffe2a7;
+ background:rgba(12,49,74,.72);font-size:.73rem;line-height:1.35;margin:7px 0;
+}
+.materialsExtraStages{border:1px solid #406c84;border-radius:9px;padding:5px 7px;margin:8px 0}
+.materialsExtraStages summary{color:#d0e4f0;font-size:.72rem;font-weight:750;cursor:pointer}
+.materialsExtraStages .materialsGrid{margin-top:8px}
+#homeSpecialRooms #homeMaterialsBtn{font-size:.72rem!important}
+@media(max-width:360px){
+ #captainAnalysisBaseline.analysisBaseline{font-size:.61rem;padding:5px;gap:2px}
+ #homeSpecialRooms #homeMaterialsBtn{font-size:.63rem!important}
+}
+
 </style>
 </head>
 <body>
@@ -662,12 +687,18 @@ body{
 </nav>
 <!-- Captain-only three-app management deck. Public Freedom APK is distributed elsewhere. -->
 <section id="appCommandDeck" aria-label="선장 전용 3앱 통합 관리본부">
- <div class="commandDeckTop"><strong>⚓ 세 앱 통합 관리본부</strong><small>선장 전용 · 세 앱 원본 독립 보존</small></div>
+ <div class="commandDeckTop"><strong>⚓ 3앱 통합 관리본부</strong><small>선장 전용 · 원본 보존</small></div>
+ <div id="captainAnalysisBaseline" class="analysisBaseline" role="status" aria-label="선장이 확인한 분석 진행 현황">
+  <strong>분석 현황 초기 기준</strong>
+  <span><b>V3</b> 350회 분석 <em>선장 보고</em></span>
+  <span><b>V7</b> 실적 미확인</span>
+  <span><b>V4</b> 실적 미확인</span>
+ </div>
  <div id="installedAppBar" aria-label="세 앱의 독립 관리 카드">
   <div class="installedAppUnit appDeckCard" data-app-card="v3">
    <div class="deckAppIcon" aria-hidden="true">🧭</div>
    <strong>항해사 V3</strong>
-   <small>설치 앱 · 내보낸 기록</small>
+   <small>분석 350회 · 선장 보고</small>
    <div class="deckCardActions">
     <button type="button" id="openInstalledV3" class="deckAction" aria-label="설치된 항해사 V3 앱 열기">앱 열기</button>
     <button type="button" class="deckAction deckSecondary" data-open-material="v3" aria-label="V3 원본 자료 관리방 열기">기록 보기</button>
@@ -676,7 +707,7 @@ body{
   <div class="installedAppUnit appDeckCard" data-app-card="v7">
    <div class="deckAppIcon" aria-hidden="true">🛡️</div>
    <strong>통제관 V7</strong>
-   <small>설치 앱 · 서버 조회</small>
+   <small>분석 실적 미확인</small>
    <div class="deckCardActions">
     <button type="button" id="openInstalledV7" class="deckAction" aria-label="설치된 통제관 V7 앱 열기">앱 열기</button>
     <button type="button" class="deckAction deckSecondary" data-open-material="v7" aria-label="V7 읽기 전용 자료 관리방 열기">기록 보기</button>
@@ -685,7 +716,7 @@ body{
   <div class="installedAppUnit appDeckCard" data-app-card="freedom">
    <div class="deckAppIcon" aria-hidden="true">🚢</div>
    <strong>항해의자유</strong>
-   <small>별도 배포 · 선장 관리</small>
+   <small>V4 · 분석 실적 미확인</small>
    <div class="deckCardActions">
     <button type="button" class="deckAction" data-open-material="freedom" aria-label="항해의자유 자료 관리방 열기">자료 관리</button>
     <button type="button" id="openFreedomApprovalShortcut" class="deckAction deckSecondary" aria-label="기존 일반판 승인관리방 열기">승인관리</button>
@@ -696,7 +727,7 @@ body{
 </section>
 <div id="homeSpecialRooms" aria-label="승인관리방과 통합자료방">
 <button id="homeApprovalBtn" type="button" aria-expanded="false" aria-controls="homeApprovalPanel">🔐 일반판 승인관리</button>
-<button id="homeMaterialsBtn" type="button" aria-expanded="false" aria-controls="homeMaterialsPanel">📚 3앱 통합자료방</button>
+<button id="homeMaterialsBtn" type="button" aria-expanded="false" aria-controls="homeMaterialsPanel">📚 V3·V7·V4 결과전 자료실</button>
 </div>
 <div id="centralRoundPanel" aria-label="중앙통제실 전회차 조회">
  <label for="centralRoundInput">🔎 중앙통제실 · 제1회부터 현회차까지 조회</label>
@@ -709,7 +740,7 @@ body{
 </div>
 <div id="homeOverview">
  <div class="homeShip">⚓</div>
- <strong>3앱 원본 보존 · 선장 전용 관리 · 승인 통제</strong>
+ <strong>V3 350회 분석 보고 · V7/V4 원본 연결 점검</strong>
  <p>담당자를 선택하거나 아래 메뉴를 이용하세요.</p>
  <small>실시간 기록은 공유 서버에서 확인합니다.</small>
 </div>
@@ -719,25 +750,27 @@ body{
  <a class="approvalFallback" href="./hanghae-distribution-approval-room.html" target="_self">승인관리 화면이 보이지 않으면 직접 열기</a>
 </div>
 <div id="homeMaterialsPanel" hidden aria-label="V7 V3 항행의자유 통합 자료방">
- <div class="homePaneTop"><strong>📚 3앱 통합자료방 · 1~1247회차</strong><button id="homeMaterialsBack" type="button" class="secondary">홈으로</button></div>
+ <div class="homePaneTop"><strong>📚 V3 + V7 + V4 · 결과전 보고서</strong><button id="homeMaterialsBack" type="button" class="secondary">홈으로</button></div>
  <div id="materialsBody">
-  <p class="materialsNote">원본 독립보존 · 결과전 최초 잠금 · 결과후 채점 · 누적DB · 엔진 검증. <b>확인되지 않은 과거 분석은 생성하거나 등록하지 않습니다.</b></p>
+  <p class="materialsNote">초기 기준: <b>V3 분석 350회(선장 보고)</b>, V7·V4 분석 실적 미확인. 350회 분석과 350건의 결과전 보고서는 다릅니다. <b>원본에서 검증된 결과전 보고서만 자동 조회 대상으로 인정합니다.</b></p>
   <div class="materialsGrid" aria-label="세 앱 독립 자료 원본">
-   <button type="button" class="matApp selected" data-material-app="v7">🛡️ V7 중앙통제실</button>
-   <button type="button" class="matApp" data-material-app="v3">🧭 V3 항해사앱</button>
-   <button type="button" class="matApp" data-material-app="freedom">🚢 항해의자유</button>
+   <button type="button" class="matApp" data-material-app="v7">🛡️ V7 통제관</button>
+   <button type="button" class="matApp selected" data-material-app="v3">🧭 V3 항해사앱</button>
+   <button type="button" class="matApp" data-material-app="freedom">🚢 V4 항해의자유</button>
   </div>
+  <div id="materialsLinkStatus" class="materialsLinkStatus" role="status" aria-live="polite">원본 자동연계 확인: V3 원본 미연결 · V7 서버 메타 조회 가능(결과전 증빙 별도 확인) · V4 원본 미연결</div>
+  <details class="materialsExtraStages"><summary>결과후·누적DB 별도 조회</summary>
   <div class="materialsGrid" aria-label="자료 구분">
    <button type="button" class="matStage selected" data-material-stage="before">📄 결과전</button>
    <button type="button" class="matStage" data-material-stage="after">📑 결과후</button>
    <button type="button" class="matStage" data-material-stage="db">🗄️ 누적DB</button>
-  </div>
+  </div></details>
   <div class="materialsFind">
    <label for="materialsRound">회차 선택 (1~1247, 빈칸은 전체 등록내역)</label>
    <div class="materialsFindRow"><input id="materialsRound" type="number" min="1" max="1247" inputmode="numeric" placeholder="1~1247">
    <button id="materialsRefresh" type="button">🔎 조회</button></div>
   </div>
-  <p id="materialsStatus" class="materialsNote" role="status" aria-live="polite">V7 원본 서버를 읽기 전용으로 조회할 수 있습니다. V3와 항행의자유는 원본 연결 상태를 구분합니다.</p>
+  <p id="materialsStatus" class="materialsNote" role="status" aria-live="polite">V3 분석 350회는 선장 보고값입니다. 원본 결과전 보고서 자동연계는 아직 확인되지 않았습니다.</p>
   <div id="materialsList" aria-label="확인된 실제 자료 기록"></div>
   <div id="materialsLocal" hidden>
    <label for="materialsLocalFile">📎 독립 앱에서 내보낸 결과전·결과후·누적DB TXT/JSON 임시 미리보기</label>
@@ -751,7 +784,7 @@ body{
    <button type="button" id="materialsComparison">📊 현재 비교 가능 여부 확인</button>
    <p id="materialsComparisonStatus" class="materialsNote">세 앱의 동일 회차 검증자료가 연결될 때만 순위를 산출합니다.</p>
   </div>
-  <p class="materialsNote">⚠️ 항해의자유 일반 사용자 화면은 기존 최근 5회차만 열람하도록 유지합니다. 이 선장 전용 통합자료방의 전체 검증 범위와 구분됩니다.</p>
+  <p class="materialsNote">⚠️ 항해의자유 V4 일반 사용자 화면은 기존 최근 5회차만 열람하도록 유지합니다. 이 선장 전용 자료실과 구분됩니다.</p>
  </div>
 </div>
 <div id="homeWorkspace" hidden aria-label="선택한 기능">
@@ -930,7 +963,7 @@ function homeView(which){
 
 /* Captain-only original ledger links for three independent apps.
  * No leakage of raw combinations or retrospective fabricated 'result-before' entries. */
-var materialApp='v7',materialStage='before',materialLast=null;
+var materialApp='v3',materialStage='before',materialLast=null;
 function materialsLabel(stage){return {before:'결과전',after:'결과후',db:'누적DB'}[stage]||stage;}
 function materialsSelect(kind,value){
  if(kind==='app')materialApp=value; else materialStage=value;
@@ -964,10 +997,10 @@ async function loadIntegratedMaterials(){
   materialLast=result;
   $('materialsList').replaceChildren();
   if(!result.linked){
-   $('materialsStatus').textContent=materialApp==='v3'?'V3 독립 앱 원본 자동 연동 대기 · 내보낸 파일로 아래 임시 미리보기를 할 수 있습니다.':'항해의자유 독립 앱 원본 자동 연동 대기 · 기존 일반 사용자 최근 5회차 제한 유지.';
+   $('materialsStatus').textContent=materialApp==='v3'?'V3 분석 350회(선장 보고). 검증된 결과전 보고서 원본 자동 연계 대기 · 내보낸 파일은 임시 미리보기만 가능합니다.':'V4 항해의자유 결과전 보고서 원본 자동 연동 대기 · 일반 사용자 기존 최근 5회차 제한 유지.';
    return;
   }
-  $('materialsStatus').textContent='🛡️ V7 원본 서버 '+materialsLabel(materialStage)+' · 실제 등록 '+result.total+'건 · 결과전 사전잠금의 적법성은 별도 확인';
+  $('materialsStatus').textContent='🛡️ V7 서버 '+materialsLabel(materialStage)+' 등록 메타 '+result.total+'건 · 현재 분석 수행 실적이나 추첨 전 사전잠금 증명이 아닙니다.';
   if(!result.items||!result.items.length){
    var none=document.createElement('p');none.className='materialsNote';none.textContent='이 조건에 검증된 등록 자료가 없습니다. 0점이나 0조합으로 간주하지 않습니다.';$('materialsList').append(none);return;
   }
