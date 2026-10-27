@@ -65,7 +65,11 @@ for(const [filename,record] of Object.entries(manifest.files)){
  assert.ok(/^reference_runtime\/[a-z0-9_]+\.txt$/.test(p),'Safe ASCII runtime asset path: '+filename);
  const src=fs.readFileSync(source+filename),portable=fs.readFileSync(base+p);
  assert.equal(sha(portable),record.android_runtime_sha256,'runtime SHA matched: '+filename);
- if(filename.includes('로또꿈해몽백과'))assert.notEqual(sha(src),sha(portable),'CP949 source must not be mislabeled UTF8 original');
- else assert.equal(sha(portable),sha(src),'runtime and original exact bytes: '+filename);
+ assert.equal(sha(portable),sha(src),'Android runtime copy must match packaged source bytes: '+filename);
+ if(filename.includes('로또꿈해몽백과')){
+   assert.equal(record.original_encoding,'CP949');
+   assert.notEqual(record.original_sha256,record.app_sha256,'Original CP949 SHA must differ from converted UTF8 SHA');
+   assert.equal(sha(portable),record.app_sha256,'App uses converted UTF8, not CP949');
+ }
 }
 console.log('PASS: 9 portable ASCII Android assets have authentic source-name manifest SHA; source originals kept separately.');
