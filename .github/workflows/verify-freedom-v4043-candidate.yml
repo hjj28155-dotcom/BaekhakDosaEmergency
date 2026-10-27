@@ -12,6 +12,7 @@ on:
       - '.github/workflows/verify-freedom-v4043-candidate.yml'
       - '.github/scripts/verify_freedom_v4043.cjs'
       - '.github/scripts/verify_freedom_v4043_references.cjs'
+      - '.github/scripts/verify_freedom_v4043_real_engine.cjs'
       - '.github/scripts/validate_freedom_r14.cjs'
   workflow_dispatch:
 permissions:
@@ -34,6 +35,10 @@ jobs:
           set -euo pipefail
           node .github/scripts/validate_freedom_r14.cjs
           node .github/scripts/verify_freedom_v4043.cjs
+      - name: Execute genuine V1.3 engine against four preserved DB-1 rounds (no mock engine)
+        run: |
+          set -euo pipefail
+          node .github/scripts/verify_freedom_v4043_real_engine.cjs
       - name: Inspect existing engine DB-1 and V3 analysis contract
         shell: bash
         run: |
