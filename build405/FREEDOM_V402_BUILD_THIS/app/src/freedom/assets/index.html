@@ -1566,6 +1566,8 @@ function v126BootEngine(force){
   try{f.setAttribute('src','engine_v2.html?v126='+V126_ENGINE_BOOT_SEQ+'_'+Date.now())}catch(e){}
 }
 window.addEventListener('message',function(ev){
+  const f=document.getElementById('engineFrame');
+  if(!f||!f.contentWindow||ev.source!==f.contentWindow)return;
   const m=ev.data||{};
   if(m.type==='V3_ENGINE_READY'){
     V3_ENGINE_READY=true;
@@ -1575,7 +1577,7 @@ window.addEventListener('message',function(ev){
     }
     return;
   }
-  if(m.type==='V3_ANALYSIS_RESULT'){if(V4043_ANALYSIS_SESSION)v4043AcceptEngineResult(m);else handleEngineResult(m);}
+  if(m.type==='V3_ANALYSIS_RESULT'&&V4043_ANALYSIS_SESSION)v4043AcceptEngineResult(m);
 });
 document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>v126BootEngine(false),180),{once:true});
 function sendAnalysisToEngine(round,raw){
@@ -1604,7 +1606,7 @@ function v123Seeded(seedStr){
 }
 function v123Auto20FromUniverse(universe,round,targetCount=20){
  const uniq=[...new Set((universe||[]).map(Number).filter(n=>Number.isInteger(n)&&n>=1&&n<=45))];
- if(uniq.length<6)return [];
+ if(uniq.length<8)return [];
  const rng=v123Seeded(`V52|${Number(round)||0}|COUNT=${targetCount}|${uniq.join(',')}`);
  const uniqueGames=[],seen=new Set();let guard=0;
  while(uniqueGames.length<targetCount&&guard<20000){
@@ -1613,9 +1615,8 @@ function v123Auto20FromUniverse(universe,round,targetCount=20){
    const g=arr.slice(0,6).sort((a,b)=>a-b),key=g.join(',');
    if(seen.has(key))continue;seen.add(key);uniqueGames.push(g)
  }
- if(!uniqueGames.length)return [];
- const out=[];for(let i=0;i<targetCount;i++)out.push([...uniqueGames[i%uniqueGames.length]]);
- return out
+ if(uniqueGames.length!==targetCount)return [];
+ return uniqueGames
 }
 function v123Seed1243Result(){
  D.rounds=D.rounds||{};D.rounds["1243"]=D.rounds["1243"]||{};
@@ -1709,6 +1710,16 @@ function v330Print(){
 }
 
 /* V4.0.43: display only actual per-round saved combinations, never reconstruct old tickets. */
+function v4043SavedLocked20(){
+ const b=R().buy||{};
+ if(b.locked!==true||!Array.isArray(b.auto20)||b.auto20.length!==20)return [];
+ const parse=v=>{
+  const nums=Array.isArray(v)?v.map(Number):String(v||'').split(/[^0-9]+/).filter(Boolean).map(Number);
+  return nums.length===6&&new Set(nums).size===6&&nums.every(n=>Number.isInteger(n)&&n>=1&&n<=45)?nums:[];
+ };
+ const parsed=b.auto20.map(parse);
+ return parsed.every(g=>g.length===6)&&new Set(parsed.map(g=>g.slice().sort((x,y)=>x-y).join(','))).size===20?parsed:[];
+}
 function v4043SavedFinal5(){
  const buy=(R().buy||{}), values=Array.isArray(buy.combos)?buy.combos.slice(0,5):[];
  return values.map(v=>{
@@ -1739,7 +1750,7 @@ function v4043MissingHistoricalCombos(round){
 }
 
 function v330ResultPage(round){
- const w=V330_WIN[round],a=R().analysis||{},games=(a.auto20||[]).slice(0,20);
+ const w=V330_WIN[round],locked=v4043SavedLocked20(),a=R().analysis||{},games=(locked.length===20?locked:(a.auto20||[])).slice(0,20);
  if(games.length!==20){if(v4043DisplaySavedFive(round,'result'))return;v4043MissingHistoricalCombos(round);return}
  const set=new Set(w.nums),scores=games.map(g=>g.filter(n=>set.has(Number(n))).length),best=Math.max(...scores),wins=scores.filter(x=>x>=3).length;
  const banner=best>=3?`<div class="scoreHero success"><strong>🎉 축하합니다!</strong><span>최고 ${best}/6 적중 · 3/6 이상 ${wins}조합</span></div>`:`<div class="scoreHero fail"><strong>이번 회차는 아쉽게 지나갔습니다.</strong><span>제${round}회 최고 ${best}/6 적중 · 다음 분석에 이어갑니다.</span></div>`;
@@ -1752,6 +1763,15 @@ function v330ResultPage(round){
  },300);
 }
 function v330PurchasePage(round){
+ const b=R().buy||{},locked=b.locked===true;
+ if(locked){
+   const saved=v4043SavedLocked20();
+   if(saved.length===20){
+     modal(`제${round}회 · 잠금된 실제 구매번호`,`<div class="analysisCompact v330print"><div class="panel goldline"><strong>구매잠금 원본 20조합</strong><p class="small">기기에 보존된 원래 구매번호입니다. 재분석으로 바꾸지 않습니다.</p></div><div class="r5grid">${v330GroupsPurchase(saved)}</div><div class="r5actions"><button class="b gold" onclick="v330Print()">🖨 인쇄</button><button class="b" onclick="rawPage()">회차선택</button></div></div>`);return;
+   }
+   if(v4043DisplaySavedFive(round,'purchase'))return;
+   modal('잠금 구매기록 확인','<div class="panel warn">잠금된 구매조합의 원본을 확인할 수 없습니다. 새 분석번호로 바꾸지 않습니다.</div>');return;
+ }
  const a=R().analysis||{},games=(a.auto20||[]).slice(0,20);
  if(games.length!==20){if(v4043DisplaySavedFive(round,'purchase'))return;if(round===1247){V330_AFTER='purchase';runAnalysisFromHome();return}v4043MissingHistoricalCombos(round);return}
  modal(`제${round}회 · 이번주 구매번호`,`<div class="analysisCompact v330print"><div class="scoreHero success"><strong>자동분석 20조합</strong><span>비상용 분석엔진 · 후보우주 기반 · 외부번호 자동추가 없음</span></div><div class="r5grid">${v330GroupsPurchase(games)}</div><div class="r5actions"><button class="b gold" onclick="v330Print()">🖨 인쇄</button><button class="b" onclick="rawPage()">회차선택</button><button class="b" onclick="rawPage()">이전</button></div></div>`);
@@ -2010,22 +2030,29 @@ function v4043BeginAnalysis(round,raw){
 }
 
 function runAnalysisFromHome(){
- let r=cur(),saved=R().raw||{},manual=String(saved.text||'').trim(),db1=v4043Db1Text(r);
- let raw=manual||db1;
+ const r=cur(),saved=R().raw||{},manual=String(saved.text||'').trim(),db1=v4043Db1Text(r);
+ if(!V330_WIN[Number(r)]&&(R().buy||{}).locked===true){v330PurchasePage(Number(r));return}
+ if(V4043_ANALYSIS_SESSION||V3_ANALYSIS_PENDING){modal('분석 진행 중','<div class="panel">이전 분석이 완료된 뒤 실행해 주세요.</div>');return}
+ if(manual&&manual.split(/\r?\n/).filter(x=>x.trim()).length!==6){
+  modal('원문 6문장 확인','<div class="panel warn">현재 원문은 정확히 6문장이어야 합니다. 이전 엔진 결과를 대신 표시하지 않습니다.</div>');return;
+ }
+ const raw=manual||db1;
  if(!db1){
   modal('DB-1 데이터 점검', '<div class="panel warn">수동 원문이 없어도 DB-1에서 6문장을 불러와 분석해야 합니다. 현재 내장 DB-1 검증이 되지 않아 번호를 임의 생성하지 않습니다. 앱의 DB-1 탑재 상태를 확인해 주세요.</div>');
   return;
  }
  const research=!!V330_WIN[Number(r)];
  V4043_ANALYSIS_INPUT={round:Number(r),source:manual?'사용자 저장 원문':'내장 DB-1 1~1247',research:research,started:Date.now()};
+ const started=V4043_ANALYSIS_INPUT.started;
  let before=String(((research?R().analysisResearch:R().analysis)||{}).analyzedAt||'');
  sendAnalysisToEngine(r,raw);
  setTimeout(()=>{try{
+   if(!V4043_ANALYSIS_INPUT||V4043_ANALYSIS_INPUT.started!==started)return;
    let now=String(((research?R().analysisResearch:R().analysis)||{}).analyzedAt||'');
-   if(now===before&&Number(cur())===Number(r)){V4043_ANALYSIS_SESSION=null;
+   if(now===before&&Number(cur())===Number(r)){V4043_ANALYSIS_SESSION=null;V3_ANALYSIS_PENDING=null;v126BootEngine(true);
      modal('분석 엔진 확인',`<div class="panel"><div class="warn">분석 엔진 응답이 아직 없습니다.</div><div class="small">임의 번호는 생성하지 않습니다.</div><div class="row" style="margin-top:10px"><button class="b gold" onclick="runAnalysisFromHome()">다시 분석</button><button class="b" onclick="rawPage()">회차선택</button></div></div>`)
    }
- }catch(e){}},30000)
+ }catch(e){}},60000)
 }
 function runAnalysisFromRaw(){saveRawAuto();runAnalysisFromHome()}
 // STAGE4.48: 홈 핵심버튼 터치 안전장치. Android WebView에서 inline onclick 누락 시에도 동작합니다.
@@ -2065,8 +2092,13 @@ function storeAnalysisResult(m,pool,original,fallback,error){
    v4043HistoricalResearchPage(Number(cur()));
    return;
  }
- R().analysis=a;
  let b=R().buy||{};
+ if(b.locked===true){
+   V330_AFTER='';V123_AFTER_ANALYSIS='';
+   modal('구매잠금 보존','<div class="panel goldline">잠금된 구매·분석 원본은 수정하지 않습니다. 기존 구매번호를 확인해 주세요.</div>');
+   return;
+ }
+ R().analysis=a;
  if(!b.locked){
    b.combos=original5.map(g=>g.join(', '));
    b.auto20=auto20.map(g=>g.join(', '));

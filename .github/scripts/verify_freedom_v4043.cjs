@@ -99,8 +99,9 @@ assert.notDeepEqual(combinedGames.map(x=>x.join(',')),baseGames.map(x=>x.join(',
 // User-supplied current original takes precedence, but the validated DB-1 remains required.
 const launchAnalysis=extract('function runAnalysisFromHome(){','function runAnalysisFromRaw(){');
 const sends=[];
-const roundData={raw:{text:'사용자 제공 현재 회차 원문'}};
+const roundData={raw:{text:lines('사용자제공')}};
 const bctx={
+ V3_ANALYSIS_PENDING:null,
  window:{V3_RAW_BANK:historyBank,DB1_UPDATE_1247:{status:'PASS'},V3_RAW_BANK_META:{count:1247}},
  R(){return roundData},cur(){return '1247'},V330_WIN:{},modal(){throw Error('valid DB-1 must not show error')},
  sendAnalysisToEngine(round,text){sends.push({round,text})},setTimeout(){},console
@@ -115,3 +116,57 @@ assert.equal(sends[1].text,historyBank['1247'].text,'no current original must us
 assert.equal(vm.runInContext('V4043_ANALYSIS_INPUT.source',bctx),'내장 DB-1 1~1247');
 
 console.log('PASS: DB-1 six-line fallback, strict 1247 check, current auto20 route, historical 20-combo research isolation, locked purchase preservation');
+
+/* 2026-10-27: sworn locked tickets must be displayed, not silently replaced by
+   new analysis; six-line manual check; actual iframe messages only. */
+const lockedReader=extract('function v4043SavedLocked20(){','function v4043SavedFinal5(){');
+const lockedUi=extract('function v330PurchasePage(round){','function v330OpenRound(n){');
+const seedAndAuto=extract('function v123Seeded(seedStr){','function v123Seed1243Result(){');
+const strictCtx={};vm.createContext(strictCtx);vm.runInContext(seedAndAuto,strictCtx);
+assert.equal(strictCtx.v123Auto20FromUniverse([1,2,3,4,5,6,7],1247,20).length,0,'cannot claim 20 distinct combos with only seven candidates');
+const twentyUnique=strictCtx.v123Auto20FromUniverse([1,2,3,4,5,6,7,8,9,10],1247,20);
+assert.equal(twentyUnique.length,20);assert.equal(new Set(Array.from(twentyUnique,g=>g.join(','))).size,20);
+const lockedData={buy:{locked:true,combos:['1, 2, 3, 4, 5, 6'],auto20:twentyUnique.map(g=>g.join(', ')),lockedAt:'BEFORE'}};
+const analysisData={auto20:Array.from({length:20},()=>[39,40,41,42,43,44])};
+let actualPage='';
+const uiCtx={R(){return Object.assign(lockedData,{analysis:analysisData})},modal(title,body){actualPage=title+' '+body},v330GroupsPurchase(g){return g.map(x=>x.join(',')).join('|')},
+ v4043DisplaySavedFive(){return false},v4043MissingHistoricalCombos(){throw Error('should never fall back')},runAnalysisFromHome(){throw Error('must not regenerate locked record')},V330_AFTER:''};
+vm.createContext(uiCtx);vm.runInContext(lockedReader+lockedUi,uiCtx);
+uiCtx.v330PurchasePage(1247);
+assert.match(actualPage,/잠금된 실제 구매번호/);
+assert.ok(actualPage.includes(twentyUnique[0].join(',')));
+assert.ok(!actualPage.includes('39,40,41,42,43,44'),'do not show fresh analysis instead of locked purchase');
+lockedData.buy.auto20=['1 2 3 4 5 6'];
+uiCtx.v330PurchasePage(1247);
+assert.match(actualPage,/원본을 확인할 수 없습니다/,'no replacement when locked record damaged');
+const preserveCurrent=extract('function storeAnalysisResult(m,pool,original,fallback,error){','function candidateBalls(nums)');
+const originalAnalysis={auto20:[[1,2,3,4,5,6]],analyzedAt:'BEFORE'};
+lockedData.analysis=originalAnalysis;let modalTitle='';
+const storeCtx={R(){return lockedData},cur(){return 1247},cleanGames(x){return x||[]},v123Auto20FromUniverse(){return twentyUnique},gamesToRows(){return []},V330_WIN:{},V330_AFTER:'',V123_AFTER_ANALYSIS:'',V4043_ANALYSIS_INPUT:{source:'manual'},modal(t){modalTitle=t},save(){throw Error('locked source must not be saved')}};
+vm.createContext(storeCtx);vm.runInContext(preserveCurrent,storeCtx);
+storeCtx.storeAnalysisResult({engine:'test',rank:[]},[1,2,3,4,5,6,7,8,9,10],[],false,'');
+assert.equal(lockedData.analysis,originalAnalysis,'locked analysis must not be overwritten');
+assert.equal(modalTitle,'구매잠금 보존');
+const strictManual=extract('function runAnalysisFromHome(){','function runAnalysisFromRaw(){');
+let manualCalls=0,manualError='';
+const rawTest={raw:{text:'single line'},buy:{}};
+const manualCtx={R(){return rawTest},cur(){return 1247},V330_WIN:{},V4043_ANALYSIS_SESSION:null,V3_ANALYSIS_PENDING:null,
+ v4043Db1Text(){return lines('DB1')},modal(t){manualError=t},sendAnalysisToEngine(){manualCalls++},setTimeout(){}};
+vm.createContext(manualCtx);vm.runInContext(strictManual,manualCtx);
+manualCtx.runAnalysisFromHome();
+assert.equal(manualCalls,0,'invalid manual text must never be sent to engine');
+assert.equal(manualError,'원문 6문장 확인');
+rawTest.raw.text=lines('valid');manualCtx.runAnalysisFromHome();assert.equal(manualCalls,1);
+const messageDispatcher=extract("window.addEventListener('message',function(ev){","document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>v126BootEngine(false),180)");
+const trusted={};let cb=null,received=0,rawReceived=0;
+const msgCtx={window:{addEventListener(type,fn){if(type==='message')cb=fn}},document:{getElementById(){return {contentWindow:trusted}}},
+ V3_ENGINE_READY:false,V3_ANALYSIS_PENDING:null,V4043_ANALYSIS_SESSION:{index:0},v4043AcceptEngineResult(){received++},handleEngineResult(){rawReceived++}};
+vm.createContext(msgCtx);vm.runInContext(messageDispatcher,msgCtx);
+cb({source:{},data:{type:'V3_ANALYSIS_RESULT',round:1247,rank:[{n:1}]}});
+assert.equal(received,0,'different window must not spoof engine');
+cb({source:trusted,data:{type:'V3_ANALYSIS_RESULT',round:1247,rank:[{n:1}]}});
+assert.equal(received,1,'own engine frame response is handled');
+msgCtx.V4043_ANALYSIS_SESSION=null;
+cb({source:trusted,data:{type:'V3_ANALYSIS_RESULT',round:1247,rank:[{n:1}]}});
+assert.equal(rawReceived,0,'orphan engine reply must not overwrite results');
+console.log('PASS: unique20 gating, locked purchase rendering priority, analysis immutability, 6-line manual guard and source-bound engine messages.');
