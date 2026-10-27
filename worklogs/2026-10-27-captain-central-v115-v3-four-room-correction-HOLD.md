@@ -30,3 +30,12 @@
 1. V1.0.15 CI 실제 성공/인증서/해시 검증 후 시험용 APK Drive 신규 파일 보관(기존 정식 링크 보존).
 2. V3 화면 실기기 시험 및 V3 제1~4방 서버 실제 자동송신 경로 확인.
 3. 별도 V4 원문10조합 엔진 원본 독립 통합 재개. 임의 번호 생성·원본 잠금 해제 금지.
+
+## 시험 빌드 및 Drive 보관 확정
+- 최종 검증 소스 커밋: `b1a3882ece812ca7123da3d1623395df20045e57` (이후 작업대장 변경은 앱 소스에 영향 없음).
+- Github Actions: `40510915774` **completed success**. 패키지 `kr.hanghae.crewmeeting.compact`, versionCode `115`; 기존 인증서 지문 `e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be` 동일서명. V3 4방·자료실·기존 승인관리 완전성 검사 PASS.
+- Actions artifact `12737321494` `HANGHAE-CREW-MEETING-1.0.15-V3ROOM-TEST-APK`; ZIP 62,440 bytes (업로드 아티팩트).
+- APK 파일명 `HANGHAE_CREW_MEETING_1.0.15_V3ROOM_TEST.apk`; **65,625 bytes**. APK SHA-256 `b619f398a23d16b7f596b4228892d31233f7fc07499062b77c4dcd04d03a5f71`. Artifact ZIP CRC 검사 PASS; 아티팩트에 포함된 sha256 체크파일과 실제 APK 해시 일치 PASS; APK ZIP CRC PASS; 번들 홈 HTML의 V3 4방·기존 승인/V7 카드 존재 PASS.
+- **신규 Drive 시험 보관본**: `https://drive.google.com/file/d/1j30HptIMjuebJWHqz81AaYU4ID2uDlJW/view` (APK+SHA256 검증 ZIP). Drive 업로드 후 파일 재읽기 성공, MIME `application/zip`. 기존 V1.0.13 고정 설치 주소 변경 없음.
+- APK 단독 파일도 대화 첨부로 생성: `/mnt/data/항행의자유_중앙통제실_선장전용_V1.0.15_V3방_시험.apk`.
+- **실기기 설치/디자인 일치/선장폰 회귀 검증은 미완료**, 시험 후보 유지. V3 원본 보고서 실제 자동 송신/결과전 확정도 미완료. V4 독립 분석 엔진 원문10조합 통합 역시 별도 미완료.
