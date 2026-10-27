@@ -1915,14 +1915,32 @@ function v4043HistorySelection(round,currentText){
  return {count:items.length,selected};
 }
 function v4043MergedRanks(current,previous){
- const scores=new Map(),cr=(current||[]).filter(x=>Number.isInteger(Number(x.n))&&Number(x.n)>=1&&Number(x.n)<=45);
- const add=(rank,weight)=>{const valid=(rank||[]).filter(x=>Number.isInteger(Number(x.n))&&Number(x.n)>=1&&Number(x.n)<=45);
-  const total=valid.length;valid.forEach((x,i)=>scores.set(Number(x.n),(scores.get(Number(x.n))||0)+weight*(total-i)/Math.max(1,total)));};
- add(cr,previous.length?0.8:1);
- previous.forEach(p=>add(p,0.2/previous.length));
- const candidates=[...new Set(cr.slice(0,6).map(x=>Number(x.n)))];
- for(const [n] of [...scores].sort((a,b)=>b[1]-a[1]||a[0]-b[0])){if(candidates.length>=10)break;if(!candidates.includes(n))candidates.push(n)}
- return candidates.map(n=>({n,score:scores.get(n)||0,source:'CURRENT+DB1_PAST'}));
+ // The current six engine leaders are authoritative. The remaining four
+ // research-only candidate slots must not silently discard all historical
+ // DB-1 evidence when it points to different, engine-generated candidates.
+ // Retain 80/20 score provenance and reserve up to two tail places for
+ // *distinct* history-derived numbers, never draw results or invented values.
+ const valid=rank=>(rank||[]).filter(x=>Number.isInteger(Number(x.n))&&Number(x.n)>=1&&Number(x.n)<=45);
+ const cr=valid(current),scores=new Map(),historyScores=new Map();
+ const add=(rank,weight,dst)=>{const arr=valid(rank);
+  arr.forEach((x,i)=>{const n=Number(x.n);dst.set(n,(dst.get(n)||0)+weight*(arr.length-i)/Math.max(1,arr.length));});
+ };
+ add(cr,previous.length?0.8:1,scores);
+ (previous||[]).forEach(p=>{
+  add(p,0.2/previous.length,scores);
+  add(p,1/previous.length,historyScores);
+ });
+ const primarySet=new Set(cr.map(x=>Number(x.n)));
+ const candidates=[...new Set(cr.slice(0,6).map(x=>Number(x.n)))],leaderSet=new Set(candidates);
+ const sortByScores=map=>[...map].sort((a,b)=>b[1]-a[1]||a[0]-b[0]).map(x=>x[0]);
+ const currentTail=cr.map(x=>Number(x.n)).filter(n=>!leaderSet.has(n));
+ const distinctHistory=sortByScores(historyScores).filter(n=>!leaderSet.has(n)&&!primarySet.has(n));
+ // Maintain at least two current-tail representatives before history
+ // contributes up to two sourced additions (where such evidence exists).
+ for(const n of currentTail.slice(0,2))if(!candidates.includes(n))candidates.push(n);
+ for(const n of distinctHistory.slice(0,2))if(!candidates.includes(n))candidates.push(n);
+ for(const n of sortByScores(scores)){if(candidates.length>=10)break;if(!candidates.includes(n))candidates.push(n)}
+ return candidates.slice(0,10).map(n=>({n,score:scores.get(n)||0,source:primarySet.has(n)?'CURRENT+DB1_PAST':'DB1_HISTORY_CANDIDATE'}));
 }
 function v4043SendNextEngineTask(){
  const session=V4043_ANALYSIS_SESSION;if(!session)return;
@@ -1945,9 +1963,12 @@ function v4043AcceptEngineResult(m){
  const historical=session.responses.filter(x=>x.task.role==='DB1_HISTORY');
  if(session.historyCount>0&&!historical.length){modal('DB-1 과거분석 점검','<div class="panel warn">과거 회차 엔진 분석이 실패했습니다. 과거 자료를 이용했다고 표시하거나 번호를 임의로 보완하지 않습니다.</div>');return}
  const merged=v4043MergedRanks(primary.reply.rank,historical.map(x=>x.reply.rank));
+ const rawCurrentSet=new Set((primary.reply.rank||[]).map(x=>Number(x.n)));
+ const historySpecificCandidates=merged.filter(x=>!rawCurrentSet.has(Number(x.n))).map(x=>Number(x.n));
  const reply=Object.assign({},primary.reply,{rank:merged,
  db1Evidence:{source:session.source,historySearched:session.historyCount,
  historyEngineAnalysed:historical.map(x=>x.task.round),currentWeight:historical.length?0.8:1,historyWeight:historical.length?0.2:0,
+ historySpecificCandidates:historySpecificCandidates,historyCandidateSlots:historySpecificCandidates.length,
  comparedWithoutWinningNumbers:true}});
  // The verified June 2026 dream index is the ONLY reference with a direct
  // number-to-word mapping; original master/manual are preserved sources but
