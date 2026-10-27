@@ -1,0 +1,102 @@
+name: Validate V4.0.43 integration candidate using original signer cache scope (NOT DISTRIBUTION)
+on:
+  push:
+    branches: [fix-freedom-v3-screen-1244-20261022]
+    paths:
+      - '.github/workflows/build-freedom-v4043-original-signer-candidate.yml'
+permissions:
+  contents: read
+jobs:
+  original_signer_candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout exact isolated verified candidate source, never source signer branch
+        uses: actions/checkout@v4
+        with:
+          ref: 77f04285976cfe19a6348d68b7975ee88469f263
+          persist-credentials: false
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Restore existing certificate, never regenerate or export private key
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: freedom-v436-production-debug-signer-20261022
+          fail-on-cache-miss: true
+      - name: Confirm exact original signing identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s ~/.android/debug.keystore
+          KEY_SHA=$(keytool -list -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey | grep -m1 SHA256: | sed 's/.*SHA256: //' | tr -d ':' | tr '[:upper:]' '[:lower:]')
+          test "$KEY_SHA" = 'bf281903f422fe925a23a7e72e82d690eaef899236e6d10365143ff32d9beb00'
+          echo 'PASS: original Freedom certificate identity. No private key bytes exposed.'
+      - name: Check original sources, DB-1, approval and reference bridge
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = '77f04285976cfe19a6348d68b7975ee88469f263'
+          node .github/scripts/validate_freedom_r14.cjs
+          node .github/scripts/verify_freedom_v4043.cjs
+          node .github/scripts/verify_freedom_v4043_references.cjs
+          grep -q 'versionCode 40043' build405/FREEDOM_V402_BUILD_THIS/app/build.gradle
+          grep -q "applicationId 'com.navigator.freedom.v3final'" build405/FREEDOM_V402_BUILD_THIS/app/build.gradle
+      - name: Compile isolated candidate with existing signer only
+        working-directory: build405/FREEDOM_V402_BUILD_THIS
+        shell: bash
+        run: |
+          set -euo pipefail
+          chmod +x gradlew
+          sed -i '/org.gradle.java.home/d' gradle.properties
+          ./gradlew :app:assembleDebug --no-daemon
+      - name: Verify APK identity and every portable reference asset
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK='build405/FREEDOM_V402_BUILD_THIS/app/build/outputs/apk/debug/HANGHAE_FREEDOM_V4_0_43_FINAL.apk'
+          test -s "$APK"
+          unzip -t "$APK" | tail -1
+          AAPT=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
+          "$AAPT" dump badging "$APK" > /tmp/freedom-4043-candidate-badging.txt
+          grep -q "package: name='com.navigator.freedom.v3final' versionCode='40043'" /tmp/freedom-4043-candidate-badging.txt
+          "$APKSIGNER" verify --print-certs "$APK" > /tmp/freedom-4043-candidate-signer.txt
+          grep -q 'certificate SHA-256 digest: bf281903f422fe925a23a7e72e82d690eaef899236e6d10365143ff32d9beb00' /tmp/freedom-4043-candidate-signer.txt
+          python3 - "$APK" <<'PY'
+          import sys,zipfile,hashlib
+          with zipfile.ZipFile(sys.argv[1]) as apk:
+            names=set(apk.namelist())
+            for n in ('assets/index.html','assets/engine_v2.html','assets/raw_bank.js','assets/db1_v1247_patch.js','assets/freedom_reference_v4043.js','assets/reference_sources_manifest_v4043.json'):
+              if n not in names: raise SystemExit('Required signed asset missing: '+n)
+            checks={
+              'baekhak_master_v2.txt':'4f8059ee26987ac1482ac687ddbe4056e7215ccbd7e719e8377bff7eb097eb3a',
+              'dream_dictionary_2026_06_utf8.txt':'1842831fe89e7d413a3ae6ea46fafd774e333c084750d80e90aff4f880a8b722',
+              'official_decoding_rules_v1.txt':'657e3a32b0b7be6bc9cc7d40a327232a4502706c05f8ae99ac53ae9478999ad1',
+              'success_master_6of6_20260818.txt':'53d38c03de30c08aee51422e5bd37cefcb40b6771cee8e67206e3a8b72e9c39f',
+              'success_patterns_1001_1033.txt':'26b05caf362dd46b3e01e6ac0464bb4ff3419b954b0c1a97f78aa53ed1a8911e',
+            }
+            for n,expected in checks.items():
+              key='assets/reference_runtime/'+n
+              if key not in names or hashlib.sha256(apk.read(key)).hexdigest()!=expected:
+                raise SystemExit('Signed APK runtime asset absent/mismatched: '+key)
+            assert b'src="freedom_reference_v4043.js"' in apk.read('assets/index.html')
+          print('PASS: original-signed candidate APK identity, packaged references and app bridge, NOT approved for release.')
+          PY
+          mkdir -p private_candidate_handoff
+          cp "$APK" private_candidate_handoff/FREEDOM_V4043_ORIGINAL_SIGNED_CANDIDATE_NOT_RELEASE.apk
+          sha256sum "$APK" > private_candidate_handoff/sha256-original-apk.txt
+          cp /tmp/freedom-4043-candidate-badging.txt private_candidate_handoff/package.txt
+          cp /tmp/freedom-4043-candidate-signer.txt private_candidate_handoff/certificate.txt
+          printf '%s\n' 'RESEARCH/TEST CANDIDATE ONLY: NOT OFFICIAL DISTRIBUTION. User approval regression, complete 4 references, full runtime engine integration and on-device data preservation not yet validated. Never replace pinned public URL.' > private_candidate_handoff/HOLD_DO_NOT_DISTRIBUTE.txt
+      - name: Private CI handoff only; do not publish on Drive or GitHub releases
+        uses: actions/upload-artifact@v4
+        with:
+          name: Freedom_V4043_Original_Signed_PRIVATE_Test_Candidate
+          path: private_candidate_handoff/
+          retention-days: 3
+          compression-level: 0
+          if-no-files-found: error
