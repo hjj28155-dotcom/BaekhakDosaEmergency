@@ -383,7 +383,7 @@ main:not(.roomMode) header h1{
 }
 /* Every INTERNAL room must replace the home dashboard from the TOP.
    External app launchers/download links keep their original navigation. */
-main.roomMode > :not(#homeWorkspace):not(#homeMorePanel):not(#homeApprovalPanel):not(#homeMaterialsPanel){
+main.roomMode > :not(#homeWorkspace):not(#homeMorePanel):not(#homeApprovalPanel):not(#homeMaterialsPanel):not(#homeV3RoomsPanel){
  display:none!important;
 }
 main.roomMode > #homeWorkspace:not([hidden]),
@@ -529,7 +529,7 @@ main:not(.roomMode) > header button{min-height:33px!important;padding:3px 9px!im
 #homeMaterialsBtn{border:1.7px solid #eac783!important;background:linear-gradient(130deg,rgba(5,63,91,.88),rgba(25,95,114,.9))!important;color:#ffedbd!important;font-weight:800}
 #homeMaterialsPanel{flex-direction:column;gap:7px;border:1.5px solid #e4c181;border-radius:12px;padding:8px;background:rgba(3,26,50,.96);min-width:0;min-height:0}
 #homeMaterialsPanel[hidden]{display:none!important}
-main.roomMode > :not(#homeWorkspace):not(#homeMorePanel):not(#homeApprovalPanel):not(#homeMaterialsPanel){display:none!important}
+main.roomMode > :not(#homeWorkspace):not(#homeMorePanel):not(#homeApprovalPanel):not(#homeMaterialsPanel):not(#homeV3RoomsPanel){display:none!important}
 main.roomMode > #homeMaterialsPanel:not([hidden]){display:flex!important;flex:1 1 auto;height:100%;min-height:0;overflow:hidden;margin:0}
 #materialsBody{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:4px}
 .materialsNote{font-size:.72rem;line-height:1.45;color:#d5e6f0;margin:8px 0}
@@ -701,6 +701,15 @@ body{
 
 
 /* Captain V3 four-room dashboard, standalone research candidate v1.0.15. */
+main.roomMode > #homeV3RoomsPanel:not([hidden]){
+ display:flex!important;flex-direction:column;flex:1 1 auto;
+ min-width:0;min-height:0;height:100%;max-height:none;margin:0;
+ overflow-y:auto;overscroll-behavior:contain;
+ border:1.5px solid #d5b77b;border-radius:13px;
+ background:linear-gradient(160deg,rgba(4,31,54,.96),rgba(3,17,42,.98));
+}
+main.roomMode > #homeV3RoomsPanel[hidden]{display:none!important}
+
 #homeV3RoomsPanel{min-width:0;overflow:auto;padding:8px 4px 18px}
 #homeV3RoomsPanel[hidden]{display:none!important}
 .v3RoomsLead{border:2px solid #edcc85;border-radius:14px;background:linear-gradient(135deg,#0c5679,#09294a);
