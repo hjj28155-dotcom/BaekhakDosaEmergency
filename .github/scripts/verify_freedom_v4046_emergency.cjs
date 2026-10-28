@@ -4,7 +4,7 @@ const base='build405/FREEDOM_V402_BUILD_THIS/app/';
 const html=fs.readFileSync(base+'src/freedom/assets/index.html','utf8');
 const gradle=fs.readFileSync(base+'build.gradle','utf8');
 assert.match(gradle,/applicationId 'com[.]navigator[.]freedom[.]v3final'/);
-assert.match(gradle,/versionCode 40047/);
+assert.match(gradle,/versionCode 40048/);
 assert.match(gradle,/signingConfig signingConfigs[.]distribution/);
 assert.match(html,/const V4046_VISIBLE=\[1244,1245,1246,1247,1248\]/);
 assert.match(html,/function rawPage[(][)]\{return v4044ReviewRound[(]1248,true[)]\}/);
@@ -18,6 +18,10 @@ assert.match(html,/href="v4047_compact[.]css"/);
 assert.match(compactCss,/#modal[.]v4047Compact [.]r5grid/);
 assert.match(compactCss,/grid-template-rows:repeat\(2,minmax\(0,1fr\)\)/);
 assert.match(compactCss,/#modal[.]v4047Compact [.]r5hit/);
+assert.match(compactCss,/grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
+assert.match(html,/function v4048GoHome/);
+assert.match(html,/emergencyHome\?'홈'/);
+
 assert.match(html,/function v4047OpenRawEditor/);
 assert.match(html,/h\+'\/6'/);
 
@@ -57,6 +61,7 @@ const root={
  save:()=>{saved.count++},
  alert:msg=>{throw Error('unexpected alert '+msg)},
  setTimeout:fn=>{queue.push(fn)},
+ closeM:()=>{root.homeNavigated=true},
 };
 vm.createContext(root);
 vm.runInContext(gameFunctions+'\n'+groupFunctions+'\n'+newest,root,{timeout:10000});
@@ -93,6 +98,10 @@ root.v4044ReviewRound(1248,false);
 const view=notes.filter(x=>x&&x.title==='제1248회 · 자동 20조합').at(-1);
 assert.ok(view,'1248 emergency combo screen');
 assert.ok(view.body.includes('v4047OpenRawEditor()'));
+assert.match(view.body,/onclick="v4048GoHome\(\)">홈<\/button>/);
+assert.equal((view.body.match(/v4048GoHome\(\)/g)||[]).length,1,'one compact footer Home control');
+root.v4048GoHome();
+assert.equal(root.homeNavigated,true,'Home closes emergency modal without returning to analysis');
 for(const n of [1244,1245,1246,1247,1248])assert.match(view.body,new RegExp('v330OpenRound\\('+n+'\\)'));
 assert.ok(!view.body.includes('v330OpenRound(1243)'),'only current plus four previous visible');
 assert.equal((view.body.match(/class="r5group"/g)||[]).length,4);
@@ -117,4 +126,4 @@ assert.equal(D.rounds['1246'].analysisResearch.researchOnly,true);
 assert.equal(D.rounds['1246'].analysisResearch.historicalResultExcluded,true);
 assert.deepEqual(copyData(D.rounds['1247']),lockedBefore);
 assert.deepEqual(researchBefore,{});
-console.log('PASS: V4.0.47 complete 1247-history analysis, optional dominant 1248 primary, 4x5 groups, result pending and graded, 5 visible rounds, future wins not fabricated, locked original preserved, historical research segregated, six JS syntax checks.');
+console.log('PASS: V4.0.48 complete 1247-history analysis, optional dominant 1248 primary, 4x5 groups, result pending and graded, 5 visible rounds, future wins not fabricated, locked original preserved, historical research segregated, six JS syntax checks.');
