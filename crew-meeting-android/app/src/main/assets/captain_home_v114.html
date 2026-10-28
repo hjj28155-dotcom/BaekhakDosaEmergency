@@ -868,10 +868,12 @@ main:not(.roomMode) #centralRoundPanel label{font-size:.68rem!important}
   <article class="v4FiveGroup">
    <strong>⚓ 선장엔진 R46 · 5조합</strong>
    <ol id="freedomFirstList" aria-label="제1분석 결과"><li>—</li><li>—</li><li>—</li><li>—</li><li>—</li></ol>
+   <small id="freedomCaptainStatus" class="v4EngineStatus">선장엔진 준비</small>
   </article>
   <article class="v4FiveGroup">
    <strong>🔗 연락관엔진 R1 · 5조합</strong>
    <ol id="freedomSecondList" aria-label="제2분석 결과"><li>—</li><li>—</li><li>—</li><li>—</li><li>—</li></ol>
+   <small id="freedomLiaisonStatus" class="v4EngineStatus">연락관 사전원본 검증 대기</small>
   </article>
  </div>
  <div id="freedomDbStatus" role="status" aria-live="polite">DB-1 내장 1~1247회차 검증 대기</div>
@@ -2352,6 +2354,7 @@ try{
 .v4DbOriginal{font-size:.69rem;border:1px solid #37617d;border-radius:8px;padding:4px 8px}
 .v4DbOriginal summary{cursor:pointer;color:#ffdc98;font-weight:700}
 #freedomDbOriginalText{white-space:pre-wrap;word-break:keep-all;line-height:1.6;max-height:180px;overflow-y:auto;font-size:.68rem}
+.v4EngineStatus{display:block;font-size:.64rem;color:#c6dbea;line-height:1.4;min-height:2.2em;margin-top:4px}
 #freedomCaptainFrame{display:none!important}
 </style>
 <script id="captainV4TwoFiveResearch">
@@ -2379,6 +2382,7 @@ try{
  function resetActiveAnalysis(){
   currentRun++;pending=null;lastCaptain=null;lastLiaison=null;lastSource=null;
   $('freedomAnalysisRound').value='1';clearList('freedomFirstList');clearList('freedomSecondList');
+  $('freedomCaptainStatus').textContent='선장엔진 준비';$('freedomLiaisonStatus').textContent='연락관 사전원본 검증 대기';
   $('freedomDbOriginalText').textContent='회차 분석 시 원문 표시';
   note('새 분석 대기 · 누적자료는 자료실에만 보존');
  }
@@ -2426,29 +2430,29 @@ try{
   if(m.type==='V3_ENGINE_READY'){engineReady=true;sendCaptain();return;}
   if(m.type!=='V3_ANALYSIS_RESULT'||!pending&&String(m.requestId||'')!==String(activeId))return;
   if(String(m.requestId)!==String(activeId)||Number(m.round)!==activeRound||activeRun!==currentRun)return;
-  if(!m.ok){note('선장엔진 R46 분석 보류 · '+String(m.error||'실행 오류'));return;}
+  if(!m.ok){$('freedomCaptainStatus').textContent='보류 · '+String(m.error||'실행 오류');note('선장엔진 R46 분석 보류 · '+String(m.error||'실행 오류'));return;}
   var games=cleanGames(m.games);
   if(!games||String(m.packGate||'').toUpperCase()!=='PASS'){
-   note('선장엔진 R46 검증 보류 · 5조합/원문 근거 게이트 미통과');return;
+   $('freedomCaptainStatus').textContent='보류 · 원문 근거 게이트 미통과';note('선장엔진 R46 검증 보류 · 5조합/원문 근거 게이트 미통과');return;
   }
   lastCaptain={round:activeRound,games:games,engine:m.engine,evidenceAudit:m.evidenceAudit};
-  showGames('freedomFirstList',games);
+  showGames('freedomFirstList',games);$('freedomCaptainStatus').textContent='✓ R46 · DB-1 원문 5조합 검증';
   note('제'+activeRound+'회 선장엔진 R46 · 실제 원문 5조합 검증 완료 · 연락관엔진 독립 검증 대기');
  });
  var activeId='',activeRound=0,activeRun=0;
  async function runCaptain(n,runId){
   var entry=await sourceFor(n);
   if(runId!==currentRun)return;
-  clearList('freedomFirstList');lastCaptain=null;
+  clearList('freedomFirstList');lastCaptain=null;$('freedomCaptainStatus').textContent='엔진 준비 중…';
   activeId='CAPTAIN_'+(++requestCounter)+'_'+n;activeRound=n;activeRun=runId;
   pending={id:activeId,round:n,raw:entry.source_text};
-  note('제'+n+'회 선장엔진 R46 · DB-1 원문 입력 분석 중…');
+  $('freedomCaptainStatus').textContent='DB-1 원문 분석 중…';note('제'+n+'회 선장엔진 R46 · DB-1 원문 입력 분석 중…');
   bootCaptain();sendCaptain();
  }
  async function runLiaison(n,runId){
   var entry=await sourceFor(n);
   if(runId!==currentRun)return;
-  clearList('freedomSecondList');lastLiaison=null;
+  clearList('freedomSecondList');lastLiaison=null;$('freedomLiaisonStatus').textContent='독립 보관 검증 확인 중…';
   // The original R1 engine REQUIRES independently attested V3 and DOSA
   // pre-target archives. The DB-1 clue alone is not such an attestation.
   try{
@@ -2459,11 +2463,12 @@ try{
    var games=cleanGames(result.sets);
    if(!games||result.official_eligible!==false)throw Error('LIAISON_RESULT_INTEGRITY_FAILED');
    lastLiaison={round:n,games:games,version:result.version};
-   showGames('freedomSecondList',games);
+   showGames('freedomSecondList',games);$('freedomLiaisonStatus').textContent='✓ R1 · 독립 사전원본 검증 연구';
    note('제'+n+'회 연락관엔진 R1 · 독립 연구 5조합 (공식 잠금 아님)');
   }catch(e){
    if(runId!==currentRun)return;
    var reason=String(e&&e.message||e);
+   $('freedomLiaisonStatus').textContent='보류 · V3·도사 독립 사전원본 필요';
    note('제'+n+'회 · 연락관엔진 R1 보류: V3·도사 사전 원본의 독립 보관 검증 필요 ('+reason+')');
   }
  }
