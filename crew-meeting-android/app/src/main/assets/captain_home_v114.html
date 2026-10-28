@@ -2510,6 +2510,7 @@ try{
   $('freedomCaptainStatus').textContent='선장엔진 준비';$('freedomLiaisonStatus').textContent='연락관 사전원본 검증 대기';
   $('freedomDbOriginalText').textContent='회차 분석 시 원문 표시';
   note('새 분석 대기 · 누적자료는 자료실에만 보존');
+  window.dispatchEvent(new CustomEvent('captain-v4-reset'));
  }
  async function loadDB1(){
   if(DB1)return DB1;
@@ -2562,6 +2563,7 @@ try{
   }
   lastCaptain={round:activeRound,games:games,engine:m.engine,evidenceAudit:m.evidenceAudit};
   showGames('freedomFirstList',games);$('freedomCaptainStatus').textContent='✓ R46 · DB-1 원문 5조합 검증';
+  window.dispatchEvent(new CustomEvent('captain-v4-verified',{detail:{engine:'captain',round:activeRound,games:games,sourceSha256:lastSource&&lastSource.source_sha256,provenance:'R46_DB1_VERIFIED'}}));
   note('제'+activeRound+'회 선장엔진 R46 · 실제 원문 5조합 검증 완료 · 연락관엔진 독립 검증 대기');
  });
  var activeId='',activeRound=0,activeRun=0;
@@ -2569,6 +2571,7 @@ try{
   var entry=await sourceFor(n);
   if(runId!==currentRun)return;
   clearList('freedomFirstList');lastCaptain=null;$('freedomCaptainStatus').textContent='엔진 준비 중…';
+  window.dispatchEvent(new CustomEvent('captain-v4-engine-reset',{detail:{engine:'captain',round:n}}));
   activeId='CAPTAIN_'+(++requestCounter)+'_'+n;activeRound=n;activeRun=runId;
   pending={id:activeId,round:n,raw:entry.source_text};
   $('freedomCaptainStatus').textContent='DB-1 원문 분석 중…';note('제'+n+'회 선장엔진 R46 · DB-1 원문 입력 분석 중…');
@@ -2578,6 +2581,7 @@ try{
   var entry=await sourceFor(n);
   if(runId!==currentRun)return;
   clearList('freedomSecondList');lastLiaison=null;$('freedomLiaisonStatus').textContent='독립 보관 검증 확인 중…';
+  window.dispatchEvent(new CustomEvent('captain-v4-engine-reset',{detail:{engine:'liaison',round:n}}));
   // The original R1 engine REQUIRES independently attested V3 and DOSA
   // pre-target archives. The DB-1 clue alone is not such an attestation.
   try{
@@ -2589,6 +2593,7 @@ try{
    if(!games||result.official_eligible!==false)throw Error('LIAISON_RESULT_INTEGRITY_FAILED');
    lastLiaison={round:n,games:games,version:result.version};
    showGames('freedomSecondList',games);$('freedomLiaisonStatus').textContent='✓ R1 · 독립 사전원본 검증 연구';
+   window.dispatchEvent(new CustomEvent('captain-v4-verified',{detail:{engine:'liaison',round:n,games:games,sourceSha256:entry.source_sha256,provenance:'R1_INDEPENDENT_ARCHIVE_RESEARCH_NOT_LOCKED'}}));
    note('제'+n+'회 연락관엔진 R1 · 독립 연구 5조합 (공식 잠금 아님)');
   }catch(e){
    if(runId!==currentRun)return;
@@ -2600,6 +2605,7 @@ try{
  async function runBoth(){var n=round();if(n===null)return;
   var runId=++currentRun;pending=null;lastCaptain=null;lastLiaison=null;
   clearList('freedomFirstList');clearList('freedomSecondList');
+  window.dispatchEvent(new CustomEvent('captain-v4-reset'));
   try{await loadDB1();if(runId!==currentRun)return;
    await Promise.all([runCaptain(n,runId),runLiaison(n,runId)]);
   }catch(e){if(runId===currentRun)note('DB-1 또는 분석 엔진 확인 실패: '+String(e.message||e));}
