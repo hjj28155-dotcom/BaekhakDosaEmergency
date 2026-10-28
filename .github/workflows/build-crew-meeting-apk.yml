@@ -106,7 +106,7 @@ jobs:
           grep -Fq 'crew-cumulative-after.css' "$HOME_HTML"
           grep -Fq 'crew-cumulative-after.js' "$HOME_HTML"
           test "$(grep -c 'class="cumRoom" data-room=' "$HOME_HTML")" -eq 4
-          test "$(grep -c 'class="cumHit pending"' "$HOME_HTML")" -eq 20
+          test "$(grep -o 'class="cumHit pending"' "$HOME_HTML" | wc -l)" -eq 20
           test -s crew-meeting-android/app/src/main/assets/cumulative_after_only.css
           test -s crew-meeting-android/app/src/main/assets/cumulative_after_only.js
           test -s crew-meeting-android/app/src/main/assets/official_draws_verified_17.json
