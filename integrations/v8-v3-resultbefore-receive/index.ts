@@ -156,6 +156,29 @@ async function main(req: Request): Promise<Response> {
     return reply({ ok: true, service: "v8-v3-resultbefore-receive", version: "1",
       original_upload_service: "v6-room-library-sync", v7_dependency: false,
       v3_native_auto_sender_bundled: false, official_predraw_certified: false });
+  if (req.method === "GET" && action === "draw") {
+    // V3 R60 old draw client can switch to this V8 URL in a same-signer APK update.
+    // This endpoint uses migrated references, NOT the V7 draw table or V7 functions.
+    const value = url.searchParams.get("round_no") || "";
+    if (!/^[1-9][0-9]{0,3}$/.test(value)) return reply({ error: "INVALID_ROUND" }, 400);
+    const n = Number(value);
+    if (!validRound(n)) return reply({ error: "INVALID_ROUND" }, 400);
+    const { data, error } = await db.from("v8_draw_references")
+      .select("round_no,numbers,bonus,source_url,confirmed_at").eq("round_no", n).maybeSingle();
+    if (error) return reply({ error: "DRAW_REFERENCE_DB_UNAVAILABLE" }, 503);
+    if (!data) return reply({ round_no: n, status: "NOT_CONFIRMED" }, 404);
+    const nums = data.numbers;
+    if (!Array.isArray(nums) || nums.length !== 6 || new Set(nums).size !== 6 ||
+        nums.some((x: unknown) => !Number.isInteger(x) || Number(x) < 1 || Number(x) > 45) ||
+        !Number.isInteger(data.bonus) || data.bonus < 1 || data.bonus > 45 ||
+        nums.includes(data.bonus) || !Number.isFinite(Date.parse(data.confirmed_at)) ||
+        typeof data.source_url !== "string" ||
+        !/^https:\/\/www\.dhlottery\.co\.kr\//.test(data.source_url))
+      return reply({ error: "DRAW_REFERENCE_INVALID" }, 503);
+    return reply({ round_no: n, status: "CONFIRMED", numbers: nums.slice().sort((a: number, b: number) => a - b),
+      bonus: data.bonus, source_url: data.source_url, confirmed_at: data.confirmed_at,
+      independent_source_verified: false, legacy_reference: true, source_scope: "V8_MIGRATED_REFERENCE" });
+  }
   const device = await authenticate(req);
   if (!device) return reply({ ok: false, error: "DEVICE_AUTH_REQUIRED" }, 401);
   if (req.method === "POST" && (action === "receive" || action === "v8-v3-resultbefore-receive")) {
