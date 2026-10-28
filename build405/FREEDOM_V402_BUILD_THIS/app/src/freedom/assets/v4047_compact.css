@@ -136,6 +136,10 @@
  #modal.v4047Compact .r5group h4{height:15px!important;line-height:14px!important}
  #modal.v4047Compact .v4047Footer,#modal.v4047Compact .v4047Footer .b{min-height:24px!important;height:24px!important}
 }
+/* Extra bottom breathing room on unfolded / wide portrait phones. */
+@media(min-width:641px){
+ #modal.v4047Compact>.card{height:calc(100vh - 24px)!important;height:calc(100dvh - 24px)!important}
+}
 @media print{
  #modal.v4047Compact,.modal{position:static!important;padding:0!important;background:#fff!important}
  #modal.v4047Compact>.card{height:auto!important;overflow:visible!important}
