@@ -6,8 +6,8 @@ android {
         applicationId 'kr.hanghae.crewmeeting.compact'
         minSdk 24
         targetSdk 34
-        versionCode 127
-        versionName '1.0.27-CAPTAIN-V4-PNG-EXPANDED'
+        versionCode 128
+        versionName '1.0.28-CAPTAIN-ROUND-RESULT-SYNC'
     }
     compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
     signingConfigs { debug { storeFile file(System.getProperty('user.home') + '/.android/debug.keystore'); storePassword 'android'; keyAlias 'androiddebugkey'; keyPassword 'android' } }
