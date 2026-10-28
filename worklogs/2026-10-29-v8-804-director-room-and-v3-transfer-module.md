@@ -27,3 +27,9 @@ CI 결과 확인 및 오류 수정 → V8 동일서명 시험 APK 확인 → 통
 - 아직 실제 V3 native host 통합/동일서명 V3 APK/단말 인증/폰 자동전송 검증은 미완료. 라이브러리 빌드 성공을 해당 작업의 완료로 간주하지 않음.
 
 - 360px 렌더에서 홈 상단 원본방 버튼과 진단표시의 경계가 겹치는 부분 확인. 작은 화면 hero 최소 높이를 205px로 확보하고 겹침 방지 브라우저 검사를 추가.
+
+## 최종 전달 결과
+- 최종 기능 커밋 331994f7d92ffc389049826fc29d37efd3e1d59c. V8 최종 시험 APK CI 40727724815 성공. Android/browser 검사 CI 40727718972 전체 성공. 최종 360/390/412px 렌더 확인, 상단 겹침 없음.
+- 최종 V8.0.4 / code 804 APK: HANGHAE_CREW_MEETING_V8_8.0.4_DIRECTOR_ROOM.apk, 6,592,684 bytes, SHA-256 359cb119447618bf85db1c1053c23afce92277437d54475722868f9fc3622ac7. CI에서 기존 V8 인증서 e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be 서명 검증. APK HTML/CSS 최종 소스 바이트 일치.
+- 보관 용량 한도로 Library 저장 실패. 기존 자료 삭제 없이 Google Drive에 저장, 메타데이터 크기 재확인 완료: 파일 ID 1dDblknY1vkTSS4acTWCGQpSvuSydKCrA. URL https://drive.google.com/file/d/1dDblknY1vkTSS4acTWCGQpSvuSydKCrA/view .
+- 휴대전화 설치/실행 확인은 미완료. V3 실제 native host 통합/동일서명 V3 APK/단말 인증/실제 자동전송은 다음 작업으로 유지. V7 서버 삭제 미실행. 기존 DB·분석·최초잠금 보존.
