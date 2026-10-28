@@ -225,3 +225,22 @@
  #modal.v4051BottomHome .v4051HomeDock{right:8px!important;bottom:5px!important}
  #modal.v4051BottomHome .v4051HomeDock button{min-height:32px!important;padding:4px 14px!important}
 }
+
+/* V4.0.52: keep Home above the Android navigation area, including older WebViews. */
+#modal.v4051BottomHome>.card{
+ height:calc(var(--v4052-height,100vh) - 64px - env(safe-area-inset-top,0px))!important;
+ max-height:calc(var(--v4052-height,100vh) - 64px - env(safe-area-inset-top,0px))!important;
+}
+#modal.v4047Compact .r5group{grid-template-rows:19px repeat(5,minmax(0,1fr))!important}
+#modal.v4047Compact .r5row,#modal.v4047Compact .r5row.purchase{
+ grid-template-rows:10px minmax(0,1fr)!important;padding:1px 0!important;gap:1px 3px!important
+}
+#modal.v4047Compact .r5balls{height:100%!important;min-height:0!important;container-type:size!important}
+#modal.v4047Compact .r5balls .r5ball{
+ height:auto!important;max-height:100%!important;width:100%!important;width:min(100%,100cqh,30px)!important;max-width:100%!important;
+ min-width:0!important;min-height:0!important;aspect-ratio:1!important
+}
+@media(max-height:650px){
+ #modal.v4047Compact .r5group{grid-template-rows:16px repeat(5,minmax(0,1fr))!important}
+ #modal.v4047Compact .r5row,#modal.v4047Compact .r5row.purchase{grid-template-rows:8px minmax(0,1fr)!important}
+}

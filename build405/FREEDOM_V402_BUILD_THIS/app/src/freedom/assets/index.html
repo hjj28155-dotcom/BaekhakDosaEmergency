@@ -1010,7 +1010,7 @@ const PINNED_NOTICE={title:'',body:''};
 if(!Number.isInteger(Number(D.currentRound))||Number(D.currentRound)<1||Number(D.currentRound)>1248)D.currentRound=1248;save();setTimeout(()=>{let q=document.getElementById('roundQuick');if(q)q.value=cur();let d=document.getElementById('homeRoundDirect');if(d)d.value=cur();refreshHomeUI()},0);
 // 구버전 단일 메모가 있으면 현재 회차 데이터로 보존
 if(D.raw||D.buy||D.merge||D.score||D.compare){let r=String(D.currentRound);D.rounds[r]=D.rounds[r]||{};['raw','buy','merge','score','compare'].forEach(k=>{if(D[k]&&!D.rounds[r][k])D.rounds[r][k]=D[k]})}
-function save(){localStorage.setItem(K,JSON.stringify(D));refreshHomeUI()} function closeM(){stopScoreAudio();let m=document.getElementById('modal');m.style.display='none';m.classList.remove('scoreOneScreen','musicOneScreen','v340BackLabel','v4047Compact','v4051BottomHome');document.querySelectorAll('.simpleHot').forEach(b=>b.style.pointerEvents='auto');document.body.style.overflowY='auto'}
+function save(){localStorage.setItem(K,JSON.stringify(D));refreshHomeUI()} function closeM(){stopScoreAudio();Object.keys(V4049_ANNOUNCED).forEach(k=>delete V4049_ANNOUNCED[k]);let m=document.getElementById('modal');m.style.display='none';m.classList.remove('scoreOneScreen','musicOneScreen','v340BackLabel','v4047Compact','v4051BottomHome');document.querySelectorAll('.simpleHot').forEach(b=>b.style.pointerEvents='auto');document.body.style.overflowY='auto'}
 function approvalCounts(){let a=D.approvalLog||[];return {pending:a.filter(x=>x.status==='승인대기').length,approved:a.filter(x=>x.status==='승인완료').length,history:a.filter(x=>x.status==='승인완료'||x.status==='승인보류'||x.status==='배포완료'||x.status==='거절').length}}
 function refreshHomeUI(){try{let h=document.getElementById('homeRoundLabel');if(h)h.innerHTML='<b>제'+esc(cur())+'회</b><span>현재 작업 회차</span>';let st=document.getElementById('specialStateHome');if(st)st.textContent=SPECIAL_APPROVED?'완료':'대기';let am=document.getElementById('approvalMessage');if(am)am.textContent=SPECIAL_APPROVED?'특별승인 완료 · 1243회차 이후 이용 가능':'제1242회차까지 정상 이용 · 이후 특별승인';}catch(e){}}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
@@ -1307,7 +1307,23 @@ function onSpecialApprovalState(p){
   if(x)x.textContent='승인 상태 응답을 읽지 못했습니다. 확인을 다시 눌러 주세요.';
  }
 }
-function modal(title,html){stopScoreAudio();document.getElementById('v4051HomeDock')?.remove();let m=document.getElementById('modal');m.classList.remove('scoreOneScreen','musicOneScreen','v340BackLabel','v4047Compact','v4051BottomHome');if(String(html).includes('class="analysisCompact v330print"'))m.classList.add('v340BackLabel');let close=m.querySelector('.close');if(close){const emergencyHome=String(html).includes('class="v4047Select"')||String(title).includes('제1248회 원문 등록');close.textContent=emergencyHome?'홈':(m.classList.contains('v340BackLabel')?'이전':'닫기');close.setAttribute('onclick',emergencyHome?'v4048GoHome()':(m.classList.contains('v340BackLabel')?'rawPage()':'closeM()'));}document.getElementById('mt').textContent=title;document.getElementById('mc').innerHTML=html;document.querySelectorAll('.simpleHot').forEach(b=>b.style.pointerEvents='none');m.style.display='block';m.style.zIndex='2147483646';m.style.overflowY='auto';document.getElementById('mc').style.overflowY='auto';
+function v4052SyncViewport(){
+ const visible=Math.floor(Math.min(window.innerHeight,window.visualViewport?window.visualViewport.height:window.innerHeight));
+ if(visible>0)document.documentElement.style.setProperty('--v4052-height',visible+'px');
+}
+window.addEventListener('resize',v4052SyncViewport);
+if(window.visualViewport)window.visualViewport.addEventListener('resize',v4052SyncViewport);
+function v4052PrepareModal(title,html){
+ v4052SyncViewport();
+ const m=document.getElementById('modal'),isScore=String(html).includes('class="v4047Select"');
+ // A verified draw callback redraws the same score shortly after speech starts.
+ // Preserve that playback; navigation or changed result still cancels it.
+ const sameScore=isScore&&m.style.display==='block'&&m._v4052ScoreHtml===html;
+ if(!sameScore)stopScoreAudio();
+ if(!sameScore)Object.keys(V4049_ANNOUNCED).forEach(k=>delete V4049_ANNOUNCED[k]);
+ m._v4052ScoreHtml=isScore?html:null;
+}
+function modal(title,html){v4052PrepareModal(title,html);document.getElementById('v4051HomeDock')?.remove();let m=document.getElementById('modal');m.classList.remove('scoreOneScreen','musicOneScreen','v340BackLabel','v4047Compact','v4051BottomHome');if(String(html).includes('class="analysisCompact v330print"'))m.classList.add('v340BackLabel');let close=m.querySelector('.close');if(close){const emergencyHome=String(html).includes('class="v4047Select"')||String(title).includes('제1248회 원문 등록');close.textContent=emergencyHome?'홈':(m.classList.contains('v340BackLabel')?'이전':'닫기');close.setAttribute('onclick',emergencyHome?'v4048GoHome()':(m.classList.contains('v340BackLabel')?'rawPage()':'closeM()'));}document.getElementById('mt').textContent=title;document.getElementById('mc').innerHTML=html;document.querySelectorAll('.simpleHot').forEach(b=>b.style.pointerEvents='none');m.style.display='block';m.style.zIndex='2147483646';m.style.overflowY='auto';document.getElementById('mc').style.overflowY='auto';
  const bottomHome=String(html).includes('class="v4047Select"')||String(title).includes('원문')||String(title).includes('업데이트');
  if(bottomHome){
   m.classList.add('v4051BottomHome');
