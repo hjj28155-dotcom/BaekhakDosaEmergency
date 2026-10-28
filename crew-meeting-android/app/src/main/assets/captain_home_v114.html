@@ -866,18 +866,21 @@ main:not(.roomMode) #centralRoundPanel label{font-size:.68rem!important}
  </div>
  <div class="v4Results" aria-label="원문 분석 5조합 두 묶음">
   <article class="v4FiveGroup">
-   <strong>제1분석 · 5조합</strong>
+   <strong>⚓ 선장엔진 R46 · 5조합</strong>
    <ol id="freedomFirstList" aria-label="제1분석 결과"><li>—</li><li>—</li><li>—</li><li>—</li><li>—</li></ol>
   </article>
   <article class="v4FiveGroup">
-   <strong>제2분석 · 5조합</strong>
+   <strong>🔗 연락관엔진 R1 · 5조합</strong>
    <ol id="freedomSecondList" aria-label="제2분석 결과"><li>—</li><li>—</li><li>—</li><li>—</li><li>—</li></ol>
   </article>
  </div>
- <div id="freedomAnalysisStatus" role="status" aria-live="polite">새 분석 대기 · 엔진 연결 전 번호 미생성</div>
+ <div id="freedomDbStatus" role="status" aria-live="polite">DB-1 내장 1~1247회차 검증 대기</div>
+ <details class="v4DbOriginal"><summary>선택 회차 DB-1 원문 6문장 보기</summary><pre id="freedomDbOriginalText">회차 분석 시 원문 표시</pre></details>
+ <div id="freedomAnalysisStatus" role="status" aria-live="polite">선장엔진 R46 · 연락관엔진 R1 검증 대기</div>
+ <iframe id="freedomCaptainFrame" title="선장엔진 R46 내장 실행기" hidden sandbox="allow-scripts allow-same-origin"></iframe>
  <div class="v4RoomActions">
-  <button type="button" class="secondary" id="freedomFirstFive">1차 점검</button>
-  <button type="button" class="secondary" id="freedomSecondFive">2차 점검</button>
+  <button type="button" class="secondary" id="freedomFirstFive">선장 5조합</button>
+  <button type="button" class="secondary" id="freedomSecondFive">연락관 5조합</button>
   <button type="button" class="secondary" id="freedomResetActive">초기화</button>
   <button type="button" id="freedomGoCumulativeDb" aria-label="과거 누적자료는 자료실에서만 조회">자료실</button>
  </div>
@@ -2344,34 +2347,149 @@ try{
 }catch(e){status('loginError','인증 저장소 확인 오류가 있습니다.');}
 })();
 </script>
+<style id="captainV4Db1OfflineStyle">
+#freedomDbStatus{font-size:.72rem;color:#bce8cf;border:1px solid #3b786d;border-radius:8px;padding:6px;background:#062f34}
+.v4DbOriginal{font-size:.69rem;border:1px solid #37617d;border-radius:8px;padding:4px 8px}
+.v4DbOriginal summary{cursor:pointer;color:#ffdc98;font-weight:700}
+#freedomDbOriginalText{white-space:pre-wrap;word-break:keep-all;line-height:1.6;max-height:180px;overflow-y:auto;font-size:.68rem}
+#freedomCaptainFrame{display:none!important}
+</style>
 <script id="captainV4TwoFiveResearch">
 (function(){
- var open=document.getElementById('openFreedomAnalysis'),status=document.getElementById('freedomAnalysisStatus');
+ 'use strict';
+ var $=function(id){return document.getElementById(id);};
+ var open=$('openFreedomAnalysis'),status=$('freedomAnalysisStatus');
  if(!open||!status)return;
- function note(message){status.textContent=message;}
- function round(){var input=document.getElementById('freedomAnalysisRound');var raw=input.value.trim();var n=Number(raw);if(!/^[1-9][0-9]*$/.test(raw)||!Number.isInteger(n)||n<1||n>1247){note('1~1247회차를 입력하세요.');return null;}return n;}
- function clearResults(){['freedomFirstList','freedomSecondList'].forEach(function(id){var list=document.getElementById(id);Array.prototype.forEach.call(list.children,function(li){li.textContent='—';});});}
- /* Reset only the ephemeral V4 analysis viewport. Never touch source DB, archive, auth or locked records. */
- function resetActiveAnalysis(){
-  document.getElementById('freedomAnalysisRound').value='1';
-  clearResults();
-  note('새 분석 대기 · 엔진 연결 전 번호 미생성');
+ var DB1=null,dbPromise=null,engineReady=false,pending=null,requestCounter=0;
+ var currentRun=0, lastCaptain=null, lastLiaison=null, lastSource=null;
+ function note(s){status.textContent=s;}
+ function round(){var raw=String($('freedomAnalysisRound').value||'').trim(),n=Number(raw);
+  if(!/^[1-9][0-9]*$/.test(raw)||!Number.isInteger(n)||n<1||n>1247){note('1~1247회차를 입력하세요.');return null;}return n;
  }
- open.addEventListener('click',function(){resetActiveAnalysis();window.captainV4Route('v4');});
- document.getElementById('freedomAnalysisBack').addEventListener('click',function(){resetActiveAnalysis();window.captainV4Route('home');});
- document.getElementById('freedomRunRound').addEventListener('click',function(){var n=round();if(n===null)return;clearResults();note('제'+n+'회 · 원문 DB-1 분석 엔진 미연결. 검증된 번호 없음.');});
- document.getElementById('freedomFirstFive').addEventListener('click',function(){var n=round();if(n===null)return;note('제'+n+'회 제1분석 · 엔진 연결 대기');});
- document.getElementById('freedomSecondFive').addEventListener('click',function(){var n=round();if(n===null)return;note('제'+n+'회 제2분석 · 독립 엔진 및 중복 검증 대기');});
- document.getElementById('freedomResetActive').addEventListener('click',resetActiveAnalysis);
- document.getElementById('freedomGoCumulativeDb').addEventListener('click',function(){
-  var field=document.getElementById('materialsRound'),db=document.querySelector('[data-material-stage="db"]'),app=document.querySelector('[data-material-app="freedom"]');
+ function cleanGames(games){if(!Array.isArray(games)||games.length!==5)return null;
+  var seen=new Set(),out=[];
+  for(var g of games){if(!Array.isArray(g)||g.length!==6)return null;
+   var nums=g.map(Number).sort(function(a,b){return a-b;});
+   if(nums.some(function(n){return !Number.isInteger(n)||n<1||n>45;})||new Set(nums).size!==6)return null;
+   var key=nums.join(',');if(seen.has(key))return null;seen.add(key);out.push(nums);
+  }return out;
+ }
+ function clearList(id){Array.from($(id).children).forEach(function(li){li.textContent='—';});}
+ function showGames(id,games){var li=$(id).children;games.forEach(function(g,i){li[i].textContent=g.map(function(n){return String(n).padStart(2,'0');}).join(' · ');});}
+ function resetActiveAnalysis(){
+  currentRun++;pending=null;lastCaptain=null;lastLiaison=null;lastSource=null;
+  $('freedomAnalysisRound').value='1';clearList('freedomFirstList');clearList('freedomSecondList');
+  $('freedomDbOriginalText').textContent='회차 분석 시 원문 표시';
+  note('새 분석 대기 · 누적자료는 자료실에만 보존');
+ }
+ async function loadDB1(){
+  if(DB1)return DB1;
+  if(!dbPromise)dbPromise=(async function(){
+   $('freedomDbStatus').textContent='내장 DB-1 원문 1~1247회차 확인 중…';
+   var response=await fetch(new URL('crew-db1-1-1247.json',document.baseURI).href,{cache:'no-store'});
+   if(!response.ok)throw Error('내장 DB-1 파일 조회 실패: HTTP '+response.status);
+   var snap=await response.json();
+   if(!snap||snap.schema!=='CAPTAIN_DB1_SNAPSHOT_V1'||snap.count!==1247||!Array.isArray(snap.rows)||snap.rows.length!==1247)throw Error('DB-1 전체 회차 누락');
+   var map=new Map();
+   snap.rows.forEach(function(item,i){
+    if(item.round_no!==i+1||typeof item.source_text!=='string'||item.source_text.split(/\n/).length!==6||!/^[a-f0-9]{64}$/.test(item.source_sha256))throw Error('DB-1 원문 무결성 오류: '+(i+1));
+    map.set(item.round_no,item);
+   });
+   DB1=map;$('freedomDbStatus').textContent='✓ 내장 DB-1 원문 1,247회차 · 6문장/회 · APK 탑재 확인';
+   return map;
+  })().catch(function(e){dbPromise=null;$('freedomDbStatus').textContent='DB-1 탑재 오류: '+String(e.message||e);throw e;});
+  return dbPromise;
+ }
+ async function sourceFor(n){
+  var db=await loadDB1(),entry=db.get(n);if(!entry)throw Error('해당 회차 원문 없음');
+  if(window.crypto&&window.crypto.subtle&&window.TextEncoder){
+   var digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(entry.source_text));
+   var hex=Array.from(new Uint8Array(digest)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+   if(hex!==entry.source_sha256)throw Error('원문 SHA-256 불일치');
+  }
+  lastSource=entry;
+  $('freedomDbOriginalText').textContent='제'+n+'회 · SHA-256 '+entry.source_sha256+'\n\n'+entry.source_text;
+  return entry;
+ }
+ function bootCaptain(){
+  var f=$('freedomCaptainFrame');if(f.getAttribute('src'))return;
+  f.setAttribute('src',new URL('crew-captain-engine-r46.html',document.baseURI).href);
+ }
+ function sendCaptain(){if(!pending||!engineReady)return;
+  var p=pending,f=$('freedomCaptainFrame');pending=null;
+  f.contentWindow.postMessage({type:'V3_ANALYZE',requestId:p.id,round:p.round,raw:p.raw,source:'CAPTAIN_R46_DB1_OFFLINE'},location.origin);
+ }
+ window.addEventListener('message',function(ev){
+  var f=$('freedomCaptainFrame');
+  if(!f||!f.contentWindow||ev.source!==f.contentWindow||ev.origin!==location.origin)return;
+  var m=ev.data||{};
+  if(m.type==='V3_ENGINE_READY'){engineReady=true;sendCaptain();return;}
+  if(m.type!=='V3_ANALYSIS_RESULT'||!pending&&String(m.requestId||'')!==String(activeId))return;
+  if(String(m.requestId)!==String(activeId)||Number(m.round)!==activeRound||activeRun!==currentRun)return;
+  if(!m.ok){note('선장엔진 R46 분석 보류 · '+String(m.error||'실행 오류'));return;}
+  var games=cleanGames(m.games);
+  if(!games||String(m.packGate||'').toUpperCase()!=='PASS'){
+   note('선장엔진 R46 검증 보류 · 5조합/원문 근거 게이트 미통과');return;
+  }
+  lastCaptain={round:activeRound,games:games,engine:m.engine,evidenceAudit:m.evidenceAudit};
+  showGames('freedomFirstList',games);
+  note('제'+activeRound+'회 선장엔진 R46 · 실제 원문 5조합 검증 완료 · 연락관엔진 독립 검증 대기');
+ });
+ var activeId='',activeRound=0,activeRun=0;
+ async function runCaptain(n,runId){
+  var entry=await sourceFor(n);
+  if(runId!==currentRun)return;
+  clearList('freedomFirstList');lastCaptain=null;
+  activeId='CAPTAIN_'+(++requestCounter)+'_'+n;activeRound=n;activeRun=runId;
+  pending={id:activeId,round:n,raw:entry.source_text};
+  note('제'+n+'회 선장엔진 R46 · DB-1 원문 입력 분석 중…');
+  bootCaptain();sendCaptain();
+ }
+ async function runLiaison(n,runId){
+  var entry=await sourceFor(n);
+  if(runId!==currentRun)return;
+  clearList('freedomSecondList');lastLiaison=null;
+  // The original R1 engine REQUIRES independently attested V3 and DOSA
+  // pre-target archives. The DB-1 clue alone is not such an attestation.
+  try{
+   var module=await import(new URL('crew-liaison-blind-r1.mjs',document.baseURI).href);
+   if(runId!==currentRun)return;
+   var raw=entry.source_text.split('\n');
+   var result=module.runLiaisonBlind({round:n,raw:raw,asOfMs:Date.now()});
+   var games=cleanGames(result.sets);
+   if(!games||result.official_eligible!==false)throw Error('LIAISON_RESULT_INTEGRITY_FAILED');
+   lastLiaison={round:n,games:games,version:result.version};
+   showGames('freedomSecondList',games);
+   note('제'+n+'회 연락관엔진 R1 · 독립 연구 5조합 (공식 잠금 아님)');
+  }catch(e){
+   if(runId!==currentRun)return;
+   var reason=String(e&&e.message||e);
+   note('제'+n+'회 · 연락관엔진 R1 보류: V3·도사 사전 원본의 독립 보관 검증 필요 ('+reason+')');
+  }
+ }
+ async function runBoth(){var n=round();if(n===null)return;
+  var runId=++currentRun;pending=null;lastCaptain=null;lastLiaison=null;
+  clearList('freedomFirstList');clearList('freedomSecondList');
+  try{await loadDB1();if(runId!==currentRun)return;
+   await Promise.all([runCaptain(n,runId),runLiaison(n,runId)]);
+  }catch(e){if(runId===currentRun)note('DB-1 또는 분석 엔진 확인 실패: '+String(e.message||e));}
+ }
+ open.addEventListener('click',function(){resetActiveAnalysis();window.captainV4Route('v4');loadDB1().catch(function(){});});
+ $('freedomAnalysisBack').addEventListener('click',function(){resetActiveAnalysis();window.captainV4Route('home');});
+ $('freedomRunRound').addEventListener('click',runBoth);
+ $('freedomFirstFive').addEventListener('click',async function(){var n=round();if(n===null)return;var id=++currentRun;pending=null;
+  try{await runCaptain(n,id);}catch(e){if(id===currentRun)note('선장엔진 오류: '+String(e.message||e));}
+ });
+ $('freedomSecondFive').addEventListener('click',async function(){var n=round();if(n===null)return;var id=++currentRun;pending=null;
+  try{await runLiaison(n,id);}catch(e){if(id===currentRun)note('연락관엔진 오류: '+String(e.message||e));}
+ });
+ $('freedomResetActive').addEventListener('click',resetActiveAnalysis);
+ $('freedomGoCumulativeDb').addEventListener('click',function(){
+  var field=$('materialsRound'),db=document.querySelector('[data-material-stage="db"]'),app=document.querySelector('[data-material-app="freedom"]');
   if(!field||!db||!app||typeof window.captainV4Route!=='function'||typeof window.captainV4Select!=='function'){note('자료실 연결 확인 필요');return;}
-  resetActiveAnalysis();
-  field.value='';
-  window.captainV4Route('materials');
-  window.captainV4ShowArchive();
-  window.captainV4Select('app','freedom');
-  window.captainV4Select('stage','db');
+  resetActiveAnalysis();field.value='';
+  window.captainV4Route('materials');window.captainV4ShowArchive();
+  window.captainV4Select('app','freedom');window.captainV4Select('stage','db');
   var details=db.closest('details');if(details)details.open=true;
  });
 })();
