@@ -88,6 +88,8 @@ jobs:
           grep -Fq 'id="freedomCaptainStatus"' "$HOME_HTML"
           grep -Fq 'id="freedomLiaisonStatus"' "$HOME_HTML"
           grep -Fq 'id="freedomPngPreview"' "$HOME_HTML"
+          grep -Fq 'id="freedomPngZoom"' "$HOME_HTML"
+          grep -Fq "viewport.classList.toggle('zoomed')" crew-meeting-android/app/src/main/assets/v4_png_report.js
           grep -Fq 'id="freedomSavePng"' "$HOME_HTML"
           grep -Fq 'id="freedomPngPanel"' "$HOME_HTML"
           grep -Fq 'id="freedomTextBackup"' "$HOME_HTML"
