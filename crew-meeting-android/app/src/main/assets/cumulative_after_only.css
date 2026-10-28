@@ -6,6 +6,7 @@
 .cumTitle{display:flex;justify-content:space-between;align-items:center;gap:5px;flex:none;border:1px solid #9b8047;border-radius:10px;padding:7px 10px;background:linear-gradient(130deg,#092f50,#031a34)}
 .cumTitle strong{font-size:1.02rem;color:#ffdb90}
 .cumTitle span{font-size:.68rem;color:#b8d4e6}
+.cumTitle button{border:1px solid #e5b765;border-radius:8px;background:#174767;color:#ffe5ab;padding:5px 7px;font-size:.69rem;font-weight:800;white-space:nowrap;min-height:28px;flex:none}
 .cumDraw{flex:none;border:1px solid #4c7894;border-radius:9px;padding:5px 7px;display:flex;align-items:center;justify-content:space-between;gap:5px;background:#072640;min-height:42px}
 .cumDraw strong{font-size:.72rem;color:#f7dfab;white-space:nowrap}
 .cumDrawNumbers{display:flex;align-items:center;gap:3px;flex-wrap:wrap;justify-content:flex-end;min-width:0;font-size:.66rem;color:#bed9e7}
@@ -14,7 +15,7 @@
 .cumLegend{font-size:.64rem;color:#c9deea;flex:none;display:flex;justify-content:flex-end;gap:10px;align-items:center}
 .cumLegend .winDot,.cumLegend .bonusDot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:3px}
 .cumLegend .winDot{background:#ef3658}.cumLegend .bonusDot{background:#f9b627}
-.cumRoomGrid{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:7px}
+.cumRoomGrid{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:none;grid-auto-rows:168px;align-content:start;gap:7px;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#b99453 #09263d;padding-right:3px;touch-action:pan-y}
 .cumRoom{min-width:0;min-height:0;border:1.5px solid var(--cumAccent,#3179ca);border-radius:9px;background:linear-gradient(160deg,#08284a,#061c34);display:flex;flex-direction:column;overflow:hidden}
 .cumRoomHead{display:flex;align-items:center;justify-content:space-between;gap:4px;flex:none;background:var(--cumAccent,#3179ca);padding:5px 7px;color:white}
 .cumRoomHead strong{font-size:.76rem;white-space:nowrap}
@@ -33,6 +34,9 @@
 .cumRoom[data-room="v3-2"]{--cumAccent:#138347}
 .cumRoom[data-room="v3-3"]{--cumAccent:#dc512f}
 .cumRoom[data-room="v3-4"]{--cumAccent:#8639d7}
+.cumRoom[data-room="v7"]{--cumAccent:#986220}
+.cumRoom[data-room="v4-1"]{--cumAccent:#137a86}
+.cumRoom[data-room="v4-2"]{--cumAccent:#8956b3}
 .cumControls{display:grid;grid-template-columns:1fr minmax(70px,.86fr) 1fr;gap:6px;flex:none}
 .cumControls button,.cumControls input{min-width:0;min-height:39px;padding:5px 4px;border-radius:9px;border:1px solid #a6c3dc;font-size:.79rem}
 .cumControls button{background:#103d63;color:#f6e4b6}
@@ -45,3 +49,7 @@
 
 .cumRefresh{flex:none;min-height:34px;border:1.5px solid #ffe1a3;border-radius:9px;background:linear-gradient(#ffe09a,#c79a42);color:#102a44;font-size:.84rem;font-weight:850;letter-spacing:.01em}
 @media(max-height:660px){.cumRefresh{min-height:29px;font-size:.74rem}}
+
+/* The last three rooms must remain in the same cumulative scroll region, not hidden. */
+@media(max-height:660px){.cumRoomGrid{grid-auto-rows:147px}.cumTitle button{min-height:25px;padding:3px 5px;font-size:.61rem}}
+@media(max-width:350px){.cumRoomGrid{grid-auto-rows:158px}.cumTitle button{font-size:.61rem;padding:3px 5px}.cumRoomHead small{font-size:.53rem}}
