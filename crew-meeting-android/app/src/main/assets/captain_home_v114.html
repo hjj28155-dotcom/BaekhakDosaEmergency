@@ -383,7 +383,7 @@ main:not(.roomMode) header h1{
 }
 /* Every INTERNAL room must replace the home dashboard from the TOP.
    External app launchers/download links keep their original navigation. */
-main.roomMode > :not(#homeWorkspace):not(#homeMorePanel):not(#homeApprovalPanel):not(#homeMaterialsPanel):not(#homeV3RoomsPanel){
+main.roomMode > :not(#homeWorkspace):not(#homeMorePanel):not(#homeApprovalPanel):not(#homeMaterialsPanel):not(#homeV3RoomsPanel):not(#homeV4AnalysisPanel){
  display:none!important;
 }
 main.roomMode > #homeWorkspace:not([hidden]),
@@ -529,7 +529,7 @@ main:not(.roomMode) > header button{min-height:33px!important;padding:3px 9px!im
 #homeMaterialsBtn{border:1.7px solid #eac783!important;background:linear-gradient(130deg,rgba(5,63,91,.88),rgba(25,95,114,.9))!important;color:#ffedbd!important;font-weight:800}
 #homeMaterialsPanel{flex-direction:column;gap:7px;border:1.5px solid #e4c181;border-radius:12px;padding:8px;background:rgba(3,26,50,.96);min-width:0;min-height:0}
 #homeMaterialsPanel[hidden]{display:none!important}
-main.roomMode > :not(#homeWorkspace):not(#homeMorePanel):not(#homeApprovalPanel):not(#homeMaterialsPanel):not(#homeV3RoomsPanel){display:none!important}
+main.roomMode > :not(#homeWorkspace):not(#homeMorePanel):not(#homeApprovalPanel):not(#homeMaterialsPanel):not(#homeV3RoomsPanel):not(#homeV4AnalysisPanel){display:none!important}
 main.roomMode > #homeMaterialsPanel:not([hidden]){display:flex!important;flex:1 1 auto;height:100%;min-height:0;overflow:hidden;margin:0}
 #materialsBody{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:4px}
 .materialsNote{font-size:.72rem;line-height:1.45;color:#d5e6f0;margin:8px 0}
@@ -731,6 +731,27 @@ main.roomMode > #homeV3RoomsPanel[hidden]{display:none!important}
 #homeV3RoomsPanel button:focus-visible{outline:3px solid #ffdf93;outline-offset:2px}
 @media(max-width:370px){.v3RoomCards{gap:5px}.v3RoomCard{padding:8px 5px}.v3RoomCard h3{font-size:.74rem}.v3RoomCard button{font-size:.65rem}}
 
+
+/* V4 captain-only 5+5 research, not public distribution. */
+#homeV4AnalysisPanel{display:flex;flex-direction:column;gap:9px;height:100%;max-height:100%;overflow-y:auto;padding:7px 6px 20px;color:#f0f7ff}
+#homeV4AnalysisPanel[hidden]{display:none!important}
+#homeV4AnalysisPanel .v4Controls{display:grid;grid-template-columns:1fr 1fr;gap:7px;align-items:center}
+#homeV4AnalysisPanel input{width:100%;min-width:0;background:#0c3852;color:white;padding:7px;border-radius:8px;border:1px solid #9ac1d8}
+#homeV4AnalysisPanel button{min-height:42px;border:1px solid #d2b977;border-radius:10px;padding:6px;background:#185772;color:#fff2ce;font-weight:800}
+#homeV4AnalysisPanel button:disabled{opacity:.45}
+#homeV4AnalysisPanel #v4RunTwoPack{grid-column:1/-1;background:#bf943c;color:#10283f}
+#homeV4AnalysisPanel textarea{width:100%;min-height:160px;background:#062e4b;color:#d6edfa;border:1px solid #84b2c6;border-radius:10px;padding:10px;line-height:1.55;resize:none}
+#homeV4AnalysisPanel #v4SourceDigest{overflow-wrap:anywhere;font-size:.65rem;color:#adcedd}
+#homeV4AnalysisPanel #v4AnalysisState{border:1px solid #abc4d2;background:#0b3453;border-radius:8px;padding:10px;font-size:.76rem}
+#homeV4AnalysisPanel .v4PackGrid{display:grid;grid-template-columns:1fr;gap:10px}
+#homeV4AnalysisPanel .v4PackGrid>section{border:1px solid #d5ba78;border-radius:12px;background:#0d405e;padding:8px}
+#homeV4AnalysisPanel .v4PackGrid h3{color:#ffe5ab;margin:5px 0 9px;font-size:.84rem}
+#homeV4AnalysisPanel .v4Game{display:flex;align-items:center;gap:6px;margin:4px 0;padding:5px 2px;border-bottom:1px solid #78a4b354}
+#homeV4AnalysisPanel .v4Game>span{font-size:.7rem;width:20px;color:#ffdc98}
+#homeV4AnalysisPanel .v4Balls{display:flex;flex-wrap:nowrap;gap:4px}
+#homeV4AnalysisPanel .v4Balls b{display:grid;place-items:center;width:30px;height:30px;border:1px solid #b5d8e9;border-radius:50%;background:#123a58;color:#fff;font-size:.71rem}
+@media(min-width:680px){#homeV4AnalysisPanel .v4PackGrid{grid-template-columns:1fr 1fr}}
+
 </style>
 </head>
 <body>
@@ -780,9 +801,9 @@ main.roomMode > #homeV3RoomsPanel[hidden]{display:none!important}
   <div class="installedAppUnit appDeckCard" data-app-card="freedom">
    <div class="deckAppIcon" aria-hidden="true">🚢</div>
    <strong>항해의자유</strong>
-   <small>원문 10조합 · 제1회차부터</small>
+   <small>원문 5조합 × 2묶음</small>
    <div class="deckCardActions">
-    <button type="button" class="deckAction" data-open-material="freedom" aria-label="항해의자유 자료 관리방 열기">자료 관리</button>
+    <button type="button" class="deckAction" id="openV4AnalysisRoom">원문 5×2 분석</button>
     <button type="button" id="openFreedomApprovalShortcut" class="deckAction deckSecondary" aria-label="기존 일반판 승인관리방 열기">승인관리</button>
    </div>
   </div>
@@ -830,11 +851,25 @@ main.roomMode > #homeV3RoomsPanel[hidden]{display:none!important}
  <div class="v3RoomsFoot"><button type="button" id="v3RoomsOpenNative">📱 기존 V3 설치 앱 열기</button><button type="button" id="v3RoomsOpenNavigator">🔗 항해사 전담 원본방 열기</button></div>
  <p class="materialsNote">원문·자동조합의 생성 및 확정은 실제 V3 앱에서 수행합니다. 중앙통제실은 방별 원본보고서 자동조회만 담당하며, 인증되지 않은 결과를 추첨 전 공식 실적으로 표시하지 않습니다.</p>
 </section>
+<section id="homeV4AnalysisPanel" hidden aria-label="V4 항해의자유 원문 5조합 두 묶음 분석">
+ <div class="homePaneTop"><strong>🚢 V4 항해의자유 · 원문 5+5 분석</strong><button id="v4AnalysisBack" class="secondary" type="button">홈으로</button></div>
+ <div id="v4AnalysisAuthGate" hidden></div>
+ <p class="materialsNote">제1회차부터 재분석 · <b>① 기존 V4 원문 엔진 5조합</b> + <b>② 동일 원문 후보번호의 기존 V4 별도 구성규칙 5조합</b>. 과거 재분석은 공식 추첨 전 예측이 아닙니다.</p>
+ <div class="v4Controls"><label for="v4AnalysisRound">회차</label><input id="v4AnalysisRound" type="number" min="1" max="1247" step="1" value="1" inputmode="numeric"><button type="button" id="v4LoadSource">DB-1 원문 불러오기</button><button type="button" id="v4RunTwoPack" disabled>⚓ 원문 5+5 분석 시작</button></div>
+ <label for="v4SourceText">검증된 DB-1 원문 6문장</label>
+ <textarea id="v4SourceText" readonly rows="7" placeholder="원문 불러오기를 누르세요."></textarea>
+ <small id="v4SourceDigest">원문 SHA-256: 확인 전</small>
+ <p id="v4AnalysisState" role="status" aria-live="polite">선장 입장키로 인증한 뒤 분석할 수 있습니다.</p>
+ <div class="v4PackGrid"><section><h3>① 원문 엔진 5조합</h3><div id="v4PackA">아직 분석 전</div></section><section><h3>② 원문 후보 재구성 5조합</h3><div id="v4PackB">아직 분석 전</div></section></div>
+ <div class="v4Controls"><button type="button" id="v4SaveTwoPack" disabled>보고서 다시 저장</button><button type="button" id="v4ResearchLibrary">📚 V4 결과전 자료실</button></div>
+ <p class="materialsNote">중복 없는 총 10조합만 저장합니다. 기존 구매잠금·일반 배포판 데이터는 수정하지 않습니다.</p>
+ <iframe id="v4OriginalEngineFrame" hidden title="V4 원본 분석 엔진" aria-hidden="true"></iframe>
+</section>
 <div id="homeMaterialsPanel" hidden aria-label="V7 V3 항행의자유 통합 자료방">
  <div class="homePaneTop"><strong>📚 V3 + V7 + V4 · 결과전 보고서</strong><button id="homeMaterialsBack" type="button" class="secondary">홈으로</button></div>
  <div id="materialsBody">
   <div id="materialsAuthGate" class="materialsAuthGate" hidden></div>
-  <p class="materialsNote"><b>새 분석 기준: 제1회차부터 3앱 공동 재분석.</b> V3 4개 방에서 원문 15·자동 5조합, V7 원문 5조합, V4 원문 10조합으로 구분합니다. <b>V3의 과거 350회 누적 분석은 별도 보존</b>하며, 과거 재분석 결과는 추첨 전에 확정한 공식 결과전과 구분합니다.</p>
+  <p class="materialsNote"><b>새 분석 기준: 제1회차부터 3앱 공동 재분석.</b> V3 4개 방에서 원문 15·자동 5조합, V7 원문 5조합, V4 원문 5조합 × 2묶음으로 구분합니다. <b>V3의 과거 350회 누적 분석은 별도 보존</b>하며, 과거 재분석 결과는 추첨 전에 확정한 공식 결과전과 구분합니다.</p>
   <div id="materialsAppSelector" class="materialsGrid" aria-label="세 앱 독립 자료 원본" hidden>
    <button type="button" class="matApp" data-material-app="v7">🛡️ V7 통제관</button>
    <button type="button" class="matApp selected" data-material-app="v3">🧭 V3 항해사앱</button>
@@ -1011,7 +1046,7 @@ var $=function(id){return document.getElementById(id);};
 })();
 var HOME_SELECTED='home';
 function homeView(which){
- if(!['live','reports','more','approval','materials','v3'].includes(which))which='home';
+ if(!['live','reports','more','approval','materials','v3','v4'].includes(which))which='home';
  HOME_SELECTED=which;
  var active=which==='live'||which==='reports';
  $('homeOverview').hidden=which!=='home';
@@ -1020,6 +1055,7 @@ function homeView(which){
  $('homeApprovalPanel').hidden=which!=='approval';
  $('homeMaterialsPanel').hidden=which!=='materials';
  $('homeV3RoomsPanel').hidden=which!=='v3';
+ $('homeV4AnalysisPanel').hidden=which!=='v4';
  if(which!=='materials')stopMaterialsMonitor();
  $('homeMaterialsBtn').setAttribute('aria-expanded',String(which==='materials'));
  var root=document.querySelector('main');
@@ -1042,19 +1078,23 @@ function homeView(which){
  live.hidden=which!=='live';reports.hidden=which!=='reports';
  live.open=which==='live';reports.open=which==='reports';
  $('homeWorkspaceTitle').textContent=which==='live'?'실시간 업무 공유':'보고서 · 자료';
- if(which==='materials'&&!token){
-   if($('loginArea').parentElement!==$('materialsAuthGate'))$('materialsAuthGate').appendChild($('loginArea'));
-   $('materialsAuthGate').hidden=false;
+ if((which==='materials'||which==='v4')&&!token){
+   var authId=which==='v4'?'v4AnalysisAuthGate':'materialsAuthGate';
+   if($('loginArea').parentElement!==$(authId))$(authId).appendChild($('loginArea'));
+   $('materialsAuthGate').hidden=which!=='materials';
+   $('v4AnalysisAuthGate').hidden=which!=='v4';
    $('loginArea').hidden=false;
    $('loginArea').style.display='block';
  }else{
    if($('loginArea').parentElement!==$('homeWorkspaceItems'))$('homeWorkspaceItems').appendChild($('loginArea'));
    $('materialsAuthGate').hidden=true;
+   $('v4AnalysisAuthGate').hidden=true;
    $('loginArea').hidden=!active||!!token;
  }
  if(which==='live'&&token)threeRoomRefresh();
  if(which==='reports'&&token)refreshV7Reports();
  if(which==='materials')startMaterialsMonitor();
+ if(which==='v4')v4OpenEngine();
  if(which==='more')$('homeMorePanel').scrollTop=0;
  if(which==='live'||which==='reports'){
    $('homeWorkspace').scrollTop=0;
@@ -2076,9 +2116,11 @@ $('fileForm').addEventListener('submit',async function(event){
 function enter(){
  $('loginArea').style.display='none';$('loginArea').hidden=true;
  $('materialsAuthGate').hidden=true;
+ $('v4AnalysisAuthGate').hidden=true;
  $('chatArea').style.display='flex';$('disconnectBtn').style.display='inline-block';
  if(HOME_SELECTED==='live')threeRoomRefresh();
  if(HOME_SELECTED==='materials'){startMaterialsMonitor();loadIntegratedMaterials();}
+ if(HOME_SELECTED==='v4'){v4OpenEngine();v4LoadSource();}
  if(HOME_SELECTED==='reports')refreshV7Reports();
  if(timer)clearInterval(timer);timer=setInterval(refresh,4000);refresh();showContinuity();refreshFiles();refreshOriginalLinks();
 }
@@ -2095,6 +2137,7 @@ function saveConfirmedEntry(){
  }catch(e){status('loginError','기기 저장이 제한되어 이번 앱 사용 중에만 입장이 유지될 수 있습니다.');}
 }
 function disconnect(){
+ v4ResetPending();
  stopMaterialsMonitor();
  threeRoomStop();
  if(timer)clearInterval(timer);timer=null;token='';clearRememberedEntry();lastFingerprint='';
