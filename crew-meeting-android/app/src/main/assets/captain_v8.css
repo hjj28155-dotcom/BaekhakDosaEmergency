@@ -180,3 +180,24 @@ main.roomMode>#homeDirectorRoom:not([hidden]){display:flex!important;flex-direct
 #homeDirectorRoom button:focus-visible,#homeDirectorRoomOpen:focus-visible{outline:3px solid #ffe09d;outline-offset:3px}
 @media(max-height:750px){main:not(.roomMode)>#v8Hero{height:clamp(205px,28dvh,230px)!important}#homeDirectorRoomOpen{min-height:44px}}
 
+
+/* V8.0.5: primary actions first; secondary tools remain in explicit drawers. */
+.roomCompactDetails{flex:none;display:block;margin:5px 0 0;border:1px solid #60788b;border-radius:10px;background:#102b40;color:#d4e2ed}
+.roomCompactDetails>summary{cursor:pointer;padding:13px 12px;font-size:.85rem;font-weight:700;color:#d9e6ef}
+.roomCompactDetailsBody{padding:3px 12px 14px;display:grid;gap:10px;min-width:0}
+.roomCompactDetailsBody>button{width:100%;min-height:42px;text-align:left}
+.roomCompactDetailsBody .directorRoomIntro{padding:0}.roomCompactDetailsBody .directorRoomIntro h2{font-size:1rem!important}
+#homeDirectorRoom .directorRoomActions{grid-template-columns:1fr;margin-top:10px}
+#homeDirectorRoom .directorToolGrid{grid-template-columns:1fr}
+#homeDirectorRoom .directorToolGrid>button{min-height:48px;padding:13px 16px}
+#homeDirectorRoom .directorToolGrid>button>span{display:none}
+#homeDirectorRoom .directorOriginalCard{padding:14px}
+#homeDirectorRoom .directorOriginalCard>strong{font-size:.96rem}
+#homeDirectorRoom{gap:12px!important}
+#homeV3RoomsPanel .v3RoomsFoot{display:block}
+#homeV3RoomsPanel .v3RoomsFoot>button{width:100%}
+#freedomAnalysisPanel .v4RoomActions{grid-template-columns:repeat(3,minmax(0,1fr))}
+#freedomAnalysisPanel.archiveMode>#v4RoomDetails{display:none}
+#reportsPanel>.reportGroup{margin-top:10px}
+.compactConnectionState{font-size:.77rem!important;line-height:1.45!important;color:#d3dfeb!important;margin:5px 2px 10px!important}
+.roomCompactDetails :focus-visible{outline:3px solid #ffe09d;outline-offset:2px}

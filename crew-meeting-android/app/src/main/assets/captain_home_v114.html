@@ -3046,4 +3046,39 @@ try{
  var v8Note=document.querySelector('#appCommandDeck .deckIntegrityNote');if(v8Note)v8Ops.appendChild(v8Note);
 })();
 </script>
+<script id="V8_COMPACT_ROOMS">
+/* Move secondary controls without replacing IDs, handlers or stored records. */
+(function(){
+ const $=id=>document.getElementById(id);
+ function drawer(parent,id,label){
+  const d=document.createElement('details');d.id=id;d.className='roomCompactDetails';
+  const title=document.createElement('summary');title.textContent=label;d.appendChild(title);
+  const body=document.createElement('div');body.className='roomCompactDetailsBody';d.appendChild(body);parent.appendChild(d);
+  return body;
+ }
+ function move(node,to){if(node)to.appendChild(node);}
+ const director=drawer($('homeDirectorRoom'),'directorRoomSettings','설정·상세');
+ ['directorOriginalEdit','directorServer','directorLive','directorDiagnostics'].forEach(id=>move($(id),director));
+ move(document.querySelector('.directorRoomIntro'),director);
+ move(document.querySelector('.directorRoomNote'),director);
+ const v3=drawer($('homeV3RoomsPanel'),'v3RoomDetails','연결·상세');
+ move(document.querySelector('#homeV3RoomsPanel .v3RoomsLead'),v3);
+ move($('v3RoomsOpenNavigator'),v3);
+ document.querySelectorAll('#homeV3RoomsPanel .v3RoomCard p,#homeV3RoomsPanel .materialsNote').forEach(n=>move(n,v3));
+ const v3State=document.createElement('p');v3State.className='compactConnectionState';v3State.textContent='자동전송 연결 전 · 저장된 원본만 조회';
+ document.querySelector('#homeV3RoomsPanel .v3RoomCards').before(v3State);
+ const v4=drawer($('freedomAnalysisPanel'),'v4RoomDetails','추가 기능');
+ move($('freedomResetActive'),v4);
+ const live=drawer($('threeRoomLivePanel'),'liveRoomDetails','연결 안내·상세');
+ const warning=document.querySelector('#threeRoomLivePanel .threeRoomWarning');
+ const note=document.createElement('p');note.className='compactConnectionState';note.textContent='공유 서버에 기록 · 원본 대화방 자동전송은 안 됩니다.';
+ warning.before(note);move(warning,live);
+ ['threeRoomNavigatorGuide','threeRoomControllerGuide','threeRoomLinkofficerGuide','threeRoomRoleStatus'].forEach(id=>move($(id),live));
+ const reports=drawer($('reportsPanel'),'reportRoomDetails','과거 V7 자료·상세');
+ move(document.querySelector('#reportsPanel > .reportDisclaimer'),reports);
+ const legacy=document.querySelector('#reportsPanel > .reportGroup');move(legacy,reports);
+ document.querySelectorAll('#reportsPanel > .reportGroup .reportDisclaimer').forEach(n=>move(n,reports));
+ document.querySelector('#reportsPanel > summary').firstChild.textContent='📑 보고서·자료 ';
+})();
+</script>
 </body></html>
