@@ -1,0 +1,44 @@
+/* Captain-only integrated cumulative DB: result-after only; original archives remain untouched. */
+#materialsBody.cumulativeOnlyMode{display:flex;flex-direction:column;gap:0;overflow:hidden!important;padding:3px}
+#materialsBody.cumulativeOnlyMode> :not(#cumulativeAfterDashboard):not(#materialsAuthGate){display:none!important}
+#cumulativeAfterDashboard[hidden]{display:none!important}
+#cumulativeAfterDashboard{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;min-width:0;gap:7px;overflow:hidden;color:#f8e4b7}
+.cumTitle{display:flex;justify-content:space-between;align-items:center;gap:5px;flex:none;border:1px solid #9b8047;border-radius:10px;padding:7px 10px;background:linear-gradient(130deg,#092f50,#031a34)}
+.cumTitle strong{font-size:1.02rem;color:#ffdb90}
+.cumTitle span{font-size:.68rem;color:#b8d4e6}
+.cumDraw{flex:none;border:1px solid #4c7894;border-radius:9px;padding:5px 7px;display:flex;align-items:center;justify-content:space-between;gap:5px;background:#072640;min-height:42px}
+.cumDraw strong{font-size:.72rem;color:#f7dfab;white-space:nowrap}
+.cumDrawNumbers{display:flex;align-items:center;gap:3px;flex-wrap:wrap;justify-content:flex-end;min-width:0;font-size:.66rem;color:#bed9e7}
+.cumDrawNumbers .cumBall{background:#164e77;border-color:#8bc4e8}
+.cumDrawNumbers .cumBall.bonus{background:#9e6106;color:#fff2cf;border-color:#ffd377}
+.cumLegend{font-size:.64rem;color:#c9deea;flex:none;display:flex;justify-content:flex-end;gap:10px;align-items:center}
+.cumLegend .winDot,.cumLegend .bonusDot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:3px}
+.cumLegend .winDot{background:#ef3658}.cumLegend .bonusDot{background:#f9b627}
+.cumRoomGrid{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:7px}
+.cumRoom{min-width:0;min-height:0;border:1.5px solid var(--cumAccent,#3179ca);border-radius:9px;background:linear-gradient(160deg,#08284a,#061c34);display:flex;flex-direction:column;overflow:hidden}
+.cumRoomHead{display:flex;align-items:center;justify-content:space-between;gap:4px;flex:none;background:var(--cumAccent,#3179ca);padding:5px 7px;color:white}
+.cumRoomHead strong{font-size:.76rem;white-space:nowrap}
+.cumRoomHead small{font-size:.6rem;white-space:nowrap}
+.cumRoomState{font-size:.59rem;color:#c5ddec;padding:3px 6px;min-height:18px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cumRoom ol{list-style:none;padding:2px 5px 4px;margin:0;flex:1 1 auto;min-height:0;display:grid;grid-template-rows:repeat(5,minmax(0,1fr));gap:2px}
+.cumRoom li{display:flex;align-items:center;justify-content:space-between;gap:2px;min-width:0;min-height:0;font-size:.65rem;color:#f0f7ff}
+.cumRowNo{font-size:.58rem;width:9px;flex:none;text-align:right}
+.cumBalls{display:flex;align-items:center;gap:2px;min-width:0;flex:1 1 auto;justify-content:center}
+.cumBall{display:inline-flex;align-items:center;justify-content:center;flex:none;width:clamp(12px,3.6vw,20px);height:clamp(12px,3.6vw,20px);border:1px solid #507caa;border-radius:50%;background:#0a3a64;color:#f1f9ff;font-size:clamp(8px,2.2vw,11px);font-weight:750;font-variant-numeric:tabular-nums}
+.cumBall.win{background:#d71845;border-color:#ff7d8c;color:white}
+.cumBall.bonus{background:#c77e05;border-color:#ffd16c;color:#fff8e4}
+.cumHit{font-size:.56rem;font-weight:800;flex:none;min-width:24px;text-align:center;border-radius:12px;padding:2px 1px;background:#ba9a54;color:#082239;font-variant-numeric:tabular-nums}
+.cumHit.pending{background:#284762;color:#bed5e4}
+.cumRoom[data-room="v3-1"]{--cumAccent:#165fca}
+.cumRoom[data-room="v3-2"]{--cumAccent:#138347}
+.cumRoom[data-room="v3-3"]{--cumAccent:#dc512f}
+.cumRoom[data-room="v3-4"]{--cumAccent:#8639d7}
+.cumControls{display:grid;grid-template-columns:1fr minmax(70px,.86fr) 1fr;gap:6px;flex:none}
+.cumControls button,.cumControls input{min-width:0;min-height:39px;padding:5px 4px;border-radius:9px;border:1px solid #a6c3dc;font-size:.79rem}
+.cumControls button{background:#103d63;color:#f6e4b6}
+.cumControls button:disabled{opacity:.35}
+.cumControls input{background:#09273e;border:1.5px solid #efbd6d;color:#ffe5a3;text-align:center;font-weight:800}
+.cumStatus{font-size:.65rem;color:#d5e3ee;flex:none;line-height:1.25;min-height:15px}
+.cumFooter{font-size:.57rem;color:#9dbbd0;flex:none;line-height:1.15}
+@media(max-width:350px){#cumulativeAfterDashboard{gap:4px}.cumRoomGrid{gap:4px}.cumRoomHead{padding:4px}.cumRoomHead strong{font-size:.67rem}.cumRoomState{padding:2px 4px;font-size:.55rem}.cumRoom ol{padding:2px 3px}.cumBalls{gap:1px}.cumHit{min-width:21px;font-size:.51rem}.cumDraw{padding:4px}.cumTitle{padding:5px 7px}}
+@media(max-height:660px){#cumulativeAfterDashboard{gap:4px}.cumTitle{padding:4px 7px}.cumTitle strong{font-size:.89rem}.cumDraw{min-height:32px;padding:3px 5px}.cumLegend{font-size:.56rem}.cumRoomHead{padding:3px 5px}.cumRoomState{padding:1px 4px;min-height:13px}.cumRoom ol{padding:1px 4px 2px;gap:1px}.cumControls button,.cumControls input{min-height:32px}.cumFooter{display:none}}
