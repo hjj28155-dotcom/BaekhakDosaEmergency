@@ -14,6 +14,9 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.DownloadListener;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import android.webkit.ValueCallback;
 import android.webkit.SslErrorHandler;
 import android.net.http.SslError;
@@ -24,7 +27,7 @@ import java.nio.charset.StandardCharsets;
 
 public final class MainActivity extends Activity {
     private static final String ROOM_URL =
-        "https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/crew-meeting.html?app_version=120";
+        "https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/crew-meeting.html?app_version=121";
     private static final int FILE_CHOOSER_CODE = 502;
     private static final int PICK_V3_APP = 503;
     private static final int PICK_V7_APP = 504;
@@ -60,6 +63,28 @@ public final class MainActivity extends Activity {
         settings.setBuiltInZoomControls(false);
         settings.setSupportZoom(false);
         web.setWebViewClient(new WebViewClient() {
+            @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest req) {
+                Uri uri=req.getUrl();
+                if(!"https".equals(uri.getScheme()) || !"hjj28155-dotcom.github.io".equals(uri.getHost()))return null;
+                String p=uri.getPath();
+                String name=null,mime=null;
+                if("/BaekhakDosaEmergency/crew-db1-1-1247.json".equals(p)){
+                    name="db1_rounds_1_1247.json";mime="application/json";
+                }else if("/BaekhakDosaEmergency/crew-captain-engine-r46.html".equals(p)){
+                    name="captain_engine_r46.html";mime="text/html";
+                }else if("/BaekhakDosaEmergency/crew-liaison-blind-r1.mjs".equals(p)){
+                    name="liaison-blind-engine.mjs";mime="text/javascript";
+                }else if("/BaekhakDosaEmergency/crew-liaison-baseline-r1.mjs".equals(p)){
+                    name="v7-engine100-baseline.mjs";mime="text/javascript";
+                }
+                if(name==null)return null;
+                try{
+                    return new WebResourceResponse(mime,"UTF-8",getAssets().open(name));
+                }catch(java.io.IOException ex){
+                    return new WebResourceResponse("text/plain","UTF-8",
+                        new java.io.ByteArrayInputStream("BUNDLED_ASSET_MISSING".getBytes(StandardCharsets.UTF_8)));
+                }
+            }
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest req) {
                 return route(req.getUrl());
             }
@@ -132,6 +157,26 @@ public final class MainActivity extends Activity {
                     || !html.contains("id=\"freedomSecondList\"")
                     || !html.contains("id=\"freedomResetActive\""))
                 throw new java.io.IOException("Required captain dashboard modules missing");
+            // The six-line original DB-1 is an APK asset, not a remote website or a material-room cache.
+            // Fail closed if the snapshot is incomplete; never silently substitute remote data.
+            try(InputStream dbStream=getAssets().open("db1_rounds_1_1247.json")){
+                ByteArrayOutputStream dbBytes=new ByteArrayOutputStream();
+                byte[] dbBuf=new byte[8192];int dbLen;
+                while((dbLen=dbStream.read(dbBuf))!=-1){
+                    if(dbBytes.size()+dbLen>2000000)throw new java.io.IOException("DB1_ASSET_TOO_LARGE");
+                    dbBytes.write(dbBuf,0,dbLen);
+                }
+                JSONObject snapshot=new JSONObject(new String(dbBytes.toByteArray(),StandardCharsets.UTF_8));
+                JSONArray rows=snapshot.getJSONArray("rows");
+                if(rows.length()!=1247 || snapshot.getInt("count")!=1247)throw new java.io.IOException("DB1_COUNT_MISMATCH");
+                for(int i=0;i<1247;i++){
+                    JSONObject item=rows.getJSONObject(i);
+                    String raw=item.getString("source_text");
+                    if(item.getInt("round_no")!=i+1 || raw.split("\\n",-1).length!=6
+                       || !item.getString("source_sha256").matches("[a-f0-9]{64}"))
+                        throw new java.io.IOException("DB1_ROUND_INVALID_"+(i+1));
+                }
+            }catch(org.json.JSONException ex){throw new java.io.IOException("DB1_PARSE_INVALID",ex);}
             web.loadDataWithBaseURL(ROOM_URL, html, "text/html", "UTF-8", ROOM_URL);
         } catch (java.io.IOException e) {
             Toast.makeText(this, "중앙통제실 홈화면을 검증할 수 없습니다. 기존 설치본을 보존하세요.",
