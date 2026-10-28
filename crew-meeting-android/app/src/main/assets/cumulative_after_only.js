@@ -172,7 +172,7 @@
     var item=scored.details.find(function(x){return x.room_key===key&&x.official_eligible===false&&
      x.provenance==='RETROSPECTIVE_RESEARCH_ONLY'&&Array.isArray(x.rows)&&x.rows.length===5;});
     if(!item){
-     state(key,key==='v4-2'?'연락관 R1 독립 원본 미수신 · 0점 아님':'선장 R46 검증 연구 원본 미수신 · 0점 아님');return;
+     state(key,key==='v4-2'?'통제실장 R1 독립 원본 미수신 · 0점 아님':'선장 R46 검증 연구 원본 미수신 · 0점 아님');return;
     }
     if(!draw||!item.draw||!Array.isArray(item.draw.numbers)||
       draw.numbers.slice().sort(function(a,b){return a-b;}).join(',')!==
@@ -189,7 +189,7 @@
      hit.textContent=row.bucket===6?'5+보':row.hits+'/6';
      hit.classList.remove('pending');
     });
-    state(key,(key==='v4-1'?'선장 R46':'연락관 R1')+' · 검증 연구 5조합 사후 대조 · 공식 잠금 아님');
+    state(key,(key==='v4-1'?'선장 R46':'통제실장 R1')+' · 검증 연구 5조합 사후 대조 · 공식 잠금 아님');
     found++;
    });
    $('cumStatus').textContent+=' · V4 '+found+'/2방 실제 원본 '+(found*5)+'조합 검증된 연구 사후 대조';
@@ -309,7 +309,7 @@
     }
    });
    var names={'v3-1':'V3 도사방','v3-2':'V3 항해사방','v3-3':'V3 자동1방','v3-4':'V3 자동2방',
-    'v7':'V7 통제관방','v4-1':'V4 선장 R46','v4-2':'V4 연락관 R1'};
+    'v7':'V7 통제관방','v4-1':'V4 선장 R46','v4-2':'V4 통제실장 R1'};
    $('scoreSyncStatus').textContent=scoreKeys.slice(1).map(function(key){
     var room=result.rooms[key];
     return names[key]+': '+(room&&room.graded_games?
