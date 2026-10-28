@@ -244,3 +244,6 @@
  #modal.v4047Compact .r5group{grid-template-rows:16px repeat(5,minmax(0,1fr))!important}
  #modal.v4047Compact .r5row,#modal.v4047Compact .r5row.purchase{grid-template-rows:8px minmax(0,1fr)!important}
 }
+@media(max-height:650px){
+ #modal.v4047Compact .r5row,#modal.v4047Compact .r5row.purchase{padding:0!important;gap:0 3px!important}
+}
