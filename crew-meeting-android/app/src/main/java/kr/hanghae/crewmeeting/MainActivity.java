@@ -225,6 +225,18 @@ public final class MainActivity extends Activity {
             if (!"v3".equals(role) && !"v7".equals(role)) return;
             runOnUiThread(() -> openSelectedApp(role, chooseAgain));
         }
+        // Registration is NOT proof of successful app launch or data synchronization.
+        @JavascriptInterface public String getLaunchState() {
+            SharedPreferences prefs=getSharedPreferences(LINK_PREFS, MODE_PRIVATE);
+            JSONObject state=new JSONObject();
+            try {
+                String v3=prefs.contains("v3") ? "SELECTED" :
+                    (getPackageManager().getLaunchIntentForPackage("com.baekhak.dosa.f6")!=null ? "AVAILABLE" : "UNSELECTED");
+                state.put("v3",v3);
+                state.put("v7",prefs.contains("v7") ? "SELECTED" : "UNSELECTED");
+            } catch(Exception ex) { return "{\"v3\":\"UNAVAILABLE\",\"v7\":\"UNAVAILABLE\"}"; }
+            return state.toString();
+        }
     }
 
 
@@ -291,6 +303,18 @@ public final class MainActivity extends Activity {
         SharedPreferences prefs = getSharedPreferences(LINK_PREFS, MODE_PRIVATE);
         String registered = prefs.getString(role, null);
         if (chooseAgain || registered == null) {
+            // V3 R60 package is known; open it directly when installed.
+            // Never guess the V7 package or silently bind a different app.
+            if (!chooseAgain && "v3".equals(role)) {
+                try {
+                    Intent known=getPackageManager().getLaunchIntentForPackage("com.baekhak.dosa.f6");
+                    if (known!=null && known.getComponent()!=null) {
+                        startActivity(known);
+                        prefs.edit().putString("v3",known.getComponent().flattenToString()).apply();
+                        return;
+                    }
+                } catch(Exception ignored) { /* Fall back to captain's explicit app selection. */ }
+            }
             chooseInstalledApp(role);
             return;
         }
