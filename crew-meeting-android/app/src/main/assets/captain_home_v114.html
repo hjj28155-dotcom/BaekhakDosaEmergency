@@ -1315,6 +1315,47 @@ function homeView(which){
 window.captainV4Route=function(which){if(['v4','home','materials'].includes(which))homeView(which);};
 window.captainV4Select=function(kind,value){if((kind==='app'&&value==='freedom')||(kind==='stage'&&value==='db'))materialsSelect(kind,value);};
 window.captainV4ShowArchive=function(){afterSevenShowMode(false);};
+/* Captain-authenticated readback and append-only V4 R46 retrospective research.
+ * This is NOT an official pre-draw lock or a V3/V7 automatic sender. */
+var CAPTAIN_ENGINE_RECEIPTS='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/crew-verified-round-results';
+window.captainEngineRoundRead=async function(round){
+ if(!token)throw Error('CAPTAIN_AUTH_REQUIRED');
+ if(!Number.isInteger(round)||round<1||round>1247)throw Error('INVALID_ROUND');
+ var url=new URL(CAPTAIN_ENGINE_RECEIPTS);url.searchParams.set('round',String(round));
+ var response=await fetch(url.href,{method:'GET',headers:{Authorization:'Bearer '+token},cache:'no-store'});
+ if(!response.ok)throw Error('ROUND_RECEIPTS_HTTP_'+response.status);
+ return response.json();
+};
+window.captainEngineRoundSave=async function(detail){
+ if(!token)throw Error('CAPTAIN_AUTH_REQUIRED');
+ if(!detail||detail.engine!=='captain'||detail.provenance!=='R46_DB1_VERIFIED'||
+    !Number.isInteger(detail.round)||detail.round<1||detail.round>1247||
+    !Array.isArray(detail.games)||detail.games.length!==5||
+    !/^[a-f0-9]{64}$/.test(String(detail.sourceSha256||'')))throw Error('INVALID_R46_RECEIPT');
+ var response=await fetch(CAPTAIN_ENGINE_RECEIPTS,{method:'POST',headers:{
+   'Content-Type':'application/json',Authorization:'Bearer '+token},
+   body:JSON.stringify({round_no:detail.round,room_key:'v4-1',
+    engine:'CAPTAIN_R46_DB1_OFFLINE',provenance:'R46_DB1_VERIFIED',
+    source_sha256:detail.sourceSha256,combinations:detail.games})
+ });
+ if(!response.ok)throw Error('R46_ARCHIVE_HTTP_'+response.status);
+ var receipt=await response.json();
+ if(!receipt.ok||receipt.official_eligible!==false||receipt.research_only!==true)throw Error('R46_ARCHIVE_RECEIPT_INVALID');
+ return receipt;
+};
+window.addEventListener('captain-v4-verified',function(event){
+ var d=event.detail;
+ if(!d||d.engine!=='captain')return;
+ window.captainEngineRoundSave(d).then(function(receipt){
+   window.captainEngineLastReceipt={round:d.round,receipt:receipt};
+   var st=document.getElementById('freedomAnalysisStatus');
+   if(st)st.textContent='선장 R46 '+d.round+'회차 연구 5조합 · 자료실 수신확인 완료';
+ }).catch(function(e){
+   var st=document.getElementById('freedomAnalysisStatus');
+   if(st)st.textContent='선장 R46 분석번호는 화면에 보존 · 자료실 전송 미완료 ('+String(e.message||e)+')';
+ });
+});
+
 window.captainCumulativeIsAuthorized=function(){return !!token;};
 window.captainCumulativeFetchAfter=function(round){
  if(!token)return Promise.reject(Error('CAPTAIN_AUTH_REQUIRED'));
