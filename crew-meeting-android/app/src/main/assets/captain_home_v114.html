@@ -865,6 +865,12 @@ main:not(.roomMode) #centralRoundPanel label{font-size:.68rem!important}
   <input id="freedomAnalysisRound" type="number" min="1" max="1247" value="1" inputmode="numeric" aria-label="분석 회차">
   <button type="button" id="freedomRunRound">회차 분석</button>
  </div>
+ <section id="freedomPngPanel" aria-label="V4 PNG 분석 결과보고서" class="v4PngPanel">
+   <div class="v4PngTop"><strong>🖼️ PNG 분석 결과보고서</strong><button type="button" id="freedomSavePng" disabled>PNG 저장</button></div>
+   <div class="v4PngViewport"><img id="freedomPngPreview" alt="V4 선장엔진 R46 및 연락관엔진 R1의 각 5조합을 담은 PNG 결과보고서. 원본이 없으면 검증 대기로 표시됩니다."></div>
+   <small id="freedomPngStatus" role="status" aria-live="polite">PNG 보고서 준비 중 · 확인된 조합만 기록</small>
+ </section>
+ <details id="freedomTextBackup" class="v4TextBackup"><summary>원문 6번호·엔진 상태 펼쳐보기</summary>
  <div class="v4Results" aria-label="원문 분석 5조합 두 묶음">
   <article class="v4FiveGroup">
    <strong>⚓ 선장엔진 R46 · 5조합</strong>
@@ -877,6 +883,7 @@ main:not(.roomMode) #centralRoundPanel label{font-size:.68rem!important}
    <small id="freedomLiaisonStatus" class="v4EngineStatus">연락관 사전원본 검증 대기</small>
   </article>
  </div>
+ </details>
  <div id="freedomDbStatus" role="status" aria-live="polite">DB-1 내장 1~1247회차 검증 대기</div>
  <details class="v4DbOriginal"><summary>선택 회차 DB-1 원문 6문장 보기</summary><pre id="freedomDbOriginalText">회차 분석 시 원문 표시</pre></details>
  <div id="freedomAnalysisStatus" role="status" aria-live="polite">선장엔진 R46 · 연락관엔진 R1 검증 대기</div>
@@ -2615,5 +2622,6 @@ try{
  });
 })();
 </script>
+<script src="crew-v4-png-report.js"></script>
 <script src="crew-cumulative-after.js"></script>
 </body></html>
