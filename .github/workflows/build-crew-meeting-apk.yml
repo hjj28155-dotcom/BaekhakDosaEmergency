@@ -1,4 +1,4 @@
-name: Build same-signer captain three-app research APK v1.0.24
+name: Build same-signer captain three-app research APK v1.0.25
 on:
   push:
     branches:
@@ -108,6 +108,21 @@ jobs:
           test "$(grep -c 'class="cumRoom" data-room=' "$HOME_HTML")" -eq 7
           test "$(grep -o 'class="cumHit pending"' "$HOME_HTML" | wc -l)" -eq 35
           grep -Fq 'id="cumJumpMore"' "$HOME_HTML"
+          grep -Fq 'id="homeCumulativeScoreBtn"' "$HOME_HTML"
+          grep -Fq 'id="cumGoTotalScore"' "$HOME_HTML"
+          grep -Fq 'id="cumulativeScoreDashboard"' "$HOME_HTML"
+          grep -Fq 'id="scoreTotalCount"' "$HOME_HTML"
+          grep -Fq 'id="scoreSuccessPercent"' "$HOME_HTML"
+          grep -Fq 'id="scoreSuccessThreshold"' "$HOME_HTML"
+          grep -Fq 'id="scoreSyncStatus"' "$HOME_HTML"
+          test "$(grep -o 'class="scoreGrade"' "$HOME_HTML" | wc -l)" -eq 8
+          test "$(grep -o 'class="scoreRoom" data-score-room=' "$HOME_HTML" | wc -l)" -eq 8
+          grep -Fq '5/6+보너스' "$HOME_HTML"
+          grep -Fq '총성공확률' "$HOME_HTML"
+          grep -Fq 'window.captainCumulativeScoreOpen=function' "$HOME_HTML"
+          grep -Fq "window.captainCumulativeScoreRender=renderScore" crew-meeting-android/app/src/main/assets/cumulative_after_only.js
+          grep -Fq "원본 자동송신 연결 안 됨" crew-meeting-android/app/src/main/assets/cumulative_after_only.js
+          grep -Fq "cumulativeScoreMode" crew-meeting-android/app/src/main/assets/cumulative_after_only.css
           grep -Fq 'id="cumRoomGrid"' "$HOME_HTML"
           grep -Fq 'data-room="v7"' "$HOME_HTML"
           grep -Fq 'data-room="v4-1"' "$HOME_HTML"
@@ -145,7 +160,7 @@ jobs:
           grep -Fq 'data-material-stage="after"' "$HOME_HTML"
           grep -Fq 'V3의 과거 350회 누적 분석은 별도 보존' "$HOME_HTML"
           grep -Fq 'loadCaptainDashboard()' crew-meeting-android/app/src/main/java/kr/hanghae/crewmeeting/MainActivity.java
-          grep -Fq "versionCode 124" crew-meeting-android/app/build.gradle
+          grep -Fq "versionCode 125" crew-meeting-android/app/build.gradle
           test "$(grep -c 'data-before-room=' "$HOME_HTML")" -eq 7
           test "$(grep -c 'data-v3-room-card=' "$HOME_HTML")" -eq 4
           test "$(grep -c 'data-v3-report=' "$HOME_HTML")" -eq 4
@@ -166,23 +181,23 @@ jobs:
           test "$NEW_CERT" = "e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be"
           echo "Recovery app signer pinned: $NEW_CERT"
           "$AAPT" dump badging "$APK" | head -5
-          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting.compact' versionCode='124'"
+          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting.compact' versionCode='125'"
           ! "$AAPT" dump badging "$APK" | grep -q "package: name='com.baekhak.dosa.v4'"
           mkdir -p crew-meeting-android/releases
-          cp "$APK" crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.24_SEVEN_ROOM_AFTER_ONLY.apk
-          (cd crew-meeting-android/releases && sha256sum HANGHAE_CREW_MEETING_1.0.24_SEVEN_ROOM_AFTER_ONLY.apk > HANGHAE_CREW_MEETING_1.0.24_SEVEN_ROOM_AFTER_ONLY.apk.sha256)
+          cp "$APK" crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.25_TOTAL_CUMULATIVE_SCORES.apk
+          (cd crew-meeting-android/releases && sha256sum HANGHAE_CREW_MEETING_1.0.25_TOTAL_CUMULATIVE_SCORES.apk > HANGHAE_CREW_MEETING_1.0.25_TOTAL_CUMULATIVE_SCORES.apk.sha256)
       - uses: actions/upload-artifact@v4
         with:
-          name: HANGHAE-CREW-MEETING-1.0.24-SEVEN-ROOM-AFTER-ONLY-APK
+          name: HANGHAE-CREW-MEETING-1.0.25-TOTAL-CUMULATIVE-SCORES-APK
           path: |
-            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.24_SEVEN_ROOM_AFTER_ONLY.apk
-            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.24_SEVEN_ROOM_AFTER_ONLY.apk.sha256
+            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.25_TOTAL_CUMULATIVE_SCORES.apk
+            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.25_TOTAL_CUMULATIVE_SCORES.apk.sha256
           if-no-files-found: error
           retention-days: 30
       - name: Verify isolated APK artifact packaging
         run: |
           set -euo pipefail
-          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.24_SEVEN_ROOM_AFTER_ONLY.apk
-          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.24_SEVEN_ROOM_AFTER_ONLY.apk.sha256
-          (cd crew-meeting-android/releases && sha256sum --check HANGHAE_CREW_MEETING_1.0.24_SEVEN_ROOM_AFTER_ONLY.apk.sha256)
+          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.25_TOTAL_CUMULATIVE_SCORES.apk
+          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.25_TOTAL_CUMULATIVE_SCORES.apk.sha256
+          (cd crew-meeting-android/releases && sha256sum --check HANGHAE_CREW_MEETING_1.0.25_TOTAL_CUMULATIVE_SCORES.apk.sha256)
           echo "TEST artifact verified. Do NOT replace the stable fixed Google Drive APK without device verification."
