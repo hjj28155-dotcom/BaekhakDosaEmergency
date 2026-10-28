@@ -1,4 +1,4 @@
-name: Build same-signer V8.0.3 V7-home-retired staging APK
+name: Build same-signer V8.0.4 director-room staging APK
 on:
   push:
     branches:
@@ -200,6 +200,9 @@ jobs:
           grep -Fq 'crew-v8-cinematic.webp' crew-meeting-android/app/src/main/assets/captain_v8.css
           grep -Fq 'captain_v8_cinematic.webp' crew-meeting-android/app/src/main/java/kr/hanghae/crewmeeting/MainActivity.java
           grep -Fq 'id="v8ExitBtn"' "$HOME_HTML"
+          grep -Fq 'id="homeDirectorRoomOpen"' "$HOME_HTML"
+          grep -Fq 'id="homeDirectorRoom"' "$HOME_HTML"
+          grep -Fq 'id="directorOriginalEdit"' "$HOME_HTML"
           grep -Fq 'v8AdvancedOperations' "$HOME_HTML"
           grep -Fq 'V8 통합 지휘본부' "$HOME_HTML"
           grep -Fq '⚓ 중앙통제실 V8' "$HOME_HTML"
@@ -235,7 +238,7 @@ jobs:
           grep -Fq 'data-material-stage="after"' "$HOME_HTML"
           grep -Fq 'V3의 과거 350회 누적 분석은 별도 보존' "$HOME_HTML"
           grep -Fq 'loadCaptainDashboard()' crew-meeting-android/app/src/main/java/kr/hanghae/crewmeeting/MainActivity.java
-          grep -Fq "versionCode 803" crew-meeting-android/app/build.gradle
+          grep -Fq "versionCode 804" crew-meeting-android/app/build.gradle
           test "$(grep -c 'data-before-room=' "$HOME_HTML")" -eq 7
           test "$(grep -c 'data-v3-room-card=' "$HOME_HTML")" -eq 4
           test "$(grep -c 'data-v3-report=' "$HOME_HTML")" -eq 4
@@ -256,23 +259,24 @@ jobs:
           test "$NEW_CERT" = "e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be"
           echo "Recovery app signer pinned: $NEW_CERT"
           "$AAPT" dump badging "$APK" | head -5
-          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting.compact' versionCode='803'"
+          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting.compact' versionCode='804'"
           ! "$AAPT" dump badging "$APK" | grep -q "package: name='com.baekhak.dosa.v4'"
           mkdir -p crew-meeting-android/releases
-          cp "$APK" crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.3_V7_HOME_RETIRED_V3_RECEIVER.apk
-          (cd crew-meeting-android/releases && sha256sum HANGHAE_CREW_MEETING_V8_8.0.3_V7_HOME_RETIRED_V3_RECEIVER.apk > HANGHAE_CREW_MEETING_V8_8.0.3_V7_HOME_RETIRED_V3_RECEIVER.apk.sha256)
+          cp "$APK" crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.4_DIRECTOR_ROOM.apk
+          (cd crew-meeting-android/releases && sha256sum HANGHAE_CREW_MEETING_V8_8.0.4_DIRECTOR_ROOM.apk > HANGHAE_CREW_MEETING_V8_8.0.4_DIRECTOR_ROOM.apk.sha256)
       - uses: actions/upload-artifact@v4
         with:
-          name: HANGHAE-CREW-MEETING-V8-8.0.3-V7-HOME-RETIRED-V3-RECEIVER-APK
+          name: HANGHAE-CREW-MEETING-V8-8.0.4-DIRECTOR-ROOM-APK
           path: |
-            crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.3_V7_HOME_RETIRED_V3_RECEIVER.apk
-            crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.3_V7_HOME_RETIRED_V3_RECEIVER.apk.sha256
+            crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.4_DIRECTOR_ROOM.apk
+            crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.4_DIRECTOR_ROOM.apk.sha256
           if-no-files-found: error
           retention-days: 30
       - name: Verify isolated APK artifact packaging
         run: |
           set -euo pipefail
-          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.3_V7_HOME_RETIRED_V3_RECEIVER.apk
-          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.3_V7_HOME_RETIRED_V3_RECEIVER.apk.sha256
-          (cd crew-meeting-android/releases && sha256sum --check HANGHAE_CREW_MEETING_V8_8.0.3_V7_HOME_RETIRED_V3_RECEIVER.apk.sha256)
+          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.4_DIRECTOR_ROOM.apk
+          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.4_DIRECTOR_ROOM.apk.sha256
+          (cd crew-meeting-android/releases && sha256sum --check HANGHAE_CREW_MEETING_V8_8.0.4_DIRECTOR_ROOM.apk.sha256)
           echo "TEST artifact verified. Do NOT replace the stable fixed Google Drive APK without device verification."
+

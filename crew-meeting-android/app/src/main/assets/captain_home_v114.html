@@ -383,7 +383,7 @@ main:not(.roomMode) header h1{
 }
 /* Every INTERNAL room must replace the home dashboard from the TOP.
    External app launchers/download links keep their original navigation. */
-main.roomMode > :not(#homeWorkspace):not(#homeMorePanel):not(#homeApprovalPanel):not(#homeMaterialsPanel):not(#homeV3RoomsPanel):not(#freedomAnalysisPanel){
+main.roomMode > :not(#homeWorkspace):not(#homeMorePanel):not(#homeApprovalPanel):not(#homeMaterialsPanel):not(#homeV3RoomsPanel):not(#homeDirectorRoom):not(#freedomAnalysisPanel){
  display:none!important;
 }
 main.roomMode > #homeWorkspace:not([hidden]),
@@ -529,7 +529,7 @@ main:not(.roomMode) > header button{min-height:33px!important;padding:3px 9px!im
 #homeMaterialsBtn{border:1.7px solid #eac783!important;background:linear-gradient(130deg,rgba(5,63,91,.88),rgba(25,95,114,.9))!important;color:#ffedbd!important;font-weight:800}
 #homeMaterialsPanel{flex-direction:column;gap:7px;border:1.5px solid #e4c181;border-radius:12px;padding:8px;background:rgba(3,26,50,.96);min-width:0;min-height:0}
 #homeMaterialsPanel[hidden]{display:none!important}
-main.roomMode > :not(#homeWorkspace):not(#homeMorePanel):not(#homeApprovalPanel):not(#homeMaterialsPanel):not(#homeV3RoomsPanel):not(#freedomAnalysisPanel){display:none!important}
+main.roomMode > :not(#homeWorkspace):not(#homeMorePanel):not(#homeApprovalPanel):not(#homeMaterialsPanel):not(#homeV3RoomsPanel):not(#homeDirectorRoom):not(#freedomAnalysisPanel){display:none!important}
 main.roomMode > #homeMaterialsPanel:not([hidden]){display:flex!important;flex:1 1 auto;height:100%;min-height:0;overflow:hidden;margin:0}
 #materialsBody{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:4px}
 .materialsNote{font-size:.72rem;line-height:1.45;color:#d5e6f0;margin:8px 0}
@@ -733,7 +733,7 @@ main.roomMode > #homeV3RoomsPanel[hidden]{display:none!important}
 
 
 /* V4 R18: single-viewport home and independent full-screen V4 room. */
-main.roomMode > :not(#homeWorkspace):not(#homeMorePanel):not(#homeApprovalPanel):not(#homeMaterialsPanel):not(#homeV3RoomsPanel):not(#freedomAnalysisPanel):not(#freedomAnalysisPanel){display:none!important}
+main.roomMode > :not(#homeWorkspace):not(#homeMorePanel):not(#homeApprovalPanel):not(#homeMaterialsPanel):not(#homeV3RoomsPanel):not(#homeDirectorRoom):not(#freedomAnalysisPanel):not(#freedomAnalysisPanel){display:none!important}
 #freedomAnalysisPanel[hidden]{display:none!important}
 main.roomMode > #freedomAnalysisPanel:not([hidden]){
  display:flex!important;flex-direction:column;gap:8px;min-width:0;min-height:0;
@@ -900,6 +900,9 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
   <span><b>V3</b> 새 분석 준비 <em>제1회차부터</em></span>
   <span><b>V4</b> 선장 R46 수신증 조회 <em>통제실장 원본 대기</em></span>
  </div>
+ <button type="button" id="homeDirectorRoomOpen" aria-controls="homeDirectorRoom" aria-expanded="false">
+  <span class="directorHomeIcon" aria-hidden="true">🔗</span><span><strong>통제실장 방</strong><small>전용 업무실 · 원본 대화 · 운영 점검</small></span><span aria-hidden="true">›</span>
+ </button>
  <div id="installedAppBar" aria-label="V3·V4·V8 독립 관리 카드">
   <div class="installedAppUnit appDeckCard" data-app-card="v3">
    <div class="deckAppIcon" aria-hidden="true">🧭</div>
@@ -924,7 +927,7 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
    <strong>중앙통제실 V8</strong>
    <small>통제실장 · 선장 원본 업무방</small>
    <div class="deckCardActions">
-    <button type="button" id="v8DirectorQuick" class="deckAction" aria-label="통제실장 원본 대화방 열기">통제실장방</button>
+    <button type="button" id="v8DirectorQuick" class="deckAction" aria-controls="homeDirectorRoom" aria-label="통제실장 전용 업무실 열기">통제실장방</button>
     <button type="button" id="v8RoomQuick" class="deckAction deckSecondary" aria-label="V8 실시간 소통방 열기">소통방</button>
    </div>
   </div>
@@ -939,6 +942,13 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
   </div>
  </div>
  <p class="deckIntegrityNote">배포판 설치·업데이트는 별도 공식 링크에서 진행합니다. 이 화면은 앱 실행 및 검증된 자료 조회·기존 승인관리만 연결하며, 각 앱 DB를 변경하지 않습니다.</p>
+</section>
+<section id="homeDirectorRoom" hidden aria-labelledby="directorRoomTitle">
+ <div class="homePaneTop"><strong id="directorRoomTitle" tabindex="-1">🔗 통제실장 방</strong><button type="button" id="directorRoomBack" class="secondary">홈으로</button></div>
+ <div class="directorRoomIntro"><span class="directorRoomBadge">V8 전용 업무실</span><h2>중앙통제실 운영을 한곳에서</h2><p>통제실장 원본 대화방과 보고서, 서버 연결 현황을 확인합니다.</p></div>
+ <div class="directorOriginalCard"><strong>통제실장 원본 대화방</strong><p id="directorOriginalState" role="status">원본방 주소 확인 중</p><div class="directorRoomActions"><button type="button" id="directorOriginalOpen">원본 대화방 열기</button><button type="button" id="directorOriginalEdit" class="secondary">방 주소 설정</button></div></div>
+ <div class="directorToolGrid"><button type="button" id="directorReports"><b>📑 업무 보고서</b><span>기존 보고서 조회</span></button><button type="button" id="directorServer"><b>📡 V3 서버 연결</b><span>연결 상태 점검</span></button><button type="button" id="directorLive"><b>💬 공동 소통방</b><span>기존 업무 공유방</span></button><button type="button" id="directorDiagnostics"><b>🔎 연결 현황</b><span>원본방·앱 상태 확인</span></button></div>
+ <p class="directorRoomNote">원본 대화는 등록한 ChatGPT 방에서 이어집니다. 새 대화방으로 이사하면 방 주소를 갱신하세요.</p>
 </section>
 <section id="freedomAnalysisPanel" hidden aria-label="선장 전용 항해의자유 V4 분석방">
  <div class="homePaneTop"><strong>🚢 항해의자유 V4 · 5조합 × 2</strong><button type="button" id="freedomAnalysisBack" class="secondary">홈으로</button></div>
@@ -1330,7 +1340,7 @@ var $=function(id){return document.getElementById(id);};
 })();
 var HOME_SELECTED='home';
 function homeView(which){
- if(!['live','reports','more','approval','materials','v3','v4'].includes(which))which='home';
+ if(!['live','reports','more','approval','materials','v3','v4','director'].includes(which))which='home';
  HOME_SELECTED=which;
  var active=which==='live'||which==='reports';
  $('homeOverview').hidden=which!=='home';
@@ -1340,6 +1350,9 @@ function homeView(which){
  $('homeMaterialsPanel').hidden=which!=='materials';
  $('homeV3RoomsPanel').hidden=which!=='v3';
  $('freedomAnalysisPanel').hidden=which!=='v4';
+ $('homeDirectorRoom').hidden=which!=='director';
+ $('homeDirectorRoomOpen').setAttribute('aria-expanded',String(which==='director'));
+ if(which==='director'){refreshDirectorRoom();$('homeDirectorRoom').scrollTop=0;}
  $('openFreedomAnalysis').setAttribute('aria-expanded',String(which==='v4'));
  if(which!=='materials')stopMaterialsMonitor();
  $('homeMaterialsBtn').setAttribute('aria-expanded',String(which==='materials'));
@@ -1792,6 +1805,22 @@ $('homeApprovalBtn').addEventListener('click',function(){homeView(HOME_SELECTED=
 
 // V3 management only. V7/V4 and the existing V3 native launch remain unchanged.
 $('openV3Rooms').addEventListener('click',function(){homeView('v3');});
+$('homeDirectorRoomOpen').addEventListener('click',function(){homeView('director');$('directorRoomTitle').focus();});
+$('v8DirectorQuick').addEventListener('click',function(){homeView('director');$('directorRoomTitle').focus();});
+$('directorRoomBack').addEventListener('click',function(){homeView('home');$('homeDirectorRoomOpen').focus();});
+$('homeDirectorRoom').addEventListener('keydown',function(e){if(e.key==='Escape'){$('directorRoomBack').click();}});
+$('directorOriginalOpen').addEventListener('click',function(){$('originalLinkofficer').click();});
+$('directorOriginalEdit').addEventListener('click',function(){editOriginalRole('linkofficer');});
+$('directorReports').addEventListener('click',function(){homeView('reports');});
+$('directorServer').addEventListener('click',function(){$('v8ServerQuick').click();});
+$('directorLive').addEventListener('click',function(){homeView('live');});
+$('directorDiagnostics').addEventListener('click',function(){$('v8ConnectionCheck').click();});
+function refreshDirectorRoom(){
+ var ready=!!roleUrl('linkofficer');
+ $('directorOriginalState').textContent=ready?'원본방 주소 등록됨 · 열기 버튼으로 대화를 이어가세요.':'원본방 주소가 아직 없습니다. 방 주소를 설정하면 연결됩니다.';
+ $('directorOriginalOpen').textContent=ready?'원본 대화방 열기':'원본방 주소 등록하기';
+}
+
 $('homeV3RoomsBack').addEventListener('click',function(){homeView('home');});
 $('v3RoomsOpenNative').addEventListener('click',function(){$('openInstalledV3').click();});
 $('v3RoomsOpenNavigator').addEventListener('click',function(){$('originalNavigator').click();});
@@ -3005,7 +3034,6 @@ try{
 <script>
 /* V8 navigation only: forward to existing authenticated handlers; no new engine or DB writes. */
 (function(){
- document.getElementById('v8DirectorQuick').addEventListener('click',function(){document.getElementById('originalLinkofficer').click();});
  document.getElementById('v8RoomQuick').addEventListener('click',function(){document.getElementById('homeLiveBtn').click();});
  document.getElementById('v8ExitBtn').addEventListener('click',function(){document.getElementById('disconnectBtn').click();});
  /* The long operations ledger and round lookup remain available in More; no IDs, data or handlers removed. */

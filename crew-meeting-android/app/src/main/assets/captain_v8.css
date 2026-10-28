@@ -159,3 +159,24 @@ main:not(.roomMode) #installedAppBar{grid-template-columns:repeat(2,minmax(0,1fr
 main:not(.roomMode) #installedAppBar .appDeckCard>strong{font-size:clamp(.88rem,3.5vw,1.08rem)!important}
 main:not(.roomMode) #installedAppBar .deckAction{font-size:clamp(.67rem,2.7vw,.82rem)!important}
 main:not(.roomMode) #installedAppBar [data-app-card="v3server"]{background:linear-gradient(145deg,#07475a,#0b284a)!important;border-color:#7bd7e3!important}
+
+/* V8.0.4: separate director entrance and internal room. */
+#homeDirectorRoomOpen{box-sizing:border-box;display:grid;grid-template-columns:30px 1fr 16px;gap:7px;align-items:center;width:100%;min-height:47px;margin:0 0 7px;padding:6px 10px;border:1.5px solid #e8c390;border-radius:11px;background:linear-gradient(120deg,#55316b,#291b4a);color:#fff0d6;text-align:left;box-shadow:inset 0 1px #ffffff38,0 3px 8px #0005}
+#homeDirectorRoomOpen .directorHomeIcon{font-size:1.5rem;text-align:center}
+#homeDirectorRoomOpen strong{display:block;font-size:1rem;line-height:1.2;color:#ffe6b8}
+#homeDirectorRoomOpen small{display:block;font-size:.61rem;line-height:1.3;color:#e3d3ed}
+#homeDirectorRoom[hidden]{display:none!important}
+main.roomMode>#homeDirectorRoom:not([hidden]){display:flex!important;flex-direction:column;gap:14px;flex:1 1 auto;width:100%;height:100%;min-height:0;box-sizing:border-box;overflow:auto;padding:8px 6px 24px;background:linear-gradient(155deg,#102d46,#101c32)}
+#homeDirectorRoom .homePaneTop{flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:12px;border-bottom:1px solid #c39d6980}
+#homeDirectorRoom .homePaneTop strong{font-size:1.15rem;color:#ffe1ad}
+#homeDirectorRoom button{min-height:44px;border-radius:10px;font-size:.88rem;white-space:normal;line-height:1.3}
+.directorRoomIntro{padding:8px 4px}.directorRoomBadge{display:inline-block;font-size:.69rem;font-weight:800;letter-spacing:.03em;color:#ebcda1;border:1px solid #b99160;border-radius:20px;padding:4px 10px}
+#homeDirectorRoom h2{font-size:1.32rem;color:#fff0cf;line-height:1.4;margin:12px 0 7px}
+#homeDirectorRoom p{font-size:.85rem;line-height:1.6;color:#cfdeed;margin:6px 0}
+.directorOriginalCard{flex:none;background:linear-gradient(125deg,#432957,#22253e);border:1px solid #c79ed5;border-radius:15px;padding:16px}
+.directorOriginalCard>strong{color:#ffe0af;font-size:1.05rem}.directorRoomActions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:14px}
+.directorToolGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:none}.directorToolGrid>button{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:16px 12px;background:#15354e;border:1px solid #547489;color:#f9e6c6;text-align:left}
+.directorToolGrid span{font-size:.73rem;color:#c7d8e7}.directorRoomNote{padding:4px 7px}
+#homeDirectorRoom button:focus-visible,#homeDirectorRoomOpen:focus-visible{outline:3px solid #ffe09d;outline-offset:3px}
+@media(max-height:750px){main:not(.roomMode)>#v8Hero{height:clamp(175px,25dvh,205px)!important}#homeDirectorRoomOpen{min-height:44px}}
+

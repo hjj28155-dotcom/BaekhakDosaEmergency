@@ -1,0 +1,1 @@
+-keepclassmembers class kr.hanghae.v3v8.V3V8Native { @android.webkit.JavascriptInterface <methods>; }
