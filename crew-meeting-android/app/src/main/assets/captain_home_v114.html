@@ -780,6 +780,21 @@ main:not(.roomMode) #centralRoundPanel label{font-size:.68rem!important}
 .v4FiveGroup ol{grid-template-rows:repeat(5,minmax(0,1fr));flex:1 1 auto}
 @media(max-height:600px){.v4Results{height:190px!important;max-height:39vh!important}}
 
+/* V4 original research must be displayed as an actual PNG, not truncated HTML rows. */
+#freedomAnalysisPanel .v4PngPanel{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;min-width:0;gap:5px;padding:7px;border:1px solid #c5a36d;border-radius:10px;background:#072842;overflow:hidden}
+.v4PngTop{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:none}
+.v4PngTop strong{font-size:.78rem;color:#ffe0a0}
+.v4PngTop button{min-height:30px;padding:5px 10px;font-size:.72rem;background:#e7c078;color:#0a2540;border:1px solid #ffe3a9;border-radius:8px}
+.v4PngTop button:disabled{opacity:.55}
+.v4PngViewport{flex:1 1 auto;min-height:0;min-width:0;display:flex;align-items:flex-start;justify-content:center;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#b99453 #09263d;touch-action:pan-y}
+#freedomPngPreview{display:block;width:auto;height:auto;max-width:100%;max-height:none;object-fit:contain;border:1px solid #b99962;border-radius:6px;background:#071f36}
+#freedomPngStatus{display:block;flex:none;font-size:.64rem;color:#c7e5d5;line-height:1.3;min-height:1em}
+.v4TextBackup{flex:none;max-height:40vh;overflow:auto;border:1px solid #426d87;border-radius:8px;padding:3px 7px}
+.v4TextBackup summary{font-size:.67rem;color:#c9dff1;cursor:pointer}
+#freedomTextBackup:not([open]) .v4Results{display:none!important}
+#freedomTextBackup[open] .v4Results{height:250px!important;max-height:40vh!important;margin:6px 0;display:grid!important}
+@media(max-height:650px){.v4TextBackup{max-height:27vh}.v4PngTop button{min-height:26px}.v4PngPanel{padding:4px!important}}
+
 /* R20: Seven result-after report surfaces visible together, no fake scores. */
 #materialsBody.afterOverviewMode{display:flex;flex-direction:column;gap:6px;overflow:hidden!important}
 #materialsBody.afterOverviewMode> :not(#afterSevenDashboard):not(#materialsAuthGate){display:none!important}
