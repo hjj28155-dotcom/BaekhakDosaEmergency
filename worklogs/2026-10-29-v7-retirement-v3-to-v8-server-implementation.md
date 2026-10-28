@@ -38,3 +38,13 @@
 - V8.0.3 CI APK 빌드 결과 확인.
 - V3 동일서명 업데이트 구현을 위한 Android 원본/서명 접근 확인과 단말 등록.
 - V7 데이터 외부 백업·공유 의존성 분리 후 실제 V7 전용 삭제 단계.
+
+## 2026-10-29 후속 검증 및 차단 해소
+- V3 R60 APK 실제 `assets/engines/nav_v3_r39_official_draw_readonly.js`에서 `BASE=https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/v7-confirmed-draw-readonly` **하드코딩 확인**. 따라서 V7 Edge Function을 즉시 삭제하면 V3 결과후 자동 채점도 끊김. V3 동일서명 APK에서 V8 URL로 교체해야 함.
+- V7 등록 당첨번호 17건(1~16, 1247)을 **V8 독립 `v8_draw_references` 테이블로 읽기전용 이관**. 원본 `v7_official_draws` 변경·삭제 0건, 독립 검증된 사실로 오인하지 않도록 `independently_source_verified=false`.
+- 신규 `v8-confirmed-draw-readonly` Edge Function은 Supabase 프로젝트 함수 수 제한으로 배포 거부. 기존 `v8-v3-resultbefore-receive` v2의 공개 읽기 전용 `GET /draw?round_no=N`으로 통합하여 함수 추가 없이 해결.
+- [V8 수신기 v2 /draw·401 검증 CI](https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/actions/runs/40719708584) **성공**: 제1회 레거시 참조 6번호 조회, 1246회 미등록 404, 무인증 POST·영수증 GET 401.
+- V8.0.3 Android 스테이징 빌드: 신규 브랜치 push 실행에서는 GitHub Actions 서명 캐시가 브랜치 범위 때문에 복원 실패(보안키 대체 생성하지 않음). 원본 서명 캐시가 접근 가능한 **초안 PR #4** 경로로 빌드하여 [GitHub Actions run 40718913986](https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/actions/runs/40718913986) **성공**. 동일 서명 SHA-256 인증서 검증.
+- 스테이징 APK 6,591,000 bytes, SHA-256 `02b1b5eda86d72e623b1cd4fa6951fb094f351a954b2f152e9f7d338415cf197`. APK에서 추출한 HTML/CSS/JS로 Chromium 360/390/412px 화면 및 기본 메뉴 이동 재검증: JS 오류 0, 한 화면 배치 PASS.
+- **주의:** V8.0.3은 V7 **홈화면 카드와 바로가기만** 제거한 단계. 누적DB/성적표·보고서 내 V7 레거시 참조 및 V7 서버 기능은 아직 남아 있음. 따라서 V7 전체 삭제 완료, V3 실기기 자동연동 완료, 공식 최종 APK 배포 완료를 주장하지 않음.
+- 원본 GitHub 브랜치 `feature/crew-meeting-standalone-apk-20261025` 변경·병합 없음. 초안 PR [#4](https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/pull/4)는 **미병합**.
