@@ -129,7 +129,7 @@ jobs:
           grep -Fq 'crew-captain-engine-r46.html' "$HOME_HTML"
           grep -Fq 'crew-liaison-blind-r1.mjs' "$HOME_HTML"
           grep -Fq '선장엔진 R46 · 5조합' "$HOME_HTML"
-          grep -Fq '연락관엔진 R1 · 5조합' "$HOME_HTML"
+          grep -Fq '통제실장엔진 R1 · 5조합' "$HOME_HTML"
           grep -Fq 'DB1_SHA256_INVALID_' crew-meeting-android/app/src/main/java/kr/hanghae/crewmeeting/MainActivity.java
           test -s crew-meeting-android/app/src/main/assets/captain_engine_r46.html
           test -s crew-meeting-android/app/src/main/assets/liaison-blind-engine.mjs
