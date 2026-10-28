@@ -202,7 +202,10 @@
     state(def.key,def.name+' · 저장 원본 5조합 확인 · 과거 연구 참고용');
     found++;
    });
-   if(found)$('cumStatus').textContent+=' · V4 '+found+'/2방 실제 원본 '+(found*5)+'조합 조회 성공';
+   if(found){
+    $('cumStatus').textContent=$('cumStatus').textContent.replace('V4 연계 대기','V4 연구원본 일부 연결');
+    $('cumStatus').textContent+=' · V4 '+found+'/2방 실제 원본 '+(found*5)+'조합 조회 성공';
+   }
    var archive=receipt.archived_v7_captain_reference;
    var refPanel=$('cumV7ArchiveReference');
    if(refPanel){
