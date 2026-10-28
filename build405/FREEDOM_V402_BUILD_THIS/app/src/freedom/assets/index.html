@@ -1715,13 +1715,13 @@ const V330_WIN={
 1247:{nums:[8,14,21,22,42,45],bonus:24}
 };
 let V330_AFTER='';
-function v330GroupsResult(games,result){
+function v330GroupsResult(games,result,bonus){
  const w=new Set(result.map(Number));
  return [0,1,2,3].map(g=>{
   const label=['1묶음 · 1~5','2묶음 · 6~10','3묶음 · 11~15','4묶음 · 16~20'][g];
   const rows=games.slice(g*5,g*5+5).map((x,i)=>{
-   const n=g*5+i+1,h=x.filter(v=>w.has(Number(v))).length;
-   return `<div class="r5row"><div class="r5no">${n}</div><div class="r5balls">${x.map(v=>`<span class="r5ball ${w.has(Number(v))?'hit':''}">${v}</span>`).join('')}</div><div class="r5hit">${h}/6</div></div>`;
+   const n=g*5+i+1,h=x.filter(v=>w.has(Number(v))).length,rank=h===6?'1등':h===5&&x.includes(Number(bonus))?'2등':h===5?'3등':h===4?'4등':h===3?'5등':'낙선';
+   return `<div class="r5row"><div class="r5no">${n}</div><div class="r5balls">${x.map(v=>`<span class="r5ball ${w.has(Number(v))?'hit':''}">${v}</span>`).join('')}</div><div class="r5hit" title="${h}/6 · ${rank}" style="font-size:11px;width:auto;min-width:40px">${h}/6 ${rank}</div></div>`;
   }).join('');
   return `<section class="r5group"><h4>${label}</h4>${rows}</section>`;
  }).join('');
@@ -1986,10 +1986,21 @@ function v4044ReviewRound(round,autoStart){
  }else{
   if(purchased&&w)html+=v4044AutoRows(purchased,w,'보존된 최초잠금 구매 5조합');
   html+='<section class="panel warn"><h3>자동분석 20조합 준비</h3>'+
-   '<p>현재 기기에서 보존된 20조합이 없습니다. 내장 DB-1 분석엔진을 사용하여 5조합씩 4묶음을 만듭니다. 이미 추첨한 회차는 사후 연구로만 기록합니다.</p>'+
-   '<button class="b gold" onclick="v4045AutoAnalyze20('+n+')">자동 20조합 분석 실행</button></section>';
+   '<p>당회차 원문이 있으면 주자료, 없으면 제1~'+Math.min(n-1,1247)+'회 과거 원문 전체를 사용해 자동 20조합을 분석합니다. 발표된 회차의 신규 분석은 사후 연구로 분류합니다.</p>'+
+   '<button class="b gold" onclick="v4045AutoAnalyze20('+n+')">원문 전수분석 20조합 실행</button></section>';
  }
- html+='<div class="r5actions"><button class="b gold" onclick="v330Print()">인쇄</button>'+
+ if(n===1248){
+  const text=String(((rec.raw||{}).text)||'');
+  const data=rec.analysis||{},mode=data.primaryWeight===0?'과거 전체 원문 우선 분석':(data.primaryWeight>0?'1248회 원문 우선 분석':'기존 기록');
+  html+='<div class="panel"><button class="b" onclick="v4046ToggleRaw()">1248회 원문 등록/수정 (선택사항)</button>'+
+   '<div id="v4046RawEditor" style="display:none"><p class="small">1248회 원문이 있으면 6구절을 입력하십시오. 없으면 원문 입력 없이 1~1247회를 분석합니다.</p>'+
+   '<textarea id="v4046RawInput" rows="9" style="width:100%">'+esc(text)+'</textarea>'+
+   '<button class="b gold" onclick="v4046SaveRaw1248()">원문 보존 저장</button></div>'+
+   '<p class="small">1248회 원문 '+(text.trim()?'등록됨':'미등록')+' · '+mode+'</p></div>';
+  if(display20&&!buy.locked)html+='<div class="panel"><button class="b" onclick="v4045AutoAnalyze20(1248,true)">원문 변경 반영 · 자동 20조합 재분석</button>'+
+   '<p class="small">기존 20조합은 분석 이력으로 보존하며, 당첨 이후에는 사후 연구로만 기록합니다.</p></div>';
+ }
+html+='<div class="r5actions"><button class="b gold" onclick="v330Print()">인쇄</button>'+
   '<button class="b" onclick="autoWinningLookup()">당첨번호 자동 재확인</button>'+
   '<button class="b" onclick="closeM()">닫기</button></div></div>';
  modal(title,html);
