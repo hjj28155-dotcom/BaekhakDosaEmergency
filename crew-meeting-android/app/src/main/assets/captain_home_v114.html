@@ -782,12 +782,26 @@ main.roomMode > #homeV3RoomsPanel[hidden]{display:none!important}
    <strong>항해의자유</strong>
    <small>원문 10조합 · 제1회차부터</small>
    <div class="deckCardActions">
+    <button type="button" class="deckAction" id="openFreedomAnalysis" aria-controls="freedomAnalysisPanel" aria-expanded="false">⚓ 분석방 · 5조합 × 2</button>
     <button type="button" class="deckAction" data-open-material="freedom" aria-label="항해의자유 자료 관리방 열기">자료 관리</button>
     <button type="button" id="openFreedomApprovalShortcut" class="deckAction deckSecondary" aria-label="기존 일반판 승인관리방 열기">승인관리</button>
    </div>
   </div>
  </div>
  <p class="deckIntegrityNote">배포판 설치·업데이트는 별도 공식 링크에서 진행합니다. 이 화면은 앱 실행 및 검증된 자료 조회·기존 승인관리만 연결하며, 각 앱 DB를 변경하지 않습니다.</p>
+</section>
+<section id="freedomAnalysisPanel" hidden aria-label="선장 전용 항해의자유 5조합 두 묶음 분석방" style="margin:12px 0;padding:15px;border:1px solid #b99c56;border-radius:12px;background:#082338;color:#f4f2e7">
+ <h3>⚓ 항해의자유 V4 · 원문 5조합 × 2</h3>
+ <p>제1회차부터 · 원문 DB-1 · 제1분석 5조합 + 제2분석 5조합. 실제 엔진 연결 전에는 번호를 생성하거나 분석 완료로 표시하지 않습니다.</p>
+ <label for="freedomAnalysisRound">분석 회차</label>
+ <input id="freedomAnalysisRound" type="number" min="1" max="1247" value="1" inputmode="numeric" style="max-width:130px">
+ <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0">
+  <button type="button" class="deckAction" id="freedomFirstFive">제1분석 5조합 확인</button>
+  <button type="button" class="deckAction" id="freedomSecondFive">제2분석 5조합 확인</button>
+  <button type="button" class="deckAction deckSecondary" id="freedomOpenRecords">V4 보고서 조회</button>
+ </div>
+ <div id="freedomAnalysisStatus" role="status" aria-live="polite">엔진 연결 대기 · 실제 10조합 분석 미실행</div>
+ <small>기존 V4 엔진의 원문 5조합 결과를 두 번 독립적으로 검증해야 합니다. 중복 또는 엔진 증빙이 없으면 보고서 확정 불가. 공식 결과전과 과거 연구는 분리합니다.</small>
 </section>
 <div id="homeSpecialRooms" aria-label="기존 승인관리와 결과전 자료실">
 <button id="homeApprovalBtn" type="button" aria-expanded="false" aria-controls="homeApprovalPanel">🔐 일반판 승인관리</button>
@@ -2140,6 +2154,20 @@ try{
   });
  }
 }catch(e){status('loginError','인증 저장소 확인 오류가 있습니다.');}
+})();
+</script>
+<script id="captainV4TwoFiveResearch">
+(function(){
+  var open=document.getElementById('openFreedomAnalysis');
+  var panel=document.getElementById('freedomAnalysisPanel');
+  var status=document.getElementById('freedomAnalysisStatus');
+  if(!open||!panel||!status)return;
+  function note(message){status.textContent=message;}
+  function round(){var input=document.getElementById('freedomAnalysisRound');var n=Number(input.value);if(!Number.isInteger(n)||n<1||n>1247){note('회차 오류: DB-1 확인 범위는 제1~1247회입니다.');return null;}return n;}
+  open.addEventListener('click',function(){panel.hidden=!panel.hidden;open.setAttribute('aria-expanded',String(!panel.hidden));if(!panel.hidden)panel.scrollIntoView({block:'nearest'});});
+  document.getElementById('freedomFirstFive').addEventListener('click',function(){var n=round();if(n===null)return;note('제'+n+'회 제1분석: V4 원본 엔진 실행 연결 대기. 검증되지 않은 번호는 표시하지 않습니다.');});
+  document.getElementById('freedomSecondFive').addEventListener('click',function(){var n=round();if(n===null)return;note('제'+n+'회 제2분석: 독립 원문 5조합 엔진 결과 및 제1분석 중복 검사 연결 대기.');});
+  document.getElementById('freedomOpenRecords').addEventListener('click',function(){var b=document.querySelector('[data-open-material="freedom"]');if(b)b.click();else note('V4 보고서 자료실 버튼을 찾을 수 없습니다.');});
 })();
 </script>
 </body></html>
