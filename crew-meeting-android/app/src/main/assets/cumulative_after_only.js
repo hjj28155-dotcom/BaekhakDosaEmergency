@@ -269,40 +269,65 @@
   return scoreRoot.isConnected&&!scoreRoot.hidden&&
    $('materialsBody').classList.contains('cumulativeScoreMode');
  }
+ function researchRate(grades,threshold){
+  var n=grades.reduce(function(a,b){return a+b;},0);
+  if(!n)return null;
+  var from=threshold===6?7:threshold;
+  var success=grades.slice(from).reduce(function(a,b){return a+b;},0);
+  return (100*success/n).toFixed(2)+'%';
+ }
  async function renderScore(){
-  var serial=++scoreSeq;
+  var serial=++scoreSeq,threshold=Number($('scoreSuccessThreshold').value)||3;
   resetScore();
-  $('scoreSyncStatus').textContent='V3·V7·V4 결과후 원본 연결 상태 확인 중…';
-  $('scoreStatus').textContent='검증된 6번호 원본 없이는 0/6~6/6, 총회수 및 백분율을 계산하지 않습니다.';
+  $('scoreSyncStatus').textContent='7방 원본·당첨번호·해시 검증 서버 조회 중…';
+  $('scoreStatus').textContent='연구 기록만 사후 검증합니다. 추첨 전 공식 구매 성적과 혼합하지 않습니다.';
   if(typeof window.captainCumulativeIsAuthorized==='function'&&!window.captainCumulativeIsAuthorized()){
-   $('scoreSyncStatus').textContent='선장 인증 대기 · V3/V4/V7 자동업로드 확인 불가';
-   return;
+   $('scoreSyncStatus').textContent='선장 인증 대기 · 원본 자료 보존';return;
   }
-  if(typeof window.captainCumulativeFetchAfter!=='function'){
-   $('scoreSyncStatus').textContent='3앱 결과후 서버 조회 연결 미설치 · 자동업로드 미검증';
-   return;
+  if(typeof window.captainSevenRoomScoreRead!=='function'){
+   $('scoreSyncStatus').textContent='7방 연구 채점 연결 미설치 · 기존 성적은 미집계';return;
   }
   try{
-   var results=await window.captainCumulativeFetchAfter(null);
+   var result=await window.captainSevenRoomScoreRead(null);
    if(serial!==scoreSeq||!scoreActive())return;
-   if(!Array.isArray(results)||results.length!==3)throw Error('THREE_APP_CONTRACT');
-   var labels={v3:'V3 4방',v7:'V7 통제관방',freedom:'V4 독립 2방'};
-   var status=results.map(function(result){
-    var label=labels[result.app]||'미확인 앱';
-    if(result.error)return label+': 서버 조회 실패 · 자동업로드 미확인';
-    var data=result.data;
-    if(!data||data.read_only!==true||data.raw_predictions_included!==false||
-      !Array.isArray(data.items)||typeof data.linked!=='boolean')
-      return label+': 조회 응답 검증 실패';
-    if(!data.linked)return label+': 원본 자동송신 연결 안 됨';
-    return label+': 결과후 메타 '+data.items.length+'건 조회 · 6번호 원본 미제공';
+   if(!result||result.ok!==true||result.read_only!==true||result.official_eligible!==false||
+      result.scope!=='SEVEN_ROOM_RESEARCH_ONLY'||!result.rooms||!result.total||
+      !Array.isArray(result.total.grades)||result.total.grades.length!==8)throw Error('SCORE_CONTRACT');
+   var total=result.total,denom=total.graded_games;
+   if(denom){
+    total.grades.forEach(function(count,i){
+     var countNode=scoreRoot.querySelector('[data-score-grade="'+i+'"]');
+     var percentNode=scoreRoot.querySelector('[data-score-grade-percent="'+i+'"]');
+     if(countNode)countNode.textContent=String(count);
+     if(percentNode)percentNode.textContent=(100*count/denom).toFixed(2)+'%';
+    });
+    $('scoreTotalCount').textContent=String(denom)+'조합 (연구)';
+    $('scoreSuccessPercent').textContent=researchRate(total.grades,threshold)||'—%';
+   }
+   scoreKeys.forEach(function(key){
+    var row=key==='all'?total:result.rooms[key];
+    if(!row||!Number.isInteger(row.graded_games)||!Array.isArray(row.grades)||row.grades.length!==8)return;
+    var totalNode=scoreRoot.querySelector('[data-score-total="'+key+'"]');
+    var successNode=scoreRoot.querySelector('[data-score-success="'+key+'"]');
+    if(row.graded_games){
+     if(totalNode)totalNode.textContent=row.graded_games+'조합 · 연구';
+     if(successNode)successNode.textContent=researchRate(row.grades,threshold)||'—%';
+    }
    });
-   $('scoreSyncStatus').textContent=status.join('\n');
-   $('scoreStatus').textContent='자동연동 완료 아님 · 검증된 35조합 원본 수신/채점 전까지 누적 성적은 미집계입니다.';
+   var names={'v3-1':'V3 도사방','v3-2':'V3 항해사방','v3-3':'V3 자동1방','v3-4':'V3 자동2방',
+    'v7':'V7 통제관방','v4-1':'V4 선장 R46','v4-2':'V4 연락관 R1'};
+   $('scoreSyncStatus').textContent=scoreKeys.slice(1).map(function(key){
+    var room=result.rooms[key];
+    return names[key]+': '+(room&&room.graded_games?
+     '검증된 연구 '+room.verified_rounds+'회차 · '+room.graded_games+'조합 사후 대조':
+     '독립 원본 미수신 · 미집계 (0점 아님)');
+   }).join('\n');
+   $('scoreStatus').textContent='총 '+denom+'조합은 실제 수신증·DB-1 SHA·공식 당첨번호가 검증된 과거 연구 표본입니다. '+
+    '7방 전체 35조합/회차 완료가 아니며, 미래 당첨 확률이나 공식 추첨 전 구매 실적으로 해석하지 마세요.';
   }catch(e){
    if(serial!==scoreSeq||!scoreActive())return;
-   $('scoreSyncStatus').textContent='결과후 서버 조회 실패 · 원본 삭제 또는 0점 처리 없음';
-   $('scoreStatus').textContent='연결 복구 및 인증된 원본 업로드 확인이 필요합니다.';
+   $('scoreSyncStatus').textContent='검증된 연구 성적 서버 조회 실패 · 원본 삭제 및 0점 처리 없음';
+   $('scoreStatus').textContent='인증·연결 확인 필요 · 기존 자료 보존';
   }
  }
  $('cumGoTotalScore').addEventListener('click',function(){
@@ -312,10 +337,7 @@
   if(typeof window.captainCumulativeOpen==='function')window.captainCumulativeOpen(Number(roundInput.value)||1);
  });
  $('scoreRefresh').addEventListener('click',renderScore);
- $('scoreSuccessThreshold').addEventListener('change',function(){
-  // No numerator or denominator exists yet; switching thresholds must not fabricate a rate.
-  $('scoreSuccessPercent').textContent='—%';
- });
+ $('scoreSuccessThreshold').addEventListener('change',renderScore);
  window.captainCumulativeScoreRender=renderScore;
 
 })();
