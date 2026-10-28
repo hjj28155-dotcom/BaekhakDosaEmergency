@@ -818,6 +818,33 @@ body:has(#modal[style*="display:block"]) .simpleHot{
 #approvalHardLock button.primary{background:#b68b18;color:#08131d}
 #approvalHardLock .status{margin-top:12px;color:#d7e8f5;min-height:44px;line-height:1.5}
 </style>
+<style id="v4044SmallScreenModalTitleFix">
+/* Keep long Korean modal titles clear of the 닫기/이전 control on narrow screens. */
+@media (max-width:640px) {
+ #modal.modal > .card > #mt {
+  white-space:normal!important;
+  overflow-wrap:anywhere!important;
+  word-break:keep-all!important;
+  padding:8px 76px 10px 8px!important;
+  margin:0 0 10px!important;
+  min-height:48px;
+  font-size:clamp(16px,4.2vw,21px)!important;
+  line-height:1.4!important;
+  text-align:left!important;
+ }
+ #modal.modal > .card > button.close {
+  position:absolute!important;
+  top:8px!important;
+  right:8px!important;
+  z-index:20!important;
+ }
+ #modal.modal #mc .panel h3 {
+  overflow-wrap:anywhere;
+  word-break:keep-all;
+  line-height:1.4;
+ }
+}
+</style>
 </head><body><div id="wrap">
   <main class="finalHome simpleHome" aria-label="항행의자유 V3.3.5 단순 홈화면">
     <img class="finalHomeBg" src="v3_simple_home_107.png" alt="흰 독수리와 바다 항행의자유 홈화면">
@@ -1291,7 +1318,7 @@ function userRawHasData(r){return !!(r&&(isFilled(r.text)||isFilled(r.gi)||isFil
 function autoStamp(obj){obj.updated=new Date().toISOString();save()}
 function rawPage(){
  let n=Number(cur());if(!V330_RECENT.includes(n))n=1247;
- modal('원문분석 · 최근 5회차',`<div class="panel goldline" style="padding:16px 12px"><div class="small status" style="text-align:center;margin-bottom:10px">현재회차 포함 최근 5회차</div><div class="r5selector">${V330_RECENT.map(r=>`<button class="b ${n===r?'gold':''}" onclick="v330OpenRound(${r})">${r}회</button>`).join('')}</div></div>`)
+ modal('원문분석 · 최근 5회차',`<div class="panel goldline"><div class="small status">최근 5회차 원문과 저장된 조합의 자동채점을 조회합니다.</div><div class="r5selector">${V330_RECENT.map(r=>`<button class="b ${n===r?'gold':''}" onclick="v330OpenRound(${r})">${r}회</button>`).join('')}</div></div>${v4044RawCard(n)}<div class="row"><button class="b gold" onclick="v330OpenRound(${n})">원문·자동채점 보기</button></div>`);
 }
 function saveRawAuto(){if(!document.getElementById('rawText'))return;let old=R().raw||{};R().raw={...old,text:rawText.value,gi:(giText.value.trim()===cur()?'':giText.value),source:rawSource.value,memo:rawMemo.value,updated:new Date().toISOString()};save()}
 function saveRaw(){saveRawAuto()}
@@ -1356,7 +1383,7 @@ window.__v3WinningResult=function(data){
   let x=R();x.score=x.score||{};x.score.result=nums.join(' ');x.score.bonus=String(Number(data.bonus)||'');x.score.source=data.source||'동행복권';x.score.drawDate=data.date||'';x.score.updated=new Date().toISOString();save();scorePage()
  }catch(e){alert('당첨번호 저장 중 오류가 발생했습니다.')}
 }
-function scorePage(){let x=R().score||{},buy=R().buy||{};modal('성적 바로보기',roundHead('score')+`<div class="panel"><h3>당첨번호 입력</h3><div class="grid2"><div><div class="label">당첨번호 6개</div><input id="winNums" value="${esc(x.result||'')}" placeholder="예: 2 4 10 16 31 41" oninput="saveScoreAuto()"></div><div><div class="label">보너스</div><input id="bonusNum" value="${esc(x.bonus||'')}" placeholder="예: 9" oninput="saveScoreAuto()"></div></div><div class="label">결과 메모</div><textarea id="scoreMemo" rows="4" oninput="saveScoreAuto()">${esc(x.memo||'')}</textarea><div class="small status">당첨번호·보너스·메모는 자동 저장되며 5조합 성적도 자동 계산됩니다.</div></div><div class="panel"><h3>최종 5조합 일치 현황</h3><table class="table"><thead><tr><th>조합</th><th>번호</th><th>일치수</th><th>일치번호</th></tr></thead><tbody id="scoreRows">${scoreRowsHtml(buy,x)}</tbody></table></div>`)}
+function scorePage(){if(V330_RECENT.includes(Number(cur())))return v4044ReviewRound(Number(cur()));let x=R().score||{},buy=R().buy||{};modal('성적 바로보기',roundHead('score')+`<div class="panel"><h3>당첨번호 입력</h3><div class="grid2"><div><div class="label">당첨번호 6개</div><input id="winNums" value="${esc(x.result||'')}" placeholder="예: 2 4 10 16 31 41" oninput="saveScoreAuto()"></div><div><div class="label">보너스</div><input id="bonusNum" value="${esc(x.bonus||'')}" placeholder="예: 9" oninput="saveScoreAuto()"></div></div><div class="label">결과 메모</div><textarea id="scoreMemo" rows="4" oninput="saveScoreAuto()">${esc(x.memo||'')}</textarea><div class="small status">당첨번호·보너스·메모는 자동 저장되며 5조합 성적도 자동 계산됩니다.</div></div><div class="panel"><h3>최종 5조합 일치 현황</h3><table class="table"><thead><tr><th>조합</th><th>번호</th><th>일치수</th><th>일치번호</th></tr></thead><tbody id="scoreRows">${scoreRowsHtml(buy,x)}</tbody></table></div>`)}
 function saveScoreAuto(){R().score={result:document.getElementById('winNums')?.value||'',bonus:document.getElementById('bonusNum')?.value||'',memo:document.getElementById('scoreMemo')?.value||'',updated:new Date().toISOString()};save();let body=document.getElementById('scoreRows');if(body)body.innerHTML=scoreRowsHtml(R().buy||{},R().score||{})}
 function saveScore(){saveScoreAuto()}
 function comparePage(){
@@ -1772,20 +1799,60 @@ function v330PurchasePage(round){
  if(games.length!==20){if(v4043DisplaySavedFive(round,'purchase'))return;if(round===1247){V330_AFTER='purchase';runAnalysisFromHome();return}v4043MissingHistoricalCombos(round);return}
  modal(`제${round}회 · 이번주 구매번호`,`<div class="analysisCompact v330print"><div class="scoreHero success"><strong>자동분석 20조합</strong><span>비상용 분석엔진 · 후보우주 기반 · 외부번호 자동추가 없음</span></div><div class="r5grid">${v330GroupsPurchase(games)}</div><div class="r5actions"><button class="b gold" onclick="v330Print()">🖨 인쇄</button><button class="b" onclick="rawPage()">회차선택</button><button class="b" onclick="rawPage()">이전</button></div></div>`);
 }
-function v330OpenRound(n){
- n=Number(n);if(!V330_RECENT.includes(n))n=1247;
- if(!setRound(n))return;
- const a=R().analysis||{};
- if(n===1247){
-  if((R().buy||{}).locked===true){v330PurchasePage(n);return}
-  if(Array.isArray(a.auto20)&&a.auto20.length===20){v330PurchasePage(n);return}
-  if(v4043DisplaySavedFive(n,'purchase'))return;
-  // Current round: DB-1 already holds six sentences. Start the engine without requiring manual raw.
-  V330_AFTER='purchase';runAnalysisFromHome();return;
- }
- if(V330_WIN[n])v330ResultPage(n);
- else v330PurchasePage(n);
+function v4044RawCard(round){
+ const n=Number(round),saved=R().raw||{},bank=rawBank(n)||{};
+ const manual=String(saved.text||'').trim(),embedded=String(bank.text||'').trim();
+ const sixLines=raw=>raw.split(/\r?\n/).filter(x=>x.trim()).length===6;
+ const manualValid=sixLines(manual),bankValid=sixLines(embedded);
+ const raw=manualValid?manual:(bankValid?embedded:'');
+ if(!raw)return `<div class="panel warn">제${n}회 원문 6문장 확인 대기 · 없는 원문은 임의 생성하지 않습니다.</div>`;
+ const source=manualValid?(saved.source||'기기 원문'):(bank.source||'내장 DB-1 원문');
+ const notice=manual&&!manualValid&&bankValid?'<p class="small warn">기기에 저장된 원문은 6문장 형식이 아니어서 내장 DB-1 원문을 대신 표시합니다. 기존 입력은 삭제하거나 덮어쓰지 않았습니다.</p>':'';
+ return `<section class="panel goldline"><h3>제${n}회 원문 6문장</h3><div class="small status">출처: ${esc(source)}</div>${notice}<div style="white-space:pre-wrap;text-align:left;line-height:1.7;margin-top:10px">${esc(raw)}</div></section>`;
 }
+function v4044ValidSets(games,count){
+ if(!Array.isArray(games)||games.length!==count)return null;
+ const sets=games.map(g=>{
+  const a=(Array.isArray(g)?g:String(g||'').match(/\d+/g)||[]).map(Number);
+  if(a.length!==6||a.some(n=>!Number.isInteger(n)||n<1||n>45)||new Set(a).size!==6)return null;
+  return [...a].sort((a,b)=>a-b);
+ });
+ return sets.every(Boolean)?sets:null; // Duplicated stored tickets remain visible for grading; never invent replacements.
+}
+
+function v4044AutoRows(games,win,label){
+ const winning=new Set(win.nums),bonus=Number(win.bonus),rankLabel=h=>h===6?'1등':h===5?'3등':h===4?'4등':h===3?'5등':'낙선';
+ const duplicateCount=games.length-new Set(games.map(nums=>nums.join(','))).size;
+ let awarded=0;
+ const rows=games.map((nums,i)=>{
+  const hits=nums.filter(x=>winning.has(x)).length,bonusHit=nums.includes(bonus),rank=hits===5&&bonusHit?'2등':rankLabel(hits);
+  if(hits>=3)awarded++;
+  return `<div class="r5row" style="grid-template-columns:28px 1fr 55px"><b>${i+1}</b><div class="r5balls">${nums.map(x=>`<span class="r5ball ${winning.has(x)?'hit':''}" style="${x===bonus?'border-color:#f9cf59;color:#f9cf59':''}">${x}</span>`).join('')}</div><span class="r5hit">${rank}</span></div>`;
+ }).join('');
+ return `<section class="panel"><h3>${esc(label)}</h3><p class="small status">당첨 조합 ${awarded}/${games.length} · 원본 보관 기록과만 비교${duplicateCount?' · 중복 저장 조합 '+duplicateCount+'건 포함':''}</p>${rows}</section>`;
+}
+
+function v4044ReviewRound(round){
+ const n=Number(round);if(!V330_RECENT.includes(n))return rawPage();if(!setRound(n))return;
+ const rec=R(),w=V330_WIN[n]||null,actual=v4044ValidSets((rec.analysis||{}).auto20,20),research=v4044ValidSets((rec.analysisResearch||{}).auto20,20);
+ const buy=rec.buy||{},purchased=buy.locked?v4044ValidSets(buy.combos,5):null;
+ // Fallback to persisted original analysis/legacy groups only; no postdraw generation or official lock assertion.
+ const archiveGroups=Array.isArray((rec.analysis||{}).groups)?rec.analysis.groups:(Array.isArray((rec.legacy||{}).groups)?rec.legacy.groups:[]);
+ const archiveRows=archiveGroups.flatMap(g=>Array.isArray(g?.rows)?g.rows.map(r=>r?.game??r?.numbers??null):[]);
+ const archived=(!purchased&&!actual&&!research&&archiveRows.length&&archiveRows.length<=100)?v4044ValidSets(archiveRows,archiveRows.length):null;
+ let html=`<div class="analysisCompact">${v4044RawCard(n)}`;
+ if(w){
+  html+=`<section class="panel goldline"><h3>제${n}회 확인된 당첨번호</h3><div class="r5winning">${w.nums.map(x=>`<span class="r5ball hit">${x}</span>`).join('')}</div><div>보너스 ${w.bonus}</div></section>`;
+  if(purchased)html+=v4044AutoRows(purchased,w,'최초잠금 구매 5조합 자동채점');
+  if(actual)html+=v4044AutoRows(actual,w,'저장된 자동분석 20조합 비교 · 사전인증과 별개');
+  if(research)html+=v4044AutoRows(research,w,'사후 연구 20조합 비교 · 공식 실적 제외');
+  if(archived)html+=v4044AutoRows(archived,w,'기존 저장 분석그룹·이관 조합 비교 · 최초잠금 인증과 별개');
+ }else html+='<section class="panel warn">당첨번호 미확인 · 자동채점 대기</section>';
+ if(!purchased&&!actual&&!research&&!archived)html+='<section class="panel warn"><h3>저장 조합 확인 대기</h3><p>이 회차의 최초잠금 구매조합 또는 원장 20조합을 찾지 못했습니다. 추첨 후 새로운 조합을 만들어 당첨 전 기록이라고 표시하지 않습니다.</p></section>';
+ html+='<div class="row"><button class="b" onclick="rawPage()">회차선택</button><button class="b" onclick="closeM()">닫기</button></div></div>';
+ modal(`제${n}회 · 원문 및 자동채점`,html);
+}
+function v330OpenRound(n){return v4044ReviewRound(n)}
 
 function v124Round1243ResultPage(){
  if(!v126Ensure1243Auto20()){
