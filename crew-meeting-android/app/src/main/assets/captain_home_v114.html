@@ -799,6 +799,7 @@ main.roomMode > #homeV3RoomsPanel[hidden]{display:none!important}
   <button type="button" class="deckAction" id="freedomFirstFive">제1분석 5조합 확인</button>
   <button type="button" class="deckAction" id="freedomSecondFive">제2분석 5조합 확인</button>
   <button type="button" class="deckAction deckSecondary" id="freedomOpenRecords">V4 보고서 조회</button>
+  <button type="button" class="deckAction" id="freedomGoCumulativeDb" aria-label="V4 원문 분석 후 해당 회차 누적 DB 조회">🗄️ 누적DB로 이동</button>
  </div>
  <div id="freedomAnalysisStatus" role="status" aria-live="polite">엔진 연결 대기 · 실제 10조합 분석 미실행</div>
  <small>기존 V4 엔진의 원문 5조합 결과를 두 번 독립적으로 검증해야 합니다. 중복 또는 엔진 증빙이 없으면 보고서 확정 불가. 공식 결과전과 과거 연구는 분리합니다.</small>
@@ -2168,6 +2169,23 @@ try{
   document.getElementById('freedomFirstFive').addEventListener('click',function(){var n=round();if(n===null)return;note('제'+n+'회 제1분석: V4 원본 엔진 실행 연결 대기. 검증되지 않은 번호는 표시하지 않습니다.');});
   document.getElementById('freedomSecondFive').addEventListener('click',function(){var n=round();if(n===null)return;note('제'+n+'회 제2분석: 독립 원문 5조합 엔진 결과 및 제1분석 중복 검사 연결 대기.');});
   document.getElementById('freedomOpenRecords').addEventListener('click',function(){var b=document.querySelector('[data-open-material="freedom"]');if(b)b.click();else note('V4 보고서 자료실 버튼을 찾을 수 없습니다.');});
+  document.getElementById('freedomGoCumulativeDb').addEventListener('click',function(){
+    var n=round();if(n===null)return;
+    var field=document.getElementById('materialsRound');
+    var db=document.querySelector('[data-material-stage="db"]');
+    var app=document.querySelector('[data-material-app="freedom"]');
+    if(!field||!db||!app||typeof homeView!=='function'||typeof materialsSelect!=='function'){
+      note('누적DB 조회 연결을 확인할 수 없습니다. 기존 자료는 변경하지 않았습니다.');return;
+    }
+    field.value=String(n);
+    homeView('materials');
+    materialsSelect('app','freedom');
+    materialsSelect('stage','db');
+    var details=db.closest('details');
+    if(details)details.open=true;
+    var heading=document.getElementById('homeMaterialsPanel')||field;
+    if(heading&&heading.scrollIntoView)heading.scrollIntoView({block:'start'});
+  });
 })();
 </script>
 </body></html>
