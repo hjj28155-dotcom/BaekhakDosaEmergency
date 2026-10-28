@@ -143,3 +143,17 @@
  #modal.v4047Compact .r5grid{height:auto!important;grid-template-rows:auto auto!important}
  #modal.v4047Compact .r5group{height:155px!important}
 }
+/* V4.0.49 score announcements must appear above the 2147483646 compact Android modal. */
+#fanfareOverlay.show,#comfortOverlay.show{
+ z-index:2147483647!important;pointer-events:auto!important
+}
+#modal.v4047Compact .v4049VoiceSummary{
+ display:flex!important;align-items:center!important;justify-content:space-between!important;gap:3px!important;
+ white-space:nowrap!important;overflow:hidden!important
+}
+#modal.v4047Compact .v4049Replay{
+ flex:0 0 auto!important;align-self:center!important;height:17px!important;min-height:17px!important;
+ margin:0!important;padding:0 5px!important;border:1px solid #8bb8ca!important;
+ border-radius:5px!important;background:#124365!important;color:#e4f3ff!important;
+ font-size:10px!important;line-height:15px!important;font-weight:800!important
+}
