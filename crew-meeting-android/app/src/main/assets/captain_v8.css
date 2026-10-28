@@ -1,0 +1,60 @@
+/* V8 CENTRAL COMMAND HOME / 2026-10-28
+   Visual-only, standalone captain control room. All V3/V7/V4 data, IDs, receipts,
+   native launch mapping, first locks, and authenticated readback remain unchanged. */
+:root{--v8gold:#ffe5a1;--v8gold2:#b98037;--v8navy:#061c36}
+html,body{height:auto!important;min-height:100dvh!important;overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior-y:auto!important}
+body{background:radial-gradient(ellipse at 50% 0%,#12629b 0%,#062a52 47%,#031224 100%)!important;color:#fff1d0!important;background-attachment:scroll!important}
+main:not(.roomMode){height:auto!important;max-height:none!important;min-height:100dvh!important;overflow:visible!important;gap:11px!important;padding:max(9px,env(safe-area-inset-top)) 9px max(24px,env(safe-area-inset-bottom))!important;background:transparent!important}
+main:not(.roomMode)>header{height:auto!important;min-height:70px!important;max-height:none!important;margin:0!important;padding:11px 12px!important;border:2px solid #f5d386!important;border-radius:16px!important;background:linear-gradient(130deg,#062443,#0b4d7d 52%,#08243e)!important;box-shadow:inset 0 0 0 2px #9e662a,0 5px 15px #0008!important}
+main:not(.roomMode)>header h1{font-size:clamp(1.28rem,5.5vw,2.05rem)!important;line-height:1.18!important;font-weight:950!important;letter-spacing:-.035em;color:#ffe7a5!important;text-shadow:0 2px 1px #8d5627,0 4px 8px #000c!important}
+main:not(.roomMode)>header small{display:block!important;font-size:.74rem!important;color:#f9dfb1!important;line-height:1.4!important}
+main:not(.roomMode)>header button{height:40px!important;min-height:40px!important;font-size:.82rem!important;border:1.5px solid #f6d288!important;border-radius:9px!important;background:#092849!important;color:#ffdf99!important;padding:5px 10px!important}
+#v8Hero{display:block;position:relative;flex:none;height:clamp(310px,91vw,520px);overflow:hidden;border:3px ridge #f4d287;border-radius:20px;background:#0d5b8c url('crew-v8-hero.svg') center 48%/cover no-repeat;box-shadow:inset 0 0 0 3px #a16b35,0 9px 26px #000b}
+#v8Hero:before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(0,19,50,.68) 0%,rgba(0,25,52,.02) 26%,transparent 55%,rgba(0,14,43,.08) 85%,rgba(0,14,38,.58) 100%)}
+#v8Hero .v8HeroTop{position:absolute;top:13px;left:12px;right:12px;display:flex;align-items:flex-start;justify-content:space-between;gap:7px}
+#v8Hero .v8HeroTitle{display:flex;flex-direction:column;gap:3px;min-width:0;color:#ffe4a1;text-shadow:0 2px 4px #00112c,0 0 9px #001e46}
+#v8Hero .v8HeroTitle b{font-size:clamp(1.22rem,5.3vw,2rem);line-height:1.1;font-weight:950;letter-spacing:-.03em}
+#v8Hero .v8HeroTitle span{font-size:clamp(.76rem,2.7vw,1.06rem);font-weight:850;color:#fff5d7}
+#v8Hero .v8HeroPill{flex:none;border:2px solid #ffe3a2;border-radius:12px;background:linear-gradient(140deg,#041b38ee,#12345dee);padding:8px 10px;text-align:center;color:#ffe4a1;box-shadow:inset 0 0 0 1px #96622b}
+#v8Hero .v8HeroPill b{display:block;font-size:1.04rem;line-height:1.15}
+#v8Hero .v8HeroPill small{display:block;font-size:.64rem;color:#ffefcc}
+#v8Hero .v8HeroBottom{position:absolute;left:12px;right:12px;bottom:12px;display:flex;justify-content:center}
+#v8Hero .v8HeroBottom span{font-size:.8rem;font-weight:850;letter-spacing:.025em;text-shadow:0 2px 4px #000;background:#052846bb;border:1px solid #d6b57b;border-radius:30px;padding:8px 13px;color:#ffe8b4}
+main:not(.roomMode) #homeOverview{display:none!important}
+main:not(.roomMode) #originalChatBar{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important;padding:0!important}
+main:not(.roomMode) #originalChatBar>button{height:65px!important;min-height:65px!important;max-height:none!important;padding:8px 3px!important;font-size:clamp(.71rem,2.8vw,.93rem)!important;font-weight:900!important;line-height:1.2!important;color:#ffe7b3!important;border:2px solid #f4cf81!important;border-radius:13px!important;background:linear-gradient(155deg,#124b7c,#031d3c)!important;box-shadow:inset 0 1px #ffffff52,0 4px 11px #0008!important}
+main:not(.roomMode) #originalChatBar>button:last-child{background:linear-gradient(155deg,#663a94,#211044)!important;border-color:#e3b7ff!important}
+main:not(.roomMode) #homeQuickActions{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important}
+main:not(.roomMode) #homeQuickActions>button,main:not(.roomMode) #homeQuickActions>a,main:not(.roomMode) #homeQuickActions>#crewUpdateOpen{height:69px!important;min-height:69px!important;max-height:none!important;padding:8px 3px!important;border:2px solid #ddba78!important;border-radius:13px!important;background:linear-gradient(155deg,#144e7d,#082542)!important;box-shadow:inset 0 1px #ffffff4b,0 4px 10px #0007!important;font-size:1.16rem!important;color:#ffe4a7!important}
+main:not(.roomMode) #homeQuickActions span{font-size:clamp(.65rem,2.7vw,.88rem)!important;font-weight:850!important;line-height:1.22!important;color:#fff3d5!important}
+main:not(.roomMode) #appCommandDeck{display:block!important;padding:13px 10px 12px!important;border:3px ridge #f5d083!important;border-radius:20px!important;background:linear-gradient(150deg,#072f59,#051d3d)!important;box-shadow:inset 0 0 0 2px #9c672e,0 8px 22px #0009!important}
+main:not(.roomMode) #appCommandDeck .commandDeckTop{margin-bottom:11px!important;gap:8px!important}
+main:not(.roomMode) #appCommandDeck .commandDeckTop strong{font-size:clamp(1.13rem,4.6vw,1.6rem)!important;color:#ffe4a3!important;text-shadow:0 2px 4px #000!important}
+main:not(.roomMode) #appCommandDeck .commandDeckTop small{font-size:.68rem!important;color:#c9e7f5!important}
+main:not(.roomMode) #installedAppBar{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+main:not(.roomMode) #installedAppBar .installedAppUnit.appDeckCard{min-height:174px!important;height:auto!important;max-height:none!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:5px!important;padding:11px 6px!important;border:3px solid #54c3ff!important;border-radius:17px!important;background:radial-gradient(ellipse at 50% 0%,#177bd4,#05285b 75%)!important;box-shadow:inset 0 0 0 2px #82ddff88,0 5px 16px #0009!important}
+main:not(.roomMode) #installedAppBar .appDeckCard[data-app-card="v7"]{border-color:#60e88c!important;background:radial-gradient(ellipse at 50% 0%,#16985a,#053d2d 80%)!important;box-shadow:inset 0 0 0 2px #a4ffc677,0 5px 16px #0009!important}
+main:not(.roomMode) #installedAppBar .appDeckCard[data-app-card="freedom"]{border-color:#ff7b62!important;background:radial-gradient(ellipse at 50% 0%,#c02d2c,#4c0715 80%)!important;box-shadow:inset 0 0 0 2px #ffca9477,0 5px 16px #0009!important}
+main:not(.roomMode) #installedAppBar .appDeckCard[data-app-card="v8"]{border-color:#d99bff!important;background:radial-gradient(ellipse at 50% 0%,#9a34d8,#340c69 80%)!important;box-shadow:inset 0 0 0 2px #f6c5ff77,0 5px 16px #0009!important}
+main:not(.roomMode) #appCommandDeck .deckAppIcon{font-size:2.5rem!important;line-height:1.1!important;filter:drop-shadow(0 3px 3px #0009)}
+main:not(.roomMode) #installedAppBar .appDeckCard>strong{font-size:clamp(1.04rem,4.2vw,1.38rem)!important;color:#fff4d1!important;line-height:1.18!important;text-shadow:0 2px 3px #000b!important;white-space:normal!important}
+main:not(.roomMode) #installedAppBar .appDeckCard>small{display:block!important;font-size:.73rem!important;color:#fff1ce!important;line-height:1.2!important;white-space:normal!important}
+main:not(.roomMode) #installedAppBar .appDeckCard .deckCardActions{gap:6px!important;margin-top:4px!important}
+main:not(.roomMode) #installedAppBar .appDeckCard .deckAction,main:not(.roomMode) #installedAppBar .appDeckCard .deckAction:first-child{height:40px!important;min-height:40px!important;max-height:none!important;font-size:clamp(.73rem,3vw,.92rem)!important;line-height:1.2!important;padding:6px 3px!important;border:1.5px solid #ffe09b!important;border-radius:11px!important;background:linear-gradient(180deg,#fff0b5,#c78b37)!important;color:#082544!important;text-shadow:none!important;font-weight:900!important}
+main:not(.roomMode) #installedAppBar .appDeckCard .deckAction.deckSecondary{background:linear-gradient(180deg,#11466f,#061e3b)!important;color:#ffe4a5!important;border-color:#e9ca85!important}
+main:not(.roomMode) #appCommandDeck .deckIntegrityNote{display:block!important;font-size:.7rem!important;color:#d8e7ee!important;line-height:1.4!important;margin-top:12px!important}
+main:not(.roomMode) #homeSpecialRooms{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
+main:not(.roomMode) #homeSpecialRooms:before{content:"⚓ 중앙통제실 V8 · 핵심 자료실";grid-column:1/-1;font-size:1.16rem;font-weight:950;color:#ffe5a1;text-shadow:0 2px 3px #0009;padding:4px 3px}
+main:not(.roomMode) #homeSpecialRooms>button{height:70px!important;min-height:70px!important;max-height:none!important;font-size:clamp(.81rem,3.4vw,1.06rem)!important;font-weight:900!important;line-height:1.3!important;border:2px solid #f3cc79!important;border-radius:14px!important;box-shadow:inset 0 1px #ffffff4b,0 4px 12px #0009!important}
+main:not(.roomMode) #homeSpecialRooms>#homeCumulativeScoreBtn{grid-column:1/-1;background:linear-gradient(110deg,#8e1b22,#c5372a 50%,#540b19)!important;color:#fff1bd!important}
+main:not(.roomMode) #centralRoundPanel{display:block!important;margin:0!important;padding:12px!important;border:2px solid #f2d08a!important;border-radius:16px!important;background:linear-gradient(135deg,#072d54,#051c37)!important}
+main:not(.roomMode) #centralRoundPanel label{font-size:.95rem!important;color:#ffe5a5!important;margin:0 0 9px!important}
+main:not(.roomMode) .centralRoundRow input,main:not(.roomMode) .centralRoundRow button{height:45px!important;min-height:45px!important;max-height:none!important;font-size:.83rem!important;border-radius:10px!important}
+main:not(.roomMode) #centralRoundPanel small{display:block!important;font-size:.71rem!important;line-height:1.35!important;color:#d6e5f1!important;margin-top:9px!important}
+main:not(.roomMode) #captainAnalysisBaseline{display:grid!important;grid-template-columns:1fr!important;gap:5px!important;margin:7px 0!important;padding:10px!important;background:#052846!important;border:1px solid #a9c6d2!important;border-radius:10px!important}
+main:not(.roomMode) #captainAnalysisBaseline strong{font-size:.81rem!important}
+main:not(.roomMode) #captainAnalysisBaseline span{font-size:.74rem!important}
+main.roomMode{height:100dvh!important;max-height:100dvh!important;overflow:hidden!important}
+main.roomMode #v8Hero{display:none!important}
+@media(max-width:370px){#v8Hero{height:315px}#v8Hero .v8HeroPill{padding:6px 7px}#v8Hero .v8HeroPill b{font-size:.88rem}#v8Hero .v8HeroPill small{font-size:.57rem}main:not(.roomMode) #installedAppBar{gap:7px!important}main:not(.roomMode) #installedAppBar .installedAppUnit.appDeckCard{min-height:160px!important;padding:8px 4px!important}main:not(.roomMode) #originalChatBar>button{font-size:.66rem!important}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
