@@ -876,8 +876,8 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
 <main>
 <header><div><h1>⚓ 항행의자유 중앙통제실 V8</h1><small>선장 전용 · 통제실장 운영 · 원본 보존</small></div><button id="disconnectBtn" class="secondary" type="button">퇴장</button></header>
 <section id="v8Hero" aria-label="V8 중앙통제실 대형 범선과 등대 항해 홈화면">
- <div class="v8HeroTop"><div class="v8HeroTitle"><b>항행의자유</b><span>V8 중앙통제실 · COMMAND CENTER</span></div><div class="v8HeroPill"><b>V8</b><small>선장 지휘본부</small></div></div>
- <div class="v8HeroBottom"><span>⚓ 항해의 모든 기록을 한눈에 · 검증된 원본만</span></div>
+ <div class="v8HeroTop"><div class="v8HeroTitle"><b>⚓ 중앙통제실 V8</b><span>항행의자유 · 선장 지휘본부</span></div><button id="v8ExitBtn" class="v8HeroPill" type="button" aria-label="중앙통제실 퇴장"><b>퇴장</b><small>선장 지휘본부</small></button></div>
+ <div class="v8HeroBottom"><span>⚓ 모든 항해를 지휘하고 원본을 지킵니다</span></div>
 </section>
 <div id="originalChatBar" role="navigation" aria-label="선장·항해사·통제관·통제실장 원본 ChatGPT 대화방 바로가기">
 <button type="button" id="originalCaptain">⚓ 선장<br>원본방</button>
@@ -893,8 +893,8 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
  <button type="button" id="homeMoreBtn" aria-controls="homeMorePanel" aria-expanded="false">☰<span>더보기</span></button>
 </nav>
 <!-- Captain-only three-app management deck. Public Freedom APK is distributed elsewhere. -->
-<section id="appCommandDeck" aria-label="선장 전용 3앱 통합 관리본부">
- <div class="commandDeckTop"><strong>⚓ 3앱 통합 관리본부</strong><small>선장 전용 · 원본 보존</small></div>
+<section id="appCommandDeck" aria-label="선장 전용 V8 통합 지휘본부">
+ <div class="commandDeckTop"><strong>⚓ V8 통합 지휘본부</strong><small>선장 전용 · 원본 보존</small></div>
  <div id="captainAnalysisBaseline" class="analysisBaseline" role="status" aria-label="선장이 확인한 분석 진행 현황">
   <strong>🔁 제1회차부터 재분석 · 새 연구 시작 기준</strong>
   <span><b>V3</b> 새 분석 준비 <em>제1회차부터</em></span>
@@ -997,9 +997,9 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
  </div>
 </section>
 <div id="homeSpecialRooms" aria-label="기존 승인관리와 결과전 자료실">
-<button id="homeApprovalBtn" type="button" aria-expanded="false" aria-controls="homeApprovalPanel">🔐 일반판 승인관리</button>
-<button id="homeMaterialsBtn" type="button" aria-expanded="false" aria-controls="homeMaterialsPanel">🗄️ 통합 누적DB · 결과후</button>
-<button id="homeCumulativeScoreBtn" type="button" aria-controls="homeMaterialsPanel">🏆 총 누적 성적 결과방</button>
+<button id="homeApprovalBtn" type="button" aria-expanded="false" aria-controls="homeApprovalPanel">🔐 승인관리</button>
+<button id="homeMaterialsBtn" type="button" aria-expanded="false" aria-controls="homeMaterialsPanel">🗄️ 누적DB</button>
+<button id="homeCumulativeScoreBtn" type="button" aria-controls="homeMaterialsPanel">🏆 누적 성적</button>
 </div>
 <div id="centralRoundPanel" aria-label="중앙통제실 전회차 조회">
  <label for="centralRoundInput">🔎 중앙통제실 · 제1회부터 현회차까지 조회</label>
@@ -2960,6 +2960,15 @@ try{
 (function(){
  document.getElementById('v8DirectorQuick').addEventListener('click',function(){document.getElementById('originalLinkofficer').click();});
  document.getElementById('v8RoomQuick').addEventListener('click',function(){document.getElementById('homeLiveBtn').click();});
+ document.getElementById('v8ExitBtn').addEventListener('click',function(){document.getElementById('disconnectBtn').click();});
+ /* The long operations ledger and round lookup remain available in More; no IDs, data or handlers removed. */
+ var v8More=document.getElementById('homeMorePanel');
+ var v8Ops=document.createElement('details');
+ v8Ops.id='v8AdvancedOperations';
+ v8Ops.innerHTML='<summary>⚓ 원본·회차 상세 운영현황</summary>';
+ v8More.insertBefore(v8Ops,v8More.firstChild);
+ ['captainAnalysisBaseline','centralRoundPanel'].forEach(function(id){var el=document.getElementById(id);if(el)v8Ops.appendChild(el);});
+ var v8Note=document.querySelector('#appCommandDeck .deckIntegrityNote');if(v8Note)v8Ops.appendChild(v8Note);
 })();
 </script>
 </body></html>
