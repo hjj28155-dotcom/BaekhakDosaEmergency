@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
-<title>선장 · 항해사 · 통제관 공동회의</title>
+<title>항행의자유 V8 중앙통제실 · 선장 전용</title>
 <style>
 :root{color-scheme:dark;font-family:system-ui,-apple-system,"Malgun Gothic",sans-serif;--ink:#ecf6ff;--dim:#a8bdd0;--line:#36506b;--panel:#11293fcc}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -30%,#2e648c 0%,#102a43 47%,#061624 100%);color:var(--ink);min-height:100dvh}
@@ -870,15 +870,20 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
 @media(max-height:630px){.afterSevenCard{padding:5px 7px;gap:2px}.afterSevenCard strong{font-size:.74rem}.afterSevenCard span{font-size:.61rem}.afterSevenDetails{max-height:58px}.afterSevenTop button{font-size:.66rem}}
 </style>
 <link rel="stylesheet" href="crew-cumulative-after.css">
+<link rel="stylesheet" href="crew-v8-home.css">
 </head>
 <body>
 <main>
-<header><div><h1>⚓ 항행의자유 중앙통제실</h1><small>선장 전용 · 일반 배포판 아님</small></div><button id="disconnectBtn" class="secondary" type="button">퇴장</button></header>
-<div id="originalChatBar" role="navigation" aria-label="선장·항해사·통제관·중앙연결관 원본 ChatGPT 대화방 바로가기">
+<header><div><h1>⚓ 항행의자유 중앙통제실 V8</h1><small>선장 전용 · 통제실장 운영 · 원본 보존</small></div><button id="disconnectBtn" class="secondary" type="button">퇴장</button></header>
+<section id="v8Hero" aria-label="V8 중앙통제실 대형 범선과 등대 항해 홈화면">
+ <div class="v8HeroTop"><div class="v8HeroTitle"><b>항행의자유</b><span>V8 중앙통제실 · COMMAND CENTER</span></div><div class="v8HeroPill"><b>V8</b><small>선장 지휘본부</small></div></div>
+ <div class="v8HeroBottom"><span>⚓ 항해의 모든 기록을 한눈에 · 검증된 원본만</span></div>
+</section>
+<div id="originalChatBar" role="navigation" aria-label="선장·항해사·통제관·통제실장 원본 ChatGPT 대화방 바로가기">
 <button type="button" id="originalCaptain">⚓ 선장<br>원본방</button>
 <button type="button" id="originalNavigator">🧭 항해사<br>V3 전담</button>
 <button type="button" id="originalController">🛡️ 통제관<br>V7 전담</button>
-<button type="button" id="originalLinkofficer">🔗 중앙연결관<br>원본방</button>
+<button type="button" id="originalLinkofficer">🔗 통제실장<br>원본방</button>
 </div>
 
 <nav id="homeQuickActions" aria-label="홈 주요 기능">
@@ -894,7 +899,7 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
   <strong>🔁 제1회차부터 재분석 · 새 연구 시작 기준</strong>
   <span><b>V3</b> 새 분석 준비 <em>제1회차부터</em></span>
   <span><b>V7</b> 새 연구 1회차부터 <em>시작 전</em></span>
-  <span><b>V4</b> 선장 R46 수신증 조회 <em>연락관 원본 대기</em></span>
+  <span><b>V4</b> 선장 R46 수신증 조회 <em>통제실장 원본 대기</em></span>
  </div>
  <div id="installedAppBar" aria-label="세 앱의 독립 관리 카드">
   <div class="installedAppUnit appDeckCard" data-app-card="v3">
@@ -924,6 +929,15 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
     <button type="button" class="deckAction deckSecondary" data-open-material="freedom" aria-label="항해의자유 기록 보기">기록 보기</button>
    </div>
   </div>
+  <div class="installedAppUnit appDeckCard" data-app-card="v8">
+   <div class="deckAppIcon" aria-hidden="true">⚓</div>
+   <strong>중앙통제실 V8</strong>
+   <small>통제실장 · 선장 원본 업무방</small>
+   <div class="deckCardActions">
+    <button type="button" id="v8DirectorQuick" class="deckAction" aria-label="통제실장 원본 대화방 열기">통제실장 원본방</button>
+    <button type="button" id="v8RoomQuick" class="deckAction deckSecondary" aria-label="V8 실시간 소통방 열기">실시간 소통</button>
+   </div>
+  </div>
  </div>
  <p class="deckIntegrityNote">배포판 설치·업데이트는 별도 공식 링크에서 진행합니다. 이 화면은 앱 실행 및 검증된 자료 조회·기존 승인관리만 연결하며, 각 앱 DB를 변경하지 않습니다.</p>
 </section>
@@ -936,10 +950,10 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
  </div>
  <section id="freedomPngPanel" aria-label="V4 PNG 분석 결과보고서" class="v4PngPanel">
    <div class="v4PngTop"><strong>🖼️ PNG 결과보고서 <span id="freedomArchiveBadge" role="status" aria-live="polite">· 자료실 조회 중</span></strong><button type="button" id="freedomPngZoom">확대</button><button type="button" id="freedomSavePng" disabled>PNG 저장</button></div>
-   <div class="v4PngViewport"><img id="freedomPngPreview" alt="V4 선장엔진 R46 및 연락관엔진 R1의 각 5조합을 담은 PNG 결과보고서. 원본이 없으면 검증 대기로 표시됩니다."></div>
+   <div class="v4PngViewport"><img id="freedomPngPreview" alt="V4 선장엔진 R46 및 통제실장엔진 R1의 각 5조합을 담은 PNG 결과보고서. 원본이 없으면 검증 대기로 표시됩니다."></div>
    <small id="freedomPngStatus" role="status" aria-live="polite">PNG 보고서 준비 중 · 확인된 조합만 기록</small>
  </section>
- <section id="freedomRoomArchive" hidden aria-label="V4 선장방·연락관방 독립 자료실">
+ <section id="freedomRoomArchive" hidden aria-label="V4 선장방·통제실장방 독립 자료실">
   <div class="v4ArchiveTop"><strong id="freedomRoomArchiveTitle">V4 각 방 자료실 · 1회차</strong><button type="button" id="freedomRoomArchiveRefresh">새로 조회</button></div>
   <div id="freedomArchiveGrid">
    <article class="v4ArchiveCard" data-v4-archive="v4-1">
@@ -947,7 +961,7 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
     <small data-v4-archive-state="v4-1">서버 원본 확인 중</small>
    </article>
    <article class="v4ArchiveCard" data-v4-archive="v4-2">
-    <h3>🔗 연락관방 · R1 · 5조합</h3><ol aria-label="연락관방 서버 수신 원본"><li>—</li><li>—</li><li>—</li><li>—</li><li>—</li></ol>
+    <h3>🔗 통제실장방 · R1 · 5조합</h3><ol aria-label="통제실장방 서버 수신 원본"><li>—</li><li>—</li><li>—</li><li>—</li><li>—</li></ol>
     <small data-v4-archive-state="v4-2">독립 원본 수신 확인 중</small>
    </article>
   </div>
@@ -965,19 +979,19 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
    <small id="freedomCaptainStatus" class="v4EngineStatus">선장엔진 준비</small>
   </article>
   <article class="v4FiveGroup">
-   <strong>🔗 연락관엔진 R1 · 5조합</strong>
+   <strong>🔗 통제실장엔진 R1 · 5조합</strong>
    <ol id="freedomSecondList" aria-label="제2분석 결과"><li>—</li><li>—</li><li>—</li><li>—</li><li>—</li></ol>
-   <small id="freedomLiaisonStatus" class="v4EngineStatus">연락관 사전원본 검증 대기</small>
+   <small id="freedomLiaisonStatus" class="v4EngineStatus">통제실장 사전원본 검증 대기</small>
   </article>
  </div>
  </details>
  <div id="freedomDbStatus" role="status" aria-live="polite">DB-1 내장 1~1247회차 검증 대기</div>
  <details class="v4DbOriginal"><summary>선택 회차 DB-1 원문 6문장 보기</summary><pre id="freedomDbOriginalText">회차 분석 시 원문 표시</pre></details>
- <div id="freedomAnalysisStatus" role="status" aria-live="polite">선장엔진 R46 · 연락관엔진 R1 검증 대기</div>
+ <div id="freedomAnalysisStatus" role="status" aria-live="polite">선장엔진 R46 · 통제실장엔진 R1 검증 대기</div>
  <iframe id="freedomCaptainFrame" title="선장엔진 R46 내장 실행기" hidden sandbox="allow-scripts allow-same-origin"></iframe>
  <div class="v4RoomActions">
   <button type="button" class="secondary" id="freedomFirstFive">선장 5조합</button>
-  <button type="button" class="secondary" id="freedomSecondFive">연락관 5조합</button>
+  <button type="button" class="secondary" id="freedomSecondFive">통제실장 5조합</button>
   <button type="button" class="secondary" id="freedomResetActive">초기화</button>
   <button type="button" id="freedomGoCumulativeDb" aria-label="과거 누적자료는 자료실에서만 조회">자료실</button>
  </div>
@@ -1062,8 +1076,8 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
  <div class="cumRoomState" data-cum-state="v4-1">결과후 원본 확인 전</div>
  <ol><li><span class="cumRowNo">1.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li><li><span class="cumRowNo">2.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li><li><span class="cumRowNo">3.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li><li><span class="cumRowNo">4.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li><li><span class="cumRowNo">5.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li></ol>
 </article>
-<article class="cumRoom" data-room="v4-2" aria-label="V4 연락관방 결과후">
- <div class="cumRoomHead"><strong>V4 연락관방</strong><small>V4 2차 · 5조합</small></div>
+<article class="cumRoom" data-room="v4-2" aria-label="V4 통제실장방 결과후">
+ <div class="cumRoomHead"><strong>V4 통제실장방</strong><small>V4 2차 · 5조합</small></div>
  <div class="cumRoomState" data-cum-state="v4-2">결과후 원본 확인 전</div>
  <ol><li><span class="cumRowNo">1.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li><li><span class="cumRowNo">2.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li><li><span class="cumRowNo">3.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li><li><span class="cumRowNo">4.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li><li><span class="cumRowNo">5.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li></ol>
 </article>
@@ -1081,7 +1095,7 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
  <section id="cumulativeScoreDashboard" hidden aria-label="총 누적 성적 결과방 7방 전체">
  <div class="scoreTop"><strong>🏆 총 누적 성적 · 전체 7방</strong><button id="scoreBack" type="button">◀ 회차별 결과후</button></div>
  <div class="scoreScroll">
-  <div class="scoreIntro">V3 4방 · V7 통제관방 · V4 선장엔진/연락관엔진 각 5조합 · 총 35조합/회차</div>
+  <div class="scoreIntro">V3 4방 · V7 통제관방 · V4 선장엔진/통제실장엔진 각 5조합 · 총 35조합/회차</div>
   <div class="scoreGrades" aria-label="0/6에서 6/6까지 8개 적중등급"><div class="scoreGrade" data-grade="0"><strong>0/6</strong><output data-score-grade="0">—</output><small data-score-grade-percent="0">—%</small></div>
 <div class="scoreGrade" data-grade="1"><strong>1/6</strong><output data-score-grade="1">—</output><small data-score-grade-percent="1">—%</small></div>
 <div class="scoreGrade" data-grade="2"><strong>2/6</strong><output data-score-grade="2">—</output><small data-score-grade-percent="2">—%</small></div>
@@ -1101,7 +1115,7 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
 <article class="scoreRoom" data-score-room="v3-4"><strong>V3 자동2방</strong><span>채점 <output data-score-total="v3-4">미집계</output></span><span>성공 <output data-score-success="v3-4">—%</output></span></article>
 <article class="scoreRoom" data-score-room="v7"><strong>V7 통제관방</strong><span>채점 <output data-score-total="v7">미집계</output></span><span>성공 <output data-score-success="v7">—%</output></span></article>
 <article class="scoreRoom" data-score-room="v4-1"><strong>V4 선장엔진 5조합</strong><span>채점 <output data-score-total="v4-1">미집계</output></span><span>성공 <output data-score-success="v4-1">—%</output></span></article>
-<article class="scoreRoom" data-score-room="v4-2"><strong>V4 연락관엔진 5조합</strong><span>채점 <output data-score-total="v4-2">미집계</output></span><span>성공 <output data-score-success="v4-2">—%</output></span></article></div>
+<article class="scoreRoom" data-score-room="v4-2"><strong>V4 통제실장엔진 5조합</strong><span>채점 <output data-score-total="v4-2">미집계</output></span><span>성공 <output data-score-success="v4-2">—%</output></span></article></div>
   <div class="scoreRoomTitle">자료실 자동업로드 연결 점검</div>
   <div id="scoreSyncStatus" class="scoreSyncStatus" role="status" aria-live="polite">원본 6번호 결과후 자동업로드: 미검증</div>
   <button id="scoreRefresh" type="button" class="cumRefresh">연동 상태 다시 확인</button>
@@ -1197,7 +1211,7 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
  <div id="threeRoomRoleStatus" aria-label="담당자별 실제 공유 메시지 최신 시각">
   <div data-room-role="navigator">🧭 항해사 · 아직 공유 메시지 없음</div>
   <div data-room-role="controller">🛡️ 통제관 · 아직 공유 메시지 없음</div>
-  <div data-room-role="linkofficer">🔗 중앙연결관 · 아직 공유 메시지 없음</div>
+  <div data-room-role="linkofficer">🔗 통제실장 · 아직 공유 메시지 없음</div>
  </div>
  <div id="threeRoomEvents" aria-label="공유 서버의 시간순 메시지" role="log"></div>
  <form id="threeRoomCaptainForm">
@@ -1212,7 +1226,7 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
   <h2>⚓ 원본방 업무 회람</h2>
   <p class="relayNote">선장 지시를 원본 채팅방에 직접 전달하고, 받은 답변을 이 화면에 기록합니다. <b>원본 3방 자동 채팅이 아닌 수동 회람</b>입니다. 저장은 이 기기의 공동회의 앱에만 적용됩니다.</p>
   <label for="relayDraft">모두에게 전달할 선장 지시</label>
-  <textarea id="relayDraft" maxlength="1200" rows="3" placeholder="원본 항해사·통제관·중앙연결관에게 전달할 같은 지시를 작성하세요."></textarea>
+  <textarea id="relayDraft" maxlength="1200" rows="3" placeholder="원본 항해사·통제관·통제실장에게 전달할 같은 지시를 작성하세요."></textarea>
   <div class="relayActions">
     <button id="relayCreate" type="button">① 새 회람 지시 저장</button>
     <button id="relayExport" type="button" class="secondary">회람록 복사</button>
@@ -1251,7 +1265,7 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
 <button type="button" data-original-role="captain" class="secondary">⚓ 선장</button>
 <button type="button" data-original-role="navigator" class="secondary">🧭 항해사</button>
 <button type="button" data-original-role="controller" class="secondary">🛡️ 통제관</button>
-<button type="button" data-original-role="linkofficer" class="secondary">🔗 중앙연결관</button>
+<button type="button" data-original-role="linkofficer" class="secondary">🔗 통제실장</button>
 </div>
 <div class="actions"><button id="originalChatSave" type="button">현재방 주소 저장</button><button id="previousOriginalChat" type="button" class="secondary" hidden>이전방 열기</button><button id="originalChatCancel" type="button" class="secondary">닫기</button></div>
 <small id="originalChatNotice">/share/ 읽기 전용 주소가 아닌, 실제 원본 대화방의 주소를 등록하세요. 입장키 없이 등록 가능합니다. 등록 뒤 원본 채팅방에서 직접 대화합니다.</small>
@@ -1874,7 +1888,7 @@ var ORIGINAL_CHAT_KEY='crew_meeting_central_linkofficer_original_chat_url_v1';
 var ORIGINAL_ROLE_PREFIX='crew_meeting_direct_original_';
 var ORIGINAL_HISTORY_PREFIX='crew_meeting_original_history_v1_';
 var originalLinks={},editingRole=null;
-var origNames={captain:'⚓ 선장',navigator:'🧭 항해사',controller:'🛡️ 통제관',linkofficer:'🔗 중앙연결관'};
+var origNames={captain:'⚓ 선장',navigator:'🧭 항해사',controller:'🛡️ 통제관',linkofficer:'🔗 통제실장'};
 var origButtons={captain:'originalCaptain',navigator:'originalNavigator',controller:'originalController',linkofficer:'originalLinkofficer'};
 function validOriginalUrl(input){
  var u=new URL(String(input||'').trim()),p=u.pathname.split('/').filter(Boolean),uid=/^[0-9a-f-]{36}$/i;
@@ -2005,7 +2019,7 @@ var HANDOFF_V7='https://docs.google.com/document/d/17ilFpSr5fRADfmG0rORPNhfxDoek
 var HANDOFF_ROLE_DETAILS={
  navigator:['V3 원본 항해사','V3 항해사앱 원본 작업과 V33 연구를 이어받으십시오. V32·V33·V7 및 배포판을 혼동하지 말고, 원본 25조합·결과전 잠금·실전구매 기록을 보존하십시오.',HANDOFF_V3],
  controller:['V7 원본 통제관','V7 중앙통제실 원본 작업을 이어받으십시오. 운영 7.9.0·E100-R2 연구·AI1~AI5·최초등록 잠금을 구분하고, 연구 성능을 공식 성능으로 승격하지 마십시오.',HANDOFF_V7],
- linkofficer:['중앙연결관','공동회의 앱 1.0.3과 V3·V7 작업의 연속성·링크·검증을 조정하십시오. 세 원본 ChatGPT 대화방은 서로 별도 세션임을 유지하고, 실시간 자동송수신을 검증 없이 주장하지 마십시오.',HANDOFF_SHARED]
+ linkofficer:['통제실장','공동회의 앱 1.0.3과 V3·V7 작업의 연속성·링크·검증을 조정하십시오. 세 원본 ChatGPT 대화방은 서로 별도 세션임을 유지하고, 실시간 자동송수신을 검증 없이 주장하지 마십시오.',HANDOFF_SHARED]
 };
 function handoffMessage(role){
  var detail=HANDOFF_ROLE_DETAILS[role]||HANDOFF_ROLE_DETAILS.navigator;
@@ -2197,7 +2211,7 @@ function relayRender(){
  var record=relayCurrent(),cards=$('relayRoleCards');
  cards.replaceChildren();
  $('relayExport').disabled=!record;
- $('relaySessionNotice').textContent=record?'선장 지시: '+record.text+' / 현재 담당자별 답변 '+RELAY_ROLES.filter(function(role){return record.replies[role]&&record.replies[role].text;}).length+'/3건':'먼저 새 지시를 저장하면 V3·V7·중앙연결관으로 보내는 버튼이 생깁니다.';
+ $('relaySessionNotice').textContent=record?'선장 지시: '+record.text+' / 현재 담당자별 답변 '+RELAY_ROLES.filter(function(role){return record.replies[role]&&record.replies[role].text;}).length+'/3건':'먼저 새 지시를 저장하면 V3·V7·통제실장으로 보내는 버튼이 생깁니다.';
  if(record)RELAY_ROLES.forEach(function(role){cards.appendChild(relayRoleCard(role,record));});
 }
 relayLoad();
@@ -2243,7 +2257,7 @@ async function threeRoomRequest(action,method,body){
  if(!res.ok||data.error)throw Error(String(data.error||res.status));
  return data;
 }
-var threeRoomName={captain:'⚓ 선장',navigator:'🧭 항해사',controller:'🛡️ 통제관',linkofficer:'🔗 중앙연결관'};
+var threeRoomName={captain:'⚓ 선장',navigator:'🧭 항해사',controller:'🛡️ 통제관',linkofficer:'🔗 통제실장'};
 function threeRoomRoleSummary(rows){
  var status={navigator:null,controller:null,linkofficer:null};
  (rows||[]).forEach(function(e){
@@ -2658,7 +2672,7 @@ try{
  function resetActiveAnalysis(){
   currentRun++;pending=null;lastCaptain=null;lastLiaison=null;lastSource=null;
   $('freedomAnalysisRound').value='1';clearList('freedomFirstList');clearList('freedomSecondList');
-  $('freedomCaptainStatus').textContent='선장엔진 준비';$('freedomLiaisonStatus').textContent='연락관 사전원본 검증 대기';
+  $('freedomCaptainStatus').textContent='선장엔진 준비';$('freedomLiaisonStatus').textContent='통제실장 사전원본 검증 대기';
   $('freedomDbOriginalText').textContent='회차 분석 시 원문 표시';
   note('새 분석 대기 · 누적자료는 자료실에만 보존');
   window.dispatchEvent(new CustomEvent('captain-v4-reset'));
@@ -2715,7 +2729,7 @@ try{
   lastCaptain={round:activeRound,games:games,engine:m.engine,evidenceAudit:m.evidenceAudit};
   showGames('freedomFirstList',games);$('freedomCaptainStatus').textContent='✓ R46 · DB-1 원문 5조합 검증';
   window.dispatchEvent(new CustomEvent('captain-v4-verified',{detail:{engine:'captain',round:activeRound,games:games,sourceSha256:lastSource&&lastSource.source_sha256,provenance:'R46_DB1_VERIFIED'}}));
-  note('제'+activeRound+'회 선장엔진 R46 · 실제 원문 5조합 검증 완료 · 연락관엔진 독립 검증 대기');
+  note('제'+activeRound+'회 선장엔진 R46 · 실제 원문 5조합 검증 완료 · 통제실장엔진 독립 검증 대기');
  });
  var activeId='',activeRound=0,activeRun=0;
  async function runCaptain(n,runId){
@@ -2745,12 +2759,12 @@ try{
    lastLiaison={round:n,games:games,version:result.version};
    showGames('freedomSecondList',games);$('freedomLiaisonStatus').textContent='✓ R1 · 독립 사전원본 검증 연구';
    window.dispatchEvent(new CustomEvent('captain-v4-verified',{detail:{engine:'liaison',round:n,games:games,sourceSha256:entry.source_sha256,provenance:'R1_INDEPENDENT_ARCHIVE_RESEARCH_NOT_LOCKED'}}));
-   note('제'+n+'회 연락관엔진 R1 · 독립 연구 5조합 (공식 잠금 아님)');
+   note('제'+n+'회 통제실장엔진 R1 · 독립 연구 5조합 (공식 잠금 아님)');
   }catch(e){
    if(runId!==currentRun)return;
    var reason=String(e&&e.message||e);
    $('freedomLiaisonStatus').textContent='보류 · V3·도사 독립 사전원본 필요';
-   note('제'+n+'회 · 연락관엔진 R1 보류: V3·도사 사전 원본의 독립 보관 검증 필요 ('+reason+')');
+   note('제'+n+'회 · 통제실장엔진 R1 보류: V3·도사 사전 원본의 독립 보관 검증 필요 ('+reason+')');
   }
  }
  async function runBoth(){var n=round();if(n===null)return;
@@ -2817,7 +2831,7 @@ try{
    if(liaison){
     lastLiaison={round:n,games:cleanGames(liaison.combinations),engine:liaison.engine,archived:true};
     showGames('freedomSecondList',lastLiaison.games);
-    $('freedomLiaisonStatus').textContent='✓ 자료실 독립 원본 수신 · 연락관 R1 5조합';
+    $('freedomLiaisonStatus').textContent='✓ 자료실 독립 원본 수신 · 통제실장 R1 5조합';
     window.dispatchEvent(new CustomEvent('captain-v4-archived',{detail:{
      engine:'liaison',round:n,games:lastLiaison.games,sourceSha256:entry.source_sha256,
      provenance:'R1_INDEPENDENT_ARCHIVE_RESEARCH_NOT_LOCKED',reportSha256:liaison.report_sha256
@@ -2844,7 +2858,7 @@ try{
   try{await runCaptain(n,id);}catch(e){if(id===currentRun)note('선장엔진 오류: '+String(e.message||e));}
  });
  $('freedomSecondFive').addEventListener('click',async function(){var n=round();if(n===null)return;var id=++currentRun;pending=null;
-  try{await runLiaison(n,id);}catch(e){if(id===currentRun)note('연락관엔진 오류: '+String(e.message||e));}
+  try{await runLiaison(n,id);}catch(e){if(id===currentRun)note('통제실장엔진 오류: '+String(e.message||e));}
  });
  $('freedomResetActive').addEventListener('click',function(){
   archiveSerial++;resetActiveAnalysis();archiveBadge('새 분석 대기',false,false);
@@ -2884,7 +2898,7 @@ try{
   $('freedomRoomArchiveTitle').textContent='V4 각 방 자료실 · '+n+'회차';
   $('freedomArchiveNotice').textContent='제'+n+'회차 · 서버에 저장된 원본 확인 중…';
   renderV4ArchiveRow('v4-1',null,'선장 R46 원본 조회 중');
-  renderV4ArchiveRow('v4-2',null,'연락관 R1 독립 원본 조회 중');
+  renderV4ArchiveRow('v4-2',null,'통제실장 R1 독립 원본 조회 중');
   try{
    var entry=await sourceFor(n);
    var response=await window.captainEngineRoundRead(n);
@@ -2893,7 +2907,7 @@ try{
     throw Error('ARCHIVE_READ_INVALID');
    var defs=[
     {key:'v4-1',engine:'CAPTAIN_R46_DB1_OFFLINE',verification:'CAPTAIN_CLIENT_RESEARCH_RECEIVED',label:'선장 R46'},
-    {key:'v4-2',engine:'LIAISON_R1_INDEPENDENT_ARCHIVE',verification:'INDEPENDENT_SOURCE_ATTESTED',label:'연락관 R1'}
+    {key:'v4-2',engine:'LIAISON_R1_INDEPENDENT_ARCHIVE',verification:'INDEPENDENT_SOURCE_ATTESTED',label:'통제실장 R1'}
    ],count=0;
    defs.forEach(function(def){
     var row=response.items.find(function(x){
@@ -2941,4 +2955,11 @@ try{
 </script>
 <script src="crew-v4-png-report.js"></script>
 <script src="crew-cumulative-after.js"></script>
+<script>
+/* V8 navigation only: forward to existing authenticated handlers; no new engine or DB writes. */
+(function(){
+ document.getElementById('v8DirectorQuick').addEventListener('click',function(){document.getElementById('originalLinkofficer').click();});
+ document.getElementById('v8RoomQuick').addEventListener('click',function(){document.getElementById('homeLiveBtn').click();});
+})();
+</script>
 </body></html>
