@@ -62,6 +62,7 @@ jobs:
           grep -Fq 'id="freedomResetActive"' "$HOME_HTML"
           grep -Fq '누적자료는 이 자료실에서만 조회합니다.' "$HOME_HTML"
           grep -Fq 'resetActiveAnalysis();window.captainV4Route' "$HOME_HTML"
+          grep -Fq 'window.captainV4ShowArchive();' "$HOME_HTML"
           grep -Fq 'id="freedomGoCumulativeDb"' "$HOME_HTML"
           grep -Fq "window.captainV4Select('app','freedom')" "$HOME_HTML"
           grep -Fq "window.captainV4Select('stage','db')" "$HOME_HTML"
