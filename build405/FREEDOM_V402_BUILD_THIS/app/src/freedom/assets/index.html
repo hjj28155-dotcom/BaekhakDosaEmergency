@@ -818,6 +818,33 @@ body:has(#modal[style*="display:block"]) .simpleHot{
 #approvalHardLock button.primary{background:#b68b18;color:#08131d}
 #approvalHardLock .status{margin-top:12px;color:#d7e8f5;min-height:44px;line-height:1.5}
 </style>
+<style id="v4044SmallScreenModalTitleFix">
+/* Keep long Korean modal titles clear of the 닫기/이전 control on narrow screens. */
+@media (max-width:640px) {
+ #modal.modal > .card > #mt {
+  white-space:normal!important;
+  overflow-wrap:anywhere!important;
+  word-break:keep-all!important;
+  padding:8px 76px 10px 8px!important;
+  margin:0 0 10px!important;
+  min-height:48px;
+  font-size:clamp(16px,4.2vw,21px)!important;
+  line-height:1.4!important;
+  text-align:left!important;
+ }
+ #modal.modal > .card > button.close {
+  position:absolute!important;
+  top:8px!important;
+  right:8px!important;
+  z-index:20!important;
+ }
+ #modal.modal #mc .panel h3 {
+  overflow-wrap:anywhere;
+  word-break:keep-all;
+  line-height:1.4;
+ }
+}
+</style>
 </head><body><div id="wrap">
   <main class="finalHome simpleHome" aria-label="항행의자유 V3.3.5 단순 홈화면">
     <img class="finalHomeBg" src="v3_simple_home_107.png" alt="흰 독수리와 바다 항행의자유 홈화면">
