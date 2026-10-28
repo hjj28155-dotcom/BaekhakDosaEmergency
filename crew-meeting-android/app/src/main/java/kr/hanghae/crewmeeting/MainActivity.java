@@ -33,9 +33,11 @@ public final class MainActivity extends Activity {
     private static final int FILE_CHOOSER_CODE = 502;
     private static final int PICK_V3_APP = 503;
     private static final int PICK_V7_APP = 504;
+    private static final int SAVE_V4_PNG_CODE = 505;
     private static final String LINK_PREFS = "crew_meeting_installed_app_links_v1";
     private WebView web;
     private ValueCallback<Uri[]> fileCallback;
+    private volatile byte[] pendingV4Png;
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -54,6 +56,7 @@ public final class MainActivity extends Activity {
         setContentView(web);
         // Only two fixed roles can be opened. The web layer never supplies package names.
         web.addJavascriptInterface(new InstalledAppLauncher(), "CrewInstalledApps");
+        web.addJavascriptInterface(new V4PngSaver(), "CrewPngSaver");
         WebSettings settings = web.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
@@ -82,6 +85,8 @@ public final class MainActivity extends Activity {
                     name="cumulative_after_only.css";mime="text/css";
                 }else if("/BaekhakDosaEmergency/crew-cumulative-after.js".equals(p)){
                     name="cumulative_after_only.js";mime="text/javascript";
+                }else if("/BaekhakDosaEmergency/crew-v4-png-report.js".equals(p)){
+                    name="v4_png_report.js";mime="text/javascript";
                 }else if("/BaekhakDosaEmergency/crew-official-draws.json".equals(p)){
                     name="official_draws_verified_17.json";mime="application/json";
                 }
@@ -164,7 +169,10 @@ public final class MainActivity extends Activity {
                     || !html.contains("id=\"freedomRunRound\"")
                     || !html.contains("id=\"freedomFirstList\"")
                     || !html.contains("id=\"freedomSecondList\"")
-                    || !html.contains("id=\"freedomResetActive\""))
+                    || !html.contains("id=\"freedomResetActive\"")
+                    || !html.contains("id=\"freedomPngPreview\"")
+                    || !html.contains("id=\"freedomSavePng\"")
+                    || !html.contains("crew-v4-png-report.js"))
                 throw new java.io.IOException("Required captain dashboard modules missing");
             // The six-line original DB-1 is an APK asset, not a remote website or a material-room cache.
             // Fail closed if the snapshot is incomplete; never silently substitute remote data.
@@ -210,6 +218,66 @@ public final class MainActivity extends Activity {
         @JavascriptInterface public void openInstalled(String role, boolean chooseAgain) {
             if (!"v3".equals(role) && !"v7".equals(role)) return;
             runOnUiThread(() -> openSelectedApp(role, chooseAgain));
+        }
+    }
+
+
+    /**
+     * Save only an in-app V4 report PNG. No arbitrary paths, URLs, filenames,
+     * HTML, or other MIME types are accepted. The source research is unchanged.
+     */
+    public final class V4PngSaver {
+        @JavascriptInterface public String savePng(String dataUrl, String fileName) {
+            if (dataUrl == null || !dataUrl.startsWith("data:image/png;base64,")
+                || dataUrl.length() > 4000000
+                || fileName == null || !fileName.matches("HANGHAE_V4_R(?:[0-9]{1,4}|UNKNOWN)_R46_R1\\.png"))
+                return "INVALID_PNG_REQUEST";
+            byte[] bytes;
+            try { bytes=android.util.Base64.decode(dataUrl.substring(22),android.util.Base64.DEFAULT); }
+            catch(Exception ex){return "INVALID_BASE64";}
+            if(bytes.length<100 || bytes.length>3000000
+               || (bytes[0]&255)!=137 || bytes[1]!=80 || bytes[2]!=78 || bytes[3]!=71
+               || bytes[4]!=13 || bytes[5]!=10 || bytes[6]!=26 || bytes[7]!=10)
+                return "INVALID_PNG_BYTES";
+            if(android.os.Build.VERSION.SDK_INT<29){
+                pendingV4Png=bytes;
+                runOnUiThread(() -> {
+                    Intent intent=new Intent(Intent.ACTION_CREATE_DOCUMENT);
+                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+                    intent.setType("image/png");
+                    intent.putExtra(Intent.EXTRA_TITLE,fileName);
+                    try{startActivityForResult(intent,SAVE_V4_PNG_CODE);}
+                    catch(Exception ex){
+                        pendingV4Png=null;
+                        Toast.makeText(MainActivity.this,"PNG 저장 위치를 선택할 수 없습니다.",Toast.LENGTH_LONG).show();
+                    }
+                });
+                return "PICKER";
+            }
+            Uri out=null;
+            try{
+                android.content.ContentValues values=new android.content.ContentValues();
+                values.put(android.provider.MediaStore.Images.Media.DISPLAY_NAME,fileName);
+                values.put(android.provider.MediaStore.Images.Media.MIME_TYPE,"image/png");
+                values.put(android.provider.MediaStore.Images.Media.RELATIVE_PATH,
+                    android.os.Environment.DIRECTORY_PICTURES+"/항행의자유");
+                values.put(android.provider.MediaStore.Images.Media.IS_PENDING,1);
+                out=getContentResolver().insert(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,values);
+                if(out==null)return "STORAGE_UNAVAILABLE";
+                try(java.io.OutputStream stream=getContentResolver().openOutputStream(out)){
+                    if(stream==null)throw new java.io.IOException("NO_OUTPUT_STREAM");
+                    stream.write(bytes);
+                }
+                android.content.ContentValues complete=new android.content.ContentValues();
+                complete.put(android.provider.MediaStore.Images.Media.IS_PENDING,0);
+                getContentResolver().update(out,complete,null,null);
+                runOnUiThread(() -> Toast.makeText(MainActivity.this,
+                    "V4 PNG 저장 완료 · 사진/Pictures/항행의자유",Toast.LENGTH_LONG).show());
+                return "SAVED";
+            }catch(Exception ex){
+                if(out!=null)try{getContentResolver().delete(out,null,null);}catch(Exception ignored){}
+                return "STORAGE_WRITE_FAILED";
+            }
         }
     }
 
@@ -288,6 +356,19 @@ public final class MainActivity extends Activity {
             }
             return;
         }
+        if(reqCode==SAVE_V4_PNG_CODE){
+            byte[] bytes=pendingV4Png;pendingV4Png=null;
+            if(resultCode==RESULT_OK && data!=null && data.getData()!=null && bytes!=null){
+                try(java.io.OutputStream stream=getContentResolver().openOutputStream(data.getData())){
+                    if(stream==null)throw new java.io.IOException("NO_OUTPUT_STREAM");
+                    stream.write(bytes);
+                    Toast.makeText(this,"V4 PNG 저장 완료",Toast.LENGTH_LONG).show();
+                }catch(Exception ex){
+                    Toast.makeText(this,"V4 PNG 저장 실패",Toast.LENGTH_LONG).show();
+                }
+            }
+            return;
+        }
         if(reqCode==FILE_CHOOSER_CODE && fileCallback!=null) {
             Uri[] result=WebChromeClient.FileChooserParams.parseResult(resultCode,data);
             fileCallback.onReceiveValue(result);
@@ -300,6 +381,7 @@ public final class MainActivity extends Activity {
     }
 
     @Override protected void onDestroy() {
+        pendingV4Png=null;
         if(fileCallback!=null){fileCallback.onReceiveValue(null);fileCallback=null;}
         if(web!=null){web.destroy();web=null;}
         super.onDestroy();
