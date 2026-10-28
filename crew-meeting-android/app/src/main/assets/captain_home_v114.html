@@ -752,6 +752,61 @@ main.roomMode > #homeV3RoomsPanel[hidden]{display:none!important}
 #homeV4AnalysisPanel .v4Balls b{display:grid;place-items:center;width:30px;height:30px;border:1px solid #b5d8e9;border-radius:50%;background:#123a58;color:#fff;font-size:.71rem}
 @media(min-width:680px){#homeV4AnalysisPanel .v4PackGrid{grid-template-columns:1fr 1fr}}
 
+
+/* R116 captain-first HOME: prioritize V3/V7/V4 workspaces and the unified report hub.
+   Old original-chat navigation/installer remains intact inside '더보기'. */
+main:not(.roomMode){overflow-y:auto!important;overscroll-behavior:contain!important;gap:7px!important;padding-bottom:max(14px,env(safe-area-inset-bottom))!important}
+#originalChatBar,#crewUpdateOpen,#homeLiveBtn,#homeReportBtn{display:none!important}
+#homeMoreTools #originalChatBar{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;margin:10px 0!important}
+#homeMoreTools #crewUpdateOpen{display:flex!important;align-items:center;justify-content:center;margin:8px 0;padding:11px!important;background:#245573;border-radius:10px;color:#ffe3a8}
+#homeMoreTools #homeReportBtn{display:block!important;margin:4px 0}
+#homeQuickActions{display:flex!important;justify-content:flex-end!important;min-height:29px!important;flex:none!important}
+#homeQuickActions> :not(#homeMoreBtn){display:none!important}
+#homeMoreBtn{display:flex!important;align-items:center;justify-content:center;gap:6px;min-height:31px!important;height:31px!important;width:auto!important;padding:5px 12px!important;font-size:.73rem!important;flex:none!important;border:1px solid #9dc3d3!important;background:#163f5a!important;color:#e9f5ff!important}
+#appCommandDeck{border:1.5px solid #f3d08d!important;padding:10px!important;margin:1px 0!important;background:linear-gradient(135deg,#062b4deb,#0a4562e8)!important}
+#appCommandDeck .commandDeckTop{padding-bottom:5px}
+#appCommandDeck .commandDeckTop strong{font-size:.9rem!important}
+#appCommandDeck .commandDeckTop small{font-size:.64rem!important}
+#captainAnalysisBaseline{margin-bottom:10px!important}
+#installedAppBar{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:7px!important}
+#installedAppBar .appDeckCard.installedAppUnit{min-height:153px!important;padding:8px 5px!important}
+#appCommandDeck .appDeckCard>strong{font-size:.79rem!important}
+#appCommandDeck .appDeckCard>small{min-height:25px;white-space:normal!important;text-wrap:balance!important;font-size:.64rem!important}
+#installedAppBar .appDeckCard .deckCardActions{margin-top:auto!important;gap:6px!important}
+#installedAppBar .appDeckCard .deckAction,#installedAppBar .appDeckCard .deckAction:first-child{
+  min-height:33px!important;height:33px!important;max-height:33px!important;font-size:.70rem!important
+}
+#appCommandDeck .deckIntegrityNote{font-size:.64rem!important;line-height:1.35!important}
+#captainHomeOperations{display:block!important;flex:none!important;margin:2px 0!important;padding:10px!important;background:linear-gradient(145deg,#082d4cec,#083e59e8)!important;border:1.5px solid #e8c07b!important;border-radius:14px!important}
+#captainHomeOperations .captainOpsHeading{display:flex;justify-content:space-between;align-items:center;gap:5px;margin-bottom:9px}
+#captainHomeOperations .captainOpsHeading strong{color:#ffe5a5;font-size:.85rem;font-weight:900}
+#captainHomeOperations .captainOpsHeading small{color:#bddced;font-size:.63rem}
+#captainOpsButtons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+#captainOpsButtons button{display:flex;align-items:center;flex-direction:column;justify-content:center;min-width:0;min-height:87px;padding:7px 2px!important;border:1.5px solid #9dcbdb!important;border-radius:11px!important;background:linear-gradient(160deg,#125070,#072b4d)!important;color:#fff!important;box-shadow:inset 0 1px #ffffff28}
+#captainOpsButtons button:nth-child(3){border-color:#efc77f!important;background:linear-gradient(160deg,#755123,#263f50)!important}
+#captainOpsButtons button span{font-size:1.16rem;line-height:1.1}
+#captainOpsButtons button strong{font-size:.83rem;color:#ffdfa2;margin:5px 0 2px}
+#captainOpsButtons button small{font-size:.61rem;color:#c6e3f1}
+#captainOpsButtons button:focus-visible{outline:3px solid #ffe8aa;outline-offset:2px}
+#captainHomeOperations .captainOpsNotice{margin:8px 0 0;font-size:.63rem;line-height:1.35;color:#c8dae7}
+#homeSpecialRooms{display:none!important}
+#centralRoundPanel{flex:none!important;max-height:none!important;min-height:auto!important;margin:0!important;padding:7px!important}
+#centralRoundPanel label{font-size:.74rem!important}
+#centralRoundPanel small{display:none!important}
+#homeOverview{display:flex!important;flex-direction:column!important;gap:2px!important;flex:none!important;min-height:0!important;max-height:none!important;padding:6px 8px!important;margin:0!important;background:#071f39b5!important;border:1px solid #80a2b777!important}
+#homeOverview strong{font-size:.67rem!important;color:#e4dcaf}
+#homeOverview small{font-size:.62rem!important;color:#b5c8d6}
+@media(max-width:370px){
+ #appCommandDeck{padding:8px 5px!important}
+ #installedAppBar{gap:4px!important}
+ #installedAppBar .appDeckCard.installedAppUnit{padding:7px 3px!important;min-height:149px!important}
+ #appCommandDeck .appDeckCard>strong{font-size:.72rem!important}
+ #appCommandDeck .appDeckCard>small{font-size:.57rem!important}
+ #installedAppBar .appDeckCard .deckAction,#installedAppBar .appDeckCard .deckAction:first-child{font-size:.61rem!important}
+ #captainOpsButtons{gap:4px}
+ #captainOpsButtons button small{font-size:.55rem}
+}
+
 </style>
 </head>
 <body>
@@ -772,7 +827,7 @@ main.roomMode > #homeV3RoomsPanel[hidden]{display:none!important}
 </nav>
 <!-- Captain-only three-app management deck. Public Freedom APK is distributed elsewhere. -->
 <section id="appCommandDeck" aria-label="선장 전용 3앱 통합 관리본부">
- <div class="commandDeckTop"><strong>⚓ 3앱 통합 관리본부</strong><small>선장 전용 · 원본 보존</small></div>
+ <div class="commandDeckTop"><strong>⚓ 선장 전용 · 3앱 작전본부</strong><small>제1회차부터 재분석</small></div>
  <div id="captainAnalysisBaseline" class="analysisBaseline" role="status" aria-label="선장이 확인한 분석 진행 현황">
   <strong>🔁 제1회차부터 재분석 · 새 연구 시작 기준</strong>
   <span><b>V3</b> 기존 누적 350회 <em>과거 연구자료</em></span>
@@ -792,10 +847,10 @@ main.roomMode > #homeV3RoomsPanel[hidden]{display:none!important}
   <div class="installedAppUnit appDeckCard" data-app-card="v7">
    <div class="deckAppIcon" aria-hidden="true">🛡️</div>
    <strong>통제관 V7</strong>
-   <small>원문 5조합 · 제1회차부터</small>
+   <small>원문 5조합 · 통제관방</small>
    <div class="deckCardActions">
-    <button type="button" id="openInstalledV7" class="deckAction" aria-label="설치된 통제관 V7 앱 열기">앱 열기</button>
-    <button type="button" class="deckAction deckSecondary" data-open-material="v7" aria-label="V7 읽기 전용 자료 관리방 열기">기록 보기</button>
+    <button type="button" class="deckAction" data-open-material="v7" aria-label="통제관방 결과전 조회">통제관방</button>
+    <button type="button" id="openInstalledV7" class="deckAction deckSecondary" aria-label="설치된 통제관 V7 앱 열기">V7 앱 열기</button>
    </div>
   </div>
   <div class="installedAppUnit appDeckCard" data-app-card="freedom">
@@ -804,11 +859,20 @@ main.roomMode > #homeV3RoomsPanel[hidden]{display:none!important}
    <small>원문 5조합 × 2묶음</small>
    <div class="deckCardActions">
     <button type="button" class="deckAction" id="openV4AnalysisRoom">원문 5×2 분석</button>
-    <button type="button" id="openFreedomApprovalShortcut" class="deckAction deckSecondary" aria-label="기존 일반판 승인관리방 열기">승인관리</button>
+    <button type="button" id="homeV4ReportShortcut" class="deckAction deckSecondary" aria-label="V4 연구보고서 조회">V4 기록보기</button>
    </div>
   </div>
  </div>
  <p class="deckIntegrityNote">배포판 설치·업데이트는 별도 공식 링크에서 진행합니다. 이 화면은 앱 실행 및 검증된 자료 조회·기존 승인관리만 연결하며, 각 앱 DB를 변경하지 않습니다.</p>
+</section>
+<section id="captainHomeOperations" aria-label="결과전 결과후 승인관리 통합조회">
+ <div class="captainOpsHeading"><strong>📚 통합 결과 자료실</strong><small>V3 4방 + V7 1방 + V4 1방</small></div>
+ <div id="captainOpsButtons">
+  <button id="captainBeforeOpen" type="button" aria-controls="homeMaterialsPanel"><span>📄</span><strong>결과전</strong><small>6개 방 원본조회</small></button>
+  <button id="captainAfterOpen" type="button" aria-controls="homeMaterialsPanel"><span>📊</span><strong>결과후</strong><small>채점·비교 조회</small></button>
+  <button id="captainApprovalOpen" type="button" aria-controls="homeApprovalPanel"><span>🔐</span><strong>승인관리</strong><small>기존 기능 유지</small></button>
+ </div>
+ <p class="captainOpsNotice">V3 자동송신 대기 · V7 메타조회 · V4 5+5 연구 분석 | 공식 결과전 잠금과 과거 재분석을 분리합니다.</p>
 </section>
 <div id="homeSpecialRooms" aria-label="기존 승인관리와 결과전 자료실">
 <button id="homeApprovalBtn" type="button" aria-expanded="false" aria-controls="homeApprovalPanel">🔐 일반판 승인관리</button>
@@ -823,12 +887,7 @@ main.roomMode > #homeV3RoomsPanel[hidden]{display:none!important}
  </div>
  <small>세 앱의 원본은 각 앱에 보존합니다. V7은 인증된 읽기 전용 조회, V3는 내보낸 자료 조회입니다. 배포판은 현회차 포함 최근 5회차만 이용합니다.</small>
 </div>
-<div id="homeOverview">
- <div class="homeShip">⚓</div>
- <strong>V3 350회 분석 보고 · V7/V4 원본 연결 점검</strong>
- <p>담당자를 선택하거나 아래 메뉴를 이용하세요.</p>
- <small>실시간 기록은 공유 서버에서 확인합니다.</small>
-</div>
+<div id="homeOverview"><strong>🗂️ 원본보존 · 결과전/결과후 분리 · 일반 배포판 미변경</strong><small>선장 전용 시험 관리화면 · 기기 설치 및 자동송신 검증 전</small></div>
 <div id="homeApprovalPanel" hidden aria-label="항행의자유 배포용 승인관리방">
  <div class="homePaneTop"><strong>🔐 일반판 사용자 승인관리 · 선장 전용</strong><button id="homeApprovalBackBtn" type="button" class="secondary">홈으로</button></div>
  <iframe id="homeApprovalFrame" title="배포용 승인요청 조회·승인·거절·상태확인" loading="lazy" referrerpolicy="no-referrer" data-src="./hanghae-distribution-approval-room.html"></iframe>
@@ -1043,6 +1102,13 @@ var $=function(id){return document.getElementById(id);};
  ['relayOpen','relayPanel','handoffOpen','handoffPanel',
   'migrateChatLinks','originalChatPanel'].forEach(function(id){move(id,tools);});
  move('chatArea',dock);
+})();
+/* Keep the original four ChatGPT links and existing update access in More, not the captain's 3-app work surface. */
+(function(){
+ var more=$('homeMoreTools');
+ ['originalChatBar','crewUpdateOpen','homeReportBtn','homeLiveBtn'].forEach(function(id){
+  var node=$(id);if(node&&more)more.appendChild(node);
+ });
 })();
 var HOME_SELECTED='home';
 function homeView(which){
@@ -2183,6 +2249,23 @@ try{
   });
  }
 }catch(e){status('loginError','인증 저장소 확인 오류가 있습니다.');}
+/* Home-first quick routes: same verified existing material and approval panels, no new auth bypass. */
+$('captainBeforeOpen').addEventListener('click',function(){
+ homeView('materials');
+ selectedBeforeRoom='all';
+ document.querySelectorAll('[data-before-room]').forEach(function(x){var on=x.getAttribute('data-before-room')==='all';x.classList.toggle('selected',on);x.setAttribute('aria-pressed',String(on));});
+ materialsSelect('stage','before');
+});
+$('captainAfterOpen').addEventListener('click',function(){
+ homeView('materials');materialsSelect('stage','after');
+ var details=document.querySelector('#homeMaterialsPanel .materialsExtraStages');if(details)details.open=true;
+});
+$('captainApprovalOpen').addEventListener('click',function(){homeView('approval');});
+$('homeV4ReportShortcut').addEventListener('click',function(){
+ homeView('materials');selectedBeforeRoom='v4';
+ document.querySelectorAll('[data-before-room]').forEach(function(x){var on=x.getAttribute('data-before-room')==='v4';x.classList.toggle('selected',on);x.setAttribute('aria-pressed',String(on));});
+ materialsSelect('stage','before');
+});
 /* V4 5+5 CAPTAIN RESEARCH R116 — ORIGINAL V4 ENGINE DATA ONLY.
    A = original engine's 5 games. B = existing V4 candidate-pool omission pattern,
    independently formed from the same raw engine rank. No random/fallback numbers. */
