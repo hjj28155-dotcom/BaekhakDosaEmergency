@@ -1,4 +1,4 @@
-name: Build same-signer captain three-app research APK v1.0.26
+name: Build same-signer captain three-app research APK v1.0.27
 on:
   push:
     branches:
@@ -92,6 +92,13 @@ jobs:
           grep -Fq "viewport.classList.toggle('zoomed')" crew-meeting-android/app/src/main/assets/v4_png_report.js
           grep -Fq 'id="freedomSavePng"' "$HOME_HTML"
           grep -Fq 'id="freedomPngPanel"' "$HOME_HTML"
+          grep -Fq '#freedomAnalysisPanel #freedomDbStatus,' "$HOME_HTML"
+          grep -Fq '#freedomAnalysisPanel .v4DbOriginal,' "$HOME_HTML"
+          grep -Fq '#freedomAnalysisPanel #freedomAnalysisStatus,' "$HOME_HTML"
+          grep -Fq '#freedomAnalysisPanel #freedomTextBackup,' "$HOME_HTML"
+          grep -Fq 'width:100%!important;height:auto!important' "$HOME_HTML"
+          grep -Fq 'var W=960,H=1350,canvas' crew-meeting-android/app/src/main/assets/v4_png_report.js
+          grep -Fq '184+j*130,cy,accent' crew-meeting-android/app/src/main/assets/v4_png_report.js
           grep -Fq 'id="freedomTextBackup"' "$HOME_HTML"
           grep -Fq 'crew-v4-png-report.js' "$HOME_HTML"
           grep -Fq 'captain-v4-verified' "$HOME_HTML"
@@ -175,7 +182,7 @@ jobs:
           grep -Fq 'data-material-stage="after"' "$HOME_HTML"
           grep -Fq 'V3의 과거 350회 누적 분석은 별도 보존' "$HOME_HTML"
           grep -Fq 'loadCaptainDashboard()' crew-meeting-android/app/src/main/java/kr/hanghae/crewmeeting/MainActivity.java
-          grep -Fq "versionCode 126" crew-meeting-android/app/build.gradle
+          grep -Fq "versionCode 127" crew-meeting-android/app/build.gradle
           test "$(grep -c 'data-before-room=' "$HOME_HTML")" -eq 7
           test "$(grep -c 'data-v3-room-card=' "$HOME_HTML")" -eq 4
           test "$(grep -c 'data-v3-report=' "$HOME_HTML")" -eq 4
@@ -196,23 +203,23 @@ jobs:
           test "$NEW_CERT" = "e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be"
           echo "Recovery app signer pinned: $NEW_CERT"
           "$AAPT" dump badging "$APK" | head -5
-          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting.compact' versionCode='126'"
+          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting.compact' versionCode='127'"
           ! "$AAPT" dump badging "$APK" | grep -q "package: name='com.baekhak.dosa.v4'"
           mkdir -p crew-meeting-android/releases
-          cp "$APK" crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.26_V4_PNG_REPORT.apk
-          (cd crew-meeting-android/releases && sha256sum HANGHAE_CREW_MEETING_1.0.26_V4_PNG_REPORT.apk > HANGHAE_CREW_MEETING_1.0.26_V4_PNG_REPORT.apk.sha256)
+          cp "$APK" crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.27_V4_PNG_EXPANDED.apk
+          (cd crew-meeting-android/releases && sha256sum HANGHAE_CREW_MEETING_1.0.27_V4_PNG_EXPANDED.apk > HANGHAE_CREW_MEETING_1.0.27_V4_PNG_EXPANDED.apk.sha256)
       - uses: actions/upload-artifact@v4
         with:
-          name: HANGHAE-CREW-MEETING-1.0.26-V4-PNG-REPORT-APK
+          name: HANGHAE-CREW-MEETING-1.0.27-V4-PNG-EXPANDED-APK
           path: |
-            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.26_V4_PNG_REPORT.apk
-            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.26_V4_PNG_REPORT.apk.sha256
+            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.27_V4_PNG_EXPANDED.apk
+            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.27_V4_PNG_EXPANDED.apk.sha256
           if-no-files-found: error
           retention-days: 30
       - name: Verify isolated APK artifact packaging
         run: |
           set -euo pipefail
-          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.26_V4_PNG_REPORT.apk
-          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.26_V4_PNG_REPORT.apk.sha256
-          (cd crew-meeting-android/releases && sha256sum --check HANGHAE_CREW_MEETING_1.0.26_V4_PNG_REPORT.apk.sha256)
+          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.27_V4_PNG_EXPANDED.apk
+          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.27_V4_PNG_EXPANDED.apk.sha256
+          (cd crew-meeting-android/releases && sha256sum --check HANGHAE_CREW_MEETING_1.0.27_V4_PNG_EXPANDED.apk.sha256)
           echo "TEST artifact verified. Do NOT replace the stable fixed Google Drive APK without device verification."
