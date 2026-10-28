@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.DownloadListener;
@@ -19,12 +20,16 @@ import android.webkit.SslErrorHandler;
 import android.net.http.SslError;
 import android.widget.Toast;
 import java.io.InputStream;
+import java.io.SequenceInputStream;
+import java.util.Vector;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 
 public final class MainActivity extends Activity {
     private static final String ROOM_URL =
-        "https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/crew-meeting.html?app_version=115";
+        "https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/crew-meeting.html?app_version=116";
+    private static final String V4_ENGINE_PATH = "/BaekhakDosaEmergency/captain-v4-original-engine-v116.html";
+    private static final int V4_ENGINE_PARTS = 19;
     private static final int FILE_CHOOSER_CODE = 502;
     private static final int PICK_V3_APP = 503;
     private static final int PICK_V7_APP = 504;
@@ -60,6 +65,31 @@ public final class MainActivity extends Activity {
         settings.setBuiltInZoomControls(false);
         settings.setSupportZoom(false);
         web.setWebViewClient(new WebViewClient() {
+            @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest req) {
+                Uri uri=req.getUrl();
+                if (!"GET".equals(req.getMethod())
+                    || !"https".equalsIgnoreCase(uri.getScheme())
+                    || !"hjj28155-dotcom.github.io".equalsIgnoreCase(uri.getHost())
+                    || !V4_ENGINE_PATH.equals(uri.getPath())) return null;
+                // Serve precisely the pinned V4 engine archived in 19 intact UTF-8
+                // asset chunks; no remote engine substitution or file:// access.
+                Vector<InputStream> parts = new Vector<>();
+                try {
+                    for (int i=0;i<V4_ENGINE_PARTS;i++) {
+                        String filename=String.format(java.util.Locale.ROOT,
+                           "v4_engine116_part_%02d.chunk",i);
+                        parts.add(getAssets().open(filename));
+                    }
+                    return new WebResourceResponse("text/html","UTF-8",
+                        new SequenceInputStream(parts.elements()));
+                } catch (Exception e) {
+                    for (InputStream input: parts)try{input.close();}catch(Exception ignored){}
+                    return new WebResourceResponse("text/html","UTF-8",
+                        new java.io.ByteArrayInputStream(
+                         "<!doctype html><p>원본 엔진의 일부를 확인할 수 없어 분석을 중단했습니다.</p>"
+                         .getBytes(StandardCharsets.UTF_8)));
+                }
+            }
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest req) {
                 return route(req.getUrl());
             }
@@ -119,6 +149,8 @@ public final class MainActivity extends Activity {
             }
             String html = new String(output.toByteArray(), StandardCharsets.UTF_8);
             if (!html.contains("id=\"beforeRoomGrid\"")
+                    || !html.contains("id=\"homeV4AnalysisPanel\"")
+                    || !html.contains("id=\"v4RunTwoPack\"")
                     || !html.contains("id=\"homeApprovalBtn\"")
                     || !html.contains("id=\"appCommandDeck\"")
                     || !html.contains("id=\"homeV3RoomsPanel\"")
@@ -188,7 +220,8 @@ public final class MainActivity extends Activity {
         if ("https".equalsIgnoreCase(uri.getScheme())
             && "hjj28155-dotcom.github.io".equalsIgnoreCase(uri.getHost())
             && ("/BaekhakDosaEmergency/crew-meeting.html".equals(uri.getPath())
-              || "/BaekhakDosaEmergency/hanghae-distribution-approval-room.html".equals(uri.getPath()))) return false;
+              || "/BaekhakDosaEmergency/hanghae-distribution-approval-room.html".equals(uri.getPath())
+              || V4_ENGINE_PATH.equals(uri.getPath()))) return false;
         if (!"https".equalsIgnoreCase(uri.getScheme())) return true;
         try {
             Intent external = new Intent(Intent.ACTION_VIEW, uri);

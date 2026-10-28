@@ -1,6 +1,12 @@
-name: Build same-signer captain three-app research APK v1.0.15
+name: Build same-signer captain V4 original 5x2 research APK v1.0.16
 on:
   push:
+    branches:
+      - feature/captain-v116-v4-two-original-packs-20261028
+    paths:
+      - 'crew-meeting-android/**'
+      - '.github/workflows/build-crew-meeting-apk.yml'
+  pull_request:
     branches:
       - feature/crew-meeting-standalone-apk-20261025
     paths:
@@ -60,11 +66,27 @@ jobs:
           grep -Fq 'data-material-stage="after"' "$HOME_HTML"
           grep -Fq '기존 누적 350회' "$HOME_HTML"
           grep -Fq 'loadCaptainDashboard()' crew-meeting-android/app/src/main/java/kr/hanghae/crewmeeting/MainActivity.java
-          grep -Fq "versionCode 115" crew-meeting-android/app/build.gradle
+          grep -Fq "versionCode 116" crew-meeting-android/app/build.gradle
           test "$(grep -c 'data-before-room=' "$HOME_HTML")" -eq 7
           test "$(grep -c 'data-v3-room-card=' "$HOME_HTML")" -eq 4
           test "$(grep -c 'data-v3-report=' "$HOME_HTML")" -eq 4
           echo 'Embedded captain-only report-before and report-after modules: present'
+      - name: Verify V4 original engine chunks equal preserved source exactly
+        run: |
+          set -euo pipefail
+          ROOT=crew-meeting-android/app/src/main/assets
+          ORIGINAL=build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/engine_v2.html
+          test -s "$ORIGINAL"
+          test "$(find "$ROOT" -maxdepth 1 -name 'v4_engine116_part_*.chunk' | wc -l)" -eq 19
+          cat "$ROOT"/v4_engine116_part_*.chunk | cmp -s - "$ORIGINAL"
+          grep -Fq 'V3_ENGINE_READY' "$ORIGINAL"
+          grep -Fq 'V3_ANALYSIS_RESULT' "$ORIGINAL"
+          grep -Fq 'id="homeV4AnalysisPanel"' "$ROOT/captain_home_v114.html"
+          grep -Fq 'id="v4RunTwoPack"' "$ROOT/captain_home_v114.html"
+          grep -Fq 'id="v4PackA"' "$ROOT/captain_home_v114.html"
+          grep -Fq 'id="v4PackB"' "$ROOT/captain_home_v114.html"
+          grep -Fq 'v4CandidatePack' "$ROOT/captain_home_v114.html"
+          echo 'V4 original engine 19 segments identical to preserved source; both 5-game panels present.'
       - name: Assemble separate app
         working-directory: crew-meeting-android
         run: gradle :app:assembleDebug --no-daemon --stacktrace
@@ -81,23 +103,23 @@ jobs:
           test "$NEW_CERT" = "e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be"
           echo "Recovery app signer pinned: $NEW_CERT"
           "$AAPT" dump badging "$APK" | head -5
-          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting.compact' versionCode='115'"
+          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting.compact' versionCode='116'"
           ! "$AAPT" dump badging "$APK" | grep -q "package: name='com.baekhak.dosa.v4'"
           mkdir -p crew-meeting-android/releases
-          cp "$APK" crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.15_V3ROOM_TEST.apk
-          (cd crew-meeting-android/releases && sha256sum HANGHAE_CREW_MEETING_1.0.15_V3ROOM_TEST.apk > HANGHAE_CREW_MEETING_1.0.15_V3ROOM_TEST.apk.sha256)
+          cp "$APK" crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.16_V4_5X2_TEST.apk
+          (cd crew-meeting-android/releases && sha256sum HANGHAE_CREW_MEETING_1.0.16_V4_5X2_TEST.apk > HANGHAE_CREW_MEETING_1.0.16_V4_5X2_TEST.apk.sha256)
       - uses: actions/upload-artifact@v4
         with:
-          name: HANGHAE-CREW-MEETING-1.0.15-V3ROOM-TEST-APK
+          name: HANGHAE-CREW-MEETING-1.0.16-V4-5X2-TEST-APK
           path: |
-            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.15_V3ROOM_TEST.apk
-            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.15_V3ROOM_TEST.apk.sha256
+            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.16_V4_5X2_TEST.apk
+            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.16_V4_5X2_TEST.apk.sha256
           if-no-files-found: error
           retention-days: 30
       - name: Verify isolated APK artifact packaging
         run: |
           set -euo pipefail
-          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.15_V3ROOM_TEST.apk
-          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.15_V3ROOM_TEST.apk.sha256
-          (cd crew-meeting-android/releases && sha256sum --check HANGHAE_CREW_MEETING_1.0.15_V3ROOM_TEST.apk.sha256)
+          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.16_V4_5X2_TEST.apk
+          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.16_V4_5X2_TEST.apk.sha256
+          (cd crew-meeting-android/releases && sha256sum --check HANGHAE_CREW_MEETING_1.0.16_V4_5X2_TEST.apk.sha256)
           echo "TEST artifact verified. Do NOT replace the stable fixed Google Drive APK without device verification."
