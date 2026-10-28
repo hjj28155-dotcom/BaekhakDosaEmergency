@@ -23,7 +23,14 @@
 - 브랜치 `feature/crew-meeting-standalone-apk-20261025`.
 - 최종 UI commit `c7ee317776b04ef54947cd21739f6a4056f057f9`.
 - 최종 CI commit `d650c4c1d46bd5240f44f47cec65130bd49af583`.
-- 빌드 https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/actions/runs/40641972166 — **검증 완료 전 상태를 성공으로 보고하지 말 것**.
+- 빌드 https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/actions/runs/40641972166 — **completed success**. 동일 서명·패키지·versionCode=120 CI 검증.
+- GitHub artifact ID `12795738463`, ZIP 67,994 bytes. ZIP 및 APK CRC 통과.
+- APK 71,173 bytes, SHA256 `7e2a586c7aabba4edd0285ba4e46170a5bd53763e3c460aa184b85781f9c0eab`, artifact .sha256와 일치.
+- 실제 APK 내 `assets/captain_home_v114.html` 추출: 결과후 7개 카드, V4 초기화, 누적자료 자료실 전용 문구, V4 자료실 화면 전환, 누적DB 자료실 탭 확인.
+- Google Drive 시험 ZIP https://drive.google.com/file/d/13-_XeKsZ-WVg_wtSDGjk-tCgWkrajPzn/view?usp=drivesdk — 업로드 성공.
+- 직접 APK `/mnt/data/항행의자유_중앙통제실_선장전용_V1.0.20_누적자료_자료실보존_초기화.apk`.
+- DB 변경 없음: 사후 조회 시 DB-1 1,247건, 누적DB 214건, V7 문서 32건 그대로.
+- **선장 실제 휴대전화 설치 및 UI 검증 대기**.
 
 ## 남은 작업
 1. 실제 휴대전화 V1.0.20 UI 및 자료실 이동 검증.
