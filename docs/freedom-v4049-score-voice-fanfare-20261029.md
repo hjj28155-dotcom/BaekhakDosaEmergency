@@ -25,3 +25,14 @@ DB-1·전체 원문·20조합·최초잠금·승인·V3/V7·공식 설치/업데
 다음: 동일 서명 CI 성공 확인 후 실제 휴대전화에서 데이터 보존·20조합/홈·음성 확인. 실기기 검증 전 정식 배포 금지.
 
 실패 CI 40725189724 원인은 5개 숫자로 구성한 낙선 테스트 조합이 유효하지 않아 기존 보관 조합으로 대조된 것. 후속 e2c76c7에서 6개 유효 번호로 수정된 검사를 통합하여 통과 확인.
+
+## APK CI 최종 확인 · 2026-10-29 01:28 KST
+- 검증 소스 커밋: 7cf82d3ef0cae2636894d8691fb89a6fc4b1d79d.
+- GitHub Actions: https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/actions/runs/40725810068 — 모든 단계 success.
+- 원본 인증서 일치, 전체 회귀검사, Android 빌드, versionCode 40049/패키지 일치, APK 내부 소스·CSS 바이트 일치 확인 성공.
+- 시험용 아티팩트: Freedom_V4049_AUDIO_CANCEL_OriginalSigned_TEST_ONLY, ID 12831429597.
+- 다운로드: https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/actions/runs/40725810068/artifacts/12831429597
+- ZIP 아티팩트 digest (APK 자체 digest와 구분): sha256:df0b7dbd96139619fb331e1b17080655aac3093fbdaa9610871113dff22bcb5f.
+- PR: https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/pull/5. 동시 작업의 문서/다시듣기/연구 분리 보존.
+- 휴대전화 실제 설치·승인/DB 유지·한 화면 20조합·실제 음성·홈 이동은 미검증. 공식 신규설치·업데이트 URL은 변경하지 않음.
+- 다음 작업 1순위: 이 시험용 APK로 휴대전화 실검증. 기존 앱 삭제/데이터 초기화 금지.
