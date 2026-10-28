@@ -24,7 +24,7 @@ import java.nio.charset.StandardCharsets;
 
 public final class MainActivity extends Activity {
     private static final String ROOM_URL =
-        "https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/crew-meeting.html?app_version=117";
+        "https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/crew-meeting.html?app_version=118";
     private static final int FILE_CHOOSER_CODE = 502;
     private static final int PICK_V3_APP = 503;
     private static final int PICK_V7_APP = 504;
@@ -126,7 +126,10 @@ public final class MainActivity extends Activity {
                     || !html.contains("id=\"freedomAnalysisPanel\"")
                     || !html.contains("id=\"freedomFirstFive\"")
                     || !html.contains("id=\"freedomSecondFive\"")
-                    || !html.contains("id=\"freedomGoCumulativeDb\""))
+                    || !html.contains("id=\"freedomGoCumulativeDb\"")
+                    || !html.contains("id=\"freedomRunRound\"")
+                    || !html.contains("id=\"freedomFirstList\"")
+                    || !html.contains("id=\"freedomSecondList\""))
                 throw new java.io.IOException("Required captain dashboard modules missing");
             web.loadDataWithBaseURL(ROOM_URL, html, "text/html", "UTF-8", ROOM_URL);
         } catch (java.io.IOException e) {
