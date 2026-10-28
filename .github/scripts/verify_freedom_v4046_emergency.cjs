@@ -35,7 +35,7 @@ const root={
  document:{getElementById(id){return id==='v4046Progress'?{set textContent(v){notes.push(v)}}:id==='v4046RawInput'?{value:makeRaw(1248)}:null}},
  V4046_VISIBLE:[1244,1245,1246,1247,1248],
  V330_RECENT:[1243,1244,1245,1246,1247,1248],
- V330_WIN:{1247:{nums:[8,14,21,22,42,45],bonus:24}},
+ V330_WIN:{1246:{nums:[16,22,23,24,27,28],bonus:6},1247:{nums:[8,14,21,22,42,45],bonus:24}},
  setRound(n){selection=n;return true},
  cur(){return String(selection)},
  R(){return D.rounds[String(selection)]||(D.rounds[String(selection)]={})},
