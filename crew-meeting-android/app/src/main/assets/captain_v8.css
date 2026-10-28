@@ -178,5 +178,5 @@ main.roomMode>#homeDirectorRoom:not([hidden]){display:flex!important;flex-direct
 .directorToolGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:none}.directorToolGrid>button{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:16px 12px;background:#15354e;border:1px solid #547489;color:#f9e6c6;text-align:left}
 .directorToolGrid span{font-size:.73rem;color:#c7d8e7}.directorRoomNote{padding:4px 7px}
 #homeDirectorRoom button:focus-visible,#homeDirectorRoomOpen:focus-visible{outline:3px solid #ffe09d;outline-offset:3px}
-@media(max-height:750px){main:not(.roomMode)>#v8Hero{height:clamp(175px,25dvh,205px)!important}#homeDirectorRoomOpen{min-height:44px}}
+@media(max-height:750px){main:not(.roomMode)>#v8Hero{height:clamp(205px,28dvh,230px)!important}#homeDirectorRoomOpen{min-height:44px}}
 

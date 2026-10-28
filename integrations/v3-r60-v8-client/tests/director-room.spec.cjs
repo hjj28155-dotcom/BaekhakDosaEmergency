@@ -37,6 +37,8 @@ const aliases={
       assert(entrance.y>=0&&entrance.y+entrance.height<=height,'director entrance must be visible on home');
       assert.equal(await page.locator('#installedAppBar [data-app-card="v7"]').count(),0);
       assert(await page.locator('#openV3Rooms').isVisible());
+      const shortcuts=await page.locator('#originalChatBar').boundingBox(), diagnosis=await page.locator('#v8ConnectionCheck').boundingBox();
+      assert(shortcuts.y+shortcuts.height<=diagnosis.y,'hero shortcuts and diagnosis must not overlap');
       await page.screenshot({path:`ui-evidence/v8-804-home-${width}.png`});
       await page.locator('#homeDirectorRoomOpen').click();
       await page.locator('#homeDirectorRoom').waitFor({state:'visible'});
