@@ -115,13 +115,13 @@
 }
 #modal.v4047Compact .v4047Footer{
  flex:0 0 auto!important;display:grid!important;
- grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ grid-template-columns:repeat(4,minmax(0,1fr))!important;
  gap:4px!important;min-height:28px!important;margin:0!important
 }
 #modal.v4047Compact .v4047Footer .b{
  min-width:0!important;min-height:27px!important;height:28px!important;
- font-size:clamp(9px,2.6vw,12px)!important;
- white-space:nowrap!important;padding:1px 3px!important;border-radius:6px!important
+ font-size:clamp(8px,2.25vw,11px)!important;
+ white-space:nowrap!important;padding:1px 2px!important;border-radius:6px!important
 }
 #modal.v4047Compact .v4047Empty{
  flex:1 1 auto!important;margin:0!important;
