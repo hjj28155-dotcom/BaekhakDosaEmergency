@@ -174,4 +174,75 @@
   return load(n);
  };
  emptyCards();
+ // The cumulative performance room never computes statistics from metadata.
+ // Each grade is populated ONLY after all 6 source numbers, draw, provenance,
+ // and deduplication are verified in a future source connector.
+ var scoreSeq=0;
+ var scoreRoot=$('cumulativeScoreDashboard');
+ var scoreKeys=['all','v3-1','v3-2','v3-3','v3-4','v7','v4-1','v4-2'];
+ function resetScore(){
+  scoreRoot.querySelectorAll('[data-score-grade]').forEach(function(el){el.textContent='—';});
+  scoreRoot.querySelectorAll('[data-score-grade-percent]').forEach(function(el){el.textContent='—%';});
+  scoreKeys.forEach(function(key){
+   var total=scoreRoot.querySelector('[data-score-total="'+key+'"]');
+   var success=scoreRoot.querySelector('[data-score-success="'+key+'"]');
+   if(total)total.textContent='미집계';
+   if(success)success.textContent='—%';
+  });
+  $('scoreTotalCount').textContent='미집계';
+  $('scoreSuccessPercent').textContent='—%';
+ }
+ function scoreActive(){
+  return scoreRoot.isConnected&&!scoreRoot.hidden&&
+   $('materialsBody').classList.contains('cumulativeScoreMode');
+ }
+ async function renderScore(){
+  var serial=++scoreSeq;
+  resetScore();
+  $('scoreSyncStatus').textContent='V3·V7·V4 결과후 원본 연결 상태 확인 중…';
+  $('scoreStatus').textContent='검증된 6번호 원본 없이는 0/6~6/6, 총회수 및 백분율을 계산하지 않습니다.';
+  if(typeof window.captainCumulativeIsAuthorized==='function'&&!window.captainCumulativeIsAuthorized()){
+   $('scoreSyncStatus').textContent='선장 인증 대기 · V3/V4/V7 자동업로드 확인 불가';
+   return;
+  }
+  if(typeof window.captainCumulativeFetchAfter!=='function'){
+   $('scoreSyncStatus').textContent='3앱 결과후 서버 조회 연결 미설치 · 자동업로드 미검증';
+   return;
+  }
+  try{
+   var results=await window.captainCumulativeFetchAfter(null);
+   if(serial!==scoreSeq||!scoreActive())return;
+   if(!Array.isArray(results)||results.length!==3)throw Error('THREE_APP_CONTRACT');
+   var labels={v3:'V3 4방',v7:'V7 통제관방',freedom:'V4 독립 2방'};
+   var status=results.map(function(result){
+    var label=labels[result.app]||'미확인 앱';
+    if(result.error)return label+': 서버 조회 실패 · 자동업로드 미확인';
+    var data=result.data;
+    if(!data||data.read_only!==true||data.raw_predictions_included!==false||
+      !Array.isArray(data.items)||typeof data.linked!=='boolean')
+      return label+': 조회 응답 검증 실패';
+    if(!data.linked)return label+': 원본 자동송신 연결 안 됨';
+    return label+': 결과후 메타 '+data.items.length+'건 조회 · 6번호 원본 미제공';
+   });
+   $('scoreSyncStatus').textContent=status.join('\n');
+   $('scoreStatus').textContent='자동연동 완료 아님 · 검증된 35조합 원본 수신/채점 전까지 누적 성적은 미집계입니다.';
+  }catch(e){
+   if(serial!==scoreSeq||!scoreActive())return;
+   $('scoreSyncStatus').textContent='결과후 서버 조회 실패 · 원본 삭제 또는 0점 처리 없음';
+   $('scoreStatus').textContent='연결 복구 및 인증된 원본 업로드 확인이 필요합니다.';
+  }
+ }
+ $('cumGoTotalScore').addEventListener('click',function(){
+  if(typeof window.captainCumulativeScoreOpen==='function')window.captainCumulativeScoreOpen();
+ });
+ $('scoreBack').addEventListener('click',function(){
+  if(typeof window.captainCumulativeOpen==='function')window.captainCumulativeOpen(Number(roundInput.value)||1);
+ });
+ $('scoreRefresh').addEventListener('click',renderScore);
+ $('scoreSuccessThreshold').addEventListener('change',function(){
+  // No numerator or denominator exists yet; switching thresholds must not fabricate a rate.
+  $('scoreSuccessPercent').textContent='—%';
+ });
+ window.captainCumulativeScoreRender=renderScore;
+
 })();
