@@ -1,4 +1,4 @@
-name: Build same-signer captain three-app research APK v1.0.20
+name: Build same-signer captain three-app research APK v1.0.21
 on:
   push:
     branches:
@@ -45,6 +45,31 @@ jobs:
           ACTUAL=$(keytool -list -v -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey | awk '/SHA256:/ { print $2 }')
           echo "Restored signing certificate SHA256: $ACTUAL"
           test "$ACTUAL" = "E2:4E:95:73:E5:E9:85:67:EA:2E:5A:BD:DA:C4:27:12:6C:43:D8:F1:E4:6B:37:E4:09:9D:AB:C9:11:CF:70:BE" || { echo "Unexpected signing key: STOP"; exit 1; }
+      - name: Assemble offline R46 captain and independent R1 liaison engines
+        run: |
+          set -euo pipefail
+          BASE=build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/engine_v2.html
+          DEST=crew-meeting-android/app/src/main/assets/captain_engine_r46.html
+          test -s "$BASE"
+          test "$(sha256sum "$BASE" | cut -d' ' -f1)" = "5519b83b9a31095a70db8efee91b502a4ce65aa02ba9c0b9727575a2f16504d9"
+          base64 -d crew-meeting-android/patches/captain_r46.patch.gz.b64 | gzip -d > /tmp/captain_r46.patch
+          patch --batch -o "$DEST" "$BASE" /tmp/captain_r46.patch
+          test "$(sha256sum "$DEST" | cut -d' ' -f1)" = "b40c756387dd56e38b0e4119b96da7903d53fe556acceb2184309b9b33d17f46"
+          cp crew-meeting-android/research-engines/liaison-blind-engine.mjs crew-meeting-android/app/src/main/assets/liaison-blind-engine.mjs
+          cp crew-meeting-android/research-engines/v7-engine100-baseline.mjs crew-meeting-android/app/src/main/assets/v7-engine100-baseline.mjs
+          node --check crew-meeting-android/research-engines/liaison-blind-engine.mjs
+          node --check crew-meeting-android/research-engines/v7-engine100-baseline.mjs
+          python3 - <<'PY'
+          import json,hashlib
+          p='crew-meeting-android/app/src/main/assets/db1_rounds_1_1247.json'
+          data=json.load(open(p))
+          assert data['count']==1247 and len(data['rows'])==1247
+          for i,row in enumerate(data['rows'],1):
+              assert row['round_no']==i
+              assert len(row['source_text'].splitlines())==6
+              assert hashlib.sha256(row['source_text'].encode()).hexdigest()==row['source_sha256']
+          print('APK DB-1 original 1247 rounds / 7482 clue lines / SHA-256: PASS')
+          PY
       - name: Verify bundled six-room captain research dashboard is present
         run: |
           set -euo pipefail
@@ -60,6 +85,15 @@ jobs:
           grep -Fq 'id="freedomFirstFive"' "$HOME_HTML"
           grep -Fq 'id="freedomSecondFive"' "$HOME_HTML"
           grep -Fq 'id="freedomResetActive"' "$HOME_HTML"
+          grep -Fq 'crew-db1-1-1247.json' "$HOME_HTML"
+          grep -Fq 'crew-captain-engine-r46.html' "$HOME_HTML"
+          grep -Fq 'crew-liaison-blind-r1.mjs' "$HOME_HTML"
+          grep -Fq '선장엔진 R46 · 5조합' "$HOME_HTML"
+          grep -Fq '연락관엔진 R1 · 5조합' "$HOME_HTML"
+          grep -Fq 'DB1_SHA256_INVALID_' crew-meeting-android/app/src/main/java/kr/hanghae/crewmeeting/MainActivity.java
+          test -s crew-meeting-android/app/src/main/assets/captain_engine_r46.html
+          test -s crew-meeting-android/app/src/main/assets/liaison-blind-engine.mjs
+          test -s crew-meeting-android/app/src/main/assets/db1_rounds_1_1247.json
           grep -Fq '누적자료는 이 자료실에서만 조회합니다.' "$HOME_HTML"
           grep -Fq 'resetActiveAnalysis();window.captainV4Route' "$HOME_HTML"
           grep -Fq 'window.captainV4ShowArchive();' "$HOME_HTML"
@@ -73,14 +107,14 @@ jobs:
           grep -Fq "window.captainV4Route('home')" "$HOME_HTML"
           grep -Fq "window.captainV4Select('stage','db')" "$HOME_HTML"
           grep -Fq 'main.roomMode > #freedomAnalysisPanel:not([hidden])' "$HOME_HTML"
-          grep -Fq '새 분석 대기 · 엔진 연결 전 번호 미생성' "$HOME_HTML"
+          grep -Fq '선장엔진 R46 · 연락관엔진 R1 검증 대기' "$HOME_HTML"
           ! grep -Fq 'openFreedomApprovalShortcut' "$HOME_HTML"
           grep -Fq 'data-v3-room-card="v3-4"' "$HOME_HTML"
           grep -Fq 'data-v3-report="v3-1"' "$HOME_HTML"
           grep -Fq 'data-material-stage="after"' "$HOME_HTML"
           grep -Fq 'V3의 과거 350회 누적 분석은 별도 보존' "$HOME_HTML"
           grep -Fq 'loadCaptainDashboard()' crew-meeting-android/app/src/main/java/kr/hanghae/crewmeeting/MainActivity.java
-          grep -Fq "versionCode 120" crew-meeting-android/app/build.gradle
+          grep -Fq "versionCode 121" crew-meeting-android/app/build.gradle
           test "$(grep -c 'data-before-room=' "$HOME_HTML")" -eq 7
           test "$(grep -c 'data-v3-room-card=' "$HOME_HTML")" -eq 4
           test "$(grep -c 'data-v3-report=' "$HOME_HTML")" -eq 4
@@ -101,23 +135,23 @@ jobs:
           test "$NEW_CERT" = "e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be"
           echo "Recovery app signer pinned: $NEW_CERT"
           "$AAPT" dump badging "$APK" | head -5
-          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting.compact' versionCode='120'"
+          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting.compact' versionCode='121'"
           ! "$AAPT" dump badging "$APK" | grep -q "package: name='com.baekhak.dosa.v4'"
           mkdir -p crew-meeting-android/releases
-          cp "$APK" crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.20_ARCHIVE_RESET_TEST.apk
-          (cd crew-meeting-android/releases && sha256sum HANGHAE_CREW_MEETING_1.0.20_ARCHIVE_RESET_TEST.apk > HANGHAE_CREW_MEETING_1.0.20_ARCHIVE_RESET_TEST.apk.sha256)
+          cp "$APK" crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.21_DB1_R46_LIAISON_R1_TEST.apk
+          (cd crew-meeting-android/releases && sha256sum HANGHAE_CREW_MEETING_1.0.21_DB1_R46_LIAISON_R1_TEST.apk > HANGHAE_CREW_MEETING_1.0.21_DB1_R46_LIAISON_R1_TEST.apk.sha256)
       - uses: actions/upload-artifact@v4
         with:
-          name: HANGHAE-CREW-MEETING-1.0.20-ARCHIVE-RESET-TEST-APK
+          name: HANGHAE-CREW-MEETING-1.0.21-DB1-R46-LIAISON-R1-TEST-APK
           path: |
-            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.20_ARCHIVE_RESET_TEST.apk
-            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.20_ARCHIVE_RESET_TEST.apk.sha256
+            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.21_DB1_R46_LIAISON_R1_TEST.apk
+            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.21_DB1_R46_LIAISON_R1_TEST.apk.sha256
           if-no-files-found: error
           retention-days: 30
       - name: Verify isolated APK artifact packaging
         run: |
           set -euo pipefail
-          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.20_ARCHIVE_RESET_TEST.apk
-          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.20_ARCHIVE_RESET_TEST.apk.sha256
-          (cd crew-meeting-android/releases && sha256sum --check HANGHAE_CREW_MEETING_1.0.20_ARCHIVE_RESET_TEST.apk.sha256)
+          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.21_DB1_R46_LIAISON_R1_TEST.apk
+          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.21_DB1_R46_LIAISON_R1_TEST.apk.sha256
+          (cd crew-meeting-android/releases && sha256sum --check HANGHAE_CREW_MEETING_1.0.21_DB1_R46_LIAISON_R1_TEST.apk.sha256)
           echo "TEST artifact verified. Do NOT replace the stable fixed Google Drive APK without device verification."
