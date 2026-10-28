@@ -64,8 +64,8 @@
   section(160,'선장엔진 R46 · 5조합',
    captain?'DB-1 원문 검증 · 선장엔진 실제 출력':'선장엔진 결과 미확인 · 임의 번호 생성 금지',
    captain&&captain.games,'#167c9c',!!captain);
-  section(638,'연락관엔진 R1 · 5조합',
-   liaison?'독립 사전원본 검증 연구 · 공식 잠금 아님':'V3·도사 독립 사전원본 필요 · 연락관엔진 보류',
+  section(638,'통제실장엔진 R1 · 5조합',
+   liaison?'독립 사전원본 검증 연구 · 공식 잠금 아님':'V3·도사 독립 사전원본 필요 · 통제실장엔진 보류',
    liaison&&liaison.games,'#8956bb',!!liaison);
   rect(40,1118,880,180,12,'#0b324c','#617f93',2);
   label('결과전 연구자료 · 공식 추첨 전 확정 잠금 증빙 아님',61,1175,23,'#f4d6a4',true);
@@ -77,7 +77,7 @@
    preview.src=lastPng;
    lastRound=round;
    save.disabled=false;
-   notice.textContent='PNG 실제 이미지 생성 완료 · 선장 '+(captain?'5':'0')+'/5 · 연락관 '+(liaison?'5':'0')+'/5 · 미확인은 빈칸';
+   notice.textContent='PNG 실제 이미지 생성 완료 · 선장 '+(captain?'5':'0')+'/5 · 통제실장 '+(liaison?'5':'0')+'/5 · 미확인은 빈칸';
   }catch(e){
    lastPng='';preview.removeAttribute('src');save.disabled=true;
    notice.textContent='PNG 생성 실패 · 원본 결과는 보존됩니다';
