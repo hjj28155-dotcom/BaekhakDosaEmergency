@@ -1875,6 +1875,7 @@ function v4046SaveRaw1248(){
   if(prior)(rec.rawRevisions||(rec.rawRevisions=[])).push({...old});
   rec.raw={...old,text:raw,source:raw?'사용자 제공 제1248회':'해당 회차 원문 없음',updated:new Date().toISOString()};
   save();
+  if(!(rec.buy||{}).locked)return v4045AutoAnalyze20(1248,true); // Re-weight primary after new six lines; preserve prior 20 in analysisVersions.
  }
  v4044ReviewRound(1248,false);
 }
