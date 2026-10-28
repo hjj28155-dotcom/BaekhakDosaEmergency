@@ -2184,5 +2184,159 @@ try{
  }
 }catch(e){status('loginError','인증 저장소 확인 오류가 있습니다.');}
 })();
+
+/* V4 5+5 CAPTAIN RESEARCH R116 — ORIGINAL V4 ENGINE DATA ONLY.
+   A = original engine's 5 games. B = existing V4 candidate-pool omission pattern,
+   independently formed from the same raw engine rank. No random/fallback numbers. */
+var V4_TWO_ENGINE_BLOB='ff50617c892bddc16109b62e4f90d59d3c4a6664';
+var V4_TWO_API='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/crew-v4-two-pack-research';
+var V4_TWO_SOURCE=null,V4_TWO_RESEARCH=null,V4_TWO_PENDING=null,V4_TWO_ENGINE_READY=false,V4_TWO_RUN_ID=0;
+function v4Status(s){$('v4AnalysisState').textContent=String(s||'');}
+function v4ResetPending(){++V4_TWO_RUN_ID;V4_TWO_PENDING=null;V4_TWO_RESEARCH=null;$('v4RunTwoPack').disabled=true;$('v4SaveTwoPack').disabled=true;}
+function v4OpenEngine(){
+ var frame=$('v4OriginalEngineFrame');
+ if(!frame.getAttribute('src')){
+  frame.setAttribute('src','./captain-v4-original-engine-v116.html?sha=ff50617c892bddc16109b62e4f90d59d3c4a6664');
+  if(!token)v4Status('선장 인증 대기 · 원본 엔진 준비 중');
+ }
+}
+function v4ValidGame(g){return Array.isArray(g)&&g.length===6&&g.every(function(n){return Number.isInteger(n)&&n>=1&&n<=45;})&&new Set(g).size===6;}
+function v4NormalizeGame(g){return g.slice().sort(function(a,b){return a-b;});}
+function v4GameKey(g){return v4NormalizeGame(g).join(',');}
+function v4ValidFive(g){
+ return Array.isArray(g)&&g.length===5&&g.every(v4ValidGame)&&new Set(g.map(v4GameKey)).size===5;
+}
+function v4CandidatePack(rank,original){
+ if(!Array.isArray(rank)||!v4ValidFive(original))return null;
+ var top=[],seen=new Set();
+ rank.forEach(function(x){
+  var n=Number(x&&typeof x==='object'?x.n:x);
+  if(Number.isInteger(n)&&n>=1&&n<=45&&!seen.has(n)){seen.add(n);top.push(n);}
+ });
+ if(top.length<10)return null;
+ var p=top.slice(0,10);
+ var omissions=[[0,1,8,9],[2,3,4,8],[2,3,5,9],[4,6,7,9],[5,6,7,8]];
+ var existing=new Set(original.map(v4GameKey));
+ function rotate(arr,k){return arr.slice(k).concat(arr.slice(0,k));}
+ for(var variant=1;variant<=3;variant++){
+  var base=variant===1?rotate(p,1):variant===2?rotate(p,3):rotate(p.slice().reverse(),2);
+  var games=omissions.map(function(skip){return base.filter(function(_,i){return !skip.includes(i);}).sort(function(a,b){return a-b;});});
+  if(v4ValidFive(games)&&games.every(function(g){return !existing.has(v4GameKey(g));}))return {games:games,profile:'V4_OMIT10_VARIANT_'+variant};
+ }
+ return null;
+}
+function v4RenderFive(id,pack){
+ var root=$(id);root.replaceChildren();
+ if(!v4ValidFive(pack)){root.textContent='검증된 5조합 없음';return;}
+ pack.forEach(function(g,i){
+  var row=document.createElement('div');row.className='v4Game';
+  var label=document.createElement('span');label.textContent=(i+1)+'.';
+  var balls=document.createElement('div');balls.className='v4Balls';
+  g.forEach(function(n){var ball=document.createElement('b');ball.textContent=String(n);balls.appendChild(ball);});
+  row.append(label,balls);root.appendChild(row);
+ });
+}
+async function v4FetchJson(url,options){
+ var resp=await fetch(url,options);
+ var data=await resp.json();
+ if(!resp.ok||!data.ok)throw Error(String(data.error||'HTTP_'+resp.status));
+ return data;
+}
+async function v4RawDigest(value){
+ if(!crypto||!crypto.subtle)throw Error('WEBVIEW_CRYPTO_UNAVAILABLE');
+ var bytes=new TextEncoder().encode(value);
+ var hash=new Uint8Array(await crypto.subtle.digest('SHA-256',bytes));
+ return Array.from(hash,function(b){return b.toString(16).padStart(2,'0');}).join('');
+}
+async function v4LoadSource(){
+ v4ResetPending();V4_TWO_SOURCE=null;
+ $('v4SourceText').value='';$('v4SourceDigest').textContent='원문 SHA-256: 확인 전';
+ $('v4PackA').textContent='아직 분석 전';$('v4PackB').textContent='아직 분석 전';
+ if(!token){v4Status('선장 인증 후 원문 불러오기를 사용할 수 있습니다.');return;}
+ var r=Number($('v4AnalysisRound').value);
+ if(!Number.isInteger(r)||r<1||r>1247){v4Status('회차는 제1~1247회만 선택할 수 있습니다.');return;}
+ v4Status('제'+r+'회 DB-1 원문과 무결성 검사 중…');$('v4LoadSource').disabled=true;
+ try{
+  var data=await v4FetchJson(V4_TWO_API+'?round='+r,{method:'GET',headers:{Authorization:'Bearer '+token},cache:'no-store'});
+  var source=data.source;
+  if(!data.read_only||data.engine_blob!==V4_TWO_ENGINE_BLOB||!source||source.round_no!==r||
+     typeof source.source_text!=='string'||!/^[a-f0-9]{64}$/.test(source.source_sha256)||
+     source.source_text.split(/\r?\n/).filter(function(x){return x.trim();}).length!==6)
+    throw Error('SOURCE_CONTRACT_MISMATCH');
+  if(await v4RawDigest(source.source_text)!==source.source_sha256)throw Error('SOURCE_DIGEST_MISMATCH');
+  if(Number($('v4AnalysisRound').value)!==r)return;
+  V4_TWO_SOURCE=source;
+  $('v4SourceText').value=source.source_text;
+  $('v4SourceDigest').textContent='DB-1 제'+r+'회 · SHA-256 '+source.source_sha256;
+  $('v4RunTwoPack').disabled=false;
+  v4Status('원문 6문장 검증 완료 · 엔진 '+(V4_TWO_ENGINE_READY?'분석 준비됨':'초기화 중')+
+     ' · 기존 연구기록 '+data.reports.length+'건');
+ }catch(e){v4Status('원문 확인 실패 · 번호를 생성하지 않았습니다: '+String(e.message||e));}
+ finally{$('v4LoadSource').disabled=false;}
+}
+function v4RunTwoPacks(){
+ if(!token||!V4_TWO_SOURCE){v4Status('먼저 원문을 확인하세요.');return;}
+ if(!V4_TWO_ENGINE_READY){v4OpenEngine();v4Status('원본 엔진 준비 중입니다. 엔진 확인 후 분석을 누르세요.');return;}
+ if(V4_TWO_PENDING){v4Status('현재 분석이 진행 중입니다.');return;}
+ if(Number($('v4AnalysisRound').value)!==V4_TWO_SOURCE.round_no){v4Status('회차가 변경되었습니다. 원문을 다시 불러오세요.');return;}
+ var f=$('v4OriginalEngineFrame');
+ if(!f.contentWindow){v4Status('분석 엔진을 불러오지 못했습니다.');return;}
+ var id=++V4_TWO_RUN_ID;
+ V4_TWO_RESEARCH=null;$('v4SaveTwoPack').disabled=true;
+ V4_TWO_PENDING={run:id,round:V4_TWO_SOURCE.round_no,source_sha256:V4_TWO_SOURCE.source_sha256};
+ $('v4RunTwoPack').disabled=true;
+ v4Status('원본 V4 엔진 분석 중 · 원문 5조합 + 후보번호 기반 5조합…');
+ f.contentWindow.postMessage({type:'V3_ANALYZE',round:V4_TWO_SOURCE.round_no,raw:V4_TWO_SOURCE.source_text},window.location.origin);
+ setTimeout(function(){
+  if(V4_TWO_PENDING&&V4_TWO_PENDING.run===id){V4_TWO_PENDING=null;
+   $('v4RunTwoPack').disabled=false;v4Status('엔진 응답 시간 초과 · 임의 번호 생성 없이 중단했습니다.');}
+ },90000);
+}
+async function v4AcceptOriginalResult(data){
+ var pending=V4_TWO_PENDING;
+ if(!pending||!V4_TWO_SOURCE||Number(data.round)!==pending.round)return;
+ V4_TWO_PENDING=null;$('v4RunTwoPack').disabled=false;
+ if(!data.ok||!v4ValidFive(data.games)){v4Status('원본 엔진의 5조합 응답을 검증할 수 없어 중단했습니다.');return;}
+ var first=data.games.map(v4NormalizeGame),second=v4CandidatePack(data.rank,first);
+ if(!second){v4Status('동일 원문에서 중복 없는 둘째 5조합을 구성할 수 없어 저장하지 않았습니다.');return;}
+ var together=first.concat(second.games).map(v4GameKey);
+ if(new Set(together).size!==10){v4Status('묶음 사이 중복 감지 · 저장 중단');return;}
+ V4_TWO_RESEARCH={
+  round_no:pending.round,source_sha256:pending.source_sha256,engine_source_blob:V4_TWO_ENGINE_BLOB,
+  pack_a:first,pack_b:second.games,profile_b:second.profile,research_only:true
+ };
+ v4RenderFive('v4PackA',first);v4RenderFive('v4PackB',second.games);
+ $('v4SaveTwoPack').disabled=false;
+ v4Status('원문 5+5 총 10조합 검증 완료 · 연구용 서버 저장을 확인 중…');
+ await v4SaveTwoPacks();
+}
+async function v4SaveTwoPacks(){
+ if(!token||!V4_TWO_RESEARCH){v4Status('저장할 검증된 분석 10조합이 없습니다.');return;}
+ $('v4SaveTwoPack').disabled=true;
+ try{
+  var r=await v4FetchJson(V4_TWO_API,{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify(V4_TWO_RESEARCH),cache:'no-store'});
+  if(!r.research_only||r.official_eligible!==false||!/^[a-f0-9]{64}$/.test(r.report_sha256))throw Error('REPORT_CONTRACT_MISMATCH');
+  v4Status('✅ 제'+V4_TWO_RESEARCH.round_no+'회 원문 5조합 × 2묶음 · '+(r.duplicate?'기존 동일 보고서 확인':'연구용 자동저장 완료')+' · 공식 결과전 잠금과 별개');
+ }catch(e){v4Status('10조합은 화면에 남아 있지만 서버 저장은 실패했습니다: '+String(e.message||e));}
+ finally{$('v4SaveTwoPack').disabled=false;}
+}
+window.addEventListener('message',function(ev){
+ var f=$('v4OriginalEngineFrame');
+ if(!f||!f.contentWindow||ev.source!==f.contentWindow||ev.origin!==window.location.origin)return;
+ var m=ev.data||{};
+ if(m.type==='V3_ENGINE_READY'){V4_TWO_ENGINE_READY=true;if(V4_TWO_SOURCE)v4Status('엔진 준비됨 · 제'+V4_TWO_SOURCE.round_no+'회 분석 가능');}
+ else if(m.type==='V3_ANALYSIS_RESULT'&&V4_TWO_PENDING)v4AcceptOriginalResult(m);
+});
+$('openV4AnalysisRoom').addEventListener('click',function(){homeView('v4');if(token)v4LoadSource();});
+$('v4AnalysisBack').addEventListener('click',function(){v4ResetPending();homeView('home');});
+$('v4LoadSource').addEventListener('click',v4LoadSource);
+$('v4RunTwoPack').addEventListener('click',v4RunTwoPacks);
+$('v4SaveTwoPack').addEventListener('click',v4SaveTwoPacks);
+$('v4AnalysisRound').addEventListener('change',function(){v4ResetPending();V4_TWO_SOURCE=null;$('v4SourceText').value='';$('v4SourceDigest').textContent='원문 SHA-256: 다시 불러오세요';});
+$('v4ResearchLibrary').addEventListener('click',function(){homeView('materials');selectedBeforeRoom='v4';
+ document.querySelectorAll('[data-before-room]').forEach(function(x){var on=x.getAttribute('data-before-room')==='v4';x.classList.toggle('selected',on);x.setAttribute('aria-pressed',String(on));});
+ loadIntegratedMaterials();
+});
+
 </script>
 </body></html>
