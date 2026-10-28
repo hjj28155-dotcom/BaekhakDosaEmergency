@@ -932,10 +932,10 @@ main:not(.roomMode) #centralRoundPanel label{font-size:.68rem!important}
  <div class="homePaneTop"><strong id="materialsRoomTitle">📑 결과후 보고서 · 전체 7개</strong><button id="homeMaterialsBack" type="button" class="secondary">홈으로</button></div>
  <div id="materialsBody">
  <section id="cumulativeAfterDashboard" hidden aria-label="통합 누적DB 결과후 전용">
-  <div class="cumTitle"><strong>누적DB · <span id="cumRoundLabel">1회차</span></strong><span>4방 결과후 전용</span></div>
+  <div class="cumTitle"><strong>누적DB · <span id="cumRoundLabel">1회차</span></strong><button id="cumJumpMore" type="button" aria-label="V7 및 V4 나머지 3방으로 이동">V7·V4 3방 ↓</button></div>
   <div class="cumDraw"><strong>공식 당첨번호</strong><div id="cumDrawNumbers" class="cumDrawNumbers">검증자료 조회 대기</div></div>
   <div class="cumLegend"><span><i class="winDot"></i>당첨번호</span><span><i class="bonusDot"></i>보너스</span><span>—/6 미확인</span></div>
-  <div class="cumRoomGrid" aria-label="도사방 항해사방 자동1방 자동2방 결과후 5조합">
+  <div class="cumRoomGrid" id="cumRoomGrid" role="region" tabindex="0" aria-label="V3 4방, V7 1방, V4 2방 총 7방 결과후 35조합. 아래로 스크롤하여 모두 확인">
 <article class="cumRoom" data-room="v3-1" aria-label="도사방 결과후">
  <div class="cumRoomHead"><strong>도사방</strong><small>5조합</small></div>
  <div class="cumRoomState" data-cum-state="v3-1">결과후 원본 확인 전</div>
@@ -956,11 +956,26 @@ main:not(.roomMode) #centralRoundPanel label{font-size:.68rem!important}
  <div class="cumRoomState" data-cum-state="v3-4">결과후 원본 확인 전</div>
  <ol><li><span class="cumRowNo">1.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li><li><span class="cumRowNo">2.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li><li><span class="cumRowNo">3.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li><li><span class="cumRowNo">4.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li><li><span class="cumRowNo">5.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li></ol>
 </article>
+<article class="cumRoom" data-room="v7" aria-label="V7 통제관방 결과후">
+ <div class="cumRoomHead"><strong>V7 통제관방</strong><small>V7 · 5조합</small></div>
+ <div class="cumRoomState" data-cum-state="v7">결과후 원본 확인 전</div>
+ <ol><li><span class="cumRowNo">1.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li><li><span class="cumRowNo">2.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li><li><span class="cumRowNo">3.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li><li><span class="cumRowNo">4.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li><li><span class="cumRowNo">5.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li></ol>
+</article>
+<article class="cumRoom" data-room="v4-1" aria-label="V4 선장방 결과후">
+ <div class="cumRoomHead"><strong>V4 선장방</strong><small>V4 1차 · 5조합</small></div>
+ <div class="cumRoomState" data-cum-state="v4-1">결과후 원본 확인 전</div>
+ <ol><li><span class="cumRowNo">1.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li><li><span class="cumRowNo">2.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li><li><span class="cumRowNo">3.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li><li><span class="cumRowNo">4.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li><li><span class="cumRowNo">5.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li></ol>
+</article>
+<article class="cumRoom" data-room="v4-2" aria-label="V4 연락관방 결과후">
+ <div class="cumRoomHead"><strong>V4 연락관방</strong><small>V4 2차 · 5조합</small></div>
+ <div class="cumRoomState" data-cum-state="v4-2">결과후 원본 확인 전</div>
+ <ol><li><span class="cumRowNo">1.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li><li><span class="cumRowNo">2.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li><li><span class="cumRowNo">3.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li><li><span class="cumRowNo">4.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li><li><span class="cumRowNo">5.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li></ol>
+</article>
   </div>
   <div class="cumControls"><button id="cumPrev" type="button" disabled>◀ 이전회차</button><input id="cumRoundInput" type="number" inputmode="numeric" min="1" max="1247" value="1" aria-label="조회 회차"><button id="cumNext" type="button">다음회차 ▶</button></div>
   <button type="button" id="cumRefresh" class="cumRefresh">결과후 조회</button>
   <div id="cumStatus" class="cumStatus" role="status" aria-live="polite">제1회 결과후 원본 확인 대기</div>
-  <div class="cumFooter">검증된 결과후 원본만 표시 · 미등록은 적중 0개가 아닙니다 · 원본 수정 없음</div>
+  <div class="cumFooter">전체 7방 · 35조합 · 아래로 스크롤 · 원본 미수신은 적중 0개가 아님</div>
  </section>
  <div id="afterSevenDashboard" aria-label="전체 7개 결과후 보고서">
   <div class="afterSevenTop">
@@ -1224,7 +1239,9 @@ window.captainV4ShowArchive=function(){afterSevenShowMode(false);};
 window.captainCumulativeIsAuthorized=function(){return !!token;};
 window.captainCumulativeFetchAfter=function(round){
  if(!token)return Promise.reject(Error('CAPTAIN_AUTH_REQUIRED'));
- return fetchThreeAppMetadata('v3','after',String(round));
+ return Promise.all(['v3','v7','freedom'].map(function(app){
+   return fetchThreeAppMetadata(app,'after',String(round)).then(function(data){return {app:app,data:data};},function(error){return {app:app,error:String(error&&error.message||error)};});
+ }));
 };
 window.captainCumulativeOpen=function(round){
  homeView('materials');
@@ -1233,7 +1250,7 @@ window.captainCumulativeOpen=function(round){
  body.classList.add('cumulativeOnlyMode');
  $('afterSevenDashboard').hidden=true;
  $('cumulativeAfterDashboard').hidden=false;
- $('materialsRoomTitle').textContent='🗄️ 통합 누적DB · 결과후';
+ $('materialsRoomTitle').textContent='🗄️ 통합 누적DB · 결과후 7방';
  if(typeof window.captainCumulativeRender==='function')window.captainCumulativeRender(round);
 };
 var materialApp='v3',materialStage='before',materialLast=null;
