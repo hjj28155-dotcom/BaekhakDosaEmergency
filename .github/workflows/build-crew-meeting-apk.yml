@@ -1,4 +1,4 @@
-name: Build same-signer captain three-app research APK v1.0.15
+name: Build same-signer captain three-app research APK v1.0.16
 on:
   push:
     branches:
@@ -55,12 +55,18 @@ jobs:
           grep -Fq 'id="homeApprovalBtn"' "$HOME_HTML"
           grep -Fq 'id="homeV3RoomsPanel"' "$HOME_HTML"
           grep -Fq 'id="openV3Rooms"' "$HOME_HTML"
+          grep -Fq 'id="openFreedomAnalysis"' "$HOME_HTML"
+          grep -Fq 'id="freedomAnalysisPanel"' "$HOME_HTML"
+          grep -Fq 'id="freedomFirstFive"' "$HOME_HTML"
+          grep -Fq 'id="freedomSecondFive"' "$HOME_HTML"
+          grep -Fq 'id="freedomOpenRecords"' "$HOME_HTML"
+          grep -Fq '실제 엔진 연결 전에는 번호를 생성하거나 분석 완료로 표시하지 않습니다.' "$HOME_HTML"
           grep -Fq 'data-v3-room-card="v3-4"' "$HOME_HTML"
           grep -Fq 'data-v3-report="v3-1"' "$HOME_HTML"
           grep -Fq 'data-material-stage="after"' "$HOME_HTML"
           grep -Fq '기존 누적 350회' "$HOME_HTML"
           grep -Fq 'loadCaptainDashboard()' crew-meeting-android/app/src/main/java/kr/hanghae/crewmeeting/MainActivity.java
-          grep -Fq "versionCode 115" crew-meeting-android/app/build.gradle
+          grep -Fq "versionCode 116" crew-meeting-android/app/build.gradle
           test "$(grep -c 'data-before-room=' "$HOME_HTML")" -eq 7
           test "$(grep -c 'data-v3-room-card=' "$HOME_HTML")" -eq 4
           test "$(grep -c 'data-v3-report=' "$HOME_HTML")" -eq 4
@@ -81,23 +87,23 @@ jobs:
           test "$NEW_CERT" = "e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be"
           echo "Recovery app signer pinned: $NEW_CERT"
           "$AAPT" dump badging "$APK" | head -5
-          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting.compact' versionCode='115'"
+          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting.compact' versionCode='116'"
           ! "$AAPT" dump badging "$APK" | grep -q "package: name='com.baekhak.dosa.v4'"
           mkdir -p crew-meeting-android/releases
-          cp "$APK" crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.15_V3ROOM_TEST.apk
-          (cd crew-meeting-android/releases && sha256sum HANGHAE_CREW_MEETING_1.0.15_V3ROOM_TEST.apk > HANGHAE_CREW_MEETING_1.0.15_V3ROOM_TEST.apk.sha256)
+          cp "$APK" crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.16_V4ROOM_TEST.apk
+          (cd crew-meeting-android/releases && sha256sum HANGHAE_CREW_MEETING_1.0.16_V4ROOM_TEST.apk > HANGHAE_CREW_MEETING_1.0.16_V4ROOM_TEST.apk.sha256)
       - uses: actions/upload-artifact@v4
         with:
-          name: HANGHAE-CREW-MEETING-1.0.15-V3ROOM-TEST-APK
+          name: HANGHAE-CREW-MEETING-1.0.16-V4ROOM-TEST-APK
           path: |
-            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.15_V3ROOM_TEST.apk
-            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.15_V3ROOM_TEST.apk.sha256
+            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.16_V4ROOM_TEST.apk
+            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.16_V4ROOM_TEST.apk.sha256
           if-no-files-found: error
           retention-days: 30
       - name: Verify isolated APK artifact packaging
         run: |
           set -euo pipefail
-          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.15_V3ROOM_TEST.apk
-          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.15_V3ROOM_TEST.apk.sha256
-          (cd crew-meeting-android/releases && sha256sum --check HANGHAE_CREW_MEETING_1.0.15_V3ROOM_TEST.apk.sha256)
+          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.16_V4ROOM_TEST.apk
+          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.16_V4ROOM_TEST.apk.sha256
+          (cd crew-meeting-android/releases && sha256sum --check HANGHAE_CREW_MEETING_1.0.16_V4ROOM_TEST.apk.sha256)
           echo "TEST artifact verified. Do NOT replace the stable fixed Google Drive APK without device verification."
