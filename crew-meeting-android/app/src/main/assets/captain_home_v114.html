@@ -891,6 +891,7 @@ main:not(.roomMode) #centralRoundPanel label{font-size:.68rem!important}
 <div id="homeSpecialRooms" aria-label="기존 승인관리와 결과전 자료실">
 <button id="homeApprovalBtn" type="button" aria-expanded="false" aria-controls="homeApprovalPanel">🔐 일반판 승인관리</button>
 <button id="homeMaterialsBtn" type="button" aria-expanded="false" aria-controls="homeMaterialsPanel">🗄️ 통합 누적DB · 결과후</button>
+<button id="homeCumulativeScoreBtn" type="button" aria-controls="homeMaterialsPanel">🏆 총 누적 성적 결과방</button>
 </div>
 <div id="centralRoundPanel" aria-label="중앙통제실 전회차 조회">
  <label for="centralRoundInput">🔎 중앙통제실 · 제1회부터 현회차까지 조회</label>
@@ -933,6 +934,7 @@ main:not(.roomMode) #centralRoundPanel label{font-size:.68rem!important}
  <div id="materialsBody">
  <section id="cumulativeAfterDashboard" hidden aria-label="통합 누적DB 결과후 전용">
   <div class="cumTitle"><strong>누적DB · <span id="cumRoundLabel">1회차</span></strong><button id="cumJumpMore" type="button" aria-label="V7 및 V4 나머지 3방으로 이동">V7·V4 3방 ↓</button></div>
+  <button id="cumGoTotalScore" type="button" class="cumScoreShortcut">🏆 총 누적 성적 결과방 · 7방 합산 보기</button>
   <div class="cumDraw"><strong>공식 당첨번호</strong><div id="cumDrawNumbers" class="cumDrawNumbers">검증자료 조회 대기</div></div>
   <div class="cumLegend"><span><i class="winDot"></i>당첨번호</span><span><i class="bonusDot"></i>보너스</span><span>—/6 미확인</span></div>
   <div class="cumRoomGrid" id="cumRoomGrid" role="region" tabindex="0" aria-label="V3 4방, V7 1방, V4 2방 총 7방 결과후 35조합. 아래로 스크롤하여 모두 확인">
@@ -977,6 +979,36 @@ main:not(.roomMode) #centralRoundPanel label{font-size:.68rem!important}
   <div id="cumStatus" class="cumStatus" role="status" aria-live="polite">제1회 결과후 원본 확인 대기</div>
   <div class="cumFooter">전체 7방 · 35조합 · 아래로 스크롤 · 원본 미수신은 적중 0개가 아님</div>
  </section>
+ <section id="cumulativeScoreDashboard" hidden aria-label="총 누적 성적 결과방 7방 전체">
+ <div class="scoreTop"><strong>🏆 총 누적 성적 · 전체 7방</strong><button id="scoreBack" type="button">◀ 회차별 결과후</button></div>
+ <div class="scoreScroll">
+  <div class="scoreIntro">V3 4방 · V7 통제관방 · V4 선장엔진/연락관엔진 각 5조합 · 총 35조합/회차</div>
+  <div class="scoreGrades" aria-label="0/6에서 6/6까지 8개 적중등급"><div class="scoreGrade" data-grade="0"><strong>0/6</strong><output data-score-grade="0">—</output><small data-score-grade-percent="0">—%</small></div>
+<div class="scoreGrade" data-grade="1"><strong>1/6</strong><output data-score-grade="1">—</output><small data-score-grade-percent="1">—%</small></div>
+<div class="scoreGrade" data-grade="2"><strong>2/6</strong><output data-score-grade="2">—</output><small data-score-grade-percent="2">—%</small></div>
+<div class="scoreGrade" data-grade="3"><strong>3/6</strong><output data-score-grade="3">—</output><small data-score-grade-percent="3">—%</small></div>
+<div class="scoreGrade" data-grade="4"><strong>4/6</strong><output data-score-grade="4">—</output><small data-score-grade-percent="4">—%</small></div>
+<div class="scoreGrade" data-grade="5"><strong>5/6</strong><output data-score-grade="5">—</output><small data-score-grade-percent="5">—%</small></div>
+<div class="scoreGrade" data-grade="6"><strong>5/6+보너스</strong><output data-score-grade="6">—</output><small data-score-grade-percent="6">—%</small></div>
+<div class="scoreGrade" data-grade="7"><strong>6/6</strong><output data-score-grade="7">—</output><small data-score-grade-percent="7">—%</small></div></div>
+  <div class="scoreTotals"><div><small>총회수 (채점 완료 조합)</small><strong id="scoreTotalCount">미집계</strong></div><div><small>총성공확률</small><strong id="scoreSuccessPercent">—%</strong></div></div>
+  <div class="scoreThreshold"><label for="scoreSuccessThreshold">성공 기준</label><select id="scoreSuccessThreshold"><option value="3">3/6 이상</option><option value="4">4/6 이상</option><option value="5">5/6 이상 (보너스 포함)</option><option value="6">6/6</option></select></div>
+  <div class="scoreHint">백분율 = 해당 적중등급 조합수 ÷ 채점 완료 조합수 × 100<br>총성공확률 = 선택한 성공 기준 이상 적중 조합수 ÷ 채점 완료 조합수 × 100<br>동일 회차·방·조합의 중복 기록은 합산하지 않습니다.</div>
+  <div class="scoreRoomTitle">방별 누적 성적</div>
+  <div class="scoreRooms" aria-label="7방과 전체 합계 누적 성적"><article class="scoreRoom" data-score-room="all"><strong>전체 7방 합계</strong><span>채점 <output data-score-total="all">미집계</output></span><span>성공 <output data-score-success="all">—%</output></span></article>
+<article class="scoreRoom" data-score-room="v3-1"><strong>V3 도사방</strong><span>채점 <output data-score-total="v3-1">미집계</output></span><span>성공 <output data-score-success="v3-1">—%</output></span></article>
+<article class="scoreRoom" data-score-room="v3-2"><strong>V3 항해사방</strong><span>채점 <output data-score-total="v3-2">미집계</output></span><span>성공 <output data-score-success="v3-2">—%</output></span></article>
+<article class="scoreRoom" data-score-room="v3-3"><strong>V3 자동1방</strong><span>채점 <output data-score-total="v3-3">미집계</output></span><span>성공 <output data-score-success="v3-3">—%</output></span></article>
+<article class="scoreRoom" data-score-room="v3-4"><strong>V3 자동2방</strong><span>채점 <output data-score-total="v3-4">미집계</output></span><span>성공 <output data-score-success="v3-4">—%</output></span></article>
+<article class="scoreRoom" data-score-room="v7"><strong>V7 통제관방</strong><span>채점 <output data-score-total="v7">미집계</output></span><span>성공 <output data-score-success="v7">—%</output></span></article>
+<article class="scoreRoom" data-score-room="v4-1"><strong>V4 선장엔진 5조합</strong><span>채점 <output data-score-total="v4-1">미집계</output></span><span>성공 <output data-score-success="v4-1">—%</output></span></article>
+<article class="scoreRoom" data-score-room="v4-2"><strong>V4 연락관엔진 5조합</strong><span>채점 <output data-score-total="v4-2">미집계</output></span><span>성공 <output data-score-success="v4-2">—%</output></span></article></div>
+  <div class="scoreRoomTitle">자료실 자동업로드 연결 점검</div>
+  <div id="scoreSyncStatus" class="scoreSyncStatus" role="status" aria-live="polite">원본 6번호 결과후 자동업로드: 미검증</div>
+  <button id="scoreRefresh" type="button" class="cumRefresh">연동 상태 다시 확인</button>
+  <div id="scoreStatus" class="scoreStatus" role="status">검증된 결과후 6번호 원본이 없는 회차는 성적에 포함하지 않습니다.</div>
+ </div>
+</section>
  <div id="afterSevenDashboard" aria-label="전체 7개 결과후 보고서">
   <div class="afterSevenTop">
    <div class="afterSevenRound"><label for="afterSevenRound">조회 회차</label><input id="afterSevenRound" type="number" min="1" max="1247" inputmode="numeric" placeholder="전체"><button type="button" id="afterSevenRefresh">조회</button></div>
@@ -1240,18 +1272,30 @@ window.captainCumulativeIsAuthorized=function(){return !!token;};
 window.captainCumulativeFetchAfter=function(round){
  if(!token)return Promise.reject(Error('CAPTAIN_AUTH_REQUIRED'));
  return Promise.all(['v3','v7','freedom'].map(function(app){
-   return fetchThreeAppMetadata(app,'after',String(round)).then(function(data){return {app:app,data:data};},function(error){return {app:app,error:String(error&&error.message||error)};});
+   return fetchThreeAppMetadata(app,'after',round==null?'':String(round)).then(function(data){return {app:app,data:data};},function(error){return {app:app,error:String(error&&error.message||error)};});
  }));
 };
 window.captainCumulativeOpen=function(round){
  homeView('materials');
  var body=$('materialsBody');
- body.classList.remove('afterOverviewMode');
+ body.classList.remove('afterOverviewMode','cumulativeScoreMode');
  body.classList.add('cumulativeOnlyMode');
+ $('cumulativeScoreDashboard').hidden=true;
  $('afterSevenDashboard').hidden=true;
  $('cumulativeAfterDashboard').hidden=false;
  $('materialsRoomTitle').textContent='🗄️ 통합 누적DB · 결과후 7방';
  if(typeof window.captainCumulativeRender==='function')window.captainCumulativeRender(round);
+};
+window.captainCumulativeScoreOpen=function(){
+ homeView('materials');
+ var body=$('materialsBody');
+ body.classList.remove('afterOverviewMode','cumulativeOnlyMode');
+ body.classList.add('cumulativeScoreMode');
+ $('afterSevenDashboard').hidden=true;
+ $('cumulativeAfterDashboard').hidden=true;
+ $('cumulativeScoreDashboard').hidden=false;
+ $('materialsRoomTitle').textContent='🏆 총 누적 성적 결과방 · 7방';
+ if(typeof window.captainCumulativeScoreRender==='function')window.captainCumulativeScoreRender();
 };
 var materialApp='v3',materialStage='before',materialLast=null;
 var afterSevenSelected='all',afterSevenSerial=0,afterSevenSnapshot=null;
@@ -1292,7 +1336,8 @@ function afterSevenChoose(room){
 }
 document.querySelectorAll('[data-after-seven]').forEach(function(el){el.addEventListener('click',function(){afterSevenChoose(el.getAttribute('data-after-seven'));});});
 function afterSevenShowMode(active){
- $('materialsBody').classList.remove('cumulativeOnlyMode');
+ $('materialsBody').classList.remove('cumulativeOnlyMode','cumulativeScoreMode');
+ $('cumulativeScoreDashboard').hidden=true;
  $('cumulativeAfterDashboard').hidden=true;
  $('materialsBody').classList.toggle('afterOverviewMode',active);
  $('afterSevenDashboard').hidden=!active;
@@ -1590,6 +1635,7 @@ $('homeMaterialsBtn').addEventListener('click',function(){
  else window.captainCumulativeOpen(1);
 });
 $('homeMaterialsBack').addEventListener('click',function(){homeView('home');});
+$('homeCumulativeScoreBtn').addEventListener('click',function(){window.captainCumulativeScoreOpen();});
 $('homeApprovalBackBtn').addEventListener('click',function(){homeView('home');});
 $('homeLiveBtn').addEventListener('click',function(){homeView('live');});
 $('homeReportBtn').addEventListener('click',function(){homeView('reports');});
