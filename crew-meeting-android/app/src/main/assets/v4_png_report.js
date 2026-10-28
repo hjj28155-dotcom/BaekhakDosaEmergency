@@ -4,7 +4,7 @@
  var byId=function(id){return document.getElementById(id);};
  var preview=byId('freedomPngPreview'),save=byId('freedomSavePng'),notice=byId('freedomPngStatus');
  if(!preview||!save||!notice)return;
- var W=960,H=1210,canvas=document.createElement('canvas');
+ var W=960,H=1350,canvas=document.createElement('canvas');
  canvas.width=W;canvas.height=H;
  var ctx=canvas.getContext('2d');
  var current={captain:null,liaison:null},lastPng='',lastRound=null,renderPending=false;
@@ -31,23 +31,23 @@
   ctx.fillStyle=color;ctx.textAlign=align||'left';ctx.fillText(text,x,y);
  }
  function ball(n,x,y,accent){
-  ctx.beginPath();ctx.arc(x,y,26,0,Math.PI*2);
+  ctx.beginPath();ctx.arc(x,y,29,0,Math.PI*2);
   ctx.fillStyle=n==null?'#123a5c':'#174d77';ctx.fill();
   ctx.strokeStyle=n==null?'#5d829d':accent;ctx.lineWidth=2.5;ctx.stroke();
-  label(n==null?'—':String(n).padStart(2,'0'),x,y+9,24,n==null?'#8baec5':'#fff4d6',true,'center');
+  label(n==null?'—':String(n).padStart(2,'0'),x,y+11,31,n==null?'#8baec5':'#fff4d6',true,'center');
  }
  function section(y,title,sub,games,accent,ready){
-  rect(40,y,880,426,20,'#082b49',accent,3);
-  rect(40,y,880,76,19,accent);
-  label(title,70,y+48,31,'#ffffff',true);
-  label(ready?'검증된 5조합':'독립 원본 확인 대기',891,y+48,21,'#f5f3e9',true,'right');
-  label(sub,70,y+108,21,'#c8e3f1',false);
+  rect(40,y,880,465,20,'#082b49',accent,3);
+  rect(40,y,880,82,19,accent);
+  label(title,70,y+52,32,'#ffffff',true);
+  label(ready?'검증된 5조합':'독립 원본 확인 대기',891,y+52,21,'#f5f3e9',true,'right');
+  label(sub,70,y+121,22,'#c8e3f1',false);
   for(var i=0;i<5;i++){
-   var cy=y+153+i*52;
-   if(i%2===0)rect(64,cy-31,828,48,9,'#103957');
-   label(String(i+1)+'.',83,cy+6,23,'#e9f3fb',true);
+   var cy=y+160+i*60;
+   if(i%2===0)rect(64,cy-33,828,57,9,'#103957');
+   label(String(i+1)+'.',83,cy+8,26,'#e9f3fb',true);
    var row=ready?games[i]:null;
-   for(var j=0;j<6;j++)ball(row?row[j]:null,164+j*103,cy,accent);
+   for(var j=0;j<6;j++)ball(row?row[j]:null,184+j*130,cy,accent);
   }
  }
  function draw(){
@@ -61,16 +61,16 @@
   rect(13,13,W-26,H-26,22,'#061f37','#d9b36f',5);
   label('항해의자유 V4 · PNG 분석 결과보고서',48,83,36,'#ffe0a3',true);
   label('제'+(round==null?'—':round)+'회차 · 독립 엔진 5조합 × 2',49,126,23,'#bcd8e8',false);
-  section(157,'선장엔진 R46 · 5조합',
+  section(160,'선장엔진 R46 · 5조합',
    captain?'DB-1 원문 검증 · 선장엔진 실제 출력':'선장엔진 결과 미확인 · 임의 번호 생성 금지',
    captain&&captain.games,'#167c9c',!!captain);
-  section(600,'연락관엔진 R1 · 5조합',
+  section(638,'연락관엔진 R1 · 5조합',
    liaison?'독립 사전원본 검증 연구 · 공식 잠금 아님':'V3·도사 독립 사전원본 필요 · 연락관엔진 보류',
    liaison&&liaison.games,'#8956bb',!!liaison);
-  rect(40,1043,880,127,12,'#0b324c','#617f93',2);
-  label('결과전 연구자료 · 공식 추첨 전 확정 잠금 증빙 아님',61,1086,23,'#f4d6a4',true);
-  label('검증된 원본만 표시 · 미확인 조합은 빈칸 유지',61,1127,20,'#c8dfec',false);
-  label('중앙 자료실 자동업로드: 별도 검증 필요',61,1154,18,'#b2c7d8',false);
+  rect(40,1118,880,180,12,'#0b324c','#617f93',2);
+  label('결과전 연구자료 · 공식 추첨 전 확정 잠금 증빙 아님',61,1175,23,'#f4d6a4',true);
+  label('검증된 원본만 표시 · 미확인 조합은 빈칸 유지',61,1220,22,'#c8dfec',false);
+  label('중앙 자료실 자동업로드: 별도 검증 필요',61,1261,20,'#b2c7d8',false);
   try{
    lastPng=canvas.toDataURL('image/png');
    if(!lastPng.startsWith('data:image/png;base64,'))throw Error('PNG_ENCODING');
