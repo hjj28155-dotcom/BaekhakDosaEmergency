@@ -52,6 +52,7 @@ function goHome(){
  try{if(window.unlockApprovedApp)window.unlockApprovedApp();
  else if(native()&&native().startApprovedRuntime)native().startApprovedRuntime()}catch(e){}
  try{if(typeof refreshHomeUI==='function')refreshHomeUI()}catch(e){}
+ setTimeout(checkHomeUpdate,1200);
 }
 function showVideo(type){
  if(stage===HOME)return;
@@ -183,8 +184,57 @@ function checkFreedomInstalledVersion(){
   msg.textContent='버전 확인에 실패했습니다. 인터넷 연결을 확인한 뒤 다시 시도하세요.';
  }
 }
+// V4.0.50: home notification uses the same verified official release callback.
+let homeUpdatePending=null,homeUpdateBusy=false,homeUpdateLastCheck=0;
+const homeUpdateShown=new Set();
+function validHomeUpdate(q){
+ if(!q||typeof q!=='object')return false;
+ const installed=Number(q.installed_code),latest=Number(q.latest_code);
+ return !!q&&q.status==='update'&&Number.isSafeInteger(installed)&&installed>0&&
+ Number.isSafeInteger(latest)&&latest>=40041&&latest<=200000&&latest>installed;
+}
+function homeIsVisible(){
+ if(stage!==HOME||window.__onboardingSequenceActive||document.hidden)return false;
+ for(const id of ['modal','freedomR14FullScreen','approvalHardLock','fanfareOverlay','comfortOverlay','installGuideOverlay']){
+  const e=document.getElementById(id);
+  if(e&&window.getComputedStyle(e).display!=='none')return false;
+ }
+ return true;
+}
+function openFreedomUpdate(){
+ try{const h=native();if(h&&h.openOfficialUpdateLink){h.openOfficialUpdateLink();return}if(h&&h.openRadioPage){h.openRadioPage(HUB);return}window.open(HUB,'_blank')}
+ catch(e){alert('공식 업데이트 링크를 열지 못했습니다.')}
+}
+function showHomeUpdate(){
+ const q=homeUpdatePending;
+ if(!q||!validHomeUpdate(q)||homeUpdateShown.has(Number(q.latest_code))||!homeIsVisible()||document.getElementById('freedomHomeUpdatePopup'))return;
+ const o=document.createElement('section');o.id='freedomHomeUpdatePopup';
+ o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');o.setAttribute('aria-labelledby','freedomHomeUpdateTitle');
+ o.style.cssText='position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(0,12,25,.78);font-family:system-ui,sans-serif';
+ o.innerHTML='<div style="width:100%;max-width:390px;padding:22px;border:1px solid #e4bf58;border-radius:18px;background:#082c47;color:white;box-shadow:0 12px 45px #0008"><h2 id="freedomHomeUpdateTitle" style="margin:0 0 14px;color:#ffe28a;font-size:21px">새 업데이트가 있습니다</h2><p id="freedomHomeUpdateVersion" style="line-height:1.6"></p><p style="line-height:1.6;font-size:14px">기존 앱을 삭제하지 않고 업데이트하세요.</p><div style="display:flex;gap:9px;margin-top:18px"><button type="button" id="freedomHomeUpdateLater" style="flex:1;padding:13px;border:1px solid #7ca4bb;border-radius:10px;background:#143d57;color:white">나중에</button><button type="button" id="freedomHomeUpdateNow" style="flex:1;padding:13px;border:1px solid #edcf77;border-radius:10px;background:#795b1a;color:white;font-weight:800">업데이트</button></div></div>';
+ document.body.appendChild(o);
+ o.querySelector('#freedomHomeUpdateVersion').textContent='현재 '+String(q.installed_name||q.installed_code)+' → 새 버전 '+String(q.latest_name||q.latest_code);
+ homeUpdateShown.add(Number(q.latest_code));
+ const previous=document.activeElement;
+ function close(){o.remove();if(previous&&typeof previous.focus==='function')previous.focus()}
+ const later=o.querySelector('#freedomHomeUpdateLater'),now=o.querySelector('#freedomHomeUpdateNow');
+ later.onclick=close;now.onclick=()=>{close();openFreedomUpdate()};
+ o.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();close()}else if(e.key==='Tab'){e.preventDefault();(document.activeElement===later?now:later).focus()}});
+ if(typeof now.focus==='function')now.focus();
+}
+function checkHomeUpdate(){
+ showHomeUpdate();
+ if(stage!==HOME||document.hidden||homeUpdateBusy)return;
+ const h=native();if(!h||typeof h.checkLatestFreedomVersion!=='function')return;
+ const now=Date.now();if(homeUpdateLastCheck&&now-homeUpdateLastCheck<300000)return;
+ homeUpdateLastCheck=now;homeUpdateBusy=true;
+ try{h.checkLatestFreedomVersion();setTimeout(()=>{homeUpdateBusy=false},30000)}catch(e){homeUpdateBusy=false}
+}
 window.onFreedomVersionStatus=function(payload){
  let q={};try{q=typeof payload==='string'?JSON.parse(payload||'{}'):(payload||{})}catch(e){}
+ homeUpdateBusy=false;
+ homeUpdatePending=validHomeUpdate(q)?q:null;
+ showHomeUpdate();
  const msg=document.getElementById('freedomVersionMessage');
  const details=document.getElementById('freedomVersionDetails');
  const dl=document.getElementById('freedomVersionDownload');
@@ -208,12 +258,12 @@ window.updatePage=function(){
  const retry=document.getElementById('freedomVersionRetry');
  const dl=document.getElementById('freedomVersionDownload');
  if(retry)retry.onclick=checkFreedomInstalledVersion;
- if(dl)dl.onclick=()=>{
-  try{const h=native();if(h&&h.openOfficialUpdateLink){h.openOfficialUpdateLink();return}if(h&&h.openRadioPage){h.openRadioPage(HUB);return}window.open(HUB,'_blank')}
-  catch(e){alert('공식 업데이트 링크를 열지 못했습니다.')}
- };
+ if(dl)dl.onclick=openFreedomUpdate;
  checkFreedomInstalledVersion();
 };
+if(window.addEventListener)window.addEventListener('focus',checkHomeUpdate);
+if(document.addEventListener)document.addEventListener('visibilitychange',checkHomeUpdate);
+if(window.setInterval)window.setInterval(checkHomeUpdate,15000);
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
 else boot();
 })();
