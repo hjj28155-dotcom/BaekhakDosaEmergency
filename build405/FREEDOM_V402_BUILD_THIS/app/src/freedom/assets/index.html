@@ -1760,11 +1760,15 @@ function v330PurchasePage(round){
 }
 function v4044RawCard(round){
  const n=Number(round),saved=R().raw||{},bank=rawBank(n)||{};
- const manual=String(saved.text||'').trim(),embedded=String(bank.text||'').trim(),raw=manual||embedded;
- if(raw.split(/\r?\n/).filter(x=>x.trim()).length!==6)return `<div class="panel warn">제${n}회 원문 6문장 확인 대기 · 없는 원문은 임의 생성하지 않습니다.</div>`;
- return `<section class="panel goldline"><h3>제${n}회 원문 6문장</h3><div class="small status">출처: ${esc(manual?(saved.source||'기기 원문'):(bank.source||'내장 DB-1 원문'))}</div><div style="white-space:pre-wrap;text-align:left;line-height:1.7;margin-top:10px">${esc(raw)}</div></section>`;
+ const manual=String(saved.text||'').trim(),embedded=String(bank.text||'').trim();
+ const sixLines=raw=>raw.split(/\r?\n/).filter(x=>x.trim()).length===6;
+ const manualValid=sixLines(manual),bankValid=sixLines(embedded);
+ const raw=manualValid?manual:(bankValid?embedded:'');
+ if(!raw)return `<div class="panel warn">제${n}회 원문 6문장 확인 대기 · 없는 원문은 임의 생성하지 않습니다.</div>`;
+ const source=manualValid?(saved.source||'기기 원문'):(bank.source||'내장 DB-1 원문');
+ const notice=manual&&!manualValid&&bankValid?'<p class="small warn">기기에 저장된 원문은 6문장 형식이 아니어서 내장 DB-1 원문을 대신 표시합니다. 기존 입력은 삭제하거나 덮어쓰지 않았습니다.</p>':'';
+ return `<section class="panel goldline"><h3>제${n}회 원문 6문장</h3><div class="small status">출처: ${esc(source)}</div>${notice}<div style="white-space:pre-wrap;text-align:left;line-height:1.7;margin-top:10px">${esc(raw)}</div></section>`;
 }
-
 function v4044ValidSets(games,count){
  if(!Array.isArray(games)||games.length!==count)return null;
  const sets=games.map(g=>{
@@ -1772,32 +1776,38 @@ function v4044ValidSets(games,count){
   if(a.length!==6||a.some(n=>!Number.isInteger(n)||n<1||n>45)||new Set(a).size!==6)return null;
   return [...a].sort((a,b)=>a-b);
  });
- return sets.every(Boolean)&&new Set(sets.map(x=>x.join(','))).size===count?sets:null;
+ return sets.every(Boolean)?sets:null; // Duplicated stored tickets remain visible for grading; never invent replacements.
 }
 
 function v4044AutoRows(games,win,label){
  const winning=new Set(win.nums),bonus=Number(win.bonus),rankLabel=h=>h===6?'1등':h===5?'3등':h===4?'4등':h===3?'5등':'낙선';
+ const duplicateCount=games.length-new Set(games.map(nums=>nums.join(','))).size;
  let awarded=0;
  const rows=games.map((nums,i)=>{
   const hits=nums.filter(x=>winning.has(x)).length,bonusHit=nums.includes(bonus),rank=hits===5&&bonusHit?'2등':rankLabel(hits);
   if(hits>=3)awarded++;
   return `<div class="r5row" style="grid-template-columns:28px 1fr 55px"><b>${i+1}</b><div class="r5balls">${nums.map(x=>`<span class="r5ball ${winning.has(x)?'hit':''}" style="${x===bonus?'border-color:#f9cf59;color:#f9cf59':''}">${x}</span>`).join('')}</div><span class="r5hit">${rank}</span></div>`;
  }).join('');
- return `<section class="panel"><h3>${esc(label)}</h3><p class="small status">당첨 조합 ${awarded}/${games.length} · 원본 보관 기록과만 비교</p>${rows}</section>`;
+ return `<section class="panel"><h3>${esc(label)}</h3><p class="small status">당첨 조합 ${awarded}/${games.length} · 원본 보관 기록과만 비교${duplicateCount?' · 중복 저장 조합 '+duplicateCount+'건 포함':''}</p>${rows}</section>`;
 }
 
 function v4044ReviewRound(round){
  const n=Number(round);if(!V330_RECENT.includes(n))return rawPage();if(!setRound(n))return;
  const rec=R(),w=V330_WIN[n]||null,actual=v4044ValidSets((rec.analysis||{}).auto20,20),research=v4044ValidSets((rec.analysisResearch||{}).auto20,20);
  const buy=rec.buy||{},purchased=buy.locked?v4044ValidSets(buy.combos,5):null;
+ // Fallback to persisted original analysis/legacy groups only; no postdraw generation or official lock assertion.
+ const archiveGroups=Array.isArray((rec.analysis||{}).groups)?rec.analysis.groups:(Array.isArray((rec.legacy||{}).groups)?rec.legacy.groups:[]);
+ const archiveRows=archiveGroups.flatMap(g=>Array.isArray(g?.rows)?g.rows.map(r=>r?.game??r?.numbers??null):[]);
+ const archived=(!purchased&&!actual&&!research&&archiveRows.length&&archiveRows.length<=100)?v4044ValidSets(archiveRows,archiveRows.length):null;
  let html=`<div class="analysisCompact">${v4044RawCard(n)}`;
  if(w){
   html+=`<section class="panel goldline"><h3>제${n}회 확인된 당첨번호</h3><div class="r5winning">${w.nums.map(x=>`<span class="r5ball hit">${x}</span>`).join('')}</div><div>보너스 ${w.bonus}</div></section>`;
   if(purchased)html+=v4044AutoRows(purchased,w,'최초잠금 구매 5조합 자동채점');
   if(actual)html+=v4044AutoRows(actual,w,'저장된 자동분석 20조합 비교 · 사전인증과 별개');
   if(research)html+=v4044AutoRows(research,w,'사후 연구 20조합 비교 · 공식 실적 제외');
+  if(archived)html+=v4044AutoRows(archived,w,'기존 저장 분석그룹·이관 조합 비교 · 최초잠금 인증과 별개');
  }else html+='<section class="panel warn">당첨번호 미확인 · 자동채점 대기</section>';
- if(!purchased&&!actual&&!research)html+='<section class="panel warn"><h3>저장 조합 확인 대기</h3><p>이 회차의 최초잠금 구매조합 또는 원장 20조합을 찾지 못했습니다. 추첨 후 새로운 조합을 만들어 당첨 전 기록이라고 표시하지 않습니다.</p></section>';
+ if(!purchased&&!actual&&!research&&!archived)html+='<section class="panel warn"><h3>저장 조합 확인 대기</h3><p>이 회차의 최초잠금 구매조합 또는 원장 20조합을 찾지 못했습니다. 추첨 후 새로운 조합을 만들어 당첨 전 기록이라고 표시하지 않습니다.</p></section>';
  html+='<div class="row"><button class="b" onclick="rawPage()">회차선택</button><button class="b" onclick="closeM()">닫기</button></div></div>';
  modal(`제${n}회 · 원문 및 자동채점`,html);
 }
