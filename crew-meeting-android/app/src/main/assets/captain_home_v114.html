@@ -798,6 +798,12 @@ main:not(.roomMode) #centralRoundPanel label{font-size:.68rem!important}
 #freedomTextBackup[open] .v4FiveGroup li{white-space:normal!important;overflow-wrap:anywhere;text-overflow:clip!important;line-height:1.2!important}
 @media(max-height:650px){.v4TextBackup{max-height:27vh}.v4PngTop button{min-height:26px}.v4PngPanel{padding:4px!important}}
 
+/* Verified V7 captain archive is reference only, never a controller room replacement. */
+.cumV7ArchiveReference{border:1px solid #a78b61;border-radius:10px;background:#092a43;padding:7px 10px;color:#f2d9a7;font-size:.7rem;max-height:170px;overflow:auto}
+.cumV7ArchiveReference summary{cursor:pointer;font-weight:700}
+.cumV7ArchiveReference ol{margin:8px 0;padding-left:24px;color:#dcecf8;line-height:1.5}
+.cumV7ArchiveReference small{color:#c2d3df;line-height:1.4}
+
 /* V1.0.27 Captain: keep provenance/DB diagnostics in DOM but hide the
    nonessential status bars, original-text disclosure and duplicate text list.
    Reclaim all their space for the verified PNG without changing the engines. */
@@ -1021,6 +1027,11 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
  <ol><li><span class="cumRowNo">1.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li><li><span class="cumRowNo">2.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li><li><span class="cumRowNo">3.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li><li><span class="cumRowNo">4.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li><li><span class="cumRowNo">5.</span><span class="cumBalls"><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span><span class="cumBall">—</span></span><span class="cumHit pending">—/6</span></li></ol>
 </article>
   </div>
+  <details id="cumV7ArchiveReference" class="cumV7ArchiveReference" hidden>
+   <summary>V7 선장 보관 원본 · 제<span id="cumV7ArchiveRound">1</span>회 5조합 (통제관방과 별도)</summary>
+   <ol id="cumV7ArchiveRows"></ol>
+   <small>서버 보관된 V7 선장방 과거 연구 원본입니다. V7 통제관방 5조합이나 추첨 전 잠금으로 대체하지 않습니다.</small>
+  </details>
   <div class="cumControls"><button id="cumPrev" type="button" disabled>◀ 이전회차</button><input id="cumRoundInput" type="number" inputmode="numeric" min="1" max="1247" value="1" aria-label="조회 회차"><button id="cumNext" type="button">다음회차 ▶</button></div>
   <button type="button" id="cumRefresh" class="cumRefresh">결과후 조회</button>
   <div id="cumStatus" class="cumStatus" role="status" aria-live="polite">제1회 결과후 원본 확인 대기</div>
