@@ -1958,6 +1958,42 @@ function v4045GroupedScore(games,w,label,sourceType){
  (duplicates?' · 중복 저장 '+duplicates+'개':'')+'</div>'+
  '<div class="r5grid">'+v330GroupsResult(games,w.nums,w.bonus)+'</div>';
 }
+const V4049_ANNOUNCED=Object.create(null);
+function v4049ScoreSummary(games,win){
+ const winning=new Set(win.nums),bonus=Number(win.bonus);
+ const results=games.map(game=>{
+  const hits=game.filter(n=>winning.has(Number(n))).length;
+  const bonusHit=hits===5&&game.includes(bonus);
+  const rank=calcRank(hits,bonusHit).no;
+  return {hits,rank};
+ });
+ const winningRows=results.filter(x=>x.rank>=1&&x.rank<=5);
+ const bestRank=winningRows.length?Math.min(...winningRows.map(x=>x.rank)):0;
+ const highestHits=Math.max(...results.map(x=>x.hits));
+ return {highestHits,wins:winningRows.length,bestRank};
+}
+function v4049Announce(round,force){
+ const n=Number(round);
+ if(!V4046_VISIBLE.includes(n)||Number(cur())!==n)return false;
+ const rec=(D.rounds||{})[String(n)]||{},buy=rec.buy||{};
+ const win=v4046WinningForRound(n,rec);
+ if(!win)return false; // No announcement until a real checked draw exists.
+ const locked=buy.locked?v4044ValidSets(buy.auto20,20):null;
+ const analysis=v4044ValidSets((rec.analysis||{}).auto20,20);
+ const groups=(rec.analysis||{}).groups,legacy=(rec.legacy||{}).groups;
+ const originals=Array.isArray(groups)&&groups.length?groups:(Array.isArray(legacy)?legacy:[]);
+ const archivedRows=originals.flatMap(g=>Array.isArray(g&&g.rows)?g.rows.map(x=>x&&('game' in x?x.game:x.numbers)):[]);
+ const archive=archivedRows.length===20?v4044ValidSets(archivedRows,20):null;
+ const tickets=locked||analysis||archive;
+ if(!tickets)return false; // In particular, post-draw analysisResearch never gets celebratory purchase language.
+ const identity=n+'|'+win.nums.join(',')+'|'+win.bonus+'|'+tickets.map(x=>x.join(',')).join(';');
+ if(!force&&V4049_ANNOUNCED[n]===identity)return false;
+ V4049_ANNOUNCED[n]=identity;
+ const outcome=v4049ScoreSummary(tickets,win);
+ if(outcome.wins>0)showFanfare(n,outcome.highestHits,outcome.wins,outcome.bestRank);
+ else showComfort(n,outcome.highestHits);
+ return true;
+}
 function v4048GoHome(){
  if(V4046_CORPUS_JOB){
   const target=Number(V4046_CORPUS_JOB.target);
@@ -1995,7 +2031,13 @@ function v4044ReviewRound(round,autoStart){
   '</div><span class="v4047Bonus">+'+win.bonus+'</span></div>';
  else html+='<div class="v4047Winning pending">제'+n+'회 당첨번호 발표 전 · 자동연동 대기</div>';
  if(display20){
-  if(win)html+=v4045GroupedScore(display20,win,source==='research'?'사후 연구 20조합':'저장 자동 20조합',source);
+  if(win){
+   html+=v4045GroupedScore(display20,win,source==='research'?'사후 연구 20조합':'저장 자동 20조합',source);
+   if(source!=='research'){
+    html=html.replace('<div class="v4047Summary">','<div class="v4047Summary v4049VoiceSummary">');
+    html=html.replace('</div><div class="r5grid">','<button class="v4049Replay" onclick="v4049Announce('+n+',true)" title="성적멘트 다시 듣기">🔊 다시듣기</button></div><div class="r5grid">');
+   }
+  }
   else html+='<div class="v4047Summary">'+(source==='research'?'사후 연구 · 결과 전 실적 제외':'자동 분석 20조합')+
   ' · 당첨번호 확인 대기</div><div class="r5grid">'+v330GroupsPurchase(display20)+'</div>';
  }else html+='<section class="panel warn v4047Empty"><h3>자동분석 20조합 준비</h3>'+
@@ -2015,6 +2057,9 @@ function v4044ReviewRound(round,autoStart){
   setTimeout(()=>{try{if(Number(cur())===n && document.getElementById('modal')?.classList.contains('v4047Compact'))v4045AutoAnalyze20(n)}catch(e){}},100);
  }
  setTimeout(()=>{try{if(Number(cur())===n)v4045MaybeRefreshWinning(n)}catch(e){}},300);
+ if(win&&display20&&source!=='research')setTimeout(()=>{
+  try{if(document.getElementById('modal')?.classList.contains('v4047Compact')&&Number(cur())===n)v4049Announce(n,false)}catch(e){}
+ },120);
 }
 function v330OpenRound(n){return v4044ReviewRound(n,true)}
 
@@ -2308,10 +2353,10 @@ function saveScoreInputOnly(){let old=R().score||{};R().score={...old,result:doc
 function scorePage(){if(V4046_VISIBLE.includes(Number(cur())))return v4044ReviewRound(Number(cur()),false);if(V330_RECENT.includes(Number(cur())))return v4044ReviewRound(Number(cur()),true);let d=scoreData(cur()),sum=roundScoreSummary(cur()),cum=cumulativeScore(),has=d.result.length===6;let bestRank=calcRank(sum.best,false).label;let banner=has?(sum.best>=3?`<div class="scoreHero success"><strong>🎉 축하합니다! 제${cur()}회 ${bestRank} 성적!</strong><span>${sum.best}/6 최고 적중 · ${sum.wins}조합 3/6 이상<br>좋은 성적입니다. 이번 회차도 수고하셨습니다!</span></div>`:`<div class="scoreHero fail"><strong>이번 회차는 아쉽게 지나갔습니다.</strong><span>괜찮습니다. 이번 기록도 다음 분석의 소중한 항해일지입니다.<br>다음 회차에서 다시 힘차게 출발하겠습니다.</span></div>`):`<div class="scoreHero fail"><strong>아직 당첨번호가 입력되지 않았습니다.</strong><span>당첨번호를 입력하면 조합별 적중 현황과 누적 성적을 자동 계산합니다.</span></div>`;let packs=sum.groups.length?sum.groups.map(packScoreHtml).join(''):'<div class="panel centerTitle">이 회차에 분석 조합이 없습니다. 먼저 원문분석을 실행해 주세요.</div>';modal('성적 바로보기',`<div class="scoreCompact">${banner}<div class="screenTitle">누적 결과표 · 회차별 성적</div><div class="scoreSummary"><div class="stat"><strong>${cum.complete}</strong><span>완료 회차</span></div><div class="stat"><strong>${cum.incomplete}</strong><span>미성적/미완료</span></div><div class="stat"><strong>${cum.total}</strong><span>전체 기록</span></div><div class="stat"><strong>${cum.c3}</strong><span>3/6 누계</span></div><div class="stat"><strong>${cum.c5} / ${cum.c6}</strong><span>5/6 · 6/6</span></div></div><div class="scoreRoundList">${recentScoreRows()||'<div class="scoreRoundRow"><span>아직 누적 성적이 없습니다.</span></div>'}</div><div class="resultInputToggle"><button id="autoWinBtn" class="b gold" onclick="autoWinningLookup()">당첨번호 자동조회</button><button class="b" onclick="toggleResultInput()">당첨번호 입력/수정</button></div><div id="resultInputBox" class="panel resultInputBox ${has?'':'open'}"><div class="grid2"><div><div class="label">당첨번호 6개</div><input id="winNums" value="${esc(d.s.result||d.result.join(' '))}" placeholder="예: 2 4 10 16 31 41" oninput="saveScoreInputOnly()" onchange="scorePage()"></div><div><div class="label">보너스</div><input id="bonusNum" value="${esc(d.s.bonus||d.bonus||'')}" placeholder="예: 9" oninput="saveScoreInputOnly()" onchange="scorePage()"></div></div><div class="label">결과 메모</div><textarea id="scoreMemo" rows="3" oninput="saveScoreInputOnly()">${esc(d.s.memo||'')}</textarea><div class="small status">입력 내용은 자동 저장됩니다.</div></div><div class="packGrid">${packs}</div></div>`);document.getElementById('modal')?.classList.add('scoreOneScreen');if(has&&sum.best>=3){setTimeout(()=>showFanfare(cur(),sum.best,sum.wins),180)}else if(has){setTimeout(()=>showComfort(cur(),sum.best),180)}}
 function scoreVoiceHost(){try{if(window.BaekhakNative)return window.BaekhakNative}catch(e){}try{if(window.AndroidHost)return window.AndroidHost}catch(e){}return null}
 function stopScoreAudio(){try{let h=scoreVoiceHost();if(h&&h.stopScoreVoice)h.stopScoreVoice()}catch(e){}try{if('speechSynthesis' in window)window.speechSynthesis.cancel()}catch(e){}}
-function successVoiceText(round,best,wins){let rank=calcRank(best,false).label||'성적';return '축하합니다! 축하합니다! 제'+round+'회 '+rank+' 성적입니다. 최고 적중은 '+best+'개이며, 3개 이상 적중한 조합은 '+wins+'개입니다. 좋은 성적입니다. 이번 회차도 수고하셨습니다!'}
+function successVoiceText(round,best,wins,rankOverride){let rank=rankOverride?rankOverride+'등':(calcRank(best,false).label||'성적');return '축하합니다! 축하합니다! 제'+round+'회 '+rank+' 성적입니다. 최고 적중은 '+best+'개이며, 3개 이상 적중한 조합은 '+wins+'개입니다. 좋은 성적입니다. 이번 회차도 수고하셨습니다!'}
 function comfortVoiceText(round,best){if(best===2)return '아쉽습니다. 제'+round+'회 최고 성적은 2개 적중입니다. 당첨에는 조금 모자랐습니다. 그래도 수고하셨습니다. 다음 회차에는 더 좋은 결과를 기대해 보겠습니다. 힘내세요!';if(best===1)return '아쉽습니다. 제'+round+'회 최고 성적은 1개 적중입니다. 오늘의 결과는 여기까지지만 다음 회차가 있습니다. 수고하셨습니다. 힘내세요!';return '아쉽습니다. 제'+round+'회에는 당첨 조합이 없었습니다. 그래도 결과를 확인하고 기록하는 과정이 중요합니다. 수고하셨습니다. 다음 회차에는 더 좋은 결과를 기대해 보겠습니다!'}
 function speakScoreFallback(text,rank){try{if(!('speechSynthesis' in window))return;let u=new SpeechSynthesisUtterance(text);u.lang='ko-KR';u.rate=rank>0&&rank<=2?.9:.96;u.pitch=rank>0?1.03:1.0;window.speechSynthesis.cancel();window.speechSynthesis.speak(u)}catch(e){}}
-function showFanfare(round,best,wins){let o=document.getElementById('fanfareOverlay');if(!o)return;let rank=calcRank(best,false).label;document.getElementById('fanfareTitle').textContent='🎉 축하합니다! 제'+round+'회 '+rank+' 성적!';document.getElementById('fanfareText').textContent=best+'/6 최고 적중 · '+wins+'조합 3/6 이상';document.getElementById('fanfareBottom').textContent='좋은 성적입니다. 이번 회차도 수고하셨습니다!';o.querySelectorAll('.confetti,.fireworkBurst,.fanfareSpark').forEach(x=>x.remove());let icons=['🎉','✨','🎊','⭐','💫','🏆','🥳'];for(let i=0;i<72;i++){let e=document.createElement('span');e.className='confetti';e.textContent=icons[i%icons.length];e.style.left=(1+(i*29)%98)+'%';e.style.animationDelay=(i%12)*0.055+'s';e.style.animationDuration=(2.6+(i%7)*0.2)+'s';o.appendChild(e)}let burstPos=[[14,25],[30,58],[50,20],[68,55],[85,28],[52,72],[22,78],[80,78]];burstPos.forEach((p,i)=>{let b=document.createElement('i');b.className='fireworkBurst';b.style.left=p[0]+'%';b.style.top=p[1]+'%';b.style.animationDelay=(i*.16)+'s';o.appendChild(b)});[['🎆',8,55],['🎇',88,55],['✨',12,15],['✨',86,16]].forEach((p,i)=>{let e=document.createElement('span');e.className='fanfareSpark';e.textContent=p[0];e.style.left=p[1]+'%';e.style.top=p[2]+'%';e.style.animationDelay=(i*.2)+'s';o.appendChild(e)});o.classList.add('show');let msg=successVoiceText(round,best,wins),rankNo=calcRank(best,false).no||5;let h=scoreVoiceHost();let nativeOk=false;try{if(h&&h.playCelebrationWithVoice){h.playCelebrationWithVoice(msg,rankNo);nativeOk=true}}catch(e){}if(!nativeOk){playFanfareTone();setTimeout(()=>playFanfareTone(),650);setTimeout(()=>speakScoreFallback(msg,rankNo),700)}setTimeout(()=>o.classList.remove('show'),5600)}
+function showFanfare(round,best,wins,rankOverride){let o=document.getElementById('fanfareOverlay');if(!o)return;let rank=rankOverride?rankOverride+'등':calcRank(best,false).label;document.getElementById('fanfareTitle').textContent='🎉 축하합니다! 제'+round+'회 '+rank+' 성적!';document.getElementById('fanfareText').textContent=best+'/6 최고 적중 · '+wins+'조합 3/6 이상';document.getElementById('fanfareBottom').textContent='좋은 성적입니다. 이번 회차도 수고하셨습니다!';o.querySelectorAll('.confetti,.fireworkBurst,.fanfareSpark').forEach(x=>x.remove());let icons=['🎉','✨','🎊','⭐','💫','🏆','🥳'];for(let i=0;i<72;i++){let e=document.createElement('span');e.className='confetti';e.textContent=icons[i%icons.length];e.style.left=(1+(i*29)%98)+'%';e.style.animationDelay=(i%12)*0.055+'s';e.style.animationDuration=(2.6+(i%7)*0.2)+'s';o.appendChild(e)}let burstPos=[[14,25],[30,58],[50,20],[68,55],[85,28],[52,72],[22,78],[80,78]];burstPos.forEach((p,i)=>{let b=document.createElement('i');b.className='fireworkBurst';b.style.left=p[0]+'%';b.style.top=p[1]+'%';b.style.animationDelay=(i*.16)+'s';o.appendChild(b)});[['🎆',8,55],['🎇',88,55],['✨',12,15],['✨',86,16]].forEach((p,i)=>{let e=document.createElement('span');e.className='fanfareSpark';e.textContent=p[0];e.style.left=p[1]+'%';e.style.top=p[2]+'%';e.style.animationDelay=(i*.2)+'s';o.appendChild(e)});o.classList.add('show');let msg=successVoiceText(round,best,wins,rankOverride),rankNo=rankOverride||calcRank(best,false).no||5;let h=scoreVoiceHost();let nativeOk=false;try{if(h&&h.playCelebrationWithVoice){h.playCelebrationWithVoice(msg,rankNo);nativeOk=true}}catch(e){}if(!nativeOk){playFanfareTone();setTimeout(()=>playFanfareTone(),650);setTimeout(()=>speakScoreFallback(msg,rankNo),700)}setTimeout(()=>o.classList.remove('show'),5600)}
 function showComfort(round,best){let o=document.getElementById('comfortOverlay');if(!o)return;document.getElementById('comfortTitle').textContent='이번 회차는 아쉽게 지나갔습니다.';document.getElementById('comfortText').textContent='제'+round+'회 최고 적중 '+best+'/6 · 이번 기록도 다음 분석의 소중한 항해일지입니다.';document.getElementById('comfortBottom').textContent='괜찮습니다. 다음 회차에서 다시 힘차게 출발하겠습니다.';o.classList.add('show');let msg=comfortVoiceText(round,best),h=scoreVoiceHost(),nativeOk=false;try{if(h&&h.speakConsolation){h.speakConsolation(msg);nativeOk=true}else if(h&&h.speakCelebration){h.speakCelebration(msg,0);nativeOk=true}}catch(e){}if(!nativeOk)setTimeout(()=>speakScoreFallback(msg,0),250);setTimeout(()=>o.classList.remove('show'),6200)}
 function playFanfareTone(){try{let A=window.AudioContext||window.webkitAudioContext;if(!A)return;let ctx=new A(),t=ctx.currentTime;let notes=[[523.25,0],[659.25,.13],[783.99,.26],[1046.5,.41],[783.99,.59],[1046.5,.75],[1318.5,.92]];notes.forEach((q,i)=>{let osc=ctx.createOscillator(),g=ctx.createGain();osc.frequency.value=q[0];osc.type=i%2?'triangle':'sawtooth';g.gain.setValueAtTime(.001,t+q[1]);g.gain.exponentialRampToValueAtTime(.11,t+q[1]+.02);g.gain.exponentialRampToValueAtTime(.001,t+q[1]+.28);osc.connect(g).connect(ctx.destination);osc.start(t+q[1]);osc.stop(t+q[1]+.3)});setTimeout(()=>ctx.close(),1800)}catch(e){}}
 
