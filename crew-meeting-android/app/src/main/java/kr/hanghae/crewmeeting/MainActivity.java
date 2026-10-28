@@ -29,7 +29,7 @@ import java.security.NoSuchAlgorithmException;
 
 public final class MainActivity extends Activity {
     private static final String ROOM_URL =
-        "https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/crew-meeting.html?app_version=130";
+        "https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/crew-meeting.html?app_version=800";
     private static final int FILE_CHOOSER_CODE = 502;
     private static final int PICK_V3_APP = 503;
     private static final int PICK_V7_APP = 504;
@@ -81,6 +81,10 @@ public final class MainActivity extends Activity {
                     name="liaison-blind-engine.mjs";mime="text/javascript";
                 }else if("/BaekhakDosaEmergency/crew-liaison-baseline-r1.mjs".equals(p)){
                     name="v7-engine100-baseline.mjs";mime="text/javascript";
+                }else if("/BaekhakDosaEmergency/crew-v8-home.css".equals(p)){
+                    name="captain_v8.css";mime="text/css";
+                }else if("/BaekhakDosaEmergency/crew-v8-hero.svg".equals(p)){
+                    name="captain_v8_hero.svg";mime="image/svg+xml";
                 }else if("/BaekhakDosaEmergency/crew-cumulative-after.css".equals(p)){
                     name="cumulative_after_only.css";mime="text/css";
                 }else if("/BaekhakDosaEmergency/crew-cumulative-after.js".equals(p)){
