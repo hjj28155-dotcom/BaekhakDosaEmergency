@@ -42,3 +42,6 @@
 .cumFooter{font-size:.57rem;color:#9dbbd0;flex:none;line-height:1.15}
 @media(max-width:350px){#cumulativeAfterDashboard{gap:4px}.cumRoomGrid{gap:4px}.cumRoomHead{padding:4px}.cumRoomHead strong{font-size:.67rem}.cumRoomState{padding:2px 4px;font-size:.55rem}.cumRoom ol{padding:2px 3px}.cumBalls{gap:1px}.cumHit{min-width:21px;font-size:.51rem}.cumDraw{padding:4px}.cumTitle{padding:5px 7px}}
 @media(max-height:660px){#cumulativeAfterDashboard{gap:4px}.cumTitle{padding:4px 7px}.cumTitle strong{font-size:.89rem}.cumDraw{min-height:32px;padding:3px 5px}.cumLegend{font-size:.56rem}.cumRoomHead{padding:3px 5px}.cumRoomState{padding:1px 4px;min-height:13px}.cumRoom ol{padding:1px 4px 2px;gap:1px}.cumControls button,.cumControls input{min-height:32px}.cumFooter{display:none}}
+
+.cumRefresh{flex:none;min-height:34px;border:1.5px solid #ffe1a3;border-radius:9px;background:linear-gradient(#ffe09a,#c79a42);color:#102a44;font-size:.84rem;font-weight:850;letter-spacing:.01em}
+@media(max-height:660px){.cumRefresh{min-height:29px;font-size:.74rem}}
