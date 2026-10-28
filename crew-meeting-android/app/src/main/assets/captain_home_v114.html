@@ -1331,6 +1331,9 @@ window.captainV4ShowArchive=function(){afterSevenShowMode(false);};
 var CAPTAIN_ENGINE_RECEIPTS='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/crew-verified-round-results';
 window.captainEngineRoundRead=async function(round){
  if(!token)throw Error('CAPTAIN_AUTH_REQUIRED');
+ if(window.captainEnginePendingSave&&window.captainEnginePendingSave.round===round){
+  try{await window.captainEnginePendingSave.promise;}catch(e){} // preserve separate readback status
+ }
  if(!Number.isInteger(round)||round<1||round>1247)throw Error('INVALID_ROUND');
  var url=new URL(CAPTAIN_ENGINE_RECEIPTS);url.searchParams.set('round',String(round));
  var response=await fetch(url.href,{method:'GET',headers:{Authorization:'Bearer '+token},cache:'no-store'});
@@ -1357,7 +1360,7 @@ window.captainEngineRoundSave=async function(detail){
 window.addEventListener('captain-v4-verified',function(event){
  var d=event.detail;
  if(!d||d.engine!=='captain')return;
- window.captainEngineRoundSave(d).then(function(receipt){
+ var pendingSave=window.captainEngineRoundSave(d).then(function(receipt){
    window.captainEngineLastReceipt={round:d.round,receipt:receipt};
    var st=document.getElementById('freedomAnalysisStatus');
    if(st)st.textContent='선장 R46 '+d.round+'회차 연구 5조합 · 자료실 수신확인 완료';
@@ -1365,6 +1368,7 @@ window.addEventListener('captain-v4-verified',function(event){
    var st=document.getElementById('freedomAnalysisStatus');
    if(st)st.textContent='선장 R46 분석번호는 화면에 보존 · 자료실 전송 미완료 ('+String(e.message||e)+')';
  });
+ window.captainEnginePendingSave={round:d.round,promise:pendingSave};
 });
 
 window.captainCumulativeIsAuthorized=function(){return !!token;};
