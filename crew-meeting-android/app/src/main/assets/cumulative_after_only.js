@@ -4,7 +4,7 @@
  var $=function(id){return document.getElementById(id);};
  var root=$('cumulativeAfterDashboard');
  if(!root)return;
- var roomIds=['v3-1','v3-2','v3-3','v3-4'],officialCache=null,officialPromise=null,seq=0;
+ var roomIds=['v3-1','v3-2','v3-3','v3-4','v7','v4-1','v4-2'],officialCache=null,officialPromise=null,seq=0;
  var roundInput=$('cumRoundInput'),currentRound=1;
  function validSix(nums){
   return Array.isArray(nums)&&nums.length===6&&nums.every(function(n){return Number.isInteger(n)&&n>=1&&n<=45;})&&new Set(nums).size===6;
@@ -82,39 +82,92 @@
   }
   try{
    if(typeof window.captainCumulativeFetchAfter!=='function')throw Error('읽기전용 결과후 연결 없음');
-   var data=await window.captainCumulativeFetchAfter(n);
+   var results=await window.captainCumulativeFetchAfter(n);
    if(serial!==seq||!root.isConnected||root.hidden)return;
-   if(!data||data.app!=='v3'||data.stage!=='after'||data.read_only!==true||
-      data.raw_predictions_included!==false||!Array.isArray(data.items))throw Error('결과후 조회 계약 불일치');
-   if(!data.linked){
-    roomIds.forEach(function(room){state(room,'V3 결과후 원본 연결 대기');});
-    $('cumStatus').textContent='제'+n+'회 · 결과후 원본 자동연계 대기 (미등록 ≠ 적중 0개)';return;
-   }
-   var grouped={};roomIds.forEach(function(r){grouped[r]=[];});
-   var unassigned=0;
-   data.items.forEach(function(item){
-    if(Number(item.round_no)!==n)return;
-    var key=String(item.room_key||item.room_id||'').toLowerCase();
-    if(roomIds.includes(key))grouped[key].push(item);
-    else unassigned++;
+   if(!Array.isArray(results)||results.length!==3||
+      results.some(function(x){return !x||!['v3','v7','freedom'].includes(x.app);})||
+      new Set(results.map(function(x){return x.app;})).size!==3)
+      throw Error('3앱 결과후 조회 계약 불일치');
+   var stats=[],failCount=0,waitingCount=0;
+   results.forEach(function(result){
+    var app=result.app;
+    var targets=app==='v3'?roomIds.slice(0,4):app==='v7'?['v7']:['v4-1','v4-2'];
+    if(result.error){
+     failCount++;
+     targets.forEach(function(room){state(room,'서버 접속 불가 · 원본 미확인');});
+     stats.push((app==='freedom'?'V4':app.toUpperCase())+' 접속 불가');
+     return;
+    }
+    var data=result.data;
+    if(!data||data.app!==app||data.stage!=='after'||data.read_only!==true||
+       data.raw_predictions_included!==false||typeof data.linked!=='boolean'||
+       !Array.isArray(data.items)){
+     failCount++;
+     targets.forEach(function(room){state(room,'응답 검증 실패 · 원본 미확인');});
+     stats.push((app==='freedom'?'V4':app.toUpperCase())+' 검증 실패');
+     return;
+    }
+    if(!data.linked){
+     waitingCount++;
+     targets.forEach(function(room){state(room,'결과후 원본 자동연계 대기');});
+     stats.push((app==='freedom'?'V4':app.toUpperCase())+' 연계 대기');
+     return;
+    }
+    var records=data.items.filter(function(item){return Number(item.round_no)===n;});
+    if(app==='v3'){
+     var grouped={'v3-1':0,'v3-2':0,'v3-3':0,'v3-4':0},unassigned=0;
+     records.forEach(function(item){
+      var key=String(item.room_key||item.room_id||'').trim().toLowerCase();
+      if(Object.prototype.hasOwnProperty.call(grouped,key))grouped[key]++;
+      else unassigned++;
+     });
+     targets.forEach(function(room){
+      var count=grouped[room];
+      state(room,count?'결과후 메타 '+count+'건 · 6번호 미수신':
+       (unassigned?'방 구분 미확인 · 조합 원본 미수신':'결과후 원본 수신 대기'));
+     });
+     stats.push('V3 메타 '+records.length+'건');
+    }else if(app==='v7'){
+     var count=records.filter(function(item){
+      return ['v7','v7-control','control'].includes(String(item.room_key||item.room_id||'').trim().toLowerCase());
+     }).length;
+     state('v7',count?'결과후 메타 '+count+'건 · 6번호 미수신':
+       (records.length?'방 구분 미확인 · 6번호 미수신':'결과후 원본 수신 대기'));
+     stats.push('V7 메타 '+records.length+'건');
+    }else{
+     // V4 has two *independent* 5-combination runs. Never split app-wide
+     // metadata between them unless an explicit verified run identifier exists.
+     var v4Counts={'v4-1':0,'v4-2':0},unknown=0;
+     records.forEach(function(item){
+      var key=String(item.room_key||item.room_id||'').trim().toLowerCase();
+      if(['v4-1','v4-captain'].includes(key))v4Counts['v4-1']++;
+      else if(['v4-2','v4-liaison'].includes(key))v4Counts['v4-2']++;
+      else unknown++;
+     });
+     targets.forEach(function(room){
+      state(room,v4Counts[room]?'결과후 메타 '+v4Counts[room]+'건 · 6번호 미수신':
+       (unknown?'V4 메타 '+unknown+'건 · 1·2차 미분류':'독립 결과후 원본 수신 대기'));
+     });
+     stats.push('V4 메타 '+records.length+'건');
+    }
    });
-   roomIds.forEach(function(room){
-    var records=grouped[room];
-    // Existing read-only API returns metadata only (raw_predictions_included=false).
-    // Never synthesize a scored combination from a report count or an unrelated V7 engine.
-    state(room,records.length?('결과후 메타 '+records.length+'건 · 조합 검증 대기'):'해당 회차 결과후 원본 없음');
-   });
-   $('cumStatus').textContent='제'+n+'회 · 결과후 메타 확인 · 채점 가능한 조합 원본 미연결'+(unassigned?' · 방 미분류 '+unassigned+'건':'');
+   $('cumStatus').textContent='제'+n+'회 · '+stats.join(' / ')+
+      (failCount?' · 서버 접속 불가 '+failCount+'앱':'')+
+      ' · 원본 미수신은 적중 0개가 아님';
   }catch(e){
    if(serial!==seq)return;
-   roomIds.forEach(function(room){state(room,'결과후 원본 조회 실패');});
-   $('cumStatus').textContent='제'+n+'회 · 결과후 원본 조회 실패 ('+String(e.message||e).slice(0,45)+')';
+   roomIds.forEach(function(room){state(room,'결과후 연결 확인 필요 · 원본 보존');});
+   $('cumStatus').textContent='제'+n+'회 · 결과후 서버 조회 중단 · 원본은 그대로 보존';
   }
  }
  window.captainCumulativeLoad=function(){return load(Number(roundInput.value)||currentRound);};
  $('cumPrev').addEventListener('click',function(){load(currentRound-1);});
  $('cumNext').addEventListener('click',function(){load(currentRound+1);});
  $('cumRefresh').addEventListener('click',function(){load(Number(roundInput.value));});
+ $('cumJumpMore').addEventListener('click',function(){
+  var card=root.querySelector('[data-room="v7"]');
+  if(card){card.scrollIntoView({behavior:'smooth',block:'start',inline:'nearest'});$('cumRoomGrid').focus({preventScroll:true});}
+ });
  roundInput.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();load(Number(roundInput.value));}});
  window.captainCumulativeRender=function(round){
   var n=Number.isInteger(round)&&round>=1&&round<=1247?round:currentRound;
