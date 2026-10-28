@@ -235,6 +235,14 @@
   var n=Number.isInteger(round)&&round>=1&&round<=1247?round:currentRound;
   return load(n);
  };
+ // A completed receipt is visible in the central room immediately when
+ // this page is open, without requiring a second manual analysis.
+ window.addEventListener('captain-v4-archive-saved',function(e){
+  if(!root.hidden&&Number(e.detail&&e.detail.round)===currentRound)load(currentRound);
+ });
+ window.addEventListener('captain-auth-ready',function(){
+  if(!root.hidden&&$('materialsBody').classList.contains('cumulativeOnlyMode'))load(currentRound);
+ });
  emptyCards();
  // The cumulative performance room never computes statistics from metadata.
  // Each grade is populated ONLY after all 6 source numbers, draw, provenance,
