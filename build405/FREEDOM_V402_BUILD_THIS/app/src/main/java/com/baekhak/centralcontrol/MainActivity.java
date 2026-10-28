@@ -115,6 +115,7 @@ public class MainActivity extends Activity {
     private boolean launchIntroFinished = false;
     private static final String LAUNCH_WELCOME_TEXT = "우리 항행의자유앱에 승선한 지인들께 알려드립니다. 희망의 배에 승선하신 것을 진심으로 환영합니다. 부디 즐거운 항해가 되시기를 기원합니다.";
     private final Handler scoreHandler = new Handler(Looper.getMainLooper());
+    private final Handler scoreVoiceHandler = new Handler(Looper.getMainLooper());
     // V4.0.2: 공용 메인스레드 Handler. 구버전 참조가 남아 있어도 컴파일되도록 고정.
     private final Handler handler = new Handler(Looper.getMainLooper());
 
@@ -1635,13 +1636,17 @@ public class MainActivity extends Activity {
     }
 
     private void playCelebrationWithVoice(String text, int rankNo) {
-        playScoreFanfare();
-        scoreHandler.postDelayed(() -> speakScoreNow(text, rankNo), 650L);
+        runOnUiThread(() -> {
+            playScoreFanfare();
+            scoreVoiceHandler.postDelayed(() -> speakScoreNow(text, rankNo), 650L);
+        });
     }
 
     private void speakConsolationVoice(String text) {
-        stopScoreFanfare();
-        scoreHandler.postDelayed(() -> speakScoreNow(text, 0), 180L);
+        runOnUiThread(() -> {
+            stopScoreFanfare();
+            scoreVoiceHandler.postDelayed(() -> speakScoreNow(text, 0), 180L);
+        });
     }
 
     private void setDownloadInitialUri(Intent i) {
@@ -2065,6 +2070,9 @@ public class MainActivity extends Activity {
         @JavascriptInterface public void speakConsolation(String text) { MainActivity.this.speakConsolationVoice(text); }
         @JavascriptInterface public void stopScoreVoice() {
             runOnUiThread(() -> {
+                scoreVoiceHandler.removeCallbacksAndMessages(null);
+                pendingScoreSpeech = null;
+                pendingScoreRank = 0;
                 try { if (scoreTts != null) scoreTts.stop(); } catch (Exception ignored) {}
                 stopScoreFanfare();
             });
@@ -2187,3 +2195,4 @@ public class MainActivity extends Activity {
         }
     }
 }
+
