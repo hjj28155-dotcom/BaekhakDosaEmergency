@@ -822,7 +822,7 @@ main:not(.roomMode) #centralRoundPanel label{font-size:.68rem!important}
  <div class="commandDeckTop"><strong>⚓ 3앱 통합 관리본부</strong><small>선장 전용 · 원본 보존</small></div>
  <div id="captainAnalysisBaseline" class="analysisBaseline" role="status" aria-label="선장이 확인한 분석 진행 현황">
   <strong>🔁 제1회차부터 재분석 · 새 연구 시작 기준</strong>
-  <span><b>V3</b> 기존 누적 350회 <em>과거 연구자료</em></span>
+  <span><b>V3</b> 새 분석 준비 <em>제1회차부터</em></span>
   <span><b>V7</b> 새 연구 1회차부터 <em>시작 전</em></span>
   <span><b>V4</b> 새 연구 1회차부터 <em>시작 전</em></span>
  </div>
@@ -874,12 +874,12 @@ main:not(.roomMode) #centralRoundPanel label{font-size:.68rem!important}
    <ol id="freedomSecondList" aria-label="제2분석 결과"><li>—</li><li>—</li><li>—</li><li>—</li><li>—</li></ol>
   </article>
  </div>
- <div id="freedomAnalysisStatus" role="status" aria-live="polite">엔진 연결 대기 · 번호 미생성</div>
+ <div id="freedomAnalysisStatus" role="status" aria-live="polite">새 분석 대기 · 엔진 연결 전 번호 미생성</div>
  <div class="v4RoomActions">
   <button type="button" class="secondary" id="freedomFirstFive">1차 점검</button>
   <button type="button" class="secondary" id="freedomSecondFive">2차 점검</button>
-  <button type="button" class="secondary" id="freedomOpenRecords">기록</button>
-  <button type="button" id="freedomGoCumulativeDb">누적DB →</button>
+  <button type="button" class="secondary" id="freedomResetActive">초기화</button>
+  <button type="button" id="freedomGoCumulativeDb" aria-label="과거 누적자료는 자료실에서만 조회">자료실</button>
  </div>
 </section>
 <div id="homeSpecialRooms" aria-label="기존 승인관리와 결과전 자료실">
@@ -912,7 +912,6 @@ main:not(.roomMode) #centralRoundPanel label{font-size:.68rem!important}
  <div class="v3RoomsLead">
   <strong>원문 15조합 + 자동 5조합</strong>
   <span>네 방 합계 20조합 · 제1회차부터 재분석</span>
-  <small>과거 V3 350회 분석은 별도 보존합니다. 350개의 추첨 전 확정 보고서를 뜻하지 않습니다.</small>
  </div>
  <div class="v3RoomCards">
   <article class="v3RoomCard" data-v3-room-card="v3-1"><h3>🧭 항해사 제1방</h3><p>결과전 원본: 자동연계 확인 전</p><button type="button" data-v3-report="v3-1">제1방 결과전 조회</button></article>
@@ -944,6 +943,7 @@ main:not(.roomMode) #centralRoundPanel label{font-size:.68rem!important}
   <div id="afterSevenDetails" class="afterSevenDetails" role="region" aria-live="polite">전체 결과후 · 기록을 조회하면 확인된 자료만 표시합니다.</div>
 </div>
   <div id="materialsAuthGate" class="materialsAuthGate" hidden></div>
+  <p class="materialsNote"><b>누적자료는 이 자료실에서만 조회합니다.</b> 분석방을 초기화해도 과거 원본과 잠금 기록은 삭제되지 않습니다.</p>
   <p class="materialsNote"><b>새 분석 기준: 제1회차부터 3앱 공동 재분석.</b> V3 4개 방에서 원문 15·자동 5조합, V7 원문 5조합, V4 원문 10조합으로 구분합니다. <b>V3의 과거 350회 누적 분석은 별도 보존</b>하며, 과거 재분석 결과는 추첨 전에 확정한 공식 결과전과 구분합니다.</p>
   <div id="materialsAppSelector" class="materialsGrid" aria-label="세 앱 독립 자료 원본" hidden>
    <button type="button" class="matApp" data-material-app="v7">🛡️ V7 통제관</button>
@@ -2350,17 +2350,23 @@ try{
  function note(message){status.textContent=message;}
  function round(){var input=document.getElementById('freedomAnalysisRound');var raw=input.value.trim();var n=Number(raw);if(!/^[1-9][0-9]*$/.test(raw)||!Number.isInteger(n)||n<1||n>1247){note('1~1247회차를 입력하세요.');return null;}return n;}
  function clearResults(){['freedomFirstList','freedomSecondList'].forEach(function(id){var list=document.getElementById(id);Array.prototype.forEach.call(list.children,function(li){li.textContent='—';});});}
- open.addEventListener('click',function(){window.captainV4Route('v4');});
- document.getElementById('freedomAnalysisBack').addEventListener('click',function(){window.captainV4Route('home');});
+ /* Reset only the ephemeral V4 analysis viewport. Never touch source DB, archive, auth or locked records. */
+ function resetActiveAnalysis(){
+  document.getElementById('freedomAnalysisRound').value='1';
+  clearResults();
+  note('새 분석 대기 · 엔진 연결 전 번호 미생성');
+ }
+ open.addEventListener('click',function(){resetActiveAnalysis();window.captainV4Route('v4');});
+ document.getElementById('freedomAnalysisBack').addEventListener('click',function(){resetActiveAnalysis();window.captainV4Route('home');});
  document.getElementById('freedomRunRound').addEventListener('click',function(){var n=round();if(n===null)return;clearResults();note('제'+n+'회 · 원문 DB-1 분석 엔진 미연결. 검증된 번호 없음.');});
  document.getElementById('freedomFirstFive').addEventListener('click',function(){var n=round();if(n===null)return;note('제'+n+'회 제1분석 · 엔진 연결 대기');});
  document.getElementById('freedomSecondFive').addEventListener('click',function(){var n=round();if(n===null)return;note('제'+n+'회 제2분석 · 독립 엔진 및 중복 검증 대기');});
- document.getElementById('freedomOpenRecords').addEventListener('click',function(){var b=document.querySelector('[data-open-material="freedom"]');if(b)b.click();else note('V4 기록 연결 확인 필요');});
+ document.getElementById('freedomResetActive').addEventListener('click',resetActiveAnalysis);
  document.getElementById('freedomGoCumulativeDb').addEventListener('click',function(){
-  var n=round();if(n===null)return;
   var field=document.getElementById('materialsRound'),db=document.querySelector('[data-material-stage="db"]'),app=document.querySelector('[data-material-app="freedom"]');
-  if(!field||!db||!app||typeof window.captainV4Route!=='function'||typeof window.captainV4Select!=='function'){note('누적DB 연결 확인 필요');return;}
-  field.value=String(n);
+  if(!field||!db||!app||typeof window.captainV4Route!=='function'||typeof window.captainV4Select!=='function'){note('자료실 연결 확인 필요');return;}
+  resetActiveAnalysis();
+  field.value='';
   window.captainV4Route('materials');
   window.captainV4Select('app','freedom');
   window.captainV4Select('stage','db');
