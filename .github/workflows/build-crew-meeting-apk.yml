@@ -1,4 +1,4 @@
-name: Build same-signer captain three-app research APK v1.0.18
+name: Build same-signer captain three-app research APK v1.0.19
 on:
   push:
     branches:
@@ -66,7 +66,10 @@ jobs:
           grep -Fq 'id="freedomRunRound"' "$HOME_HTML"
           grep -Fq 'id="freedomFirstList"' "$HOME_HTML"
           grep -Fq 'id="freedomSecondList"' "$HOME_HTML"
-          grep -Fq "homeView('v4')" "$HOME_HTML"
+          grep -Fq "window.captainV4Route('v4')" "$HOME_HTML"
+          grep -Fq "window.captainV4Route('home')" "$HOME_HTML"
+          grep -Fq "window.captainV4Select('stage','db')" "$HOME_HTML"
+          grep -Fq 'main.roomMode > #freedomAnalysisPanel:not([hidden])' "$HOME_HTML"
           grep -Fq '엔진 연결 대기 · 번호 미생성' "$HOME_HTML"
           ! grep -Fq 'openFreedomApprovalShortcut' "$HOME_HTML"
           grep -Fq 'data-v3-room-card="v3-4"' "$HOME_HTML"
@@ -74,7 +77,7 @@ jobs:
           grep -Fq 'data-material-stage="after"' "$HOME_HTML"
           grep -Fq '기존 누적 350회' "$HOME_HTML"
           grep -Fq 'loadCaptainDashboard()' crew-meeting-android/app/src/main/java/kr/hanghae/crewmeeting/MainActivity.java
-          grep -Fq "versionCode 118" crew-meeting-android/app/build.gradle
+          grep -Fq "versionCode 119" crew-meeting-android/app/build.gradle
           test "$(grep -c 'data-before-room=' "$HOME_HTML")" -eq 7
           test "$(grep -c 'data-v3-room-card=' "$HOME_HTML")" -eq 4
           test "$(grep -c 'data-v3-report=' "$HOME_HTML")" -eq 4
@@ -95,23 +98,23 @@ jobs:
           test "$NEW_CERT" = "e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be"
           echo "Recovery app signer pinned: $NEW_CERT"
           "$AAPT" dump badging "$APK" | head -5
-          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting.compact' versionCode='118'"
+          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting.compact' versionCode='119'"
           ! "$AAPT" dump badging "$APK" | grep -q "package: name='com.baekhak.dosa.v4'"
           mkdir -p crew-meeting-android/releases
-          cp "$APK" crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.18_V4_ONESCREEN_TEST.apk
-          (cd crew-meeting-android/releases && sha256sum HANGHAE_CREW_MEETING_1.0.18_V4_ONESCREEN_TEST.apk > HANGHAE_CREW_MEETING_1.0.18_V4_ONESCREEN_TEST.apk.sha256)
+          cp "$APK" crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.19_V4_ROUTE_TEST.apk
+          (cd crew-meeting-android/releases && sha256sum HANGHAE_CREW_MEETING_1.0.19_V4_ROUTE_TEST.apk > HANGHAE_CREW_MEETING_1.0.19_V4_ROUTE_TEST.apk.sha256)
       - uses: actions/upload-artifact@v4
         with:
-          name: HANGHAE-CREW-MEETING-1.0.18-V4-ONESCREEN-TEST-APK
+          name: HANGHAE-CREW-MEETING-1.0.19-V4-ROUTE-TEST-APK
           path: |
-            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.18_V4_ONESCREEN_TEST.apk
-            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.18_V4_ONESCREEN_TEST.apk.sha256
+            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.19_V4_ROUTE_TEST.apk
+            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.19_V4_ROUTE_TEST.apk.sha256
           if-no-files-found: error
           retention-days: 30
       - name: Verify isolated APK artifact packaging
         run: |
           set -euo pipefail
-          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.18_V4_ONESCREEN_TEST.apk
-          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.18_V4_ONESCREEN_TEST.apk.sha256
-          (cd crew-meeting-android/releases && sha256sum --check HANGHAE_CREW_MEETING_1.0.18_V4_ONESCREEN_TEST.apk.sha256)
+          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.19_V4_ROUTE_TEST.apk
+          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.19_V4_ROUTE_TEST.apk.sha256
+          (cd crew-meeting-android/releases && sha256sum --check HANGHAE_CREW_MEETING_1.0.19_V4_ROUTE_TEST.apk.sha256)
           echo "TEST artifact verified. Do NOT replace the stable fixed Google Drive APK without device verification."
