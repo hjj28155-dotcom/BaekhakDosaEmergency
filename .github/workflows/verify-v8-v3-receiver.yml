@@ -1,0 +1,30 @@
+name: Verify V8 independent V3 receiver (no data writes)
+on:
+  push:
+    branches:
+      - feature/v8-v7-retirement-v3-link-20261029
+    paths:
+      - '.github/workflows/verify-v8-v3-receiver.yml'
+      - 'integrations/v8-v3-resultbefore-receive/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  health-and-auth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify public health and mandatory device auth
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/v8-v3-resultbefore-receive'
+          curl --retry 3 --retry-delay 2 -fsS --max-time 20 "$BASE/health" -o /tmp/v8-health.json
+          jq -e '.ok==true and .v7_dependency==false and .v3_native_auto_sender_bundled==false and .official_predraw_certified==false' /tmp/v8-health.json
+          code=$(curl -sS --max-time 20 -o /tmp/v8-noauth.json -w '%{http_code}' -X POST "$BASE/receive" -H 'Content-Type: application/json' --data '{"origin_app":"V3_NAVIGATOR"}')
+          test "$code" = 401
+          jq -e '.error=="DEVICE_AUTH_REQUIRED"' /tmp/v8-noauth.json
+          code=$(curl -sS --max-time 20 -o /tmp/v8-noauth-get.json -w '%{http_code}' "$BASE/receipt?epoch=V3_RESTART_R53_20261028&round=1")
+          test "$code" = 401
+          jq -e '.error=="DEVICE_AUTH_REQUIRED"' /tmp/v8-noauth-get.json
+          echo 'PASS: independent V8 health; unauthorized write and receipt read blocked.'
