@@ -22,7 +22,7 @@
 ## 최신 클라이언트 / 배포 확인
 
 - GitHub feature 브랜치 소스 `crew-meeting-android/app/build.gradle`: versionCode **129**, versionName `1.0.29-CAPTAIN-TWO-ROOM-ARCHIVE-SYNC`. APK 빌드/서명 성공 여부는 이번 작업에서 확인하지 못함.
-- Google Drive 고정 APK 파일 ID `1NtFkXk2HPqUOPsp2K-as29r9SHgKJmYc` 읽기 확인. 이전 revision 6,506,367 bytes, 최신 revision 6,508,467 bytes (2026-10-28 12:38 UTC). 파일 내용의 실제 APK versionCode는 별도 확인 필요. 같은 Drive 파일 ID가 유지된 사실은 확인되지만 기기 자동 설치를 의미하지 않음.
+- Google Drive 고정 APK 파일 ID `1NtFkXk2HPqUOPsp2K-as29r9SHgKJmYc` 읽기 확인. 이전 revision 6,506,367 bytes, 최신 revision 6,508,467 bytes (2026-10-28 12:38 UTC). 실제 APK ZIP의 AndroidManifest.xml 문자열을 읽어 **versionName `1.0.28-CAPTAIN-ROUND-RESULT-SYNC`** 확인. APK SHA-256 `eaeceb09fb76c36ebf50660a1bed36397226916c13f28ff7d3c7da7fb13a8b38`. 현재 Drive 파일은 GitHub 소스 1.0.29와 동일한 APK가 아님. versionCode 및 실제 단말 설치는 미검증. 같은 Drive 파일 ID가 유지된 사실은 확인되지만 기기 자동 설치를 의미하지 않음.
 - V3 참고 이미지 `40225.png`는 현재 대화 컨테이너에서 발견되지 않음. 새 항해 테마 적용·APK 업데이트 미수행.
 
 ## 다음 우선순위
