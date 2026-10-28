@@ -99,6 +99,13 @@
   schedule();
  });
  byId('freedomAnalysisRound').addEventListener('input',schedule);
+ byId('freedomPngZoom').addEventListener('click',function(){
+  var viewport=document.querySelector('#freedomPngPanel .v4PngViewport');
+  if(!viewport)return;
+  var zoomed=viewport.classList.toggle('zoomed');
+  this.textContent=zoomed?'전체 보기':'확대';
+  viewport.scrollTop=0;viewport.scrollLeft=0;
+ });
  save.addEventListener('click',function(){
   if(!lastPng){notice.textContent='저장할 PNG 이미지가 없습니다';return;}
   var name='HANGHAE_V4_R'+(lastRound||'UNKNOWN')+'_R46_R1.png';
