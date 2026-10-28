@@ -1,4 +1,4 @@
-name: Build same-signer captain three-app research APK v1.0.28
+name: Build same-signer captain three-app research APK v1.0.29
 on:
   push:
     branches:
@@ -88,12 +88,22 @@ jobs:
           grep -Fq 'id="freedomCaptainStatus"' "$HOME_HTML"
           grep -Fq 'id="freedomLiaisonStatus"' "$HOME_HTML"
           grep -Fq 'id="freedomPngPreview"' "$HOME_HTML"
+          grep -Fq 'id="freedomRoomArchive"' "$HOME_HTML"
+          grep -Fq 'id="freedomArchiveCentral"' "$HOME_HTML"
+          grep -Fq 'id="freedomArchiveBack"' "$HOME_HTML"
+          grep -Fq 'id="freedomArchiveBadge"' "$HOME_HTML"
+          grep -Fq 'captainV4RestoreArchive=restoreArchivedRound' "$HOME_HTML"
+          grep -Fq 'captain-v4-archive-saved' "$HOME_HTML"
+          grep -Fq 'captain-v4-archived' "$HOME_HTML"
+          grep -Fq 'captain-v4-archived' crew-meeting-android/app/src/main/assets/v4_png_report.js
+          grep -Fq 'INDEPENDENT_SOURCE_ATTESTED' "$HOME_HTML"
+          grep -Fq "V4 '+found+'/2방 실제 원본" crew-meeting-android/app/src/main/assets/cumulative_after_only.js
           grep -Fq 'captainEngineRoundSave=async function' "$HOME_HTML"
           grep -Fq 'captainEngineRoundRead=async function' "$HOME_HTML"
           grep -Fq 'crew-verified-round-results' "$HOME_HTML"
           grep -Fq 'id="cumV7ArchiveReference"' "$HOME_HTML"
           grep -Fq 'archived_v7_captain_reference' crew-meeting-android/app/src/main/assets/cumulative_after_only.js
-          grep -Fq 'V4 선장 R46 5조합 자료실 조회 성공' crew-meeting-android/app/src/main/assets/cumulative_after_only.js
+          grep -Fq "V4 '+found+'/2방 실제 원본" crew-meeting-android/app/src/main/assets/cumulative_after_only.js
           grep -Fq 'id="freedomPngZoom"' "$HOME_HTML"
           grep -Fq "viewport.classList.toggle('zoomed')" crew-meeting-android/app/src/main/assets/v4_png_report.js
           grep -Fq 'id="freedomSavePng"' "$HOME_HTML"
@@ -125,7 +135,7 @@ jobs:
           test -s crew-meeting-android/app/src/main/assets/liaison-blind-engine.mjs
           test -s crew-meeting-android/app/src/main/assets/db1_rounds_1_1247.json
           grep -Fq '누적자료는 이 자료실에서만 조회합니다.' "$HOME_HTML"
-          grep -Fq 'resetActiveAnalysis();window.captainV4Route' "$HOME_HTML"
+          grep -Fq "window.captainV4Route('v4')" "$HOME_HTML"
           grep -Fq 'id="freedomGoCumulativeDb"' "$HOME_HTML"
           grep -Fq 'id="cumulativeAfterDashboard"' "$HOME_HTML"
           grep -Fq 'id="cumDrawNumbers"' "$HOME_HTML"
@@ -188,7 +198,7 @@ jobs:
           grep -Fq 'data-material-stage="after"' "$HOME_HTML"
           grep -Fq 'V3의 과거 350회 누적 분석은 별도 보존' "$HOME_HTML"
           grep -Fq 'loadCaptainDashboard()' crew-meeting-android/app/src/main/java/kr/hanghae/crewmeeting/MainActivity.java
-          grep -Fq "versionCode 128" crew-meeting-android/app/build.gradle
+          grep -Fq "versionCode 129" crew-meeting-android/app/build.gradle
           test "$(grep -c 'data-before-room=' "$HOME_HTML")" -eq 7
           test "$(grep -c 'data-v3-room-card=' "$HOME_HTML")" -eq 4
           test "$(grep -c 'data-v3-report=' "$HOME_HTML")" -eq 4
@@ -209,23 +219,23 @@ jobs:
           test "$NEW_CERT" = "e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be"
           echo "Recovery app signer pinned: $NEW_CERT"
           "$AAPT" dump badging "$APK" | head -5
-          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting.compact' versionCode='128'"
+          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting.compact' versionCode='129'"
           ! "$AAPT" dump badging "$APK" | grep -q "package: name='com.baekhak.dosa.v4'"
           mkdir -p crew-meeting-android/releases
-          cp "$APK" crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.28_ROUND_RESULT_SYNC.apk
-          (cd crew-meeting-android/releases && sha256sum HANGHAE_CREW_MEETING_1.0.28_ROUND_RESULT_SYNC.apk > HANGHAE_CREW_MEETING_1.0.28_ROUND_RESULT_SYNC.apk.sha256)
+          cp "$APK" crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.29_TWO_ROOM_ARCHIVE_SYNC.apk
+          (cd crew-meeting-android/releases && sha256sum HANGHAE_CREW_MEETING_1.0.29_TWO_ROOM_ARCHIVE_SYNC.apk > HANGHAE_CREW_MEETING_1.0.29_TWO_ROOM_ARCHIVE_SYNC.apk.sha256)
       - uses: actions/upload-artifact@v4
         with:
-          name: HANGHAE-CREW-MEETING-1.0.28-ROUND-RESULT-SYNC-APK
+          name: HANGHAE-CREW-MEETING-1.0.29-TWO-ROOM-ARCHIVE-SYNC-APK
           path: |
-            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.28_ROUND_RESULT_SYNC.apk
-            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.28_ROUND_RESULT_SYNC.apk.sha256
+            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.29_TWO_ROOM_ARCHIVE_SYNC.apk
+            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.29_TWO_ROOM_ARCHIVE_SYNC.apk.sha256
           if-no-files-found: error
           retention-days: 30
       - name: Verify isolated APK artifact packaging
         run: |
           set -euo pipefail
-          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.28_ROUND_RESULT_SYNC.apk
-          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.28_ROUND_RESULT_SYNC.apk.sha256
-          (cd crew-meeting-android/releases && sha256sum --check HANGHAE_CREW_MEETING_1.0.28_ROUND_RESULT_SYNC.apk.sha256)
+          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.29_TWO_ROOM_ARCHIVE_SYNC.apk
+          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.29_TWO_ROOM_ARCHIVE_SYNC.apk.sha256
+          (cd crew-meeting-android/releases && sha256sum --check HANGHAE_CREW_MEETING_1.0.29_TWO_ROOM_ARCHIVE_SYNC.apk.sha256)
           echo "TEST artifact verified. Do NOT replace the stable fixed Google Drive APK without device verification."
