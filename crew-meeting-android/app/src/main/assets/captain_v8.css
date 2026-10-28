@@ -105,3 +105,42 @@ main.roomMode #v8Hero{display:none!important}
 
 /* The offline cinematic artwork has SVG fallback for older WebViews. */
 main:not(.roomMode)>#v8Hero{background-image:url('crew-v8-cinematic.webp'),url('crew-v8-hero.svg')!important;background-size:cover,cover!important;background-position:center 54%,center 50%!important}
+/* V8.0.2: captain-requested original-room shortcuts moved into the TOP hero.
+ * The same four button IDs/listeners are preserved; no new database connections. */
+main:not(.roomMode)>#v8Hero>#originalChatBar{
+ position:absolute!important;z-index:5!important;top:clamp(73px,10dvh,92px)!important;
+ left:10px!important;right:10px!important;width:auto!important;display:grid!important;
+ grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:5px!important;
+ padding:5px!important;margin:0!important;border:1px solid #ffe4a7b8!important;
+ border-radius:12px!important;background:linear-gradient(180deg,#021d39cb,#052646c4)!important;
+ box-shadow:0 4px 14px #00132388!important;
+}
+main:not(.roomMode)>#v8Hero>#originalChatBar>button{
+ display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;
+ gap:2px!important;height:47px!important;min-height:47px!important;max-height:47px!important;
+ min-width:0!important;padding:3px 1px!important;border:1.5px solid #f1ce8d!important;
+ border-radius:8px!important;background:linear-gradient(155deg,#13537bdb,#06223fe8)!important;
+ box-shadow:inset 0 1px #ffffff66,0 2px 4px #0008!important;
+}
+main:not(.roomMode)>#v8Hero>#originalChatBar>button:last-child{background:linear-gradient(145deg,#67369cdd,#2b1258ef)!important;border-color:#e4b6fa!important}
+main:not(.roomMode)>#v8Hero>#originalChatBar .v8RoleName{font-size:clamp(.67rem,2.5vw,.86rem)!important;font-weight:900!important;line-height:1.12!important;color:#fff0cc!important;white-space:nowrap!important}
+main:not(.roomMode)>#v8Hero>#originalChatBar .v8RoleState{font-size:clamp(.51rem,1.9vw,.64rem)!important;line-height:1.1!important;color:#ffd5a0!important;white-space:nowrap!important}
+main:not(.roomMode)>#v8Hero>#originalChatBar>button.ready{border-color:#83eeb9!important}
+main:not(.roomMode)>#v8Hero>#originalChatBar>button.ready .v8RoleState{color:#a3ffd4!important}
+main:not(.roomMode)>#v8Hero>#v8ConnectionCheck{
+ position:absolute!important;z-index:5!important;left:12px!important;right:12px!important;
+ bottom:48px!important;width:calc(100% - 24px)!important;height:27px!important;min-height:27px!important;
+ padding:3px 6px!important;border:1px solid #f4d48b!important;border-radius:10px!important;
+ background:#052541e8!important;color:#ffe9b2!important;font-size:clamp(.54rem,2.3vw,.78rem)!important;
+ line-height:1.1!important;font-weight:850!important;white-space:nowrap!important;
+ overflow:hidden!important;text-overflow:ellipsis!important;box-shadow:0 2px 6px #0008!important;
+}
+main.roomMode #v8Hero,main.roomMode #originalChatBar{display:none!important}
+#v8LinkDiagnostics{padding:12px!important;margin:6px 0 10px!important;border:2px solid #edc982!important;border-radius:13px!important;background:linear-gradient(145deg,#103b5b,#061b35)!important;color:#f8e8bd!important}
+#v8LinkDiagnostics strong{font-size:1.05rem;color:#ffe6a5}
+#v8LinkDiagnostics p{font-size:.8rem;line-height:1.45;margin:8px 0;color:#e3eff8}
+#v8LinkDiagnostics #v8DiagnosticSummary{font-weight:900;color:#ffdc8d}
+#v8LinkDiagnostics small{display:block;margin-top:8px;font-size:.72rem;line-height:1.45;color:#d9e9f5}
+#v8LinkDiagnostics .v8DiagnosticActions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+#v8LinkDiagnostics .v8DiagnosticActions button{min-height:39px;padding:4px 2px;font-size:clamp(.63rem,2.5vw,.8rem);line-height:1.15;border-radius:8px}
+@media(max-height:750px){main:not(.roomMode)>#v8Hero>#originalChatBar{top:70px!important}main:not(.roomMode)>#v8Hero>#originalChatBar>button{height:42px!important;min-height:42px!important;max-height:42px!important}main:not(.roomMode)>#v8Hero>#v8ConnectionCheck{bottom:43px!important;height:24px!important;min-height:24px!important}}
