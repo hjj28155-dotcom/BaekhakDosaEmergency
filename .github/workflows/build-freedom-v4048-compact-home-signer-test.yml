@@ -1,0 +1,99 @@
+name: Verify Freedom V4.0.48 compact 20-combo plus Home navigation original-signer APK (TEST ONLY)
+on:
+  push:
+    branches:
+      - fix-freedom-v3-screen-1244-20261022
+    paths:
+      - '.github/workflows/build-freedom-v4048-compact-home-signer-test.yml'
+permissions:
+  contents: read
+jobs:
+  same_signer_test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout exact isolated V4.0.48 source, never modify original branch sources
+        uses: actions/checkout@v4
+        with:
+          ref: aff21e0f00d5e38894756f57b53d15dccc2640f2
+          persist-credentials: false
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Restore original signed-distribution identity from original branch cache scope
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: freedom-v436-production-debug-signer-20261022
+          fail-on-cache-miss: true
+      - name: Verify signer fingerprint without displaying or exporting key
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s ~/.android/debug.keystore
+          KEY_SHA=$(keytool -list -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey | grep -m1 SHA256: | sed 's/.*SHA256: //' | tr -d ':' | tr '[:upper:]' '[:lower:]')
+          test "$KEY_SHA" = 'bf281903f422fe925a23a7e72e82d690eaef899236e6d10365143ff32d9beb00'
+          echo 'PASS: original signing certificate matches. No replacement key created.'
+      - name: Verify DB-1, reference bridge, raw recovery, auto scoring and narrow-screen layout
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = 'aff21e0f00d5e38894756f57b53d15dccc2640f2'
+          node .github/scripts/validate_freedom_r14.cjs
+          node .github/scripts/verify_freedom_v4043.cjs
+          node .github/scripts/verify_freedom_v4043_references.cjs
+          node .github/scripts/verify_freedom_v4046_emergency.cjs
+      - name: Build same-signer V4.0.48 test APK only
+        working-directory: build405/FREEDOM_V402_BUILD_THIS
+        shell: bash
+        run: |
+          set -euo pipefail
+          chmod +x gradlew
+          sed -i '/org.gradle.java.home/d' gradle.properties
+          ./gradlew :app:assembleDebug --no-daemon
+      - name: Verify build version, same original signer, packaged source and no key export
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK='build405/FREEDOM_V402_BUILD_THIS/app/build/outputs/apk/debug/HANGHAE_FREEDOM_V4_0_48_HOME_TEST_CANDIDATE.apk'
+          test -s "$APK"
+          unzip -t "$APK" | tail -1
+          AAPT=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
+          "$AAPT" dump badging "$APK" > /tmp/freedom-4044-package.txt
+          grep -q "package: name='com.navigator.freedom.v3final' versionCode='40048'" /tmp/freedom-4044-package.txt
+          "$APKSIGNER" verify --print-certs "$APK" > /tmp/freedom-4044-certificate.txt
+          grep -q 'certificate SHA-256 digest: bf281903f422fe925a23a7e72e82d690eaef899236e6d10365143ff32d9beb00' /tmp/freedom-4044-certificate.txt
+          python3 - "$APK" <<'PY'
+          import sys,zipfile,hashlib,pathlib
+          path=sys.argv[1]
+          with zipfile.ZipFile(path) as apk:
+            for f in ['assets/index.html','assets/raw_bank.js','assets/db1_v1247_patch.js','assets/freedom_reference_v4043.js','assets/reference_sources_manifest_v4043.json','assets/engine_v2.html','assets/v4047_compact.css']:
+              if f not in apk.namelist(): raise SystemExit('Required APK asset missing: '+f)
+            embedded=apk.read('assets/index.html')
+            source=pathlib.Path('build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/index.html').read_bytes()
+            if embedded!=source: raise SystemExit('Packaged app UI differs from verified source')
+            if b'v4044SmallScreenModalTitleFix' not in embedded or b'v4044ReviewRound' not in embedded: raise SystemExit('Original/auto-grade fix not packaged')
+            if b'href="v4047_compact.css"' not in embedded or b"v4047Compact" not in embedded: raise SystemExit('Compact layout not packaged')
+            css=apk.read('assets/v4047_compact.css')
+            original_css=pathlib.Path('build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/v4047_compact.css').read_bytes()
+            if css!=original_css or b'grid-template-columns:repeat(2,minmax(0,1fr))' not in css: raise SystemExit('Compact CSS missing or mismatch')
+            if b'grid-template-columns:repeat(4,minmax(0,1fr))' not in css or b'v4048GoHome' not in embedded: raise SystemExit('Four-button Home control missing')
+          print('PASS: signed candidate includes source-matched recovered original, scoring, DB1, and no production publication')
+          PY
+          mkdir -p signed_candidate_HOLD
+          cp "$APK" signed_candidate_HOLD/HANGHAE_FREEDOM_V4048_COMPACT_20_HOME_ORIGINAL_SIGNED_TEST_ONLY.apk
+          (cd signed_candidate_HOLD && sha256sum HANGHAE_FREEDOM_V4048_COMPACT_20_HOME_ORIGINAL_SIGNED_TEST_ONLY.apk > SHA256.txt)
+          cp /tmp/freedom-4044-package.txt signed_candidate_HOLD/package.txt
+          cp /tmp/freedom-4044-certificate.txt signed_candidate_HOLD/certificate.txt
+          printf '%s\n' 'V4.0.48 SAME-SIGNER TEST ONLY. NOT OFFICIAL RELEASE. Android on-device data-preservation and UI behavior not yet certified. Original installed app/data must not be deleted. Official latest-apk URL remains unchanged.' > signed_candidate_HOLD/HOLD_TEST_ONLY.txt
+      - name: Upload private validation artifact only; never publish to official update route
+        uses: actions/upload-artifact@v4
+        with:
+          name: Freedom_V4048_COMPACT_20_HOME_OriginalSigned_TEST_ONLY
+          path: signed_candidate_HOLD/
+          retention-days: 3
+          compression-level: 0
+          if-no-files-found: error
