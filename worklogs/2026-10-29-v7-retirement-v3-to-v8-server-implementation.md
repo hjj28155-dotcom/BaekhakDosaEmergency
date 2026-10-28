@@ -48,3 +48,8 @@
 - 스테이징 APK 6,591,000 bytes, SHA-256 `02b1b5eda86d72e623b1cd4fa6951fb094f351a954b2f152e9f7d338415cf197`. APK에서 추출한 HTML/CSS/JS로 Chromium 360/390/412px 화면 및 기본 메뉴 이동 재검증: JS 오류 0, 한 화면 배치 PASS.
 - **주의:** V8.0.3은 V7 **홈화면 카드와 바로가기만** 제거한 단계. 누적DB/성적표·보고서 내 V7 레거시 참조 및 V7 서버 기능은 아직 남아 있음. 따라서 V7 전체 삭제 완료, V3 실기기 자동연동 완료, 공식 최종 APK 배포 완료를 주장하지 않음.
 - 원본 GitHub 브랜치 `feature/crew-meeting-standalone-apk-20261025` 변경·병합 없음. 초안 PR [#4](https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/pull/4)는 **미병합**.
+
+## V3 R60 클라이언트 소스 패치 준비 (APK 미설치)
+- 기존 `nav_v3_r30_fresh20_central_outbox.js`를 수정하지 않는 별도 `v3_r60_v8_transfer_adapter.js` 제작: 대기 보고서 JSON 바이트·SHA-256 추출, 네이티브 인증된 서버 GET 영수증 대조 후 `centralOutbox` 상태만 `SENT_VERIFIED` 전환. 최초 분석·잠금 불변.
+- Node.js 모의 IndexedDB 테스트 PASS: 잘못된 해시 거부, 20조합 최초잠금, 정상 형식 ACK 후 상태 전환, 중복 ACK 멱등성, 원본 보존, 중복 잠금 거부. **실제 단말·서버 업로드 시험 아님**.
+- 로컬 배포 산출물 `/mnt/data/V3_R60_V8_연동_개발패키지_20261029.zip`, SHA-256 `312a93bc35547248e9ae30d68d149dcbe8e5929ea307b97cd6f63052b42e95ee`. 서명키나 토큰 포함 없음. 동일서명 V3 APK는 아직 생성하지 못함.
