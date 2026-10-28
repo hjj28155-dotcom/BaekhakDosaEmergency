@@ -23,3 +23,16 @@
 - 채점된 20조합의 1~5등/낙선 판단, 보너스 2등, 사후연구 표시, 재방문 오버레이 중복, 발표 전 침묵, 홈 이동 취소 등을 독립 회귀검사로 확인.
 - Android versionCode **40049**로 올려 **원본 인증서** 동일 서명 APK를 별도 CI 빌드/아티팩트로 만들고 실기기 검사. 기존 V4.0.48/정식 설치·업데이트 경로 미변경.
 - 참고 V4.0.48 테스트 APK CI: https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/actions/runs/40723492051
+
+
+## 최신 추가 인계 · 2026-10-29 01:29 KST
+이 절은 위의 V4.0.49 미착수 상태보다 최신 검증 기록입니다.
+- V4.0.49 자동채점 축하/낙선·보너스 2등·다시듣기·연구 제외 연결 완료. 홈/모달 이동 시 웹 타이머/빵빠레 및 네이티브 지연 음성/TTS 대기 취소 추가.
+- 원본 서명 시험용 APK CI **성공**: https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/actions/runs/40725810068
+- 아티팩트 **12831429597**: https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/actions/runs/40725810068/artifacts/12831429597
+- 검증 APK의 정확한 소스는 **7cf82d3ef0cae2636894d8691fb89a6fc4b1d79d**, versionCode **40049**. 원본 인증서 SHA256 일치와 내부 index/CSS 바이트 대조 및 회귀검사 성공.
+- PR #5 통합 완료(merge f8adaa04556940a72c99fa0f9986001978a1f550). 동시 작업의 다시듣기와 작업 문서도 보존.
+- 이후 브랜치에 추가된 **2073a2b** 넓은 화면 하단 여백 CSS는 위 APK 빌드 이후 변경으로, 이 APK에 포함되지 않음. 최신 브랜치 전체와 시험 APK 소스를 혼동하지 말 것.
+- 상세 기록: docs/freedom-v4049-score-voice-fanfare-20261029.md.
+- 휴대전화 실검증은 여전히 미완료. 공식 신규설치·업데이트 URL 변경 없음. 기존 앱/승인/DB-1/잠금/V3/V7 보존.
+- 다음 작업 1순위: 시험 APK로 데이터 보존·20조합 한 화면·당첨/낙선 실제 음성·홈 이동 검사. 설치 앱 삭제나 데이터 초기화 금지.
