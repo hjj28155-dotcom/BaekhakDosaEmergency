@@ -53,3 +53,43 @@
 /* The last three rooms must remain in the same cumulative scroll region, not hidden. */
 @media(max-height:660px){.cumRoomGrid{grid-auto-rows:147px}.cumTitle button{min-height:25px;padding:3px 5px;font-size:.61rem}}
 @media(max-width:350px){.cumRoomGrid{grid-auto-rows:158px}.cumTitle button{font-size:.61rem;padding:3px 5px}.cumRoomHead small{font-size:.53rem}}
+
+/* Captain's distinct 7-room cumulative performance report: NEVER invent counts. */
+#homeSpecialRooms{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+#homeCumulativeScoreBtn{grid-column:1/-1;border:1.7px solid #f2d18c!important;background:linear-gradient(115deg,#174763,#67501f)!important;color:#fff0c6!important;font-weight:850!important}
+#materialsBody.cumulativeScoreMode{display:flex;flex-direction:column;gap:0;overflow:hidden!important;padding:3px}
+#materialsBody.cumulativeScoreMode> :not(#cumulativeScoreDashboard):not(#materialsAuthGate){display:none!important}
+#cumulativeScoreDashboard[hidden]{display:none!important}
+#cumulativeScoreDashboard{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;min-width:0;gap:8px;overflow:hidden;color:#e9f4fc;background:linear-gradient(160deg,#092a47,#071e35);padding:8px;border:1px solid #d1aa68;border-radius:13px;margin:0}
+.cumScoreShortcut{flex:none;min-height:30px;border:1.5px solid #efca82;border-radius:9px;background:#174b68;color:#ffefc9;font-size:.74rem;font-weight:850;padding:4px}
+.scoreTop{display:flex;align-items:center;justify-content:space-between;gap:5px;flex:none;border-bottom:1px solid #b5945e;padding-bottom:7px}
+.scoreTop strong{font-size:clamp(.85rem,3.5vw,1.15rem);color:#ffe0a0}
+.scoreTop button{flex:none;border:1px solid #c6a06b;border-radius:8px;background:#143e5a;color:#fff0ce;padding:6px;font-size:.67rem;min-height:30px}
+.scoreScroll{display:flex;flex-direction:column;gap:9px;min-height:0;flex:1 1 auto;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#c3a268 #0a2945;padding:3px 2px 8px}
+.scoreIntro{font-size:.7rem;color:#c3dbe8;line-height:1.35}
+.scoreGrades{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.scoreGrade{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;min-height:70px;background:#123b5d;border:1px solid #5e8aab;border-radius:10px;padding:6px 2px}
+.scoreGrade[data-grade="6"]{border-color:#f4c766;background:#493c27}
+.scoreGrade[data-grade="7"]{border-color:#f7a86a;background:#54301f}
+.scoreGrade strong{font-size:clamp(.61rem,2.6vw,.81rem);color:#ffe2ab;white-space:nowrap}
+.scoreGrade output{font-size:1.1rem;font-weight:850;color:#f7fcff;font-variant-numeric:tabular-nums}
+.scoreGrade small{font-size:.64rem;color:#c5d8e7}
+.scoreTotals{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.scoreTotals>div{border:1px solid #c6a46a;border-radius:10px;background:#0b324f;padding:10px;display:flex;flex-direction:column;gap:5px}
+.scoreTotals small{font-size:.67rem;color:#d8e7f0}
+.scoreTotals strong{font-size:1.14rem;color:#ffdc95}
+.scoreThreshold{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid #467a9a;border-radius:9px;padding:6px 9px;background:#0a2b48}
+.scoreThreshold label{font-size:.76rem;color:#ffe1a6;margin:0}
+.scoreThreshold select{min-width:0;width:auto;max-width:70%;border:1px solid #6da0bb;background:#102f4e;color:#fff3d5;border-radius:7px;padding:6px;font-size:.74rem}
+.scoreHint{font-size:.63rem;line-height:1.55;color:#bbd4e5}
+.scoreRoomTitle{font-size:.82rem;font-weight:850;color:#ffdfa4;padding-top:4px;border-top:1px solid #3d6078}
+.scoreRooms{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.scoreRoom{border:1px solid #517e9e;border-radius:9px;background:#0b304f;display:flex;flex-direction:column;gap:4px;padding:7px;min-width:0}
+.scoreRoom[data-score-room="all"]{grid-column:1/-1;border-color:#f3c16d;background:#20445b}
+.scoreRoom strong{font-size:.75rem;color:#ffdb9b}
+.scoreRoom span{font-size:.68rem;color:#d1e5f2;display:flex;justify-content:space-between;gap:3px}
+.scoreRoom output{color:#fff4db;font-weight:800}
+.scoreSyncStatus{font-size:.71rem;line-height:1.5;border:1px solid #547b99;border-radius:9px;padding:9px;background:#0a304f;color:#d7e8f4;white-space:pre-line}
+.scoreStatus{font-size:.66rem;color:#d6e2ed;line-height:1.35}
+@media(max-width:350px){.scoreGrades{gap:4px}.scoreGrade{padding:4px 1px;min-height:60px}.scoreRoom{padding:5px}.scoreTop button{font-size:.6rem}}
+@media(max-height:660px){.scoreGrade{min-height:58px}.scoreScroll{gap:6px}}
