@@ -188,13 +188,10 @@ assert.equal(historyState.v126Ensure1243Auto20(),false,'no synthesized 1243 20-c
 assert.equal(Object.keys(oldRoundRecord.analysis).length,0,'no historical analysis overwrite');
 assert.equal(oldRoundRecord.buy.auto20,undefined,'no historical buy rewrite');
 const currentOpen=extract('function v330OpenRound(n){','function v124Round1243ResultPage(){');
-let openedLocked=false,calledRound=0;
-const currentState={V330_RECENT:[1243,1244,1245,1246,1247],R(){return {buy:{locked:true},analysis:{}}},
- setRound(n){calledRound=n;return true},v330PurchasePage(n){openedLocked=n===1247},
- V330_WIN:{},v4043DisplaySavedFive(){throw Error('must prioritize original locked purchase')},
- runAnalysisFromHome(){throw Error('must not generate new locked purchase')}};
+let reviewedRound=0;
+const currentState={v4044ReviewRound(n){reviewedRound=n;return 'VERIFIED_EXISTING_RECORDS'}};
 vm.createContext(currentState);vm.runInContext(currentOpen,currentState);
-currentState.v330OpenRound(1247);
-assert.equal(openedLocked,true);
-assert.equal(calledRound,1247);
-console.log('PASS: 1243 synthetic history disabled, 1247 locked round reads original purchase, engine raw evidence anti-stale verified.');
+assert.equal(currentState.v330OpenRound(1247),'VERIFIED_EXISTING_RECORDS');
+assert.equal(reviewedRound,1247,'recent round must route into preserved-record-only grading review');
+// New suite verify_freedom_v4044.cjs separately checks locked original five and no postdraw generation.
+console.log('PASS: 1243 synthetic history disabled, 1247 review routes to preserved-record-only grading, engine anti-stale verified.');
