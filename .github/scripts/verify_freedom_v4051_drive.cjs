@@ -1,0 +1,14 @@
+const fs=require('node:fs'),assert=require('node:assert/strict');
+const root='build405/FREEDOM_V402_BUILD_THIS/app/';
+const java=fs.readFileSync(root+'src/main/java/com/baekhak/centralcontrol/MainActivity.java','utf8');
+const r14=fs.readFileSync(root+'src/freedom/assets/freedom_onboarding_r14.js','utf8');
+const open=java.slice(java.indexOf('private void openOfficialUpdateLink()'),java.indexOf('private void launchApkInstaller'));
+assert.match(open,/readVerifiedFreedomRelease\(\)/);assert.match(open,/openFreedomDriveUri\(meta.getString\("apk_url"\)\)/);
+assert.match(open,/catch \(Exception e\) \{[\s\S]*openFreedomDriveUri\(FREEDOM_UPDATE_DRIVE_FOLDER\)/);
+assert.ok(!open.includes('OFFICIAL_UPDATE_PAGE'));assert.ok(!open.includes('hanghae-freedom-distribution'));
+assert.match(java,/reply.put\("apk_url", meta.getString\("apk_url"\)\)/);
+assert.match(r14,/dl.hidden=false;dl.textContent='드라이브 업데이트 파일 열기'/);
+assert.match(r14,/const url=verifiedDriveUpdateUrl\|\|UPDATE_DRIVE_FOLDER/);
+assert.ok(!r14.includes('h.openRadioPage(HUB)'));
+assert.match(r14,/if\(!q\|\|typeof q!=='object'\)q=\{\}/);
+console.log('PASS: validated Drive APK action, Drive folder access on lookup error/older release, visible manual Drive button, no new-install walkthrough redirect.');

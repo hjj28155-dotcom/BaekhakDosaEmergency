@@ -10,8 +10,8 @@ android {
         applicationId 'com.navigator.freedom.v3final'
         minSdk 23
         targetSdk 35
-        versionCode 40050
-        versionName "4.0.50-HOME-UPDATE-POPUP"
+        versionCode 40051
+        versionName "4.0.51-DRIVE-READABLE-HOME"
     }
 
     buildFeatures {
@@ -61,7 +61,7 @@ android {
 
     applicationVariants.all { variant ->
         variant.outputs.all {
-            outputFileName = "HANGHAE_FREEDOM_V4_0_50_HOME_UPDATE_TEST_CANDIDATE.apk"
+            outputFileName = "HANGHAE_FREEDOM_V4_0_51_DRIVE_HOME_TEST_CANDIDATE.apk"
         }
     }
 }

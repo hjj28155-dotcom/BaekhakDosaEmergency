@@ -1661,9 +1661,34 @@ public class MainActivity extends Activity {
     private static final String LATEST_APK_URL =
             "https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/latest-apk";
 
-    private static final String OFFICIAL_UPDATE_PAGE = "https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/update.html";
+    private static final String FREEDOM_UPDATE_DRIVE_FOLDER = "https://drive.google.com/drive/folders/1VI4a3RZfBdNxfs6unkZzEIaeI4a4bnMY";
     private static final String FREEDOM_RELEASE_STATUS_URL =
             "https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/freedom-release-latest.json";
+
+    private JSONObject readVerifiedFreedomRelease() throws Exception {
+        HttpURLConnection connection = null;
+        try {
+            URL endpoint = new URL(FREEDOM_RELEASE_STATUS_URL + "?check=" + System.currentTimeMillis());
+            connection = (HttpURLConnection) endpoint.openConnection();
+            connection.setConnectTimeout(8000);
+            connection.setReadTimeout(8000);
+            connection.setRequestProperty("Cache-Control", "no-cache");
+            if (connection.getResponseCode() != 200) throw new Exception("release unavailable");
+            byte[] body;
+            try (InputStream stream = connection.getInputStream()) { body = readAll(stream); }
+            if (body.length > 16384) throw new Exception("release metadata too large");
+            JSONObject meta = new JSONObject(new String(body, StandardCharsets.UTF_8));
+            if (!"com.navigator.freedom.v3final".equals(meta.optString("application_id"))) throw new Exception("wrong APK package");
+            long latest = meta.optLong("version_code", 0L);
+            if (latest < 40041L || latest > 200000L) throw new Exception("invalid remote version");
+            String downloadUrl = meta.optString("apk_url", "");
+            URL verified = new URL(downloadUrl);
+            if (!"https".equals(verified.getProtocol()) || !"drive.google.com".equals(verified.getHost())) throw new Exception("invalid APK host");
+            return meta;
+        } finally {
+            if (connection != null) connection.disconnect();
+        }
+    }
 
     // Check actual installed versionCode against the independently published Freedom release.
     // Never claim "latest" on network errors, and never reset approvals or app data.
@@ -1674,22 +1699,9 @@ public class MainActivity extends Activity {
             try {
                 reply.put("installed_code", getInstalledVersionCode());
                 reply.put("installed_name", currentVersionName());
-                URL endpoint = new URL(FREEDOM_RELEASE_STATUS_URL + "?check=" + System.currentTimeMillis());
-                connection = (HttpURLConnection) endpoint.openConnection();
-                connection.setConnectTimeout(8000);
-                connection.setReadTimeout(8000);
-                connection.setRequestProperty("Cache-Control", "no-cache");
-                if (connection.getResponseCode() != 200) throw new Exception("release unavailable");
-                byte[] body;
-                try (InputStream stream = connection.getInputStream()) { body = readAll(stream); }
-                if (body.length > 16384) throw new Exception("release metadata too large");
-                JSONObject meta = new JSONObject(new String(body, StandardCharsets.UTF_8));
-                if (!"com.navigator.freedom.v3final".equals(meta.optString("application_id"))) throw new Exception("wrong APK package");
+                JSONObject meta = readVerifiedFreedomRelease();
                 long latest = meta.optLong("version_code", 0L);
-                if (latest < 40041L || latest > 200000L) throw new Exception("invalid remote version");
-                String downloadUrl = meta.optString("apk_url", "");
-                URL verified = new URL(downloadUrl);
-                if (!"https".equals(verified.getProtocol()) || !"drive.google.com".equals(verified.getHost())) throw new Exception("invalid APK host");
+                reply.put("apk_url", meta.getString("apk_url"));
                 reply.put("latest_code", latest);
                 reply.put("latest_name", meta.optString("version_name", ""));
                 reply.put("status", getInstalledVersionCode() >= latest ? "latest" : "update");
@@ -1709,15 +1721,30 @@ public class MainActivity extends Activity {
         }, "Freedom-APK-Version-Check").start();
     }
 
+    // Updates open the validated Drive APK directly, never the new-install walkthrough.
     private void openOfficialUpdateLink() {
+        new Thread(() -> {
+            try {
+                JSONObject meta = readVerifiedFreedomRelease();
+                if (meta.optLong("version_code", 0L) < getInstalledVersionCode()) {
+                    openFreedomDriveUri(FREEDOM_UPDATE_DRIVE_FOLDER);
+                    return;
+                }
+                openFreedomDriveUri(meta.getString("apk_url"));
+            } catch (Exception e) {
+                // Version lookup errors must not hide or disable the user's Drive access.
+                openFreedomDriveUri(FREEDOM_UPDATE_DRIVE_FOLDER);
+            }
+        }, "Freedom-Drive-APK-Open").start();
+    }
+    private void openFreedomDriveUri(final String target) {
         runOnUiThread(() -> {
             try {
-                Uri uri=Uri.parse(OFFICIAL_UPDATE_PAGE);
-                Intent browser=new Intent(Intent.ACTION_VIEW,uri);
+                Intent browser = new Intent(Intent.ACTION_VIEW, Uri.parse(target));
                 browser.addCategory(Intent.CATEGORY_BROWSABLE);
                 startActivity(browser);
-            } catch(Exception e) {
-                Toast.makeText(this,"공식 다운로드 링크를 열 수 없습니다. 인터넷 연결을 확인해 주세요.",Toast.LENGTH_LONG).show();
+            } catch (Exception e) {
+                Toast.makeText(this, "드라이브를 열 수 없습니다. 인터넷 연결을 확인하세요.", Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -2195,4 +2222,5 @@ public class MainActivity extends Activity {
         }
     }
 }
+
 

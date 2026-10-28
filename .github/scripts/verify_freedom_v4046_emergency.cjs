@@ -4,7 +4,7 @@ const base='build405/FREEDOM_V402_BUILD_THIS/app/';
 const html=fs.readFileSync(base+'src/freedom/assets/index.html','utf8');
 const gradle=fs.readFileSync(base+'build.gradle','utf8');
 assert.match(gradle,/applicationId 'com[.]navigator[.]freedom[.]v3final'/);
-assert.match(gradle,/versionCode 40050/);
+assert.match(gradle,/versionCode 40051/);
 assert.match(gradle,/signingConfig signingConfigs[.]distribution/);
 assert.match(html,/const V4046_VISIBLE=\[1244,1245,1246,1247,1248\]/);
 assert.match(html,/function rawPage[(][)]\{return v4044ReviewRound[(]1248,true[)]\}/);
@@ -171,5 +171,5 @@ D.rounds['1245']={};
 assert.equal(root.v4049Announce(1245,true),false,'missing original tickets must remain silent');
 selection=1248;
 
-console.log('PASS: V4.0.50 complete 1247-history analysis, optional dominant 1248 primary, 4x5 groups, result pending and graded, 5 visible rounds, future wins not fabricated, locked original preserved, historical research segregated, six JS syntax checks.');
+console.log('PASS: V4.0.51 complete 1247-history analysis, optional dominant 1248 primary, 4x5 groups, result pending and graded, 5 visible rounds, future wins not fabricated, locked original preserved, historical research segregated, six JS syntax checks.');
 

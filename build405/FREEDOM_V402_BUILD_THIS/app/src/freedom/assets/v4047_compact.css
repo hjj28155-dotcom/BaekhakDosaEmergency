@@ -161,3 +161,67 @@
  border-radius:5px!important;background:#124365!important;color:#e4f3ff!important;
  font-size:10px!important;line-height:15px!important;font-weight:800!important
 }
+
+/* V4.0.51: give all six numbers the full card width; compact metadata above. */
+#modal.v4047Compact .r5grid{gap:6px!important}
+#modal.v4047Compact .r5group{
+ padding:3px 6px!important;grid-template-rows:21px repeat(5,minmax(34px,1fr))!important;
+ background:linear-gradient(180deg,#0c3047,#08263b)!important;border-color:#37617a!important
+}
+#modal.v4047Compact .r5group h4{height:21px!important;line-height:20px!important;font-size:12px!important}
+#modal.v4047Compact .r5row,#modal.v4047Compact .r5row.purchase{
+ grid-template-areas:"no score" "balls balls"!important;
+ grid-template-columns:minmax(0,1fr) 30px!important;
+ grid-template-rows:11px minmax(20px,1fr)!important;
+ gap:2px 3px!important;padding:3px 0!important;
+ align-content:center!important;border-bottom:1px solid #275069!important
+}
+#modal.v4047Compact .r5row:last-child{border-bottom:0!important}
+#modal.v4047Compact .r5no{grid-area:no!important;font-size:9px!important;color:#a8c8da!important;line-height:11px!important}
+#modal.v4047Compact .r5no::before{content:"조합 ";font-weight:500}
+#modal.v4047Compact .r5balls{
+ grid-area:balls!important;display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;
+ gap:3px!important;align-items:center!important;justify-items:center!important
+}
+#modal.v4047Compact .r5balls .r5ball{
+ width:100%!important;height:auto!important;aspect-ratio:1!important;max-width:30px!important;max-height:30px!important;
+ font-size:clamp(10px,3.3vw,14px)!important;font-weight:850!important;
+ background:#154863!important;border:1px solid #7aa5bc!important;color:#f7fcff!important;
+ display:inline-grid!important;place-items:center!important;line-height:1!important;margin:0!important
+}
+#modal.v4047Compact .r5balls .r5ball.hit{background:#bb2048!important;border-color:#ff91a6!important;color:#fff!important}
+#modal.v4047Compact .r5hit{
+ grid-area:score!important;width:auto!important;max-width:none!important;height:auto!important;
+ min-height:0!important;padding:0!important;border-radius:0!important;background:none!important;
+ box-shadow:none!important;font-size:10px!important;line-height:11px!important;color:#bad6e5!important
+}
+#modal.v4047Compact .r5row.purchase::after{display:none!important}
+@media(max-height:650px){
+ #modal.v4047Compact .r5group{grid-template-rows:17px repeat(5,minmax(29px,1fr))!important;padding:2px 5px!important}
+ #modal.v4047Compact .r5group h4{height:17px!important;line-height:16px!important;font-size:11px!important}
+ #modal.v4047Compact .r5row,#modal.v4047Compact .r5row.purchase{grid-template-rows:9px minmax(17px,1fr)!important;padding:1px 0!important;gap:1px 3px!important}
+ #modal.v4047Compact .r5no,#modal.v4047Compact .r5hit{line-height:9px!important;font-size:8px!important}
+ #modal.v4047Compact .r5balls .r5ball{max-width:24px!important;max-height:24px!important;font-size:10px!important}
+}
+/* Home is anchored at the bottom-right of the visible panel, outside scrolling content. */
+#modal.v4051BottomHome{padding:4px!important;overflow:hidden!important}
+#modal.v4051BottomHome>.card{
+ display:flex!important;flex-direction:column!important;position:relative!important;
+ width:calc(100vw - 8px)!important;max-width:680px!important;
+ height:calc(100vh - 8px)!important;height:calc(100dvh - 8px)!important;
+ max-height:calc(100dvh - 8px)!important;min-height:0!important;
+ margin:0 auto!important;padding-bottom:52px!important;overflow:hidden!important
+}
+#modal.v4051BottomHome>.card>button.close{display:none!important}
+#modal.v4051BottomHome>.card>#mt{flex:0 0 auto!important;padding-right:4px!important}
+#modal.v4051BottomHome #mc{flex:1 1 auto!important;min-height:0!important;overflow:auto!important}
+#modal.v4051BottomHome #mc button[onclick="v4048GoHome()"]{display:none!important}
+#modal.v4051BottomHome .v4051HomeDock{position:absolute!important;right:10px!important;bottom:8px!important;z-index:30!important}
+#modal.v4051BottomHome .v4051HomeDock button{min-width:68px!important;min-height:36px!important;margin:0!important;padding:6px 16px!important;font-size:14px!important;border-radius:10px!important}
+#modal.v4051BottomHome.v4047Compact #mc{overflow:hidden!important}
+#modal.v4051BottomHome.v4047Compact .v4047Footer{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+@media(max-height:650px){
+ #modal.v4051BottomHome>.card{padding-bottom:43px!important}
+ #modal.v4051BottomHome .v4051HomeDock{right:8px!important;bottom:5px!important}
+ #modal.v4051BottomHome .v4051HomeDock button{min-height:32px!important;padding:4px 14px!important}
+}

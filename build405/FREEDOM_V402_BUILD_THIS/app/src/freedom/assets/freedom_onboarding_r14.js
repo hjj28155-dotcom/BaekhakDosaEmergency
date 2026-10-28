@@ -8,6 +8,7 @@ const INTRO_INSTALL='install_guide_final.mp4';
 const INTRO_GUIDE='freedom_onboarding_postscroll_20260928.mp4';
 const HUB='https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/hanghae-freedom-distribution.html';
 const GATE='freedomR14FullScreen';
+const UPDATE_DRIVE_FOLDER='https://drive.google.com/drive/folders/1VI4a3RZfBdNxfs6unkZzEIaeI4a4bnMY';
 let stage='init',approvedOnce=false,approvalCheckRequested=false;
 const native=()=>{try{return window.AndroidHost||window.BaekhakNative||null}catch(e){return null}};
 function approvalState(){
@@ -171,7 +172,7 @@ function checkFreedomInstalledVersion(){
  if(!msg||!details||!dl)return;
  msg.textContent='현재 설치된 APK 버전을 확인하고 있습니다…';
  details.textContent='';
- dl.hidden=true;
+ dl.hidden=false;dl.textContent='드라이브 업데이트 파일 열기';
  try{
   const h=native();
   if(!h||typeof h.checkLatestFreedomVersion!=='function'){
@@ -185,7 +186,7 @@ function checkFreedomInstalledVersion(){
  }
 }
 // V4.0.50: home notification uses the same verified official release callback.
-let homeUpdatePending=null,homeUpdateBusy=false,homeUpdateLastCheck=0;
+let homeUpdatePending=null,homeUpdateBusy=false,homeUpdateLastCheck=0,verifiedDriveUpdateUrl='';
 const homeUpdateShown=new Set();
 function validHomeUpdate(q){
  if(!q||typeof q!=='object')return false;
@@ -202,7 +203,7 @@ function homeIsVisible(){
  return true;
 }
 function openFreedomUpdate(){
- try{const h=native();if(h&&h.openOfficialUpdateLink){h.openOfficialUpdateLink();return}if(h&&h.openRadioPage){h.openRadioPage(HUB);return}window.open(HUB,'_blank')}
+ try{const h=native();if(h&&h.openOfficialUpdateLink){h.openOfficialUpdateLink();return}const url=verifiedDriveUpdateUrl||UPDATE_DRIVE_FOLDER;if(h&&h.openRadioPage){h.openRadioPage(url);return}window.open(url,'_blank')}
  catch(e){alert('공식 업데이트 링크를 열지 못했습니다.')}
 }
 function showHomeUpdate(){
@@ -233,13 +234,15 @@ function checkHomeUpdate(){
 window.onFreedomVersionStatus=function(payload){
  let q={};try{q=typeof payload==='string'?JSON.parse(payload||'{}'):(payload||{})}catch(e){}
  homeUpdateBusy=false;
+ if(!q||typeof q!=='object')q={};
+ verifiedDriveUpdateUrl=(Number(q.latest_code)>=Number(q.installed_code)&&/^https:\/\/drive[.]google[.]com\/file\/d\/[A-Za-z0-9_-]+(?:\/|$)/.test(String(q.apk_url||'')))?String(q.apk_url):'';
  homeUpdatePending=validHomeUpdate(q)?q:null;
  showHomeUpdate();
  const msg=document.getElementById('freedomVersionMessage');
  const details=document.getElementById('freedomVersionDetails');
  const dl=document.getElementById('freedomVersionDownload');
  if(!msg||!details||!dl)return;
- dl.hidden=true;
+ dl.hidden=false;dl.textContent='드라이브 업데이트 파일 열기';
  const installed=Number(q.installed_code)||0,latest=Number(q.latest_code)||0;
  if(q.status==='latest'&&installed>=latest&&latest>=40041){
   msg.textContent='✅ 최신 APK가 설치되어 있습니다. 업데이트할 필요가 없습니다.';
@@ -254,7 +257,7 @@ window.onFreedomVersionStatus=function(payload){
  }
 };
 window.updatePage=function(){
- modal('항행의자유 업데이트','<div class="panel goldline"><h3>설치 및 업데이트 버전 확인</h3><p id="freedomVersionMessage" role="status">현재 설치 버전 확인 중…</p><p class="small" id="freedomVersionDetails"></p><button class="b green" id="freedomVersionRetry" style="width:100%">버전 다시 확인</button><button class="b gold" id="freedomVersionDownload" style="width:100%" hidden>구글 드라이브 최신 APK 업데이트</button></div>');
+ modal('항행의자유 업데이트','<div class="panel goldline"><h3>설치 및 업데이트 버전 확인</h3><p id="freedomVersionMessage" role="status">현재 설치 버전 확인 중…</p><p class="small" id="freedomVersionDetails"></p><button class="b green" id="freedomVersionRetry" style="width:100%">버전 다시 확인</button><button class="b gold" id="freedomVersionDownload" style="width:100%">드라이브 업데이트 파일 열기</button></div>');
  const retry=document.getElementById('freedomVersionRetry');
  const dl=document.getElementById('freedomVersionDownload');
  if(retry)retry.onclick=checkFreedomInstalledVersion;
@@ -267,3 +270,4 @@ if(window.setInterval)window.setInterval(checkHomeUpdate,15000);
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
 else boot();
 })();
+
