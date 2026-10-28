@@ -27,6 +27,8 @@ assert.match(html,/showFanfare\(n,outcome[.]highestHits,outcome[.]wins,outcome[.
 assert.match(html,/showComfort\(n,outcome[.]highestHits\)/);
 assert.match(compactCss,/#fanfareOverlay[.]show,#comfortOverlay[.]show/);
 assert.match(compactCss,/z-index:2147483647!important/);
+assert.match(compactCss,/@media\(min-width:641px\)/);
+assert.match(compactCss,/height:calc\(100dvh - 24px\)/);
 assert.match(html,/emergencyHome\?'홈'/);
 
 assert.match(html,/function v4047OpenRawEditor/);
