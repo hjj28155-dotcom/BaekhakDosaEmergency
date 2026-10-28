@@ -1850,15 +1850,103 @@ function v4044AutoRows(games,win,label){
 }
 
 const V4045_AUTOGEN_STARTED=Object.create(null);
-function v4045AutoAnalyze20(round){
- const n=Number(round),raw=v4043Db1Text(n);
- if(!raw){
-  modal('DB-1 자동분석 확인', '<div class="panel warn">내장 DB-1 6문장 원본을 검증하지 못했습니다. 임의 조합을 생성하지 않습니다.</div>');
-  return;
+let V4046_CORPUS_JOB=null;
+function v4046WinningForRound(round,rec){
+ const verified=V330_WIN[Number(round)];if(verified)return verified;
+ const score=(rec||{}).score||{};if(!String(score.source||'').includes('동행복권'))return null;
+ const nums=(String(score.result||'').match(/\d+/g)||[]).map(Number),bonus=Number(score.bonus||0);
+ return nums.length===6&&nums.every(n=>Number.isInteger(n)&&n>=1&&n<=45)&&new Set(nums).size===6&&
+  Number.isInteger(bonus)&&bonus>=1&&bonus<=45&&!nums.includes(bonus)?{nums,bonus}:null;
+}
+function v4046PrimaryRaw(round){
+ const n=Number(round),rec=(D.rounds||{})[String(n)]||{},manual=String((rec.raw||{}).text||'').trim();
+ const text=manual||(n<=1247?v4043Db1Text(n):String((rawBank(n)||{}).text||'').trim());
+ const lines=text.split(/\r?\n/).filter(x=>x.trim());
+ return {raw:lines.length===6?text:'',invalid:!!text&&lines.length!==6,origin:manual?'당회차 사용자 제공 원문':'당회차 내장 원문'};
+}
+function v4046ToggleRaw(){const e=document.getElementById('v4046RawEditor');if(e)e.style.display=e.style.display==='none'?'block':'none'}
+function v4046SaveRaw1248(){
+ if(Number(cur())!==1248)return;
+ const editor=document.getElementById('v4046RawInput');if(!editor)return;
+ const raw=String(editor.value||'').trim(),lines=raw.split(/\r?\n/).filter(x=>x.trim());
+ if(raw&&lines.length!==6){alert('당회차 원문은 정확히 6구절이어야 합니다. 이전 원문은 보존됩니다.');return}
+ const rec=D.rounds['1248']||(D.rounds['1248']={}),old=rec.raw||{},prior=String(old.text||'').trim();
+ if(raw!==prior){
+  if(prior)(rec.rawRevisions||(rec.rawRevisions=[])).push({...old});
+  rec.raw={...old,text:raw,source:raw?'사용자 제공 제1248회':'해당 회차 원문 없음',updated:new Date().toISOString()};
+  save();
  }
- if(V4043_ANALYSIS_SESSION||V3_ANALYSIS_PENDING)return;
- V4043_ANALYSIS_INPUT={round:n,source:'내장 DB-1 원문 기반 자동분석 · 사용자 입력 없음',research:!!V330_WIN[n],started:Date.now()};
- sendAnalysisToEngine(n,raw);
+ v4044ReviewRound(1248,false);
+}
+function v4045AutoAnalyze20(round,force){
+ const target=Number(round),lastSource=Math.min(target-1,1247);
+ if(!V4046_VISIBLE.includes(target)||lastSource<1)return;
+ const rec=(D.rounds||{})[String(target)]||{},locked=(rec.buy||{}).locked===true;
+ if(locked){modal('최초잠금 보존','<div class="panel warn">잠금된 원본 구매·분석은 재생성하지 않습니다.</div>');return}
+ const existing=v4044ValidSets((rec.analysis||{}).auto20,20);
+ if(existing&&!force&&!v4046WinningForRound(target,rec))return v4044ReviewRound(target,false);
+ if(V4046_CORPUS_JOB){modal('비상용 전체 분석 진행 중','<div class="panel">현재 전체 원문 분석이 진행 중입니다.</div>');return}
+ const status=window.DB1_UPDATE_1247||{},meta=window.V3_RAW_BANK_META||{},reference=window.FREEDOM_REF_V4043;
+ if(status.status!=='PASS'||Number(meta.count)!==1247||!reference||typeof reference.scoreRaw!=='function'){
+  modal('DB-1 분석자료 확인','<div class="panel warn">원문 1~1247회 검증 또는 꿈사전 참조자료 확인 실패. 임의 조합을 생성하지 않습니다.</div>');return}
+ const main=v4046PrimaryRaw(target);
+ if(main.invalid){modal('당회차 원문 형식 확인','<div class="panel warn">저장된 당회차 원문이 6구절 형식이 아닙니다. 기존 원문은 유지합니다.</div>');return}
+ const primary=main.raw?reference.scoreRaw(main.raw):null;
+ if(primary&&primary.status!=='OK'){modal('당회차 주분석 보류','<div class="panel warn">입력된 주원문을 검증하지 못했습니다.</div>');return}
+ const job={target,lastSource,next:1,processed:0,hits:0,scores:Array(46).fill(0),primary,mainOrigin:main.raw?main.origin:'당회차 원문 없음 · 과거 전체 원문 주분석',
+  research:!!v4046WinningForRound(target,rec),force:!!force};
+ V4046_CORPUS_JOB=job;
+ modal('제'+target+'회 · 비상용 원문 전수분석','<div class="panel goldline"><h3>DB-1 1~'+lastSource+'회 원문 전수분석</h3>'+
+  '<p>'+(main.raw?'당회차 주원문 70% + 과거 전체 보조 30%':'당회차 원문 미등록 · 과거 전체 원문 100%')+'</p>'+
+  '<p id="v4046Progress" class="small">원문 검증 중…</p></div>');
+ function batch(){
+  if(V4046_CORPUS_JOB!==job)return;
+  try{
+   const end=Math.min(job.next+11,job.lastSource+1);
+   while(job.next<end){
+    const n=job.next++,raw=v4043Db1Text(n);
+    if(!raw)throw Error('제'+n+'회 DB-1 원문 여섯 구절 미확인');
+    const scored=reference.scoreRaw(raw);
+    if(!scored||scored.status!=='OK')throw Error('제'+n+'회 원문 분석 실패');
+    for(let k=1;k<=45;k++){
+     const v=Number((scored.scores||{})[k]||0);
+     if(v>0&&Number.isFinite(v)){job.scores[k]+=v;job.hits++}
+    }
+    job.processed++;
+   }
+   const indicator=document.getElementById('v4046Progress');
+   if(indicator)indicator.textContent='원문 전체 분석 '+job.processed+' / '+job.lastSource+'회';
+   if(job.next<=job.lastSource){setTimeout(batch,0);return}
+   const hp=Math.max(...job.scores.slice(1)),p=(job.primary||{}).scores||{};
+   const pp=Math.max(...Array.from({length:45},(_,i)=>Number(p[i+1]||0)));
+   if(!hp&&!pp)throw Error('검증된 원문에서 후보 번호를 확보하지 못했습니다');
+   const mainWeight=job.primary&&pp>0?0.7:0,historyWeight=1-mainWeight;
+   const ranking=Array.from({length:45},(_,i)=>i+1).map(n=>({n,score:historyWeight*(hp?job.scores[n]/hp:0)+mainWeight*(pp?Number(p[n]||0)/pp:0)}))
+    .filter(x=>x.score>0).sort((a,b)=>b.score-a.score||a.n-b.n);
+   if(ranking.length<8)throw Error('원문 사전과 대응한 후보가 8개 미만입니다. 추가 번호는 만들지 않습니다');
+   const pool=ranking.slice(0,12).map(x=>x.n),games=v123Auto20FromUniverse(pool,target,20);
+   if(!v4044ValidSets(games,20))throw Error('후보우주 내에서 20개 고유 조합을 생성하지 못했습니다');
+   const dest=D.rounds[String(target)]||(D.rounds[String(target)]={});
+   if((dest.buy||{}).locked===true)throw Error('분석 도중 최초잠금 확인. 원본 변경 금지');
+   const previous=dest.analysis||{},hasPrevious=!!v4044ValidSets(previous.auto20,20);
+   const data={round:target,engine:'EMERGENCY_DB1_FULL_CORPUS_DICTIONARY',
+    source:job.mainOrigin,corpusFirstRound:1,corpusLastRound:lastSource,corpusRoundCount:job.processed,
+    primaryWeight:mainWeight,historyWeight,lexiconMatches:job.hits,
+    referenceVersion:'FREEDOM_REF_V4043',winningNumbersUsed:false,
+    candidates:pool,rank:ranking,auto20:games,
+    groups:[0,1,2,3].map(i=>({name:(i+1)+'묶음',rows:games.slice(i*5,i*5+5).map((game,j)=>({slot:i*5+j+1,game}))})),
+    analyzedAt:new Date().toISOString(),researchOnly:job.research,historicalResultExcluded:job.research};
+   if(job.research)dest.analysisResearch=data;
+   else if(!hasPrevious||force){
+    if(hasPrevious)(dest.analysisVersions||(dest.analysisVersions=[])).push(previous);
+    dest.analysis=data;
+   }
+   V4046_CORPUS_JOB=null;save();v4044ReviewRound(target,false);
+  }catch(err){V4046_CORPUS_JOB=null;
+   modal('원문 전수분석 점검','<div class="panel warn">'+esc(String(err&&err.message||err))+' · 기존 원본 및 최초잠금 기록은 유지됩니다.</div>');
+  }
+ }
+ setTimeout(batch,0);
 }
 function v4045GroupedScore(games,w,label,sourceType){
  const total=games.length,winning=new Set(w.nums),bonus=Number(w.bonus);
