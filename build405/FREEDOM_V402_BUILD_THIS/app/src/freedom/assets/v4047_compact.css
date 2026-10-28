@@ -1,0 +1,145 @@
+/* V4.0.47 portrait one-screen four 5-combo groups. Scope to emergency results ONLY. */
+#modal.v4047Compact{padding:4px!important;overflow:hidden!important}
+#modal.v4047Compact>.card{
+ display:flex!important;flex-direction:column!important;
+ box-sizing:border-box!important;width:calc(100vw - 8px)!important;max-width:680px!important;
+ height:calc(100vh - 8px)!important;height:calc(100dvh - 8px)!important;
+ min-height:0!important;overflow:hidden!important;
+ margin:0 auto!important;padding:3px 5px!important;border-radius:10px!important
+}
+#modal.v4047Compact>.card>#mt{
+ flex:0 0 auto!important;min-height:0!important;
+ height:27px!important;line-height:24px!important;margin:0!important;
+ padding:1px 56px 1px 4px!important;text-align:left!important;
+ font-size:clamp(13px,3.7vw,18px)!important;
+ overflow:hidden!important;white-space:nowrap!important;text-overflow:ellipsis!important
+}
+#modal.v4047Compact>.card>button.close{
+ top:4px!important;right:4px!important;
+ min-height:23px!important;line-height:21px!important;
+ padding:1px 8px!important;font-size:12px!important
+}
+#modal.v4047Compact #mc{flex:1 1 auto!important;min-height:0!important;overflow:hidden!important;padding:0!important}
+#modal.v4047Compact #mc>.analysisCompact{
+ display:flex!important;flex-direction:column!important;
+ height:100%!important;min-height:0!important;
+ gap:3px!important;overflow:hidden!important
+}
+#modal.v4047Compact .v4047Select{
+ flex:0 0 auto!important;display:grid!important;
+ grid-template-columns:69px minmax(0,1fr)!important;
+ gap:3px!important;align-items:center!important;min-height:32px!important
+}
+#modal.v4047Compact .v4047Select strong{
+ color:#ffe28a!important;font-size:clamp(10px,2.6vw,12px)!important;
+ line-height:1.1!important;text-align:center!important
+}
+#modal.v4047Compact .r5selector{
+ display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
+ gap:2px!important;min-width:0!important
+}
+#modal.v4047Compact .r5selector .b{
+ height:28px!important;min-height:28px!important;
+ font-size:clamp(9px,2.5vw,12px)!important;
+ padding:1px!important;border-radius:7px!important
+}
+#modal.v4047Compact .v4047Winning{
+ flex:0 0 auto!important;display:flex!important;
+ align-items:center!important;justify-content:center!important;
+ gap:5px!important;min-height:36px!important;
+ margin:0!important;padding:2px 4px!important;
+ border-radius:8px!important;border:1px solid #9a7834!important;background:#071f34!important
+}
+#modal.v4047Compact .v4047Winning strong,
+#modal.v4047Compact .v4047Bonus{font-size:11px!important;color:#ffe28a!important;white-space:nowrap!important}
+#modal.v4047Compact .v4047Winning.pending{
+ min-height:27px!important;font-size:12px!important;color:#d3ecfa!important
+}
+#modal.v4047Compact .r5winning{display:flex!important;gap:3px!important;flex-wrap:nowrap!important;margin:0!important}
+#modal.v4047Compact .r5winning .r5ball{
+ width:clamp(20px,6vw,29px)!important;height:clamp(20px,6vw,29px)!important;
+ flex:0 0 auto!important;font-size:clamp(10px,2.8vw,13px)!important;
+ box-shadow:none!important;border-width:1px!important
+}
+#modal.v4047Compact .v4047Summary{
+ flex:0 0 auto!important;min-height:19px!important;
+ padding:2px 5px!important;margin:0!important;border-radius:5px!important;
+ background:#0b3048!important;color:#c6e7ec!important;
+ line-height:15px!important;font-size:clamp(9px,2.6vw,12px)!important;
+ white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important
+}
+#modal.v4047Compact .r5grid{
+ flex:1 1 auto!important;min-height:0!important;
+ display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ grid-template-rows:repeat(2,minmax(0,1fr))!important;
+ gap:4px!important;align-items:stretch!important;overflow:hidden!important
+}
+#modal.v4047Compact .r5group{
+ display:grid!important;box-sizing:border-box!important;
+ grid-template-rows:18px repeat(5,minmax(0,1fr))!important;
+ min-width:0!important;min-height:0!important;overflow:hidden!important;
+ margin:0!important;padding:2px 4px!important;border-radius:8px!important
+}
+#modal.v4047Compact .r5group h4{
+ min-width:0!important;height:18px!important;line-height:16px!important;
+ margin:0!important;font-size:clamp(9px,2.5vw,12px)!important;
+ white-space:nowrap!important;overflow:hidden!important
+}
+#modal.v4047Compact .r5row,
+#modal.v4047Compact .r5row.purchase{
+ display:grid!important;box-sizing:border-box!important;
+ grid-template-columns:12px minmax(0,1fr) 27px!important;
+ gap:1px!important;min-width:0!important;min-height:0!important;
+ height:auto!important;margin:0!important;padding:0!important;align-items:center!important
+}
+#modal.v4047Compact .r5no{font-size:clamp(8px,2.2vw,10px)!important;text-align:left!important}
+#modal.v4047Compact .r5balls{
+ display:flex!important;min-width:0!important;width:100%!important;
+ justify-content:space-between!important;align-items:center!important;
+ gap:0!important;flex-wrap:nowrap!important
+}
+#modal.v4047Compact .r5balls .r5ball{
+ box-sizing:border-box!important;width:clamp(12px,3.85vw,17px)!important;
+ height:clamp(12px,3.85vw,17px)!important;
+ flex:0 0 auto!important;border-radius:50%!important;
+ border-width:1px!important;font-size:clamp(8px,2.3vw,10px)!important;
+ line-height:1!important;box-shadow:none!important
+}
+#modal.v4047Compact .r5hit{
+ width:27px!important;min-width:0!important;max-width:27px!important;
+ font-size:clamp(8px,2.3vw,10px)!important;white-space:nowrap!important;
+ overflow:hidden!important;text-align:right!important;padding:0!important;border:0!important
+}
+#modal.v4047Compact .r5row.purchase::after{
+ content:""!important;display:block!important;width:27px!important
+}
+#modal.v4047Compact .v4047Footer{
+ flex:0 0 auto!important;display:grid!important;
+ grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ gap:4px!important;min-height:28px!important;margin:0!important
+}
+#modal.v4047Compact .v4047Footer .b{
+ min-width:0!important;min-height:27px!important;height:28px!important;
+ font-size:clamp(9px,2.6vw,12px)!important;
+ white-space:nowrap!important;padding:1px 3px!important;border-radius:6px!important
+}
+#modal.v4047Compact .v4047Empty{
+ flex:1 1 auto!important;margin:0!important;
+ padding:8px!important;min-height:0!important;overflow:auto!important
+}
+@media(max-height:650px){
+ #modal.v4047Compact>.card>#mt{height:23px!important;line-height:20px!important}
+ #modal.v4047Compact .v4047Select{min-height:29px!important}
+ #modal.v4047Compact .r5selector .b{height:25px!important;min-height:25px!important}
+ #modal.v4047Compact .v4047Winning{min-height:31px!important}
+ #modal.v4047Compact .r5group{grid-template-rows:15px repeat(5,minmax(0,1fr))!important}
+ #modal.v4047Compact .r5group h4{height:15px!important;line-height:14px!important}
+ #modal.v4047Compact .v4047Footer,#modal.v4047Compact .v4047Footer .b{min-height:24px!important;height:24px!important}
+}
+@media print{
+ #modal.v4047Compact,.modal{position:static!important;padding:0!important;background:#fff!important}
+ #modal.v4047Compact>.card{height:auto!important;overflow:visible!important}
+ #modal.v4047Compact #mc,#modal.v4047Compact #mc>.analysisCompact{height:auto!important;overflow:visible!important}
+ #modal.v4047Compact .r5grid{height:auto!important;grid-template-rows:auto auto!important}
+ #modal.v4047Compact .r5group{height:155px!important}
+}
