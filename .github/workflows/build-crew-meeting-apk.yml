@@ -159,7 +159,7 @@ jobs:
           grep -Fq '총성공확률' "$HOME_HTML"
           grep -Fq 'window.captainCumulativeScoreOpen=function' "$HOME_HTML"
           grep -Fq "window.captainCumulativeScoreRender=renderScore" crew-meeting-android/app/src/main/assets/cumulative_after_only.js
-          grep -Fq "원본 자동송신 연결 안 됨" crew-meeting-android/app/src/main/assets/cumulative_after_only.js
+          grep -Fq "독립 원본 미수신 · 미집계 (0점 아님)" crew-meeting-android/app/src/main/assets/cumulative_after_only.js
           grep -Fq "cumulativeScoreMode" crew-meeting-android/app/src/main/assets/cumulative_after_only.css
           grep -Fq 'id="cumRoomGrid"' "$HOME_HTML"
           grep -Fq 'data-room="v7"' "$HOME_HTML"
