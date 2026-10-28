@@ -189,7 +189,9 @@ jobs:
           grep -Fq 'android:label="항행의자유 중앙통제실 V8"' crew-meeting-android/app/src/main/AndroidManifest.xml
           grep -Fq 'captainSevenRoomScoreRead=async function' "$HOME_HTML"
           grep -Fq 'researchRate(grades,threshold)' crew-meeting-android/app/src/main/assets/cumulative_after_only.js
-          grep -Fq '1NtFkXk2HPqUOPsp2K-as29r9SHgKJmYc' "$HOME_HTML"
+          grep -Fq 'id="crewUpdateOpen" type="button" disabled' "$HOME_HTML"
+          grep -Fq 'V8 배포대기' "$HOME_HTML"
+          ! grep -Fq '1NtFkXk2HPqUOPsp2K-as29r9SHgKJmYc' "$HOME_HTML"
           python3 - <<'PY'
           import json
           x=json.load(open('crew-meeting-android/app/src/main/assets/official_draws_verified_17.json'))
