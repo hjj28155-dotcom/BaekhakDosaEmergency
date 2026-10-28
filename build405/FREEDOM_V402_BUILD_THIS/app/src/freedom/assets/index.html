@@ -974,7 +974,7 @@ function closeInstallGuideVideo(reveal){
   /* FIX57: 설명서 재생 중에는 김광석 영상음악만 재생 */
 }
 
-if(!D.rounds)D.rounds={}; D.currentRound=1247; if(!D.notices)D.notices=[]; if(!D.approvalLog)D.approvalLog=[]; if(!D.suggestions)D.suggestions=[]; if(!D.historyNotes)D.historyNotes={}; if(!D.historyRound)D.historyRound=Math.min(Number(D.currentRound||1242),1242);
+if(!D.rounds)D.rounds={}; if(!Number.isInteger(Number(D.currentRound))||Number(D.currentRound)<1||Number(D.currentRound)>1247)D.currentRound=1247; if(!D.notices)D.notices=[]; if(!D.approvalLog)D.approvalLog=[]; if(!D.suggestions)D.suggestions=[]; if(!D.historyNotes)D.historyNotes={}; if(!D.historyRound)D.historyRound=Math.min(Number(D.currentRound||1242),1242);
 const VISIBLE_ROUND_MIN=1240, VISIBLE_ROUND_MAX=1247;
 const SPECIAL_APPROVAL_START_ROUND=1243;
 let SPECIAL_APPROVED=false,SPECIAL_APPROVAL_STATE={};
@@ -1006,7 +1006,7 @@ function bootSpecialApprovalAutoCheck(){
 }
 setTimeout(bootSpecialApprovalAutoCheck,1200);
 const PINNED_NOTICE={title:'',body:''};
-D.currentRound=1247;save();setTimeout(()=>{let q=document.getElementById('roundQuick');if(q)q.value=1244;let d=document.getElementById('homeRoundDirect');if(d)d.value=1244;refreshHomeUI()},0);
+if(!Number.isInteger(Number(D.currentRound))||Number(D.currentRound)<1||Number(D.currentRound)>1247)D.currentRound=1247;save();setTimeout(()=>{let q=document.getElementById('roundQuick');if(q)q.value=cur();let d=document.getElementById('homeRoundDirect');if(d)d.value=cur();refreshHomeUI()},0);
 // 구버전 단일 메모가 있으면 현재 회차 데이터로 보존
 if(D.raw||D.buy||D.merge||D.score||D.compare){let r=String(D.currentRound);D.rounds[r]=D.rounds[r]||{};['raw','buy','merge','score','compare'].forEach(k=>{if(D[k]&&!D.rounds[r][k])D.rounds[r][k]=D[k]})}
 function save(){localStorage.setItem(K,JSON.stringify(D));refreshHomeUI()} function closeM(){let m=document.getElementById('modal');m.style.display='none';m.classList.remove('scoreOneScreen','musicOneScreen','v340BackLabel');document.querySelectorAll('.simpleHot').forEach(b=>b.style.pointerEvents='auto');document.body.style.overflowY='auto'}
@@ -1316,10 +1316,7 @@ function scoreHasData(sc){return !!(sc&&(parseNums(sc.result).length===6||isFill
 function rawHasData(r,n){return !!((r&&isFilled(r.text))||rawBank(n))}
 function userRawHasData(r){return !!(r&&(isFilled(r.text)||isFilled(r.gi)||isFilled(r.source)||isFilled(r.memo)))}
 function autoStamp(obj){obj.updated=new Date().toISOString();save()}
-function rawPage(){
- let n=Number(cur());if(!V330_RECENT.includes(n))n=1247;
- modal('원문분석 · 최근 5회차',`<div class="panel goldline"><div class="small status">최근 5회차 원문과 저장된 조합의 자동채점을 조회합니다.</div><div class="r5selector">${V330_RECENT.map(r=>`<button class="b ${n===r?'gold':''}" onclick="v330OpenRound(${r})">${r}회</button>`).join('')}</div></div>${v4044RawCard(n)}<div class="row"><button class="b gold" onclick="v330OpenRound(${n})">원문·자동채점 보기</button></div>`);
-}
+function rawPage(){return v4044ReviewRound(Number(cur()),true)}
 function saveRawAuto(){if(!document.getElementById('rawText'))return;let old=R().raw||{};R().raw={...old,text:rawText.value,gi:(giText.value.trim()===cur()?'':giText.value),source:rawSource.value,memo:rawMemo.value,updated:new Date().toISOString()};save()}
 function saveRaw(){saveRawAuto()}
 function restoreEmbeddedRaw(){let b=rawBank(cur());if(!b){alert('이 회차의 내장 원문이 없습니다.');return}rawText.value=b.text||'';giText.value=(b.gi&&b.gi!==cur())?b.gi:'';rawSource.value=b.source||'내장 원문은행';saveRawAuto();alert('제'+cur()+'회 내장 원문을 화면에 다시 불러왔습니다.')}
@@ -1364,24 +1361,42 @@ function addApproval(){D.approvalLog=D.approvalLog||[];D.approvalLog.push({time:
 function parseNums(s){return String(s||'').match(/\d+/g)?.map(Number).filter(n=>n>=1&&n<=45).slice(0,6)||[]}
 function comboStats(buy,score){let result=parseNums(score?.result),combos=Array.isArray(buy?.combos)?buy.combos.slice(0,5):[];let stats=combos.map((c,i)=>{let nums=parseNums(c),hit=nums.filter(n=>result.includes(n));return {i:i+1,c:c||'',hit}});let best=stats.filter(x=>x.c).sort((a,b)=>b.hit.length-a.hit.length)[0]||null;return {result,stats,best}}
 function scoreRowsHtml(buy,score){if(!buyHasData(buy))return '<tr><td colspan="4">최종 5조합 미등록</td></tr>';let st=comboStats(buy,score);return st.stats.map(x=>`<tr><td>${x.i}</td><td>${esc(x.c||'미등록')}</td><td>${st.result.length===6?x.hit.length:'-'}</td><td>${st.result.length===6?esc(x.hit.join(', ')||'-'):'-'}</td></tr>`).join('')}
+let V4045_WIN_PENDING=null;
+const V4045_WIN_FETCHED=Object.create(null);
 function autoWinningLookup(){
- let r=Number(cur());
- if(!Number.isFinite(r)||r<1){alert('회차 번호를 확인해 주세요.');return}
- try{
-  if(!window.AndroidHost||typeof AndroidHost.fetchWinningNumbers!=='function'){alert('자동조회는 Android 설치본에서 사용할 수 있습니다.');return}
-  let b=document.getElementById('autoWinBtn');if(b){b.disabled=true;b.textContent='조회 중…'}
-  AndroidHost.fetchWinningNumbers(r)
- }catch(e){alert('당첨번호 자동조회를 시작하지 못했습니다.')}
+ const round=Number(cur());
+ if(!Number.isInteger(round)||round<1||round>1247)return;
+ const host=window.AndroidHost;
+ if(!host||typeof host.fetchWinningNumbers!=='function')return;
+ V4045_WIN_PENDING=round;
+ try{host.fetchWinningNumbers(round)}catch(e){V4045_WIN_PENDING=null}
+}
+function v4045MaybeRefreshWinning(round){
+ if(V4045_WIN_FETCHED[round]||!(window.AndroidHost&&typeof window.AndroidHost.fetchWinningNumbers==='function'))return;
+ V4045_WIN_FETCHED[round]=true;
+ autoWinningLookup();
 }
 window.__v3WinningResult=function(data){
  try{
-  let b=document.getElementById('autoWinBtn');if(b){b.disabled=false;b.textContent='당첨번호 자동조회'}
-  if(!data||data.ok!==true){alert((data&&data.error)||'당첨번호를 조회하지 못했습니다.');return}
-  if(Number(data.round)!==Number(cur())){alert('조회 회차와 현재 회차가 다릅니다.');return}
-  let nums=(data.numbers||[]).map(Number).filter(n=>n>=1&&n<=45)
-  if(nums.length!==6){alert('당첨번호 데이터 형식이 올바르지 않습니다.');return}
-  let x=R();x.score=x.score||{};x.score.result=nums.join(' ');x.score.bonus=String(Number(data.bonus)||'');x.score.source=data.source||'동행복권';x.score.drawDate=data.date||'';x.score.updated=new Date().toISOString();save();scorePage()
- }catch(e){alert('당첨번호 저장 중 오류가 발생했습니다.')}
+  const expected=V4045_WIN_PENDING;
+  if(expected===null)return; // Ignore unsolicited, stale or unrequested native replies.
+  V4045_WIN_PENDING=null;
+  const round=Number(data&&data.round);
+  if(!data||data.ok!==true||!Number.isInteger(round)||round!==expected)return;
+  const nums=Array.isArray(data.numbers)?data.numbers.map(Number):[];
+  const bonus=Number(data.bonus);
+  if(nums.length!==6||nums.some(n=>!Number.isInteger(n)||n<1||n>45)||new Set(nums).size!==6||!Number.isInteger(bonus)||bonus<1||bonus>45||nums.includes(bonus))return;
+  const built=V330_WIN[round];
+  if(built&&(nums.slice().sort((a,b)=>a-b).join(',')!==built.nums.slice().sort((a,b)=>a-b).join(',')||bonus!==built.bonus)){
+   // Do not overwrite verified bundled results with mismatching network content.
+   return;
+  }
+  const record=(D.rounds||{})[String(round)]||((D.rounds||{})[String(round)]={});
+  const old=record.score||{};
+  record.score={...old,result:nums.join(' '),bonus:String(bonus),source:data.source||'동행복권 자동조회',drawDate:data.date||old.drawDate||'',updated:new Date().toISOString()};
+  save();
+  if(Number(cur())===round)v4044ReviewRound(round,false);
+ }catch(e){}
 }
 function scorePage(){if(V330_RECENT.includes(Number(cur())))return v4044ReviewRound(Number(cur()));let x=R().score||{},buy=R().buy||{};modal('성적 바로보기',roundHead('score')+`<div class="panel"><h3>당첨번호 입력</h3><div class="grid2"><div><div class="label">당첨번호 6개</div><input id="winNums" value="${esc(x.result||'')}" placeholder="예: 2 4 10 16 31 41" oninput="saveScoreAuto()"></div><div><div class="label">보너스</div><input id="bonusNum" value="${esc(x.bonus||'')}" placeholder="예: 9" oninput="saveScoreAuto()"></div></div><div class="label">결과 메모</div><textarea id="scoreMemo" rows="4" oninput="saveScoreAuto()">${esc(x.memo||'')}</textarea><div class="small status">당첨번호·보너스·메모는 자동 저장되며 5조합 성적도 자동 계산됩니다.</div></div><div class="panel"><h3>최종 5조합 일치 현황</h3><table class="table"><thead><tr><th>조합</th><th>번호</th><th>일치수</th><th>일치번호</th></tr></thead><tbody id="scoreRows">${scoreRowsHtml(buy,x)}</tbody></table></div>`)}
 function saveScoreAuto(){R().score={result:document.getElementById('winNums')?.value||'',bonus:document.getElementById('bonusNum')?.value||'',memo:document.getElementById('scoreMemo')?.value||'',updated:new Date().toISOString()};save();let body=document.getElementById('scoreRows');if(body)body.innerHTML=scoreRowsHtml(R().buy||{},R().score||{})}
@@ -1759,7 +1774,7 @@ function v4043DisplaySavedFive(round,mode){
 function v4043HistoricalResearchPage(round){
  const a=R().analysisResearch||{},games=(a.auto20||[]).slice(0,20);
  if(games.length!==20)return false;
- modal('제'+round+'회 · DB-1 사후 연구 조합','<div class="analysisCompact v330print"><div class="panel warn"><b>사후 연구 20조합 · 실제 결과전 등록 조합 아님</b><p class="small">내장 DB-1과 분석엔진으로 지금 재계산한 자료입니다. 구매기록, 최초잠금, 성적 및 과거 분석원본은 변경하지 않습니다.</p></div><div class="r5grid">'+v330GroupsPurchase(games)+'</div><div class="r5actions"><button class="b" onclick="rawPage()">회차선택</button><button class="b" onclick="closeM()">닫기</button></div></div>');
+ v4044ReviewRound(round,false);
  return true;
 }
 function v4043MissingHistoricalCombos(round){
@@ -1833,27 +1848,69 @@ function v4044AutoRows(games,win,label){
  return `<section class="panel"><h3>${esc(label)}</h3><p class="small status">당첨 조합 ${awarded}/${games.length} · 원본 보관 기록과만 비교${duplicateCount?' · 중복 저장 조합 '+duplicateCount+'건 포함':''}</p>${rows}</section>`;
 }
 
-function v4044ReviewRound(round){
- const n=Number(round);if(!V330_RECENT.includes(n))return rawPage();if(!setRound(n))return;
- const rec=R(),w=V330_WIN[n]||null,actual=v4044ValidSets((rec.analysis||{}).auto20,20),research=v4044ValidSets((rec.analysisResearch||{}).auto20,20);
- const buy=rec.buy||{},purchased=buy.locked?v4044ValidSets(buy.combos,5):null;
- // Fallback to persisted original analysis/legacy groups only; no postdraw generation or official lock assertion.
- const archiveGroups=Array.isArray((rec.analysis||{}).groups)?rec.analysis.groups:(Array.isArray((rec.legacy||{}).groups)?rec.legacy.groups:[]);
- const archiveRows=archiveGroups.flatMap(g=>Array.isArray(g?.rows)?g.rows.map(r=>r?.game??r?.numbers??null):[]);
- const archived=(!purchased&&!actual&&!research&&archiveRows.length&&archiveRows.length<=100)?v4044ValidSets(archiveRows,archiveRows.length):null;
- let html=`<div class="analysisCompact">${v4044RawCard(n)}`;
- if(w){
-  html+=`<section class="panel goldline"><h3>제${n}회 확인된 당첨번호</h3><div class="r5winning">${w.nums.map(x=>`<span class="r5ball hit">${x}</span>`).join('')}</div><div>보너스 ${w.bonus}</div></section>`;
-  if(purchased)html+=v4044AutoRows(purchased,w,'최초잠금 구매 5조합 자동채점');
-  if(actual)html+=v4044AutoRows(actual,w,'저장된 자동분석 20조합 비교 · 사전인증과 별개');
-  if(research)html+=v4044AutoRows(research,w,'사후 연구 20조합 비교 · 공식 실적 제외');
-  if(archived)html+=v4044AutoRows(archived,w,'기존 저장 분석그룹·이관 조합 비교 · 최초잠금 인증과 별개');
- }else html+='<section class="panel warn">당첨번호 미확인 · 자동채점 대기</section>';
- if(!purchased&&!actual&&!research&&!archived)html+='<section class="panel warn"><h3>저장 조합 확인 대기</h3><p>이 회차의 최초잠금 구매조합 또는 원장 20조합을 찾지 못했습니다. 추첨 후 새로운 조합을 만들어 당첨 전 기록이라고 표시하지 않습니다.</p></section>';
- html+='<div class="row"><button class="b" onclick="rawPage()">회차선택</button><button class="b" onclick="closeM()">닫기</button></div></div>';
- modal(`제${n}회 · 원문 및 자동채점`,html);
+const V4045_AUTOGEN_STARTED=Object.create(null);
+function v4045AutoAnalyze20(round){
+ const n=Number(round),raw=v4043Db1Text(n);
+ if(!raw){
+  modal('DB-1 자동분석 확인', '<div class="panel warn">내장 DB-1 6문장 원본을 검증하지 못했습니다. 임의 조합을 생성하지 않습니다.</div>');
+  return;
+ }
+ if(V4043_ANALYSIS_SESSION||V3_ANALYSIS_PENDING)return;
+ V4043_ANALYSIS_INPUT={round:n,source:'내장 DB-1 원문 기반 자동분석 · 사용자 입력 없음',research:!!V330_WIN[n],started:Date.now()};
+ sendAnalysisToEngine(n,raw);
 }
-function v330OpenRound(n){return v4044ReviewRound(n)}
+function v4045GroupedScore(games,w,label,sourceType){
+ const total=games.length,winning=new Set(w.nums),bonus=Number(w.bonus);
+ const matches=games.map(g=>g.filter(n=>winning.has(n)).length);
+ const awarded=matches.filter(h=>h>=3).length;
+ const duplicates=total-new Set(games.map(g=>g.join(','))).size;
+ const hint=sourceType==='research'?'추첨 후 생성된 연구조합입니다. 결과 전 구매·최초잠금 실적으로 인정하지 않습니다.':sourceType==='locked'?'원본에 저장된 최초잠금 20조합입니다.':'보관된 원본 조합과 당첨번호를 비교합니다.';
+ return '<section class="panel"><h3>'+esc(label)+'</h3><p class="small status">'+esc(hint)+' · 3개 이상 적중 '+awarded+'/'+total+(duplicates?' · 중복 저장 '+duplicates+'건':'')+'</p></section>'+
+  '<div class="r5grid">'+v330GroupsResult(games,w.nums,bonus)+'</div>';
+}
+function v4044ReviewRound(round,autoStart){
+ const n=Number(round);
+ if(!V330_RECENT.includes(n))return rawPage();
+ if(!setRound(n))return;
+ const rec=R(),buy=rec.buy||{},w=V330_WIN[n]||null;
+ const locked20=buy.locked?v4044ValidSets(buy.auto20,20):null;
+ const analysis=v4044ValidSets((rec.analysis||{}).auto20,20);
+ const research=v4044ValidSets((rec.analysisResearch||{}).auto20,20);
+ const groups=(rec.analysis||{}).groups;
+ const legacy=(rec.legacy||{}).groups;
+ const originals=Array.isArray(groups)&&groups.length?groups:(Array.isArray(legacy)?legacy:[]);
+ const archiveRows=originals.flatMap(g=>Array.isArray(g&&g.rows)?g.rows.map(x=>x&&('game' in x?x.game:x.numbers)):[]);
+ const archived=archiveRows.length===20?v4044ValidSets(archiveRows,20):null;
+ const purchased=buy.locked?v4044ValidSets(buy.combos,5):null;
+ const display20=locked20||(!buy.locked?(analysis||archived):null)||research;
+ const type=locked20?'locked':(!buy.locked&&(analysis||archived)?'saved':'research');
+ const title='제'+n+'회 · 자동 20조합 및 당첨연동';
+ let html='<div class="analysisCompact v330print"><div class="panel goldline">'+
+  '<h3>자동분석 5조합 × 4묶음 = 총 20조합</h3>'+
+  '<div class="r5selector">'+V330_RECENT.map(r=>'<button class="b '+(r===n?'gold':'')+'" onclick="v330OpenRound('+r+')">'+r+'회</button>').join('')+'</div></div>';
+ if(w){
+  html+='<div class="panel goldline centerTitle"><h3>제'+n+'회 자동 연동 당첨번호</h3><div class="r5winning">'+w.nums.map(k=>'<span class="r5ball hit">'+k+'</span>').join('')+'</div><div>보너스 '+w.bonus+'</div></div>';
+ }else html+='<div class="panel warn">당첨번호 확인 대기 · 발표 후 자동조회와 연동합니다.</div>';
+ if(display20){
+  html+=w?v4045GroupedScore(display20,w,type==='research'?'사후 연구 자동 20조합':(type==='locked'?'최초잠금 자동 20조합':'저장된 자동 20조합'),type):
+   '<section class="panel"><h3>자동분석 20조합</h3></section><div class="r5grid">'+v330GroupsPurchase(display20)+'</div>';
+ }else{
+  if(purchased&&w)html+=v4044AutoRows(purchased,w,'보존된 최초잠금 구매 5조합');
+  html+='<section class="panel warn"><h3>자동분석 20조합 준비</h3>'+
+   '<p>현재 기기에서 보존된 20조합이 없습니다. 내장 DB-1 분석엔진을 사용하여 5조합씩 4묶음을 만듭니다. 이미 추첨한 회차는 사후 연구로만 기록합니다.</p>'+
+   '<button class="b gold" onclick="v4045AutoAnalyze20('+n+')">자동 20조합 분석 실행</button></section>';
+ }
+ html+='<div class="r5actions"><button class="b gold" onclick="v330Print()">인쇄</button>'+
+  '<button class="b" onclick="autoWinningLookup()">당첨번호 자동 재확인</button>'+
+  '<button class="b" onclick="closeM()">닫기</button></div></div>';
+ modal(title,html);
+ if(!display20&&autoStart&&!V4045_AUTOGEN_STARTED[n]&&v4043Db1Text(n)){
+  V4045_AUTOGEN_STARTED[n]=true;
+  setTimeout(()=>{try{if(Number(cur())===n)v4045AutoAnalyze20(n)}catch(e){}},100);
+ }
+ if(w)setTimeout(()=>{try{if(Number(cur())===n)v4045MaybeRefreshWinning(n)}catch(e){}},300);
+}
+function v330OpenRound(n){return v4044ReviewRound(n,true)}
 
 function v124Round1243ResultPage(){
  if(!v126Ensure1243Auto20()){
@@ -2142,7 +2199,7 @@ function cumulativeScore(){let complete=0,incomplete=0,c3=0,c4=0,c5=0,c6=0;for(c
 function recentScoreRows(){let rs=Object.keys(D.rounds||{}).map(Number).filter(Number.isFinite).filter(r=>r>=VISIBLE_ROUND_MIN&&r<=VISIBLE_ROUND_MAX).filter(r=>groupsForRound(r).length||scoreData(r).result.length===6).sort((a,b)=>b-a).slice(0,8);return rs.map(r=>{let d=scoreData(r),sum=roundScoreSummary(r);return `<div class="scoreRoundRow" onclick="setRound(${r});scorePage()"><b>제${r}회</b><span>${d.result.length===6?'완료 · 3/6 '+sum.rows.filter(x=>x.hits.length>=3).length+' · 4/6 '+sum.rows.filter(x=>x.hits.length>=4).length+' · 5/6 '+sum.rows.filter(x=>x.hits.length>=5).length:'당첨번호 미입력'}</span><strong class="${d.result.length===6&&sum.best===0?'zero':''}">${d.result.length===6?sum.best+'/6':'-'}</strong></div>`}).join('')}
 function toggleResultInput(){let e=document.getElementById('resultInputBox');if(e)e.classList.toggle('open')}
 function saveScoreInputOnly(){let old=R().score||{};R().score={...old,result:document.getElementById('winNums')?.value||'',bonus:document.getElementById('bonusNum')?.value||'',memo:document.getElementById('scoreMemo')?.value||'',updated:new Date().toISOString()};save()}
-function scorePage(){let d=scoreData(cur()),sum=roundScoreSummary(cur()),cum=cumulativeScore(),has=d.result.length===6;let bestRank=calcRank(sum.best,false).label;let banner=has?(sum.best>=3?`<div class="scoreHero success"><strong>🎉 축하합니다! 제${cur()}회 ${bestRank} 성적!</strong><span>${sum.best}/6 최고 적중 · ${sum.wins}조합 3/6 이상<br>좋은 성적입니다. 이번 회차도 수고하셨습니다!</span></div>`:`<div class="scoreHero fail"><strong>이번 회차는 아쉽게 지나갔습니다.</strong><span>괜찮습니다. 이번 기록도 다음 분석의 소중한 항해일지입니다.<br>다음 회차에서 다시 힘차게 출발하겠습니다.</span></div>`):`<div class="scoreHero fail"><strong>아직 당첨번호가 입력되지 않았습니다.</strong><span>당첨번호를 입력하면 조합별 적중 현황과 누적 성적을 자동 계산합니다.</span></div>`;let packs=sum.groups.length?sum.groups.map(packScoreHtml).join(''):'<div class="panel centerTitle">이 회차에 분석 조합이 없습니다. 먼저 원문분석을 실행해 주세요.</div>';modal('성적 바로보기',`<div class="scoreCompact">${banner}<div class="screenTitle">누적 결과표 · 회차별 성적</div><div class="scoreSummary"><div class="stat"><strong>${cum.complete}</strong><span>완료 회차</span></div><div class="stat"><strong>${cum.incomplete}</strong><span>미성적/미완료</span></div><div class="stat"><strong>${cum.total}</strong><span>전체 기록</span></div><div class="stat"><strong>${cum.c3}</strong><span>3/6 누계</span></div><div class="stat"><strong>${cum.c5} / ${cum.c6}</strong><span>5/6 · 6/6</span></div></div><div class="scoreRoundList">${recentScoreRows()||'<div class="scoreRoundRow"><span>아직 누적 성적이 없습니다.</span></div>'}</div><div class="resultInputToggle"><button id="autoWinBtn" class="b gold" onclick="autoWinningLookup()">당첨번호 자동조회</button><button class="b" onclick="toggleResultInput()">당첨번호 입력/수정</button></div><div id="resultInputBox" class="panel resultInputBox ${has?'':'open'}"><div class="grid2"><div><div class="label">당첨번호 6개</div><input id="winNums" value="${esc(d.s.result||d.result.join(' '))}" placeholder="예: 2 4 10 16 31 41" oninput="saveScoreInputOnly()" onchange="scorePage()"></div><div><div class="label">보너스</div><input id="bonusNum" value="${esc(d.s.bonus||d.bonus||'')}" placeholder="예: 9" oninput="saveScoreInputOnly()" onchange="scorePage()"></div></div><div class="label">결과 메모</div><textarea id="scoreMemo" rows="3" oninput="saveScoreInputOnly()">${esc(d.s.memo||'')}</textarea><div class="small status">입력 내용은 자동 저장됩니다.</div></div><div class="packGrid">${packs}</div></div>`);document.getElementById('modal')?.classList.add('scoreOneScreen');if(has&&sum.best>=3){setTimeout(()=>showFanfare(cur(),sum.best,sum.wins),180)}else if(has){setTimeout(()=>showComfort(cur(),sum.best),180)}}
+function scorePage(){if(V330_RECENT.includes(Number(cur())))return v4044ReviewRound(Number(cur()),true);let d=scoreData(cur()),sum=roundScoreSummary(cur()),cum=cumulativeScore(),has=d.result.length===6;let bestRank=calcRank(sum.best,false).label;let banner=has?(sum.best>=3?`<div class="scoreHero success"><strong>🎉 축하합니다! 제${cur()}회 ${bestRank} 성적!</strong><span>${sum.best}/6 최고 적중 · ${sum.wins}조합 3/6 이상<br>좋은 성적입니다. 이번 회차도 수고하셨습니다!</span></div>`:`<div class="scoreHero fail"><strong>이번 회차는 아쉽게 지나갔습니다.</strong><span>괜찮습니다. 이번 기록도 다음 분석의 소중한 항해일지입니다.<br>다음 회차에서 다시 힘차게 출발하겠습니다.</span></div>`):`<div class="scoreHero fail"><strong>아직 당첨번호가 입력되지 않았습니다.</strong><span>당첨번호를 입력하면 조합별 적중 현황과 누적 성적을 자동 계산합니다.</span></div>`;let packs=sum.groups.length?sum.groups.map(packScoreHtml).join(''):'<div class="panel centerTitle">이 회차에 분석 조합이 없습니다. 먼저 원문분석을 실행해 주세요.</div>';modal('성적 바로보기',`<div class="scoreCompact">${banner}<div class="screenTitle">누적 결과표 · 회차별 성적</div><div class="scoreSummary"><div class="stat"><strong>${cum.complete}</strong><span>완료 회차</span></div><div class="stat"><strong>${cum.incomplete}</strong><span>미성적/미완료</span></div><div class="stat"><strong>${cum.total}</strong><span>전체 기록</span></div><div class="stat"><strong>${cum.c3}</strong><span>3/6 누계</span></div><div class="stat"><strong>${cum.c5} / ${cum.c6}</strong><span>5/6 · 6/6</span></div></div><div class="scoreRoundList">${recentScoreRows()||'<div class="scoreRoundRow"><span>아직 누적 성적이 없습니다.</span></div>'}</div><div class="resultInputToggle"><button id="autoWinBtn" class="b gold" onclick="autoWinningLookup()">당첨번호 자동조회</button><button class="b" onclick="toggleResultInput()">당첨번호 입력/수정</button></div><div id="resultInputBox" class="panel resultInputBox ${has?'':'open'}"><div class="grid2"><div><div class="label">당첨번호 6개</div><input id="winNums" value="${esc(d.s.result||d.result.join(' '))}" placeholder="예: 2 4 10 16 31 41" oninput="saveScoreInputOnly()" onchange="scorePage()"></div><div><div class="label">보너스</div><input id="bonusNum" value="${esc(d.s.bonus||d.bonus||'')}" placeholder="예: 9" oninput="saveScoreInputOnly()" onchange="scorePage()"></div></div><div class="label">결과 메모</div><textarea id="scoreMemo" rows="3" oninput="saveScoreInputOnly()">${esc(d.s.memo||'')}</textarea><div class="small status">입력 내용은 자동 저장됩니다.</div></div><div class="packGrid">${packs}</div></div>`);document.getElementById('modal')?.classList.add('scoreOneScreen');if(has&&sum.best>=3){setTimeout(()=>showFanfare(cur(),sum.best,sum.wins),180)}else if(has){setTimeout(()=>showComfort(cur(),sum.best),180)}}
 function scoreVoiceHost(){try{if(window.BaekhakNative)return window.BaekhakNative}catch(e){}try{if(window.AndroidHost)return window.AndroidHost}catch(e){}return null}
 function stopScoreAudio(){try{let h=scoreVoiceHost();if(h&&h.stopScoreVoice)h.stopScoreVoice()}catch(e){}try{if('speechSynthesis' in window)window.speechSynthesis.cancel()}catch(e){}}
 function successVoiceText(round,best,wins){let rank=calcRank(best,false).label||'성적';return '축하합니다! 축하합니다! 제'+round+'회 '+rank+' 성적입니다. 최고 적중은 '+best+'개이며, 3개 이상 적중한 조합은 '+wins+'개입니다. 좋은 성적입니다. 이번 회차도 수고하셨습니다!'}
