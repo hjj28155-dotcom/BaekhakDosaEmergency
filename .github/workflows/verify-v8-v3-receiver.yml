@@ -27,4 +27,9 @@ jobs:
           code=$(curl -sS --max-time 20 -o /tmp/v8-noauth-get.json -w '%{http_code}' "$BASE/receipt?epoch=V3_RESTART_R53_20261028&round=1")
           test "$code" = 401
           jq -e '.error=="DEVICE_AUTH_REQUIRED"' /tmp/v8-noauth-get.json
-          echo 'PASS: independent V8 health; unauthorized write and receipt read blocked.'
+          curl --retry 2 -fsS --max-time 20 "$BASE/draw?round_no=1" -o /tmp/v8-draw.json
+          jq -e '.status=="CONFIRMED" and .round_no==1 and (.numbers|length)==6 and .legacy_reference==true and .independent_source_verified==false' /tmp/v8-draw.json
+          code=$(curl -sS --max-time 20 -o /tmp/v8-draw-missing.json -w '%{http_code}' "$BASE/draw?round_no=1246")
+          test "$code" = 404
+          jq -e '.status=="NOT_CONFIRMED"' /tmp/v8-draw-missing.json
+          echo 'PASS: independent V8 health; unauthenticated writes blocked; migrated draw reference read-only verified.'
