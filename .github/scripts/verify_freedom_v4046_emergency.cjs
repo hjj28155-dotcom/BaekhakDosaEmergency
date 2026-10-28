@@ -4,7 +4,7 @@ const base='build405/FREEDOM_V402_BUILD_THIS/app/';
 const html=fs.readFileSync(base+'src/freedom/assets/index.html','utf8');
 const gradle=fs.readFileSync(base+'build.gradle','utf8');
 assert.match(gradle,/applicationId 'com[.]navigator[.]freedom[.]v3final'/);
-assert.match(gradle,/versionCode 40048/);
+assert.match(gradle,/versionCode 40049/);
 assert.match(gradle,/signingConfig signingConfigs[.]distribution/);
 assert.match(html,/const V4046_VISIBLE=\[1244,1245,1246,1247,1248\]/);
 assert.match(html,/function rawPage[(][)]\{return v4044ReviewRound[(]1248,true[)]\}/);
@@ -20,6 +20,13 @@ assert.match(compactCss,/grid-template-rows:repeat\(2,minmax\(0,1fr\)\)/);
 assert.match(compactCss,/#modal[.]v4047Compact [.]r5hit/);
 assert.match(compactCss,/grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
 assert.match(html,/function v4048GoHome/);
+assert.match(html,/function v4049Announce/);
+assert.match(html,/function v4049ScoreSummary/);
+assert.match(html,/source!=='research'/);
+assert.match(html,/showFanfare\(n,outcome[.]highestHits,outcome[.]wins,outcome[.]bestRank\)/);
+assert.match(html,/showComfort\(n,outcome[.]highestHits\)/);
+assert.match(compactCss,/#fanfareOverlay[.]show,#comfortOverlay[.]show/);
+assert.match(compactCss,/z-index:2147483647!important/);
 assert.match(html,/emergencyHome\?'홈'/);
 
 assert.match(html,/function v4047OpenRawEditor/);
@@ -34,7 +41,7 @@ const groupFunctions=range('function v330GroupsResult(games,result,bonus){','fun
 const newest=range('function v4044ValidSets(games,count){','function v330OpenRound(n){');
 const corpus={calls:0};
 const makeRaw=n=>Array.from({length:6},(_,i)=>'제'+n+'회 자료 '+(i+1)+'번째 원문').join('\n');
-const notes=[],queue=[],saved={count:0};
+const notes=[],queue=[],saved={count:0},played=[];
 let selection=1248;
 const D={rounds:{'1247':{buy:{locked:true,combos:['1,2,3,4,5,6']},analysis:{source:'ORIGINAL_LOCKED'}}}};
 const root={
@@ -58,6 +65,9 @@ const root={
  v4045MaybeRefreshWinning:()=>{},
  v4044RawCard:()=>'<div>raw unused by emergency UI</div>',
  v4044AutoRows:()=>'<div>locked original 5</div>',
+ showFanfare:(...args)=>{played.push({type:'win',args})},
+ showComfort:(...args)=>{played.push({type:'loss',args})},
+ calcRank:(h,b)=>h===6?{no:1}:h===5&&b?{no:2}:h===5?{no:3}:h===4?{no:4}:h===3?{no:5}:{no:0},
  save:()=>{saved.count++},
  alert:msg=>{throw Error('unexpected alert '+msg)},
  setTimeout:fn=>{queue.push(fn)},
@@ -126,4 +136,37 @@ assert.equal(D.rounds['1246'].analysisResearch.researchOnly,true);
 assert.equal(D.rounds['1246'].analysisResearch.historicalResultExcluded,true);
 assert.deepEqual(copyData(D.rounds['1247']),lockedBefore);
 assert.deepEqual(researchBefore,{});
-console.log('PASS: V4.0.48 complete 1247-history analysis, optional dominant 1248 primary, 4x5 groups, result pending and graded, 5 visible rounds, future wins not fabricated, locked original preserved, historical research segregated, six JS syntax checks.');
+
+// Extra voice checks: draw pending must remain silent; bonus-based second place
+// must use "2등", replay only on a real user action, and afterdraw research never
+// produces a false purchased-ticket celebration or consolation.
+selection=1248;
+assert.equal(root.v4049Announce(1248,false),false,'before official draw no voice');
+assert.equal(played.length,0);
+const draw='1 2 3 4 5 6',bon=7;
+const test20=[[1,2,3,4,5,7],...Array.from({length:19},(_,i)=>[8+i,9+i,10+i,11+i,12+i,13+i])];
+D.rounds['1248'].analysis.auto20=test20;
+D.rounds['1248'].score={source:'동행복권 자동조회',result:draw,bonus:String(bon)};
+assert.equal(root.v4049Announce(1248,false),true,'verified draw and stored tickets trigger message');
+assert.equal(played.length,1);
+assert.equal(played[0].type,'win');
+assert.equal(played[0].args[3],2,'5 matching + bonus is second prize');
+assert.equal(played[0].args[2],1,'one winning ticket');
+assert.equal(root.v4049Announce(1248,false),false,'reopening same draw/tickets must not repeat');
+assert.equal(played.length,1);
+assert.equal(root.v4049Announce(1248,true),true,'explicit replay allows repeat');
+assert.equal(played.length,2);
+D.rounds['1248'].analysis.auto20=Array.from({length:20},(_,i)=>[8+i,9+i,10+i,11+i,12+i]);
+assert.equal(root.v4049Announce(1248,false),true,'changed verified ticket set triggers revised result');
+assert.equal(played.at(-1).type,'loss','no 3+ combos must play consolation');
+assert.equal(played.at(-1).args[1],0,'best matching count reported honestly');
+const prior=played.length;
+D.rounds['1245']={analysisResearch:{auto20:test20},score:{source:'동행복권 자동조회',result:draw,bonus:String(bon)}};
+selection=1245;
+assert.equal(root.v4049Announce(1245,true),false,'afterdraw research cannot imitate saved purchase result');
+assert.equal(played.length,prior);
+D.rounds['1245']={};
+assert.equal(root.v4049Announce(1245,true),false,'missing original tickets must remain silent');
+selection=1248;
+
+console.log('PASS: V4.0.49 complete 1247-history analysis, optional dominant 1248 primary, 4x5 groups, result pending and graded, 5 visible rounds, future wins not fabricated, locked original preserved, historical research segregated, six JS syntax checks.');
