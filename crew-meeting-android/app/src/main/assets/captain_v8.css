@@ -144,3 +144,18 @@ main.roomMode #v8Hero,main.roomMode #originalChatBar{display:none!important}
 #v8LinkDiagnostics .v8DiagnosticActions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
 #v8LinkDiagnostics .v8DiagnosticActions button{min-height:39px;padding:4px 2px;font-size:clamp(.63rem,2.5vw,.8rem);line-height:1.15;border-radius:8px}
 @media(max-height:750px){main:not(.roomMode)>#v8Hero>#originalChatBar{top:70px!important}main:not(.roomMode)>#v8Hero>#originalChatBar>button{height:42px!important;min-height:42px!important;max-height:42px!important}main:not(.roomMode)>#v8Hero>#v8ConnectionCheck{bottom:43px!important;height:24px!important;min-height:24px!important}}
+
+/* V8 V7 retirement phase 1: home only; old data/engine preserved pending isolated backup. */
+main:not(.roomMode)>#v8Hero>#originalChatBar{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+main:not(.roomMode) #installedAppBar{grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-template-rows:clamp(92px,12dvh,116px)!important}
+main:not(.roomMode)>#homeQuickActions{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+main:not(.roomMode)>#homeQuickActions>#crewUpdateOpen{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;height:43px!important;min-height:43px!important;max-height:43px!important;padding:3px!important;border:2px solid #d8b06c!important;border-radius:11px!important;color:#ffe5ab!important;text-align:center!important}
+main:not(.roomMode)>#homeQuickActions>#crewUpdateOpen span{font-size:clamp(.62rem,2.5vw,.8rem)!important}
+[data-room="v7"],[data-score-room="v7"],[data-after-seven="v7"],[data-before-room="v7"],[data-material-app="v7"],#cumV7ArchiveReference{display:none!important}
+@media(max-width:390px){main:not(.roomMode) #installedAppBar .appDeckCard>strong{font-size:.8rem!important}main:not(.roomMode) #installedAppBar .deckAction{font-size:.6rem!important}}
+
+/* Restore readable 2x2 deck: V3, V4, V8, independent V3 receiver. */
+main:not(.roomMode) #installedAppBar{grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-template-rows:repeat(2,clamp(85px,10.7dvh,104px))!important;gap:7px!important}
+main:not(.roomMode) #installedAppBar .appDeckCard>strong{font-size:clamp(.88rem,3.5vw,1.08rem)!important}
+main:not(.roomMode) #installedAppBar .deckAction{font-size:clamp(.67rem,2.7vw,.82rem)!important}
+main:not(.roomMode) #installedAppBar [data-app-card="v3server"]{background:linear-gradient(145deg,#07475a,#0b284a)!important;border-color:#7bd7e3!important}
