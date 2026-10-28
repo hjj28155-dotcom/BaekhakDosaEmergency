@@ -105,7 +105,7 @@
   try{
    if(window.CrewPngSaver&&typeof window.CrewPngSaver.savePng==='function'){
     var result=String(window.CrewPngSaver.savePng(lastPng,name));
-    notice.textContent=result==='SAVED'?'PNG 기기 사진함 저장 완료':('PNG 저장 실패: '+result.slice(0,80));
+    notice.textContent=result==='SAVED'?'PNG 기기 사진함 저장 완료':result==='PICKER'?'PNG 저장 위치 선택창을 확인하세요':('PNG 저장 실패: '+result.slice(0,80));
    }else{
     var link=document.createElement('a');link.href=lastPng;link.download=name;
     document.body.appendChild(link);link.click();link.remove();
