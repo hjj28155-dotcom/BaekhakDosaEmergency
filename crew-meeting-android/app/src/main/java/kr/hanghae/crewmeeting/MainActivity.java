@@ -24,6 +24,8 @@ import android.widget.Toast;
 import java.io.InputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public final class MainActivity extends Activity {
     private static final String ROOM_URL =
@@ -175,6 +177,13 @@ public final class MainActivity extends Activity {
                     if(item.getInt("round_no")!=i+1 || raw.split("\\n",-1).length!=6
                        || !item.getString("source_sha256").matches("[a-f0-9]{64}"))
                         throw new java.io.IOException("DB1_ROUND_INVALID_"+(i+1));
+                    try{
+                        byte[] digest=MessageDigest.getInstance("SHA-256").digest(raw.getBytes(StandardCharsets.UTF_8));
+                        StringBuilder hex=new StringBuilder(64);
+                        for(byte b:digest)hex.append(String.format(java.util.Locale.ROOT,"%02x",b & 255));
+                        if(!hex.toString().equals(item.getString("source_sha256")))
+                            throw new java.io.IOException("DB1_SHA256_INVALID_"+(i+1));
+                    }catch(NoSuchAlgorithmException ex){throw new java.io.IOException("SHA256_UNAVAILABLE",ex);}
                 }
             }catch(org.json.JSONException ex){throw new java.io.IOException("DB1_PARSE_INVALID",ex);}
             web.loadDataWithBaseURL(ROOM_URL, html, "text/html", "UTF-8", ROOM_URL);
