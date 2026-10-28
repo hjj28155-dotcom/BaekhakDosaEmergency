@@ -7,6 +7,12 @@ on:
     paths:
       - 'crew-meeting-android/**'
       - '.github/workflows/build-crew-meeting-apk.yml'
+  pull_request:
+    branches:
+      - feature/crew-meeting-standalone-apk-20261025
+    paths:
+      - 'crew-meeting-android/**'
+      - '.github/workflows/build-crew-meeting-apk.yml'
 permissions:
   contents: write
 concurrency:
