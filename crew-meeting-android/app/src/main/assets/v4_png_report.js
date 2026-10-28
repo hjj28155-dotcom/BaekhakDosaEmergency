@@ -88,6 +88,19 @@
  window.addEventListener('captain-v4-engine-reset',function(e){
   if(e.detail&&['captain','liaison'].includes(e.detail.engine)){current[e.detail.engine]=null;schedule();}
  });
+ // A verified server readback must render the identical PNG, but must NOT
+ // emit the original engine-run event (that event starts an archive POST).
+ window.addEventListener('captain-v4-archived',function(e){
+  var d=e.detail||{};
+  if(!['captain','liaison'].includes(d.engine)||!Number.isInteger(d.round)||d.round<1||d.round>1247)return;
+  var games=validGames(d.games);
+  if(!games||!(/^[a-f0-9]{64}$/).test(String(d.sourceSha256||''))||
+    !(/^[a-f0-9]{64}$/).test(String(d.reportSha256||'')))return;
+  if(d.engine==='captain'&&d.provenance!=='R46_DB1_VERIFIED')return;
+  if(d.engine==='liaison'&&d.provenance!=='R1_INDEPENDENT_ARCHIVE_RESEARCH_NOT_LOCKED')return;
+  current[d.engine]={round:d.round,games:games,sourceSha256:d.sourceSha256,archived:true};
+  schedule();
+ });
  window.addEventListener('captain-v4-verified',function(e){
   var d=e.detail||{};
   if(!['captain','liaison'].includes(d.engine)||!Number.isInteger(d.round)||d.round<1||d.round>1247)return;
