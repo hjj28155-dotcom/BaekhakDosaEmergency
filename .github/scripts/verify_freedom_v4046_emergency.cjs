@@ -156,7 +156,7 @@ assert.equal(root.v4049Announce(1248,false),false,'reopening same draw/tickets m
 assert.equal(played.length,1);
 assert.equal(root.v4049Announce(1248,true),true,'explicit replay allows repeat');
 assert.equal(played.length,2);
-D.rounds['1248'].analysis.auto20=Array.from({length:20},(_,i)=>[8+i,9+i,10+i,11+i,12+i]);
+D.rounds['1248'].analysis.auto20=Array.from({length:20},(_,i)=>[8+i,9+i,10+i,11+i,12+i,13+i]);
 assert.equal(root.v4049Announce(1248,false),true,'changed verified ticket set triggers revised result');
 assert.equal(played.at(-1).type,'loss','no 3+ combos must play consolation');
 assert.equal(played.at(-1).args[1],0,'best matching count reported honestly');
