@@ -35,9 +35,13 @@
 
 ## 빌드 상태
 - 첫 V8.0.1 GitHub Actions CI 실행 `40709330279`: **성공**.
-- 가독성 버튼 개선이 반영된 최종 CI 실행 `40709655288`: **작업대장 작성 시 대기 중**.
+- 가독성 버튼 개선이 반영된 최종 CI 실행 **`40709655288`: SUCCESS**. 소스 커밋 `1aa7983c58fc871bd6d9b027c0ad55febf3a3f1e`.
+- APK artifact ID **`12825486577`**, 파일 `HANGHAE_CREW_MEETING_V8_8.0.1_ONE_SCREEN_CINEMATIC.apk`.
+- 실제 APK 크기 **6,587,540 bytes**, SHA-256 **`2409d650597e65819cb2cc15ce5c1d893d202ceb2a3d39828de1d87b58abaec5`**. 아티팩트 내 SHA-256 체크섬 일치.
+- APK 안에 시네마틱 WebP(63,274 bytes, SHA-256 `fadeda26f030d1c4e386cf6c1d0268b65ce01438dc7d7fae5329dcbfdd1574e6`), CSS, SVG, V8 HTML 포함 확인. AndroidManifest.xml 버전명 `8.0.1-ONE-SCREEN-CINEMATIC` 확인.
+- **최종 APK에서 직접 추출한 에셋**으로 360×740, 360×800, 390×844, 412×915 Chromium 레이아웃 재검증. 스크롤 없이 전 메뉴 표시, 수평 넘침 없음, V3 관리방·실시간 소통 전환 정상, JS 예외 없음.
 
 ## 남은 확인
-- 최종 CI 결과 및 APK SHA-256 확인.
+- 최종 CI·APK 체크섬 검증은 완료.
 - 선장님 실제 Android 기기에서 설치·홈화면·버튼 검증.
 - 선장님 승인된 공식 경로를 통해 Drive 파일 교체/배포 여부 결정.
