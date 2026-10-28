@@ -26,3 +26,17 @@
 2. 아티팩트 APK 추출, zip·SHA256 검증, 시험판으로만 제공.
 3. 안드로이드 실기기에서 실제 소리/음량/음성 겹침 및 20조합 한 화면 확인.
 4. 선장 승인 전 V4 신규설치와 업데이트 공식 링크 변경 금지. 어떤 자료/원본/설치도 삭제·초기화 금지.
+
+## 최종 V4.0.49 시험용 APK 검증 추가 (2026-10-29 KST)
+- Android **최종 빌드 소스 고정 커밋** `42029565d404b2a5b14fdd2898174cfcad28b5bc`.
+- 원본 서명 CI 재검증 최종 **성공**: https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/actions/runs/40726475588
+- GitHub Actions 아티팩트 `Freedom_V4049_VOICE_20_OriginalSigned_TEST_ONLY`, ID `12833685809`.
+- 최종 APK 원본 바이트 수: **48,011,015**.
+- 최종 APK SHA-256: **`bf5b6d4b5f5ba107287adb73a17f533a612a35741e3de23f992e6e2603cd18e7`**. CI `SHA256.txt` 기대값과 추출 APK 실제 재계산값 일치.
+- Android 패키지 `com.navigator.freedom.v3final`, `versionCode=40049`, `versionName=4.0.49-EMERGENCY-SCORE-VOICE`.
+- Android 서명 인증서 SHA-256은 기존 검증된 `bf281903f422fe925a23a7e72e82d690eaef899236e6d10365143ff32d9beb00`와 일치. 신규 서명키 생성 없음.
+- ZIP/APK CRC 검사 통과; `assets/index.html`, `assets/v4047_compact.css`, `assets/raw_bank.js`, `assets/db1_v1247_patch.js`, `assets/freedom_reference_v4043.js`, reference manifest, 엔진 검증.
+- Android `MainActivity.java`의 `@JavascriptInterface playCelebrationWithVoice`, `speakConsolation`, `stopScoreVoice`와 웹뷰 브리지의 `AndroidHost`/`BaekhakNative` 연결 소스 확인.
+- 최종 APK 실바이트 기반 Chromium(Playwright) 렌더검증 **320×600, 360×640, 360×740, 392×852, 704×1440 5종 전부 통과**: 4묶음/20줄/공과 적중표시 겹침 0/아래 홈 버튼 화면 내/🔊 다시듣기 표시/낙선 오버레이 상단 출력. **넓은 세로화면에서 아래 버튼 6px 넘침** 발견 후, `@media(min-width:641px)`에서 24px 바닥 여유를 두어 최종 APK 재빌드한 결과 해결.
+- **실제 선장 휴대전화의 음성, 음량, 설치 후 저장 데이터 보존 검증은 미완료**. 본 파일은 **TEST ONLY**.
+- V4 신규설치 URL 및 공식 업데이트 함수/URL, V3/V7 원본, 최초잠금/DB-1/기존 사용기록 **미변경**. 선장 실사용 확인 및 명시적 승인 없이 정식 배포 경로 변경 금지.
