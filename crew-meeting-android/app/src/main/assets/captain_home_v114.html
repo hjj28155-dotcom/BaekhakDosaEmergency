@@ -2552,6 +2552,7 @@ function enter(){
  if(HOME_SELECTED==='materials'){startMaterialsMonitor();loadIntegratedMaterials();}
  if(HOME_SELECTED==='reports')refreshV7Reports();
  if(timer)clearInterval(timer);timer=setInterval(refresh,4000);refresh();showContinuity();refreshFiles();refreshOriginalLinks();
+ window.dispatchEvent(new Event('captain-auth-ready'));
 }
 var PERSISTENT_AUTH_KEY='crew_meeting_persistent_auth_v1';
 function clearRememberedEntry(){
@@ -2909,6 +2910,11 @@ try{
   loadV4Archive();
  });
  $('freedomRoomArchiveRefresh').addEventListener('click',loadV4Archive);
+ window.addEventListener('captain-auth-ready',function(){
+  if($('freedomAnalysisPanel').hidden)return;
+  if($('freedomAnalysisPanel').classList.contains('archiveMode'))loadV4Archive();
+  else restoreArchivedRound(Number($('freedomAnalysisRound').value)||1);
+ });
  $('freedomArchiveBack').addEventListener('click',function(){
   roomArchiveSerial++;
   $('freedomAnalysisPanel').classList.remove('archiveMode');
