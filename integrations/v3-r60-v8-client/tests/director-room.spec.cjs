@@ -28,6 +28,14 @@ const aliases={
     for(const [width,height] of [[360,740],[390,844],[412,915]]){
       const context=await browser.newContext({viewport:{width,height}});
       const page=await context.newPage();const errors=[];
+      await page.addInitScript(()=>{
+        window.__distInstalled=true;window.__distLaunches=0;
+        window.CrewInstalledApps={
+          getLaunchState:()=>JSON.stringify({v3:'AVAILABLE'}),
+          getFreedomDistributionState:()=>JSON.stringify(window.__distInstalled?{status:'INSTALLED',versionName:'4.0.51-TEST',versionCode:40051}:{status:'NOT_INSTALLED'}),
+          openFreedomDistribution:()=>{if(!window.__distInstalled)return JSON.stringify({status:'NOT_INSTALLED'});window.__distLaunches++;return JSON.stringify({status:'LAUNCH_REQUESTED'});}
+        };
+      });
       page.on('pageerror',e=>errors.push(e.message));
       await page.route('**/*',route=>route.request().url().startsWith('http://127.0.0.1:')?route.continue():route.abort());
       await page.goto(`http://127.0.0.1:${server.address().port}/BaekhakDosaEmergency/crew-meeting.html`);
@@ -39,7 +47,7 @@ const aliases={
       assert(await page.locator('#openV3Rooms').isVisible());
       const shortcuts=await page.locator('#originalChatBar').boundingBox(), diagnosis=await page.locator('#v8ConnectionCheck').boundingBox();
       assert(shortcuts.y+shortcuts.height<=diagnosis.y,'hero shortcuts and diagnosis must not overlap');
-      await page.screenshot({path:`ui-evidence/v8-805-home-${width}.png`});
+      await page.screenshot({path:`ui-evidence/v8-806-home-${width}.png`});
       await page.locator('#homeDirectorRoomOpen').click();
       await page.locator('#homeDirectorRoom').waitFor({state:'visible'});
       assert.equal(await page.locator('#freedomAnalysisPanel').isVisible(),false);
@@ -47,6 +55,15 @@ const aliases={
       assert((await page.locator('#directorOriginalState').innerText()).includes('아직 없습니다'));
       assert(await page.locator('#directorRoomBack').isVisible());
       assert(await page.locator('#directorReports').isVisible());
+      assert(await page.locator('#directorOriginalAnalysis').isVisible());
+      await page.locator('#directorOriginalAnalysis').click();
+      await page.locator('#freedomAnalysisPanel').waitFor({state:'visible'});
+      assert((await page.locator('#freedomAnalysisPanel > .homePaneTop').innerText()).includes('통제실장'));
+      assert(await page.locator('#freedomRunRound').isVisible());
+      assert.equal(await page.locator('#freedomDistributionPanel').isVisible(),false);
+      await page.screenshot({path:`ui-evidence/v8-806-original-analysis-${width}.png`});
+      await page.locator('#freedomAnalysisBack').click();
+      await page.locator('#homeDirectorRoom').waitFor({state:'visible'});
       assert.equal(await page.locator('#directorServer').isVisible(),false,'secondary director tools start folded');
       assert.equal(await page.locator('#directorOriginalEdit').isVisible(),false);
       await page.locator('#directorRoomSettings > summary').click();
@@ -54,7 +71,7 @@ const aliases={
       assert(await page.locator('#directorOriginalEdit').isVisible());
       await page.locator('#directorRoomSettings > summary').click();
       assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no horizontal overflow');
-      await page.screenshot({path:`ui-evidence/v8-805-director-${width}.png`});
+      await page.screenshot({path:`ui-evidence/v8-806-director-${width}.png`});
       await page.locator('#directorOriginalOpen').click();
       await page.locator('#originalChatPanel').waitFor({state:'visible'});
       assert((await page.locator('#originalChatLabel').innerText()).includes('통제실장'));
@@ -76,9 +93,26 @@ const aliases={
       await page.locator('#v3RoomDetails > summary').click();
       assert(await page.locator('#v3RoomsOpenNavigator').isVisible());
       await page.locator('#v3RoomDetails > summary').click();
-      await page.screenshot({path:`ui-evidence/v8-805-v3-${width}.png`});
+      await page.screenshot({path:`ui-evidence/v8-806-v3-${width}.png`});
       await page.locator('#homeV3RoomsBack').click();
-      await page.evaluate(()=>window.captainV4Route('v4'));
+      await page.locator('#openFreedomAnalysis').click();
+      await page.locator('#freedomDistributionPanel').waitFor({state:'visible'});
+      assert.equal(await page.locator('#freedomAnalysisPanel').isVisible(),false,'public app entry does not open research');
+      assert((await page.locator('#distributionState').innerText()).includes('4.0.51-TEST'));
+      assert.equal(await page.locator('#distributionOfficialDrive').getAttribute('href'),'https://drive.google.com/file/d/1ULoKMeNFSOWDebMfY4tFvgyiK4EDxaJ-/view?usp=drivesdk');
+      assert.equal(await page.locator('#distributionDriveQuick').getAttribute('href'),await page.locator('#distributionOfficialDrive').getAttribute('href'));
+      await page.screenshot({path:`ui-evidence/v8-806-distribution-${width}.png`});
+      await page.locator('#distributionLaunch').click();
+      assert.equal(await page.evaluate(()=>window.__distLaunches),1);
+      await page.locator('#distributionBack').click();
+      await page.evaluate(()=>{window.__distInstalled=false;});
+      await page.locator('#openFreedomAnalysis').click();
+      assert((await page.locator('#distributionState').innerText()).includes('설치되어 있지 않습니다'));
+      await page.locator('#distributionLaunch').click();
+      assert((await page.locator('#distributionState').innerText()).includes('배포판이 없습니다'));
+      await page.locator('#distributionBack').click();
+      await page.locator('#homeDirectorRoomOpen').click();
+      await page.locator('#directorOriginalAnalysis').click();
       assert(await page.locator('#freedomRunRound').isVisible());
       assert.equal(await page.locator('#freedomResetActive').isVisible(),false);
       await page.locator('#v4RoomDetails > summary').click();

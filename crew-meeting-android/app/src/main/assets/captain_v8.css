@@ -201,3 +201,17 @@ main.roomMode>#homeDirectorRoom:not([hidden]){display:flex!important;flex-direct
 #reportsPanel>.reportGroup{margin-top:10px}
 .compactConnectionState{font-size:.77rem!important;line-height:1.45!important;color:#d3dfeb!important;margin:5px 2px 10px!important}
 .roomCompactDetails :focus-visible{outline:3px solid #ffe09d;outline-offset:2px}
+
+/* V8.0.6: research belongs to the director; the public app has its own entry. */
+#freedomDistributionPanel[hidden]{display:none!important}
+main.roomMode>#freedomDistributionPanel:not([hidden]){display:flex!important;flex-direction:column;gap:14px;flex:1 1 auto;width:100%;height:100%;min-height:0;overflow:auto;box-sizing:border-box;padding:8px 6px 24px;background:linear-gradient(155deg,#102d46,#101c32)}
+#freedomDistributionPanel .homePaneTop{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:none;padding:4px 0 12px;border-bottom:1px solid #c39d6980}
+#freedomDistributionPanel .homePaneTop strong{color:#ffe1ad;font-size:1.05rem}
+#freedomDistributionPanel button,#freedomDistributionPanel a{box-sizing:border-box;min-height:44px;border-radius:10px;font-size:.88rem;line-height:1.4;padding:12px;white-space:normal}
+.distributionCard{display:flex;flex-direction:column;gap:12px;align-items:stretch;flex:none;padding:22px 15px;border:1px solid #dcaa77;border-radius:15px;background:linear-gradient(140deg,#56332c,#252a45);text-align:center}
+.distributionIcon{font-size:2.8rem}.distributionCard h2{margin:0;color:#ffe6bd;font-size:1.4rem}
+.distributionCard p{margin:0 0 5px;color:#dce7f2;font-size:.84rem;line-height:1.5}
+.distributionCard a{display:block;color:#ffebbf;border:1px solid #b79c73;text-decoration:none;background:#19374c}
+#freedomDistributionPanel .roomCompactDetailsBody{font-size:.8rem;line-height:1.6;color:#cbdcea}
+#freedomDistributionPanel .roomCompactDetailsBody a{color:#d8ecff}
+#distributionDriveQuick{display:flex!important;align-items:center;justify-content:center;text-decoration:none}

@@ -1,4 +1,4 @@
-name: Build same-signer V8.0.5 simple-rooms staging APK
+name: Build same-signer V8.0.6 analysis-distribution staging APK
 on:
   push:
     branches:
@@ -229,7 +229,7 @@ jobs:
           grep -Fq 'id="freedomFirstList"' "$HOME_HTML"
           grep -Fq 'id="freedomSecondList"' "$HOME_HTML"
           grep -Fq "window.captainV4Route('v4')" "$HOME_HTML"
-          grep -Fq "window.captainV4Route('home')" "$HOME_HTML"
+          grep -Fq "window.captainV4Route('director')" "$HOME_HTML"
           grep -Fq 'main.roomMode > #freedomAnalysisPanel:not([hidden])' "$HOME_HTML"
           grep -Fq '선장엔진 R46 · 통제실장엔진 R1 검증 대기' "$HOME_HTML"
           ! grep -Fq 'openFreedomApprovalShortcut' "$HOME_HTML"
@@ -238,7 +238,7 @@ jobs:
           grep -Fq 'data-material-stage="after"' "$HOME_HTML"
           grep -Fq 'V3의 과거 350회 누적 분석은 별도 보존' "$HOME_HTML"
           grep -Fq 'loadCaptainDashboard()' crew-meeting-android/app/src/main/java/kr/hanghae/crewmeeting/MainActivity.java
-          grep -Fq "versionCode 805" crew-meeting-android/app/build.gradle
+          grep -Fq "versionCode 806" crew-meeting-android/app/build.gradle
           test "$(grep -c 'data-before-room=' "$HOME_HTML")" -eq 7
           test "$(grep -c 'data-v3-room-card=' "$HOME_HTML")" -eq 4
           test "$(grep -c 'data-v3-report=' "$HOME_HTML")" -eq 4
@@ -259,24 +259,24 @@ jobs:
           test "$NEW_CERT" = "e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be"
           echo "Recovery app signer pinned: $NEW_CERT"
           "$AAPT" dump badging "$APK" | head -5
-          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting.compact' versionCode='805'"
+          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting.compact' versionCode='806'"
           ! "$AAPT" dump badging "$APK" | grep -q "package: name='com.baekhak.dosa.v4'"
           mkdir -p crew-meeting-android/releases
-          cp "$APK" crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.5_SIMPLE_ROOMS.apk
-          (cd crew-meeting-android/releases && sha256sum HANGHAE_CREW_MEETING_V8_8.0.5_SIMPLE_ROOMS.apk > HANGHAE_CREW_MEETING_V8_8.0.5_SIMPLE_ROOMS.apk.sha256)
+          cp "$APK" crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.6_DIRECTOR_ANALYSIS_DISTRIBUTION.apk
+          (cd crew-meeting-android/releases && sha256sum HANGHAE_CREW_MEETING_V8_8.0.6_DIRECTOR_ANALYSIS_DISTRIBUTION.apk > HANGHAE_CREW_MEETING_V8_8.0.6_DIRECTOR_ANALYSIS_DISTRIBUTION.apk.sha256)
       - uses: actions/upload-artifact@v4
         with:
-          name: HANGHAE-CREW-MEETING-V8-8.0.5-SIMPLE-ROOMS-APK
+          name: HANGHAE-CREW-MEETING-V8-8.0.6-DIRECTOR-ANALYSIS-DISTRIBUTION-APK
           path: |
-            crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.5_SIMPLE_ROOMS.apk
-            crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.5_SIMPLE_ROOMS.apk.sha256
+            crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.6_DIRECTOR_ANALYSIS_DISTRIBUTION.apk
+            crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.6_DIRECTOR_ANALYSIS_DISTRIBUTION.apk.sha256
           if-no-files-found: error
           retention-days: 30
       - name: Verify isolated APK artifact packaging
         run: |
           set -euo pipefail
-          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.5_SIMPLE_ROOMS.apk
-          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.5_SIMPLE_ROOMS.apk.sha256
-          (cd crew-meeting-android/releases && sha256sum --check HANGHAE_CREW_MEETING_V8_8.0.5_SIMPLE_ROOMS.apk.sha256)
+          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.6_DIRECTOR_ANALYSIS_DISTRIBUTION.apk
+          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.6_DIRECTOR_ANALYSIS_DISTRIBUTION.apk.sha256
+          (cd crew-meeting-android/releases && sha256sum --check HANGHAE_CREW_MEETING_V8_8.0.6_DIRECTOR_ANALYSIS_DISTRIBUTION.apk.sha256)
           echo "TEST artifact verified. Do NOT replace the stable fixed Google Drive APK without device verification."
 

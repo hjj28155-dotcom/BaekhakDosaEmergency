@@ -55,5 +55,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: v8-805-simple-room-ui-evidence
+          name: v8-806-analysis-distribution-ui-evidence
           path: ui-evidence/*.png

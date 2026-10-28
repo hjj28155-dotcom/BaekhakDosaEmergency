@@ -383,7 +383,7 @@ main:not(.roomMode) header h1{
 }
 /* Every INTERNAL room must replace the home dashboard from the TOP.
    External app launchers/download links keep their original navigation. */
-main.roomMode > :not(#homeWorkspace):not(#homeMorePanel):not(#homeApprovalPanel):not(#homeMaterialsPanel):not(#homeV3RoomsPanel):not(#homeDirectorRoom):not(#freedomAnalysisPanel){
+main.roomMode > :not(#homeWorkspace):not(#homeMorePanel):not(#homeApprovalPanel):not(#homeMaterialsPanel):not(#homeV3RoomsPanel):not(#homeDirectorRoom):not(#freedomDistributionPanel):not(#freedomAnalysisPanel){
  display:none!important;
 }
 main.roomMode > #homeWorkspace:not([hidden]),
@@ -529,7 +529,7 @@ main:not(.roomMode) > header button{min-height:33px!important;padding:3px 9px!im
 #homeMaterialsBtn{border:1.7px solid #eac783!important;background:linear-gradient(130deg,rgba(5,63,91,.88),rgba(25,95,114,.9))!important;color:#ffedbd!important;font-weight:800}
 #homeMaterialsPanel{flex-direction:column;gap:7px;border:1.5px solid #e4c181;border-radius:12px;padding:8px;background:rgba(3,26,50,.96);min-width:0;min-height:0}
 #homeMaterialsPanel[hidden]{display:none!important}
-main.roomMode > :not(#homeWorkspace):not(#homeMorePanel):not(#homeApprovalPanel):not(#homeMaterialsPanel):not(#homeV3RoomsPanel):not(#homeDirectorRoom):not(#freedomAnalysisPanel){display:none!important}
+main.roomMode > :not(#homeWorkspace):not(#homeMorePanel):not(#homeApprovalPanel):not(#homeMaterialsPanel):not(#homeV3RoomsPanel):not(#homeDirectorRoom):not(#freedomDistributionPanel):not(#freedomAnalysisPanel){display:none!important}
 main.roomMode > #homeMaterialsPanel:not([hidden]){display:flex!important;flex:1 1 auto;height:100%;min-height:0;overflow:hidden;margin:0}
 #materialsBody{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:4px}
 .materialsNote{font-size:.72rem;line-height:1.45;color:#d5e6f0;margin:8px 0}
@@ -733,7 +733,7 @@ main.roomMode > #homeV3RoomsPanel[hidden]{display:none!important}
 
 
 /* V4 R18: single-viewport home and independent full-screen V4 room. */
-main.roomMode > :not(#homeWorkspace):not(#homeMorePanel):not(#homeApprovalPanel):not(#homeMaterialsPanel):not(#homeV3RoomsPanel):not(#homeDirectorRoom):not(#freedomAnalysisPanel):not(#freedomAnalysisPanel){display:none!important}
+main.roomMode > :not(#homeWorkspace):not(#homeMorePanel):not(#homeApprovalPanel):not(#homeMaterialsPanel):not(#homeV3RoomsPanel):not(#homeDirectorRoom):not(#freedomDistributionPanel):not(#freedomAnalysisPanel):not(#freedomAnalysisPanel){display:none!important}
 #freedomAnalysisPanel[hidden]{display:none!important}
 main.roomMode > #freedomAnalysisPanel:not([hidden]){
  display:flex!important;flex-direction:column;gap:8px;min-width:0;min-height:0;
@@ -916,10 +916,10 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
   <div class="installedAppUnit appDeckCard" data-app-card="freedom">
    <div class="deckAppIcon" aria-hidden="true">🚢</div>
    <strong>항해의자유</strong>
-   <small>원문 10조합 · 제1회차부터</small>
+   <small>사용자용 배포판</small>
    <div class="deckCardActions">
-    <button type="button" class="deckAction" id="openFreedomAnalysis" aria-controls="freedomAnalysisPanel" aria-expanded="false">앱 열기</button>
-    <button type="button" class="deckAction deckSecondary" data-open-material="freedom" aria-label="항해의자유 기록 보기">기록 보기</button>
+    <button type="button" class="deckAction" id="openFreedomAnalysis" aria-controls="freedomDistributionPanel" aria-expanded="false">배포판 열기</button>
+    <a id="distributionDriveQuick" class="deckAction deckSecondary" href="https://drive.google.com/file/d/1ULoKMeNFSOWDebMfY4tFvgyiK4EDxaJ-/view?usp=drivesdk" aria-label="항해의자유 공식 배포판 드라이브 파일">드라이브</a>
    </div>
   </div>
   <div class="installedAppUnit appDeckCard" data-app-card="v8">
@@ -947,11 +947,16 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
  <div class="homePaneTop"><strong id="directorRoomTitle" tabindex="-1">🔗 통제실장 방</strong><button type="button" id="directorRoomBack" class="secondary">홈으로</button></div>
  <div class="directorRoomIntro"><span class="directorRoomBadge">V8 전용 업무실</span><h2>중앙통제실 운영을 한곳에서</h2><p>통제실장 원본 대화방과 보고서, 서버 연결 현황을 확인합니다.</p></div>
  <div class="directorOriginalCard"><strong>통제실장 원본 대화방</strong><p id="directorOriginalState" role="status">원본방 주소 확인 중</p><div class="directorRoomActions"><button type="button" id="directorOriginalOpen">원본 대화방 열기</button><button type="button" id="directorOriginalEdit" class="secondary">방 주소 설정</button></div></div>
- <div class="directorToolGrid"><button type="button" id="directorReports"><b>📑 업무 보고서</b><span>기존 보고서 조회</span></button><button type="button" id="directorServer"><b>📡 V3 서버 연결</b><span>연결 상태 점검</span></button><button type="button" id="directorLive"><b>💬 공동 소통방</b><span>기존 업무 공유방</span></button><button type="button" id="directorDiagnostics"><b>🔎 연결 현황</b><span>원본방·앱 상태 확인</span></button></div>
+ <div class="directorToolGrid"><button type="button" id="directorOriginalAnalysis" aria-controls="freedomAnalysisPanel" aria-expanded="false"><b>📖 원문분석</b><span>선장 원문엔진 · 통제실장 연구</span></button><button type="button" id="directorReports"><b>📑 업무 보고서</b><span>기존 보고서 조회</span></button><button type="button" id="directorServer"><b>📡 V3 서버 연결</b><span>연결 상태 점검</span></button><button type="button" id="directorLive"><b>💬 공동 소통방</b><span>기존 업무 공유방</span></button><button type="button" id="directorDiagnostics"><b>🔎 연결 현황</b><span>원본방·앱 상태 확인</span></button></div>
  <p class="directorRoomNote">원본 대화는 등록한 ChatGPT 방에서 이어집니다. 새 대화방으로 이사하면 방 주소를 갱신하세요.</p>
 </section>
-<section id="freedomAnalysisPanel" hidden aria-label="선장 전용 항해의자유 V4 분석방">
- <div class="homePaneTop"><strong>🚢 항해의자유 V4 · 5조합 × 2</strong><button type="button" id="freedomAnalysisBack" class="secondary">홈으로</button></div>
+<section id="freedomDistributionPanel" hidden aria-labelledby="distributionTitle">
+ <div class="homePaneTop"><strong id="distributionTitle">🚢 항해의자유 배포판</strong><button type="button" id="distributionBack" class="secondary">홈으로</button></div>
+ <div class="distributionCard"><span class="distributionIcon" aria-hidden="true">🚢</span><h2>항해의자유</h2><p id="distributionState" role="status">설치된 배포판 확인 중</p><button type="button" id="distributionLaunch">설치된 배포판 열기</button><a id="distributionOfficialDrive" href="https://drive.google.com/file/d/1ULoKMeNFSOWDebMfY4tFvgyiK4EDxaJ-/view?usp=drivesdk">공식 배포판 드라이브</a></div>
+ <details class="roomCompactDetails"><summary>설치·업데이트 안내</summary><div class="roomCompactDetailsBody"><p>설치된 배포판은 기존 승인과 기록을 유지한 채 별도 앱으로 열립니다. 기존 앱을 삭제하거나 데이터를 초기화하지 마세요.</p><p>공식 드라이브 파일은 V4.0.41 보존판입니다. 더 높은 버전이 설치되어 있으면 이전 버전으로 설치하지 마세요.</p><a id="distributionTrialDrive" href="https://drive.google.com/file/d/1PpZeDrzyQK77zzy8qxVDpGcL_KuUSSwI/view?usp=drivesdk">V4.0.51 시험판 드라이브</a></div></details>
+</section>
+<section id="freedomAnalysisPanel" hidden aria-label="통제실장 원문분석">
+ <div class="homePaneTop"><strong>📖 통제실장 · 원문분석</strong><button type="button" id="freedomAnalysisBack" class="secondary">통제실장 방으로</button></div>
  <div class="v4RoundControls">
   <label for="freedomAnalysisRound">회차</label>
   <input id="freedomAnalysisRound" type="number" min="1" max="1247" value="1" inputmode="numeric" aria-label="분석 회차">
@@ -1340,7 +1345,7 @@ var $=function(id){return document.getElementById(id);};
 })();
 var HOME_SELECTED='home';
 function homeView(which){
- if(!['live','reports','more','approval','materials','v3','v4','director'].includes(which))which='home';
+ if(!['live','reports','more','approval','materials','v3','v4','director','distribution'].includes(which))which='home';
  HOME_SELECTED=which;
  var active=which==='live'||which==='reports';
  $('homeOverview').hidden=which!=='home';
@@ -1351,9 +1356,12 @@ function homeView(which){
  $('homeV3RoomsPanel').hidden=which!=='v3';
  $('freedomAnalysisPanel').hidden=which!=='v4';
  $('homeDirectorRoom').hidden=which!=='director';
+ $('freedomDistributionPanel').hidden=which!=='distribution';
+ if(which==='distribution')refreshDistributionState();
+ $('directorOriginalAnalysis').setAttribute('aria-expanded',String(which==='v4'));
  $('homeDirectorRoomOpen').setAttribute('aria-expanded',String(which==='director'));
  if(which==='director'){refreshDirectorRoom();$('homeDirectorRoom').scrollTop=0;}
- $('openFreedomAnalysis').setAttribute('aria-expanded',String(which==='v4'));
+ $('openFreedomAnalysis').setAttribute('aria-expanded',String(which==='distribution'));
  if(which!=='materials')stopMaterialsMonitor();
  $('homeMaterialsBtn').setAttribute('aria-expanded',String(which==='materials'));
  var root=document.querySelector('main');
@@ -1403,7 +1411,7 @@ function homeView(which){
 /* Captain-only original ledger links for three independent apps.
  * No leakage of raw combinations or retrospective fabricated 'result-before' entries. */
 /* Narrow V4 navigation bridge: the original homeView/materialsSelect are IIFE-local. */
-window.captainV4Route=function(which){if(['v4','home','materials'].includes(which))homeView(which);};
+window.captainV4Route=function(which){if(['v4','home','materials','director'].includes(which))homeView(which);};
 window.captainV4Select=function(kind,value){if((kind==='app'&&value==='freedom')||(kind==='stage'&&value==='db'))materialsSelect(kind,value);};
 window.captainV4ShowArchive=function(){afterSevenShowMode(false);};
 /* Captain-authenticated readback and append-only V4 R46 retrospective research.
@@ -1812,6 +1820,17 @@ $('homeDirectorRoom').addEventListener('keydown',function(e){if(e.key==='Escape'
 $('directorOriginalOpen').addEventListener('click',function(){$('originalLinkofficer').click();});
 $('directorOriginalEdit').addEventListener('click',function(){editOriginalRole('linkofficer');});
 $('directorReports').addEventListener('click',function(){homeView('reports');});
+$('openFreedomAnalysis').addEventListener('click',function(){homeView('distribution');});
+$('distributionBack').addEventListener('click',function(){homeView('home');});
+function refreshDistributionState(){
+ var state={status:'NATIVE_REQUIRED'};
+ try{if(window.CrewInstalledApps&&typeof window.CrewInstalledApps.getFreedomDistributionState==='function')state=JSON.parse(window.CrewInstalledApps.getFreedomDistributionState());}catch(e){}
+ $('distributionState').textContent=state.status==='INSTALLED'?'설치된 배포판 · '+(state.versionName||'버전 확인 필요'):state.status==='NOT_INSTALLED'?'배포판이 설치되어 있지 않습니다.':'실제 설치 여부는 Android 앱에서 확인합니다.';
+}
+$('distributionLaunch').addEventListener('click',function(){
+ if(!window.CrewInstalledApps||typeof window.CrewInstalledApps.openFreedomDistribution!=='function'){$('distributionState').textContent='Android 중앙통제실 앱에서 설치된 배포판을 열 수 있습니다.';return;}
+ try{var result=JSON.parse(window.CrewInstalledApps.openFreedomDistribution());$('distributionState').textContent=result.status==='LAUNCH_REQUESTED'?'항해의자유 배포판 실행 요청':result.status==='NOT_INSTALLED'?'배포판이 없습니다. 드라이브에서 설치하세요.':'배포판 실행 상태를 확인할 수 없습니다.';}catch(e){$('distributionState').textContent='배포판 실행 상태를 확인할 수 없습니다.';}
+});
 $('directorServer').addEventListener('click',function(){$('v8ServerQuick').click();});
 $('directorLive').addEventListener('click',function(){homeView('live');});
 $('directorDiagnostics').addEventListener('click',function(){$('v8ConnectionCheck').click();});
@@ -2727,7 +2746,7 @@ try{
 (function(){
  'use strict';
  var $=function(id){return document.getElementById(id);};
- var open=$('openFreedomAnalysis'),status=$('freedomAnalysisStatus');
+ var open=$('directorOriginalAnalysis'),status=$('freedomAnalysisStatus');
  if(!open||!status)return;
  var DB1=null,dbPromise=null,engineReady=false,pending=null,requestCounter=0;
  var currentRun=0, lastCaptain=null, lastLiaison=null, lastSource=null;
@@ -2928,7 +2947,7 @@ try{
   var n=Number($('freedomAnalysisRound').value)||1;
   restoreArchivedRound(n);
  });
- $('freedomAnalysisBack').addEventListener('click',function(){resetActiveAnalysis();window.captainV4Route('home');});
+ $('freedomAnalysisBack').addEventListener('click',function(){resetActiveAnalysis();window.captainV4Route('director');});
  $('freedomRunRound').addEventListener('click',runBoth);
  $('freedomFirstFive').addEventListener('click',async function(){var n=round();if(n===null)return;var id=++currentRun;pending=null;
   try{await runCaptain(n,id);}catch(e){if(id===currentRun)note('선장엔진 오류: '+String(e.message||e));}
