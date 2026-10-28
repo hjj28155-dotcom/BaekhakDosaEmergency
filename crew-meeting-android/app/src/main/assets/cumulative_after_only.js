@@ -72,6 +72,7 @@
  async function load(n){
   if(!setRound(n))return;
   var serial=++seq;emptyCards();showDraw(null);
+  var v7Ref=$('cumV7ArchiveReference');if(v7Ref)v7Ref.hidden=true;
   $('cumStatus').textContent='제'+n+'회 · 공식번호와 결과후 원본 조회 중…';
   var draw=null;
   try{var map=await officialDraws();if(serial!==seq)return;draw=map.get(n)||null;showDraw(draw);}
@@ -158,6 +159,54 @@
    if(serial!==seq)return;
    roomIds.forEach(function(room){state(room,'결과후 연결 확인 필요 · 원본 보존');});
    $('cumStatus').textContent='제'+n+'회 · 결과후 서버 조회 중단 · 원본은 그대로 보존';
+  }
+  // Independent, captain-authenticated readback of real 5x6 R46 receipts.
+  // Existing V3/V7 metadata responses do NOT contain six-number originals.
+  try{
+   if(typeof window.captainEngineRoundRead!=='function')throw Error('NO_ENGINE_RECEIPT_BRIDGE');
+   var receipt=await window.captainEngineRoundRead(n);
+   if(serial!==seq||!root.isConnected||root.hidden)return;
+   if(!receipt||receipt.ok!==true||receipt.read_only!==true||receipt.round!==n||!Array.isArray(receipt.items))
+     throw Error('RECEIPT_CONTRACT');
+   var r46=receipt.items.find(function(x){
+    return x.room_key==='v4-1'&&x.engine==='CAPTAIN_R46_DB1_OFFLINE'&&
+     x.research_only===true&&x.official_eligible===false&&
+     /^[a-f0-9]{64}$/.test(String(x.source_sha256||''))&&
+     Array.isArray(x.combinations)&&x.combinations.length===5&&
+     x.combinations.every(validSix);
+   });
+   if(r46){
+    var card=root.querySelector('[data-room="v4-1"]');
+    card.querySelectorAll('li').forEach(function(li,i){
+     var nums=r46.combinations[i];
+     renderBalls(li.querySelector('.cumBalls'),nums,draw&&draw.numbers,draw&&draw.bonus);
+     var hit=li.querySelector('.cumHit');
+     var overlap=draw?nums.filter(function(v){return draw.numbers.includes(v);}).length:null;
+     hit.textContent=overlap===null?'—/6':overlap+'/6';
+     hit.classList.toggle('pending',overlap===null);
+    });
+    state('v4-1','선장 R46 연구 5조합 수신 · 적중은 과거 재분석 참고');
+    $('cumStatus').textContent+=' · V4 선장 R46 5조합 자료실 조회 성공';
+   }else{
+    state('v4-1','선장 R46 자료실 수신 대기 · 이전 기기 실행은 자동 복구 불가');
+   }
+   var archive=receipt.archived_v7_captain_reference;
+   var refPanel=$('cumV7ArchiveReference');
+   if(refPanel){
+    refPanel.hidden=!(archive&&Array.isArray(archive.combinations)&&archive.combinations.length===5&&archive.combinations.every(validSix));
+    if(!refPanel.hidden){
+     $('cumV7ArchiveRound').textContent=String(n);
+     $('cumV7ArchiveRows').replaceChildren();
+     archive.combinations.forEach(function(nums,i){
+      var li=document.createElement('li');
+      li.textContent=(i+1)+'. '+nums.map(function(v){return String(v).padStart(2,'0');}).join(' · ');
+      $('cumV7ArchiveRows').appendChild(li);
+     });
+    }
+   }
+  }catch(e){
+   if(serial!==seq)return;
+   state('v4-1','선장 R46 자료실 조회 실패 · 원본은 보존');
   }
  }
  window.captainCumulativeLoad=function(){return load(Number(roundInput.value)||currentRound);};
