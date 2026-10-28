@@ -31,3 +31,12 @@
 2. V3·도사 사전 원본의 독립 SHA-256/보관시점 증빙을 확보하고 연락관 R1 5조합 실제 실행 검증. **DB-1 단독으로는 R1 원본 게이트 통과 불가**.
 3. V4 실제 결과전 보고서·자료실 보관(과거 재분석과 공식 사전잠금 구분) 및 결과후 채점 연동.
 4. V3·V7·V4 독립 원본 앱/배포판은 변경하지 않음.
+
+## V1.0.22 검증 추가
+- GitHub Actions 40644538573: SUCCESS, 서명·버전·패키지 검사 통과.
+- APK 6486871 bytes, SHA256 053c5d3cf9b2fb2bd65fd146a5170cb672debaea8dc91b2caced02e9a9e967d8.
+- APK 내 DB1 1247건 SHA256 전부 통과, R46 원본 해시 일치.
+- APK 추출 HTML의 Chromium 테스트: 1·2회차 선장 5조합 및 초기화 통과, 오류 0.
+- 연락관 R1 소스 15/15 테스트 통과, 사전 원본 미확보로 실조합 생성 보류.
+- Google Drive ZIP: https://drive.google.com/file/d/104sCXNWgESWvCJxFMNeNIpUiv1eezmpg/view
+- 실기기 설치 검증 및 R1 사전자료 확보는 미완료.
