@@ -826,6 +826,9 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
  #freedomAnalysisPanel .v4RoomActions button{min-height:30px!important}
 }
 
+#freedomArchiveBadge{font-size:.65rem;font-weight:600;color:#b9d6e5}
+#freedomArchiveBadge[data-ok="true"]{color:#a7ecc5}
+#freedomArchiveBadge[data-error="true"]{color:#e7c488}
 /* R20: Seven result-after report surfaces visible together, no fake scores. */
 #materialsBody.afterOverviewMode{display:flex;flex-direction:column;gap:6px;overflow:hidden!important}
 #materialsBody.afterOverviewMode> :not(#afterSevenDashboard):not(#materialsAuthGate){display:none!important}
@@ -912,7 +915,7 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
   <button type="button" id="freedomRunRound">회차 분석</button>
  </div>
  <section id="freedomPngPanel" aria-label="V4 PNG 분석 결과보고서" class="v4PngPanel">
-   <div class="v4PngTop"><strong>🖼️ PNG 결과보고서</strong><button type="button" id="freedomPngZoom">확대</button><button type="button" id="freedomSavePng" disabled>PNG 저장</button></div>
+   <div class="v4PngTop"><strong>🖼️ PNG 결과보고서 <span id="freedomArchiveBadge" role="status" aria-live="polite">· 자료실 조회 중</span></strong><button type="button" id="freedomPngZoom">확대</button><button type="button" id="freedomSavePng" disabled>PNG 저장</button></div>
    <div class="v4PngViewport"><img id="freedomPngPreview" alt="V4 선장엔진 R46 및 연락관엔진 R1의 각 5조합을 담은 PNG 결과보고서. 원본이 없으면 검증 대기로 표시됩니다."></div>
    <small id="freedomPngStatus" role="status" aria-live="polite">PNG 보고서 준비 중 · 확인된 조합만 기록</small>
  </section>
@@ -1362,9 +1365,11 @@ window.addEventListener('captain-v4-verified',function(event){
  if(!d||d.engine!=='captain')return;
  var pendingSave=window.captainEngineRoundSave(d).then(function(receipt){
    window.captainEngineLastReceipt={round:d.round,receipt:receipt};
+   window.dispatchEvent(new CustomEvent('captain-v4-archive-saved',{detail:{round:d.round,receipt:receipt}}));
    var st=document.getElementById('freedomAnalysisStatus');
    if(st)st.textContent='선장 R46 '+d.round+'회차 연구 5조합 · 자료실 수신확인 완료';
  }).catch(function(e){
+   window.dispatchEvent(new CustomEvent('captain-v4-archive-failed',{detail:{round:d.round,reason:String(e.message||e)}}));
    var st=document.getElementById('freedomAnalysisStatus');
    if(st)st.textContent='선장 R46 분석번호는 화면에 보존 · 자료실 전송 미완료 ('+String(e.message||e)+')';
  });
@@ -2699,6 +2704,8 @@ try{
   }
  }
  async function runBoth(){var n=round();if(n===null)return;
+  archiveSerial++;
+  archiveBadge('분석 중 · 수신 대기',false,false);
   var runId=++currentRun;pending=null;lastCaptain=null;lastLiaison=null;
   clearList('freedomFirstList');clearList('freedomSecondList');
   window.dispatchEvent(new CustomEvent('captain-v4-reset'));
@@ -2706,7 +2713,79 @@ try{
    await Promise.all([runCaptain(n,runId),runLiaison(n,runId)]);
   }catch(e){if(runId===currentRun)note('DB-1 또는 분석 엔진 확인 실패: '+String(e.message||e));}
  }
- open.addEventListener('click',function(){resetActiveAnalysis();window.captainV4Route('v4');loadDB1().catch(function(){});});
+ // Restore the captain's already-received, immutable 1st-round research
+ // without rerunning the engine and without re-uploading a second copy.
+ // This is also the source for the V4 room's PNG after leaving/reopening it.
+ var archiveSerial=0;
+ function archiveBadge(text,ok,error){
+  var el=$('freedomArchiveBadge');
+  if(!el)return;
+  el.textContent=' · '+text;
+  el.dataset.ok=ok?'true':'false';el.dataset.error=error?'true':'false';
+ }
+ function archiveRowOk(row,room,sourceSha){
+  return !!row&&row.room_key===room&&row.research_only===true&&
+   row.official_eligible===false&&row.source_sha256===sourceSha&&
+   cleanGames(row.combinations)!==null&&
+   /^[a-f0-9]{64}$/.test(String(row.report_sha256||''));
+ }
+ async function restoreArchivedRound(n){
+  var ticket=++archiveSerial,runAtStart=currentRun;
+  if(!Number.isInteger(n)||n<1||n>1247)return;
+  archiveBadge('자료실 확인 중',false,false);
+  if(typeof window.captainEngineRoundRead!=='function'){
+   archiveBadge('연결 기능 확인 필요',false,true);return;
+  }
+  try{
+   var entry=await sourceFor(n);
+   if(ticket!==archiveSerial||runAtStart!==currentRun||Number($('freedomAnalysisRound').value)!==n)return;
+   var response=await window.captainEngineRoundRead(n);
+   if(ticket!==archiveSerial||runAtStart!==currentRun||Number($('freedomAnalysisRound').value)!==n)return;
+   if(!response||response.ok!==true||response.read_only!==true||response.round!==n||!Array.isArray(response.items))
+    throw Error('INVALID_ARCHIVE_RESPONSE');
+   var found=0;
+   var captain=response.items.find(function(row){
+    return archiveRowOk(row,'v4-1',entry.source_sha256)&&row.engine==='CAPTAIN_R46_DB1_OFFLINE';
+   });
+   if(captain){
+    lastCaptain={round:n,games:cleanGames(captain.combinations),engine:captain.engine,archived:true};
+    showGames('freedomFirstList',lastCaptain.games);
+    $('freedomCaptainStatus').textContent='✓ 자료실 원본 수신 · 선장 R46 5조합';
+    window.dispatchEvent(new CustomEvent('captain-v4-archived',{detail:{
+     engine:'captain',round:n,games:lastCaptain.games,sourceSha256:entry.source_sha256,
+     provenance:'R46_DB1_VERIFIED',reportSha256:captain.report_sha256
+    }}));
+    found++;
+   }
+   // Liaison must carry an independently attested archive receipt; a
+   // 5x6 array alone cannot establish R1 provenance.
+   var liaison=response.items.find(function(row){
+    return archiveRowOk(row,'v4-2',entry.source_sha256)&&
+     row.engine==='LIAISON_R1_INDEPENDENT_ARCHIVE'&&
+     row.verification_state==='INDEPENDENT_SOURCE_ATTESTED';
+   });
+   if(liaison){
+    lastLiaison={round:n,games:cleanGames(liaison.combinations),engine:liaison.engine,archived:true};
+    showGames('freedomSecondList',lastLiaison.games);
+    $('freedomLiaisonStatus').textContent='✓ 자료실 독립 원본 수신 · 연락관 R1 5조합';
+    window.dispatchEvent(new CustomEvent('captain-v4-archived',{detail:{
+     engine:'liaison',round:n,games:lastLiaison.games,sourceSha256:entry.source_sha256,
+     provenance:'R1_INDEPENDENT_ARCHIVE_RESEARCH_NOT_LOCKED',reportSha256:liaison.report_sha256
+    }}));
+    found++;
+   }
+   archiveBadge(found?('자료실 '+found+'/2방 수신'):'미등록 · 기존 원본 보존',!!found,false);
+  }catch(e){
+   if(ticket!==archiveSerial||runAtStart!==currentRun)return;
+   archiveBadge('서버 조회 실패 · 원본 보존',false,true);
+  }
+ }
+ window.captainV4RestoreArchive=restoreArchivedRound;
+ open.addEventListener('click',function(){
+  window.captainV4Route('v4');
+  var n=Number($('freedomAnalysisRound').value)||1;
+  restoreArchivedRound(n);
+ });
  $('freedomAnalysisBack').addEventListener('click',function(){resetActiveAnalysis();window.captainV4Route('home');});
  $('freedomRunRound').addEventListener('click',runBoth);
  $('freedomFirstFive').addEventListener('click',async function(){var n=round();if(n===null)return;var id=++currentRun;pending=null;
@@ -2715,11 +2794,30 @@ try{
  $('freedomSecondFive').addEventListener('click',async function(){var n=round();if(n===null)return;var id=++currentRun;pending=null;
   try{await runLiaison(n,id);}catch(e){if(id===currentRun)note('연락관엔진 오류: '+String(e.message||e));}
  });
- $('freedomResetActive').addEventListener('click',resetActiveAnalysis);
+ $('freedomResetActive').addEventListener('click',function(){
+  archiveSerial++;resetActiveAnalysis();archiveBadge('새 분석 대기',false,false);
+ });
+ $('freedomAnalysisRound').addEventListener('change',function(){
+  var n=round();if(n===null)return;
+  currentRun++;archiveSerial++;pending=null;lastCaptain=null;lastLiaison=null;
+  clearList('freedomFirstList');clearList('freedomSecondList');
+  window.dispatchEvent(new CustomEvent('captain-v4-reset'));
+  restoreArchivedRound(n);
+ });
+ window.addEventListener('captain-v4-archive-failed',function(e){
+  if(Number(e.detail&&e.detail.round)===Number($('freedomAnalysisRound').value))
+   archiveBadge('전송 실패 · 재시도 필요',false,true);
+ });
+ window.addEventListener('captain-v4-archive-saved',function(e){
+  var d=e.detail||{};
+  if(Number(d.round)===Number($('freedomAnalysisRound').value)){
+   archiveBadge('선장 1/2방 저장 확인',true,false);
+  }
+ });
  $('freedomGoCumulativeDb').addEventListener('click',function(){
   if(typeof window.captainCumulativeOpen!=='function'){note('통합 누적DB 연결 확인 필요');return;}
   var selected=Number($('freedomAnalysisRound').value);
-  resetActiveAnalysis();
+  // Do not discard a completed V4 analysis when navigating to its archive.
   window.captainCumulativeOpen(Number.isInteger(selected)&&selected>=1&&selected<=1247?selected:1);
  });
 })();
