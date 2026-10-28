@@ -59,7 +59,7 @@
   var liaison=current.liaison&&current.liaison.round===round?current.liaison:null;
   ctx.fillStyle='#041a2f';ctx.fillRect(0,0,W,H);
   rect(13,13,W-26,H-26,22,'#061f37','#d9b36f',5);
-  label('항해의자유 V4 · PNG 분석 결과보고서',48,83,36,'#ffe0a3',true);
+  label('통제실장 · 원문분석 보고서',48,83,36,'#ffe0a3',true);
   label('제'+(round==null?'—':round)+'회차 · 독립 엔진 5조합 × 2',49,126,23,'#bcd8e8',false);
   section(160,'선장엔진 R46 · 5조합',
    captain?'DB-1 원문 검증 · 선장엔진 실제 출력':'선장엔진 결과 미확인 · 임의 번호 생성 금지',
@@ -135,3 +135,4 @@
  });
  schedule();
 })();
+

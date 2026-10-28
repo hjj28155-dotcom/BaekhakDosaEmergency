@@ -215,3 +215,7 @@ main.roomMode>#freedomDistributionPanel:not([hidden]){display:flex!important;fle
 #freedomDistributionPanel .roomCompactDetailsBody{font-size:.8rem;line-height:1.6;color:#cbdcea}
 #freedomDistributionPanel .roomCompactDetailsBody a{color:#d8ecff}
 #distributionDriveQuick{display:flex!important;align-items:center;justify-content:center;text-decoration:none}
+#freedomAnalysisPanel .v4PngTop{align-items:flex-start;gap:5px}
+#freedomAnalysisPanel .v4PngTop>strong{flex:1 1 auto;min-width:0;font-size:.75rem}
+#freedomAnalysisPanel .v4PngTop>button{flex:0 0 auto;white-space:nowrap;min-width:48px;padding:5px 7px}
+#freedomAnalysisPanel .v4PngTop>#freedomSavePng{min-width:70px}
