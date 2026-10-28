@@ -1,4 +1,4 @@
-name: Build same-signer captain three-app research APK v1.0.22
+name: Build same-signer captain three-app research APK v1.0.23
 on:
   push:
     branches:
@@ -98,16 +98,35 @@ jobs:
           test -s crew-meeting-android/app/src/main/assets/db1_rounds_1_1247.json
           grep -Fq '누적자료는 이 자료실에서만 조회합니다.' "$HOME_HTML"
           grep -Fq 'resetActiveAnalysis();window.captainV4Route' "$HOME_HTML"
-          grep -Fq 'window.captainV4ShowArchive();' "$HOME_HTML"
           grep -Fq 'id="freedomGoCumulativeDb"' "$HOME_HTML"
-          grep -Fq "window.captainV4Select('app','freedom')" "$HOME_HTML"
-          grep -Fq "window.captainV4Select('stage','db')" "$HOME_HTML"
+          grep -Fq 'id="cumulativeAfterDashboard"' "$HOME_HTML"
+          grep -Fq 'id="cumDrawNumbers"' "$HOME_HTML"
+          grep -Fq 'id="cumRefresh"' "$HOME_HTML"
+          grep -Fq 'captainCumulativeOpen' "$HOME_HTML"
+          grep -Fq 'crew-cumulative-after.css' "$HOME_HTML"
+          grep -Fq 'crew-cumulative-after.js' "$HOME_HTML"
+          test "$(grep -c 'class="cumRoom" data-room=' "$HOME_HTML")" -eq 4
+          test "$(grep -c 'class="cumHit pending"' "$HOME_HTML")" -eq 20
+          test -s crew-meeting-android/app/src/main/assets/cumulative_after_only.css
+          test -s crew-meeting-android/app/src/main/assets/cumulative_after_only.js
+          test -s crew-meeting-android/app/src/main/assets/official_draws_verified_17.json
+          node --check crew-meeting-android/app/src/main/assets/cumulative_after_only.js
+          python3 - <<'PY'
+          import json
+          x=json.load(open('crew-meeting-android/app/src/main/assets/official_draws_verified_17.json'))
+          assert x['count']==17 and len(x['rows'])==17
+          assert [r['round_no'] for r in x['rows']]==list(range(1,17))+[1247]
+          for r in x['rows']:
+              assert len(r['numbers'])==6 and len(set(r['numbers']))==6
+              assert all(1<=n<=45 for n in r['numbers'])
+              assert 1<=r['bonus']<=45 and r['bonus'] not in r['numbers']
+          print('17 actual official draw records, 4 rooms x 5 result-after slots: PASS')
+          PY
           grep -Fq 'id="freedomRunRound"' "$HOME_HTML"
           grep -Fq 'id="freedomFirstList"' "$HOME_HTML"
           grep -Fq 'id="freedomSecondList"' "$HOME_HTML"
           grep -Fq "window.captainV4Route('v4')" "$HOME_HTML"
           grep -Fq "window.captainV4Route('home')" "$HOME_HTML"
-          grep -Fq "window.captainV4Select('stage','db')" "$HOME_HTML"
           grep -Fq 'main.roomMode > #freedomAnalysisPanel:not([hidden])' "$HOME_HTML"
           grep -Fq '선장엔진 R46 · 연락관엔진 R1 검증 대기' "$HOME_HTML"
           ! grep -Fq 'openFreedomApprovalShortcut' "$HOME_HTML"
@@ -116,7 +135,7 @@ jobs:
           grep -Fq 'data-material-stage="after"' "$HOME_HTML"
           grep -Fq 'V3의 과거 350회 누적 분석은 별도 보존' "$HOME_HTML"
           grep -Fq 'loadCaptainDashboard()' crew-meeting-android/app/src/main/java/kr/hanghae/crewmeeting/MainActivity.java
-          grep -Fq "versionCode 122" crew-meeting-android/app/build.gradle
+          grep -Fq "versionCode 123" crew-meeting-android/app/build.gradle
           test "$(grep -c 'data-before-room=' "$HOME_HTML")" -eq 7
           test "$(grep -c 'data-v3-room-card=' "$HOME_HTML")" -eq 4
           test "$(grep -c 'data-v3-report=' "$HOME_HTML")" -eq 4
@@ -137,23 +156,23 @@ jobs:
           test "$NEW_CERT" = "e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be"
           echo "Recovery app signer pinned: $NEW_CERT"
           "$AAPT" dump badging "$APK" | head -5
-          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting.compact' versionCode='122'"
+          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting.compact' versionCode='123'"
           ! "$AAPT" dump badging "$APK" | grep -q "package: name='com.baekhak.dosa.v4'"
           mkdir -p crew-meeting-android/releases
-          cp "$APK" crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.22_DB1_R46_LIAISON_R1_TEST.apk
-          (cd crew-meeting-android/releases && sha256sum HANGHAE_CREW_MEETING_1.0.22_DB1_R46_LIAISON_R1_TEST.apk > HANGHAE_CREW_MEETING_1.0.22_DB1_R46_LIAISON_R1_TEST.apk.sha256)
+          cp "$APK" crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.23_CUMULATIVE_AFTER_ONLY.apk
+          (cd crew-meeting-android/releases && sha256sum HANGHAE_CREW_MEETING_1.0.23_CUMULATIVE_AFTER_ONLY.apk > HANGHAE_CREW_MEETING_1.0.23_CUMULATIVE_AFTER_ONLY.apk.sha256)
       - uses: actions/upload-artifact@v4
         with:
-          name: HANGHAE-CREW-MEETING-1.0.22-DB1-R46-LIAISON-R1-TEST-APK
+          name: HANGHAE-CREW-MEETING-1.0.23-CUMULATIVE-AFTER-ONLY-APK
           path: |
-            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.22_DB1_R46_LIAISON_R1_TEST.apk
-            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.22_DB1_R46_LIAISON_R1_TEST.apk.sha256
+            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.23_CUMULATIVE_AFTER_ONLY.apk
+            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.23_CUMULATIVE_AFTER_ONLY.apk.sha256
           if-no-files-found: error
           retention-days: 30
       - name: Verify isolated APK artifact packaging
         run: |
           set -euo pipefail
-          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.22_DB1_R46_LIAISON_R1_TEST.apk
-          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.22_DB1_R46_LIAISON_R1_TEST.apk.sha256
-          (cd crew-meeting-android/releases && sha256sum --check HANGHAE_CREW_MEETING_1.0.22_DB1_R46_LIAISON_R1_TEST.apk.sha256)
+          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.23_CUMULATIVE_AFTER_ONLY.apk
+          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.23_CUMULATIVE_AFTER_ONLY.apk.sha256
+          (cd crew-meeting-android/releases && sha256sum --check HANGHAE_CREW_MEETING_1.0.23_CUMULATIVE_AFTER_ONLY.apk.sha256)
           echo "TEST artifact verified. Do NOT replace the stable fixed Google Drive APK without device verification."
