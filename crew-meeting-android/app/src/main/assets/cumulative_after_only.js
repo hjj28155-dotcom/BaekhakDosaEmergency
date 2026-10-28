@@ -160,53 +160,49 @@
    roomIds.forEach(function(room){state(room,'결과후 연결 확인 필요 · 원본 보존');});
    $('cumStatus').textContent='제'+n+'회 · 결과후 서버 조회 중단 · 원본은 그대로 보존';
   }
-  // Independent, captain-authenticated readback of real 5x6 R46 receipts.
-  // Existing V3/V7 metadata responses do NOT contain six-number originals.
+  // Server verifies DB-1 original SHA, receipt canonical SHA and official draw.
+  // Missing V3/V7/R1 sources remain pending, never zero-score placeholders.
   try{
-   if(typeof window.captainEngineRoundRead!=='function')throw Error('NO_ENGINE_RECEIPT_BRIDGE');
-   var receipt=await window.captainEngineRoundRead(n);
+   if(typeof window.captainSevenRoomScoreRead!=='function')throw Error('NO_VERIFIED_SCORE_BRIDGE');
+   var scored=await window.captainSevenRoomScoreRead(n);
    if(serial!==seq||!root.isConnected||root.hidden)return;
-   if(!receipt||receipt.ok!==true||receipt.read_only!==true||receipt.round!==n||!Array.isArray(receipt.items))
-     throw Error('RECEIPT_CONTRACT');
-   // The two V4 rooms have independent provenance; do not copy the
-   // captain's R46 pack into the liaison room or into the V7 controller.
-   var savedRooms=[
-    {key:'v4-1',engine:'CAPTAIN_R46_DB1_OFFLINE',verification:'CAPTAIN_CLIENT_RESEARCH_RECEIVED',name:'선장 R46'},
-    {key:'v4-2',engine:'LIAISON_R1_INDEPENDENT_ARCHIVE',verification:'INDEPENDENT_SOURCE_ATTESTED',name:'연락관 R1'}
-   ];
+   if(scored.round!==n||!Array.isArray(scored.details))throw Error('SCORE_CONTRACT');
    var found=0;
-   savedRooms.forEach(function(def){
-    var item=receipt.items.find(function(x){
-     return x.room_key===def.key&&x.engine===def.engine&&
-      x.verification_state===def.verification&&
-      x.research_only===true&&x.official_eligible===false&&
-      /^[a-f0-9]{64}$/.test(String(x.source_sha256||''))&&
-      /^[a-f0-9]{64}$/.test(String(x.report_sha256||''))&&
-      Array.isArray(x.combinations)&&x.combinations.length===5&&
-      x.combinations.every(validSix);
-    });
+   ['v4-1','v4-2'].forEach(function(key){
+    var item=scored.details.find(function(x){return x.room_key===key&&x.official_eligible===false&&
+     x.provenance==='RETROSPECTIVE_RESEARCH_ONLY'&&Array.isArray(x.rows)&&x.rows.length===5;});
     if(!item){
-     state(def.key,def.key==='v4-2'?'연락관 독립 원본 미수신 · 0점 아님':
-       '선장 R46 자료실 수신 대기 · 이전 기기 실행은 자동 복구 불가');
-     return;
+     state(key,key==='v4-2'?'연락관 R1 독립 원본 미수신 · 0점 아님':'선장 R46 검증 연구 원본 미수신 · 0점 아님');return;
     }
-    var card=root.querySelector('[data-room="'+def.key+'"]');
+    if(!draw||!item.draw||!Array.isArray(item.draw.numbers)||
+      draw.numbers.slice().sort(function(a,b){return a-b;}).join(',')!==
+      item.draw.numbers.slice().sort(function(a,b){return a-b;}).join(',')||
+      draw.bonus!==item.draw.bonus){
+     state(key,'공식 당첨번호 대조 불일치 · 연구 채점 보류');return;
+    }
+    var card=root.querySelector('[data-room="'+key+'"]');
     card.querySelectorAll('li').forEach(function(li,i){
-     var nums=item.combinations[i];
-     renderBalls(li.querySelector('.cumBalls'),nums,draw&&draw.numbers,draw&&draw.bonus);
+     var row=item.rows[i],nums=row.numbers;
+     if(!validSix(nums))return;
+     renderBalls(li.querySelector('.cumBalls'),nums,draw.numbers,draw.bonus);
      var hit=li.querySelector('.cumHit');
-     var overlap=draw?nums.filter(function(v){return draw.numbers.includes(v);}).length:null;
-     hit.textContent=overlap===null?'—/6':overlap+'/6';
-     hit.classList.toggle('pending',overlap===null);
+     hit.textContent=row.bucket===6?'5+보':row.hits+'/6';
+     hit.classList.remove('pending');
     });
-    state(def.key,def.name+' · 저장 원본 5조합 확인 · 과거 연구 참고용');
+    state(key,(key==='v4-1'?'선장 R46':'연락관 R1')+' · 검증 연구 5조합 사후 대조 · 공식 잠금 아님');
     found++;
    });
-   if(found){
-    $('cumStatus').textContent=$('cumStatus').textContent.replace('V4 연계 대기','V4 연구원본 일부 연결');
-    $('cumStatus').textContent+=' · V4 '+found+'/2방 실제 원본 '+(found*5)+'조합 조회 성공';
-   }
-   var archive=receipt.archived_v7_captain_reference;
+   $('cumStatus').textContent+=' · V4 '+found+'/2방 실제 원본 '+(found*5)+'조합 검증된 연구 사후 대조';
+  }catch(e){
+   if(serial!==seq)return;
+   state('v4-1','연구 채점 서버 조회 실패 · 원본 보존');
+   state('v4-2','독립 원본 검증 대기 · 0점 아님');
+  }
+  // Separate legacy V7 captain archive reference, NOT V7 controller room.
+  try{
+   var receipt=await window.captainEngineRoundRead(n);
+   if(serial!==seq||!root.isConnected||root.hidden)return;
+   var archive=receipt&&receipt.archived_v7_captain_reference;
    var refPanel=$('cumV7ArchiveReference');
    if(refPanel){
     refPanel.hidden=!(archive&&Array.isArray(archive.combinations)&&archive.combinations.length===5&&archive.combinations.every(validSix));
@@ -220,10 +216,8 @@
      });
     }
    }
-  }catch(e){
-   if(serial!==seq)return;
-   state('v4-1','선장 R46 자료실 조회 실패 · 원본은 보존');
-  }
+  }catch(e){if(serial!==seq)return;}
+
  }
  window.captainCumulativeLoad=function(){return load(Number(roundInput.value)||currentRound);};
  $('cumPrev').addEventListener('click',function(){load(currentRound-1);});
