@@ -7,8 +7,9 @@ const assert = require('node:assert/strict');
 (async () => {
   const server = http.createServer((req, res) => { res.setHeader('Content-Type', 'text/html'); res.end('<!doctype html><title>V3 V8 isolated test</title>'); });
   await new Promise(r => server.listen(0, '127.0.0.1', r));
-  const browser = await chromium.launch({headless:true, args:['--no-sandbox']});
+  let browser;
   try {
+    browser = await chromium.launch({headless:true, args:['--no-sandbox']});
     const page = await browser.newPage();
     await page.goto('http://127.0.0.1:' + server.address().port);
     await page.addScriptTag({path:path.join(__dirname, 'r60_outbox_original.js')});
@@ -81,5 +82,5 @@ const assert = require('node:assert/strict');
     });
     assert(results.length>=20);
     console.log(JSON.stringify({passed:results.length,tests:results,scope:'Chromium real IndexedDB + mocked native bridge; no device or live upload'},null,2));
-  } finally { await browser.close(); await new Promise(r=>server.close(r)); }
+  } finally { if(browser)await browser.close(); await new Promise(r=>server.close(r)); }
 })().catch(e=>{console.error(e);process.exitCode=1;});

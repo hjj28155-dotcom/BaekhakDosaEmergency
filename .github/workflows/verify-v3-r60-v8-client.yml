@@ -9,18 +9,37 @@ on:
 permissions:
   contents: read
 jobs:
-  verify:
+  android-library:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout: integrations/v3-r60-v8-client
       - uses: actions/setup-java@v4
         with: {distribution: temurin, java-version: '17'}
-      - uses: android-actions/setup-android@v3
       - uses: gradle/actions/setup-gradle@v4
         with: {gradle-version: '8.9'}
+      - name: Install required current Android SDK packages
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0"
       - name: Compile Android library (no APK, no signing)
         working-directory: integrations/v3-r60-v8-client/android
         run: gradle --no-daemon assembleDebug lintDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v3-r60-v8-source-library-not-installable
+          path: integrations/v3-r60-v8-client/android/build/outputs/aar/*debug.aar
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            integrations/v3-r60-v8-client
+            crew-meeting-android/app/src/main/assets
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Install isolated browser test dependencies
@@ -38,7 +57,3 @@ jobs:
         with:
           name: v8-804-director-room-ui-evidence
           path: ui-evidence/*.png
-      - uses: actions/upload-artifact@v4
-        with:
-          name: v3-r60-v8-source-library-not-installable
-          path: integrations/v3-r60-v8-client/android/build/outputs/aar/*debug.aar
