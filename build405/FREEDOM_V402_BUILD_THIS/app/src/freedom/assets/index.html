@@ -1951,61 +1951,57 @@ function v4045AutoAnalyze20(round,force){
  setTimeout(batch,0);
 }
 function v4045GroupedScore(games,w,label,sourceType){
- const total=games.length,winning=new Set(w.nums),bonus=Number(w.bonus);
- const matches=games.map(g=>g.filter(n=>winning.has(n)).length);
- const awarded=matches.filter(h=>h>=3).length;
- const duplicates=total-new Set(games.map(g=>g.join(','))).size;
- const hint=sourceType==='research'?'추첨 후 생성된 연구조합입니다. 결과 전 구매·최초잠금 실적으로 인정하지 않습니다.':sourceType==='locked'?'원본에 저장된 최초잠금 20조합입니다.':'보관된 원본 조합과 당첨번호를 비교합니다.';
- return '<section class="panel"><h3>'+esc(label)+'</h3><p class="small status">'+esc(hint)+' · 3개 이상 적중 '+awarded+'/'+total+(duplicates?' · 중복 저장 '+duplicates+'건':'')+'</p></section>'+
-  '<div class="r5grid">'+v330GroupsResult(games,w.nums,bonus)+'</div>';
+ const hits=new Set(w.nums),won=games.filter(g=>g.filter(n=>hits.has(n)).length>=3).length;
+ const duplicates=games.length-new Set(games.map(g=>g.join(','))).size;
+ const origin=sourceType==='research'?'사후 연구 · 결과 전 실적 제외':(sourceType==='locked'?'최초잠금 20조합':label);
+ return '<div class="v4047Summary">'+esc(origin)+' · 3개 이상 '+won+'/'+games.length+
+ (duplicates?' · 중복 저장 '+duplicates+'개':'')+'</div>'+
+ '<div class="r5grid">'+v330GroupsResult(games,w.nums,w.bonus)+'</div>';
+}
+function v4047OpenRawEditor(){
+ const rec=(D.rounds||{})['1248']||{},raw=String((rec.raw||{}).text||'');
+ modal('제1248회 원문 등록','<div class="panel goldline"><h3>당회차 원문 여섯 구절</h3>'+
+ '<p class="small">원문이 없어도 1~1247회 전체 분석을 사용합니다. 기존 기록은 유지합니다.</p>'+
+ '<textarea id="v4046RawInput" rows="9">'+esc(raw)+'</textarea>'+
+ '<div class="row"><button class="b gold" onclick="v4046SaveRaw1248()">원문 저장 · 재분석</button>'+
+ '<button class="b" onclick="v4044ReviewRound(1248,false)">20조합으로 돌아가기</button></div></div>');
 }
 function v4044ReviewRound(round,autoStart){
  const n=Number(round);
  if(!V4046_VISIBLE.includes(n))return v4044ReviewRound(1248,autoStart);
  if(!setRound(n))return;
- const rec=R(),buy=rec.buy||{},w=v4046WinningForRound(n,rec);
+ const rec=R(),buy=rec.buy||{},win=v4046WinningForRound(n,rec);
  const locked20=buy.locked?v4044ValidSets(buy.auto20,20):null;
- const analysis=v4044ValidSets((rec.analysis||{}).auto20,20);
+ const saved=v4044ValidSets((rec.analysis||{}).auto20,20);
  const research=v4044ValidSets((rec.analysisResearch||{}).auto20,20);
- const groups=(rec.analysis||{}).groups;
- const legacy=(rec.legacy||{}).groups;
+ const groups=(rec.analysis||{}).groups,legacy=(rec.legacy||{}).groups;
  const originals=Array.isArray(groups)&&groups.length?groups:(Array.isArray(legacy)?legacy:[]);
- const archiveRows=originals.flatMap(g=>Array.isArray(g&&g.rows)?g.rows.map(x=>x&&('game' in x?x.game:x.numbers)):[]);
- const archived=archiveRows.length===20?v4044ValidSets(archiveRows,20):null;
- const purchased=buy.locked?v4044ValidSets(buy.combos,5):null;
- const display20=locked20||analysis||archived||research;
- const type=locked20?'locked':((analysis||archived)?'saved':'research');
- const title='제'+n+'회 · 자동 20조합 및 당첨연동';
- let html='<div class="analysisCompact v330print"><div class="panel goldline">'+
-  '<h3>자동분석 5조합 × 4묶음 = 총 20조합</h3>'+
-  '<div class="r5selector">'+V4046_VISIBLE.map(r=>'<button class="b '+(r===n?'gold':'')+'" onclick="v330OpenRound('+r+')">'+r+'회</button>').join('')+'</div></div>';
- if(w){
-  html+='<div class="panel goldline centerTitle"><h3>제'+n+'회 자동 연동 당첨번호</h3><div class="r5winning">'+w.nums.map(k=>'<span class="r5ball hit">'+k+'</span>').join('')+'</div><div>보너스 '+w.bonus+'</div></div>';
- }else html+='<div class="panel warn">당첨번호 확인 대기 · 발표 후 자동조회와 연동합니다.</div>';
+ const archivedRows=originals.flatMap(g=>Array.isArray(g&&g.rows)?g.rows.map(x=>x&&('game' in x?x.game:x.numbers)):[]);
+ const archived=archivedRows.length===20?v4044ValidSets(archivedRows,20):null;
+ const display20=locked20||saved||archived||research;
+ const source=locked20?'locked':(saved||archived?'saved':'research');
+ let html='<div class="analysisCompact v330print"><div class="v4047Select"><strong>5조합 × 4묶음</strong>'+
+ '<div class="r5selector">'+V4046_VISIBLE.map(r=>'<button class="b '+(r===n?'gold':'')+'" onclick="v330OpenRound('+r+')">'+r+'회</button>').join('')+'</div></div>';
+ if(win)html+='<div class="v4047Winning"><strong>당첨</strong><div class="r5winning">'+
+  win.nums.map(k=>'<span class="r5ball hit">'+k+'</span>').join('')+
+  '</div><span class="v4047Bonus">+'+win.bonus+'</span></div>';
+ else html+='<div class="v4047Winning pending">제'+n+'회 당첨번호 발표 전 · 자동연동 대기</div>';
  if(display20){
-  html+=w?v4045GroupedScore(display20,w,type==='research'?'사후 연구 자동 20조합':(type==='locked'?'최초잠금 자동 20조합':'저장된 자동 20조합'),type):
-   '<section class="panel"><h3>자동분석 20조합</h3></section><div class="r5grid">'+v330GroupsPurchase(display20)+'</div>';
- }else{
-  if(purchased&&w)html+=v4044AutoRows(purchased,w,'보존된 최초잠금 구매 5조합');
-  html+='<section class="panel warn"><h3>자동분석 20조합 준비</h3>'+
-   '<p>당회차 원문이 있으면 주자료, 없으면 제1~'+Math.min(n-1,1247)+'회 과거 원문 전체를 사용해 자동 20조합을 분석합니다. 발표된 회차의 신규 분석은 사후 연구로 분류합니다.</p>'+
-   '<button class="b gold" onclick="v4045AutoAnalyze20('+n+')">원문 전수분석 20조합 실행</button></section>';
- }
+  if(win)html+=v4045GroupedScore(display20,win,source==='research'?'사후 연구 20조합':'저장 자동 20조합',source);
+  else html+='<div class="v4047Summary">'+(source==='research'?'사후 연구 · 결과 전 실적 제외':'자동 분석 20조합')+
+  ' · 당첨번호 확인 대기</div><div class="r5grid">'+v330GroupsPurchase(display20)+'</div>';
+ }else html+='<section class="panel warn v4047Empty"><h3>자동분석 20조합 준비</h3>'+
+  '<p>보관된 20조합이 없습니다. 당회차 원문이 있으면 주자료, 없으면 과거 원문 전체를 분석합니다. 추첨 후 생성분은 사후 연구로 분리합니다.</p>'+
+  '<button class="b gold" onclick="v4045AutoAnalyze20('+n+')">전체 원문 분석 · 20조합 생성</button></section>';
+ html+='<div class="v4047Footer">';
  if(n===1248){
-  const text=String(((rec.raw||{}).text)||'');
-  const data=rec.analysis||{},mode=data.primaryWeight===0?'과거 전체 원문 우선 분석':(data.primaryWeight>0?'1248회 원문 우선 분석':'기존 기록');
-  html+='<div class="panel"><button class="b" onclick="v4046ToggleRaw()">1248회 원문 등록/수정 (선택사항)</button>'+
-   '<div id="v4046RawEditor" style="display:none"><p class="small">1248회 원문이 있으면 6구절을 입력하십시오. 없으면 원문 입력 없이 1~1247회를 분석합니다.</p>'+
-   '<textarea id="v4046RawInput" rows="9" style="width:100%">'+esc(text)+'</textarea>'+
-   '<button class="b gold" onclick="v4046SaveRaw1248()">원문 보존 저장</button></div>'+
-   '<p class="small">1248회 원문 '+(text.trim()?'등록됨':'미등록')+' · '+mode+'</p></div>';
-  if(display20&&!buy.locked)html+='<div class="panel"><button class="b" onclick="v4045AutoAnalyze20(1248,true)">원문 변경 반영 · 자동 20조합 재분석</button>'+
-   '<p class="small">기존 20조합은 분석 이력으로 보존하며, 당첨 이후에는 사후 연구로만 기록합니다.</p></div>';
- }
-html+='<div class="r5actions"><button class="b gold" onclick="v330Print()">인쇄</button>'+
-  '<button class="b" onclick="autoWinningLookup()">당첨번호 자동 재확인</button>'+
-  '<button class="b" onclick="closeM()">닫기</button></div></div>';
- modal(title,html);
+  html+='<button class="b" onclick="v4047OpenRawEditor()">원문 등록</button>'+
+  '<button class="b" onclick="v4045AutoAnalyze20(1248,'+(display20&&!buy.locked?'true':'false')+')">'+(display20?'재분석':'20조합 생성')+'</button>';
+ }else html+='<button class="b" onclick="v330Print()">인쇄</button>'+
+  '<button class="b" onclick="v4044ReviewRound(1248,false)">1248회 이동</button>';
+ html+='<button class="b gold" onclick="autoWinningLookup()">당첨번호 조회</button></div></div>';
+ modal('제'+n+'회 · 자동 20조합',html);
+ document.getElementById('modal')?.classList.add('v4047Compact');
  if(!display20&&autoStart&&!V4045_AUTOGEN_STARTED[n]){
   V4045_AUTOGEN_STARTED[n]=true;
   setTimeout(()=>{try{if(Number(cur())===n)v4045AutoAnalyze20(n)}catch(e){}},100);
