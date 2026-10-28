@@ -18,3 +18,13 @@
 - 이 기록 시점 동일 서명 APK CI는 다음 단계. 실제 휴대전화 검증 미완료.
 
 다음: 원본 서명 시험 APK 빌드와 온보딩 회귀검사 확인. 공식 배포 링크는 실기기 검증 전 변경하지 않음.
+
+## 빌드 최종 확인 · 2026-10-29 01:36 KST
+- 검증 소스 970cc18405b2e0a0857be29860b21739fbfa7d25.
+- CI https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/actions/runs/40727220338 모든 단계 성공.
+- 원본 인증서 SHA256 bf281903f422fe925a23a7e72e82d690eaef899236e6d10365143ff32d9beb00 일치, package com.navigator.freedom.v3final / versionCode 40050 확인.
+- 온보딩/승인 유지·DB-1·원문·20조합·축하/낙선 음성·홈 팝업 검사 및 Android 빌드 통과.
+- APK 내 index/CSS/홈 알림 모듈이 검증 소스와 바이트 일치.
+- 시험 아티팩트 ID 12834050845: https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/actions/runs/40727220338/artifacts/12834050845
+- 공식 배포 링크는 유지, 정식 승격 없음. 휴대전화 실검증 미완료.
+- 다음 1순위: 이 시험판을 기존 앱 위에 업데이트 설치해 홈 진입/복귀 및 공식 신규 버전 알림 실제 표시 확인. 현재 공식 버전이 설치 버전 이하이면 알림이 안 뜨는 것이 정상. 테스트 목적으로 공식 버전정보/설치 URL을 변경하지 않았음.
