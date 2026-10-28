@@ -15,7 +15,7 @@ jobs:
       - name: Checkout exact isolated V4.0.49 source, never modify original branch sources
         uses: actions/checkout@v4
         with:
-          ref: e2c76c7dc95ba135978e90df9f64f861bb95c677
+          ref: 42029565d404b2a5b14fdd2898174cfcad28b5bc
           persist-credentials: false
       - name: Set up Java 17
         uses: actions/setup-java@v4
@@ -40,7 +40,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD)" = 'e2c76c7dc95ba135978e90df9f64f861bb95c677'
+          test "$(git rev-parse HEAD)" = '42029565d404b2a5b14fdd2898174cfcad28b5bc'
           node .github/scripts/validate_freedom_r14.cjs
           node .github/scripts/verify_freedom_v4043.cjs
           node .github/scripts/verify_freedom_v4043_references.cjs
@@ -83,6 +83,7 @@ jobs:
             if b'grid-template-columns:repeat(4,minmax(0,1fr))' not in css or b'v4048GoHome' not in embedded: raise SystemExit('Four-button Home control missing')
             if b'v4049Announce' not in embedded or b'showFanfare(n,outcome.highestHits,outcome.wins,outcome.bestRank)' not in embedded: raise SystemExit('Celebration hook not packaged')
             if b'z-index:2147483647!important' not in css: raise SystemExit('Fanfare overlay obscured by compact modal')
+            if b'@media(min-width:641px)' not in css or b'height:calc(100dvh - 24px)' not in css: raise SystemExit('Unfolded portrait compact overflow fix missing')
           print('PASS: signed candidate includes source-matched recovered original, scoring, DB1, and no production publication')
           PY
           mkdir -p signed_candidate_HOLD
