@@ -1818,7 +1818,7 @@ $('directorDiagnostics').addEventListener('click',function(){$('v8ConnectionChec
 function refreshDirectorRoom(){
  var ready=!!roleUrl('linkofficer');
  $('directorOriginalState').textContent=ready?'원본방 주소 등록됨 · 열기 버튼으로 대화를 이어가세요.':'원본방 주소가 아직 없습니다. 방 주소를 설정하면 연결됩니다.';
- $('directorOriginalOpen').textContent=ready?'원본 대화방 열기':'원본방 주소 등록하기';
+ $('directorOriginalOpen').textContent=ready?'원본 대화방 열기':'원본방 등록';
 }
 
 $('homeV3RoomsBack').addEventListener('click',function(){homeView('home');});

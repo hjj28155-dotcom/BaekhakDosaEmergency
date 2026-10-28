@@ -18,3 +18,10 @@
 
 ## 다음
 CI 결과 확인 및 오류 수정 → V8 동일서명 시험 APK 확인 → 통제실장 화면 최종 렌더 확인. V3는 R60 전체 native 프로젝트 및 원본 서명 해제 경로 확보 후 앱 통합/인증/폰에서 실제 전송 검증 필요.
+
+## 후속 검증 결과
+- V8.0.4 동일서명 APK CI 40726470348 성공. APK 6,592,692 bytes, SHA-256 7e5b736daa153bd678e2550923deb609cc0a897cba7411917b3a27e2603be0a0. v2 공개 인증서 SHA-256 e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be. APK 내 HTML/CSS가 수정 원본과 바이트 일치.
+- 첫 검증 CI는 폐기된 SDK tools 패키지 요청으로 실패. 현재 SDK 패키지 명시 + Android/browser 독립 job으로 수정.
+- CI 40727008078 성공: Android library assembleDebug/lintDebug, Chromium 실제 IndexedDB 보존/ACK 거부 27건, 360×740/390×844/412×915px 통제실장 방 진입·주소 설정·보고서·홈 복귀, JavaScript 오류 0.
+- 세 화면 렌더 이미지 직접 확인. 미등록 원본방 버튼의 마지막 글자 줄바꿈을 피하도록 원본방 등록으로 줄임. 최종 APK 재빌드 결과를 이어서 기록.
+- 아직 실제 V3 native host 통합/동일서명 V3 APK/단말 인증/폰 자동전송 검증은 미완료. 라이브러리 빌드 성공을 해당 작업의 완료로 간주하지 않음.
