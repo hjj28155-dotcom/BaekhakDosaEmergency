@@ -42,3 +42,13 @@
 3. 제1247회 화면에서 원문 6구절, 닫기 버튼 제목 겹침, 당첨번호, 기존 저장 조합 1~5등/낙선 결과 검증. 실제 선장 기기에서 조합 데이터가 없는 경우 “저장 조합 확인 대기” 표기가 정상.
 4. 사용자 실기기 검증 전 공식 업데이트 경로 변경·정식 배포 및 완료 선언 금지.
 5. 기존 원본 1~16회차, DB-1, V3, V7, 최초잠금 자료는 삭제·덮어쓰기·초기화하지 않음.
+
+## 시험 APK 실파일 추가 검증
+
+- ChatGPT 작업 환경에서 GitHub Actions 아티팩트 ZIP을 실제 다운로드해 `HANGHAE_FREEDOM_V4044_ORIGINAL_SIGNED_TEST_ONLY.apk`를 추출함.
+- 실 APK 바이트 크기: **48,004,558**.
+- 실 APK SHA-256: **`6da43500c1986201f97ca0c8bb1570658e564d0d77ca31e8aef90ad27b9414be`**.
+- 아티팩트에 포함된 `SHA256.txt` 기대값과 추출 APK의 새 계산값 **일치**.
+- 추출 ZIP/APK 압축 무결성 확인, `assets/index.html` 원문/채점·모바일 제목 수정 함수 내장, `assets/raw_bank.js`, `assets/db1_v1247_patch.js`, reference JS/manifest/engine 내장 확인.
+- 아티팩트의 Android package 확인자료는 `com.navigator.freedom.v3final` / `versionCode 40044` / `4.0.44-RAW-GRADE-RECOVERY`; 인증서 SHA-256은 기존 공개 지문 `bf281903f422fe925a23a7e72e82d690eaef899236e6d10365143ff32d9beb00`와 일치함.
+- APK 파일은 현재 채팅 산출물로 제공함. **정식 배포가 아니라 실기기 시험용**이며, 앱 저장공간 삭제·초기화 없이 업데이트로만 사용해야 함. 공식 배포 포인터는 계속 V4.0.36.
