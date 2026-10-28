@@ -88,6 +88,7 @@ public final class MainActivity extends Activity {
                 }
             }
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest req) {
+                if(!req.isForMainFrame())return false; // allow only WebView subresources and bundled R46 iframe
                 return route(req.getUrl());
             }
             @Override public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -250,7 +251,8 @@ public final class MainActivity extends Activity {
         if ("https".equalsIgnoreCase(uri.getScheme())
             && "hjj28155-dotcom.github.io".equalsIgnoreCase(uri.getHost())
             && ("/BaekhakDosaEmergency/crew-meeting.html".equals(uri.getPath())
-              || "/BaekhakDosaEmergency/hanghae-distribution-approval-room.html".equals(uri.getPath()))) return false;
+              || "/BaekhakDosaEmergency/hanghae-distribution-approval-room.html".equals(uri.getPath())
+              || "/BaekhakDosaEmergency/crew-captain-engine-r46.html".equals(uri.getPath()))) return false;
         if (!"https".equalsIgnoreCase(uri.getScheme())) return true;
         try {
             Intent external = new Intent(Intent.ACTION_VIEW, uri);
