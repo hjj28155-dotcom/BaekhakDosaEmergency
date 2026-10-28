@@ -1183,6 +1183,7 @@ function homeView(which){
 /* Narrow V4 navigation bridge: the original homeView/materialsSelect are IIFE-local. */
 window.captainV4Route=function(which){if(['v4','home','materials'].includes(which))homeView(which);};
 window.captainV4Select=function(kind,value){if((kind==='app'&&value==='freedom')||(kind==='stage'&&value==='db'))materialsSelect(kind,value);};
+window.captainV4ShowArchive=function(){afterSevenShowMode(false);};
 var materialApp='v3',materialStage='before',materialLast=null;
 var afterSevenSelected='all',afterSevenSerial=0,afterSevenSnapshot=null;
 var AFTER_SEVEN_ROOMS=['all','v3-1','v3-2','v3-3','v3-4','v7','v4'];
@@ -2368,6 +2369,7 @@ try{
   resetActiveAnalysis();
   field.value='';
   window.captainV4Route('materials');
+  window.captainV4ShowArchive();
   window.captainV4Select('app','freedom');
   window.captainV4Select('stage','db');
   var details=db.closest('details');if(details)details.open=true;
