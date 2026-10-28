@@ -1,4 +1,4 @@
-name: Build same-signer captain three-app research APK v1.0.23
+name: Build same-signer captain three-app research APK v1.0.24
 on:
   push:
     branches:
@@ -105,8 +105,18 @@ jobs:
           grep -Fq 'captainCumulativeOpen' "$HOME_HTML"
           grep -Fq 'crew-cumulative-after.css' "$HOME_HTML"
           grep -Fq 'crew-cumulative-after.js' "$HOME_HTML"
-          test "$(grep -c 'class="cumRoom" data-room=' "$HOME_HTML")" -eq 4
-          test "$(grep -o 'class="cumHit pending"' "$HOME_HTML" | wc -l)" -eq 20
+          test "$(grep -c 'class="cumRoom" data-room=' "$HOME_HTML")" -eq 7
+          test "$(grep -o 'class="cumHit pending"' "$HOME_HTML" | wc -l)" -eq 35
+          grep -Fq 'id="cumJumpMore"' "$HOME_HTML"
+          grep -Fq 'id="cumRoomGrid"' "$HOME_HTML"
+          grep -Fq 'data-room="v7"' "$HOME_HTML"
+          grep -Fq 'data-room="v4-1"' "$HOME_HTML"
+          grep -Fq 'data-room="v4-2"' "$HOME_HTML"
+          grep -Fq "['v3','v7','freedom'].map" "$HOME_HTML"
+          grep -Fq "grid-auto-rows:168px" crew-meeting-android/app/src/main/assets/cumulative_after_only.css
+          grep -Fq "overflow-y:auto" crew-meeting-android/app/src/main/assets/cumulative_after_only.css
+          grep -Fq "raw_predictions_included!==false" crew-meeting-android/app/src/main/assets/cumulative_after_only.js
+          grep -Fq "roomIds=['v3-1','v3-2','v3-3','v3-4','v7','v4-1','v4-2']" crew-meeting-android/app/src/main/assets/cumulative_after_only.js
           test -s crew-meeting-android/app/src/main/assets/cumulative_after_only.css
           test -s crew-meeting-android/app/src/main/assets/cumulative_after_only.js
           test -s crew-meeting-android/app/src/main/assets/official_draws_verified_17.json
@@ -135,7 +145,7 @@ jobs:
           grep -Fq 'data-material-stage="after"' "$HOME_HTML"
           grep -Fq 'V3의 과거 350회 누적 분석은 별도 보존' "$HOME_HTML"
           grep -Fq 'loadCaptainDashboard()' crew-meeting-android/app/src/main/java/kr/hanghae/crewmeeting/MainActivity.java
-          grep -Fq "versionCode 123" crew-meeting-android/app/build.gradle
+          grep -Fq "versionCode 124" crew-meeting-android/app/build.gradle
           test "$(grep -c 'data-before-room=' "$HOME_HTML")" -eq 7
           test "$(grep -c 'data-v3-room-card=' "$HOME_HTML")" -eq 4
           test "$(grep -c 'data-v3-report=' "$HOME_HTML")" -eq 4
@@ -159,20 +169,20 @@ jobs:
           "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting.compact' versionCode='123'"
           ! "$AAPT" dump badging "$APK" | grep -q "package: name='com.baekhak.dosa.v4'"
           mkdir -p crew-meeting-android/releases
-          cp "$APK" crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.23_CUMULATIVE_AFTER_ONLY.apk
-          (cd crew-meeting-android/releases && sha256sum HANGHAE_CREW_MEETING_1.0.23_CUMULATIVE_AFTER_ONLY.apk > HANGHAE_CREW_MEETING_1.0.23_CUMULATIVE_AFTER_ONLY.apk.sha256)
+          cp "$APK" crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.24_SEVEN_ROOM_AFTER_ONLY.apk
+          (cd crew-meeting-android/releases && sha256sum HANGHAE_CREW_MEETING_1.0.24_SEVEN_ROOM_AFTER_ONLY.apk > HANGHAE_CREW_MEETING_1.0.24_SEVEN_ROOM_AFTER_ONLY.apk.sha256)
       - uses: actions/upload-artifact@v4
         with:
-          name: HANGHAE-CREW-MEETING-1.0.23-CUMULATIVE-AFTER-ONLY-APK
+          name: HANGHAE-CREW-MEETING-1.0.24-SEVEN-ROOM-AFTER-ONLY-APK
           path: |
-            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.23_CUMULATIVE_AFTER_ONLY.apk
-            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.23_CUMULATIVE_AFTER_ONLY.apk.sha256
+            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.24_SEVEN_ROOM_AFTER_ONLY.apk
+            crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.24_SEVEN_ROOM_AFTER_ONLY.apk.sha256
           if-no-files-found: error
           retention-days: 30
       - name: Verify isolated APK artifact packaging
         run: |
           set -euo pipefail
-          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.23_CUMULATIVE_AFTER_ONLY.apk
-          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.23_CUMULATIVE_AFTER_ONLY.apk.sha256
-          (cd crew-meeting-android/releases && sha256sum --check HANGHAE_CREW_MEETING_1.0.23_CUMULATIVE_AFTER_ONLY.apk.sha256)
+          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.24_SEVEN_ROOM_AFTER_ONLY.apk
+          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_1.0.24_SEVEN_ROOM_AFTER_ONLY.apk.sha256
+          (cd crew-meeting-android/releases && sha256sum --check HANGHAE_CREW_MEETING_1.0.24_SEVEN_ROOM_AFTER_ONLY.apk.sha256)
           echo "TEST artifact verified. Do NOT replace the stable fixed Google Drive APK without device verification."
