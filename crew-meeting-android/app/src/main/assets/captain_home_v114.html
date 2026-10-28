@@ -779,6 +779,26 @@ main:not(.roomMode) #centralRoundPanel label{font-size:.68rem!important}
 .v4Results{flex:0 0 auto!important;height:250px!important;max-height:46vh!important}
 .v4FiveGroup ol{grid-template-rows:repeat(5,minmax(0,1fr));flex:1 1 auto}
 @media(max-height:600px){.v4Results{height:190px!important;max-height:39vh!important}}
+
+/* R20: Seven result-after report surfaces visible together, no fake scores. */
+#materialsBody.afterOverviewMode{display:flex;flex-direction:column;gap:6px;overflow:hidden!important}
+#materialsBody.afterOverviewMode> :not(#afterSevenDashboard):not(#materialsAuthGate){display:none!important}
+#afterSevenDashboard[hidden]{display:none!important}
+#afterSevenDashboard{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;gap:6px}
+.afterSevenTop{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:center;flex:none}
+.afterSevenRound{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:5px;align-items:center;min-width:0}
+.afterSevenRound label{font-size:.73rem;color:#ffe0a5;white-space:nowrap}
+.afterSevenRound input{min-width:0;width:100%;height:35px;box-sizing:border-box;padding:4px 6px;font-size:.83rem}
+.afterSevenTop button{min-height:35px;padding:5px 7px;font-size:.73rem}
+#afterSevenStatus{flex:none;font-size:.7rem;color:#e8d5b0;line-height:1.25;min-height:18px}
+.afterSevenCards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(4,minmax(0,1fr));gap:6px;flex:1 1 auto;min-height:0}
+.afterSevenCard{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:5px;text-align:left;min-width:0;min-height:0;border:1.5px solid #76abc3;border-radius:10px;background:linear-gradient(130deg,#0c4563,#06233f);color:#f4e4c0;padding:8px 10px;overflow:hidden}
+.afterSevenCard strong{font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.afterSevenCard span{font-size:.68rem;color:#d6e8f1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.afterSevenCard.selected{border-color:#f2c975;background:linear-gradient(130deg,#176584,#154362)}
+.afterSevenDetails{flex:none;min-height:31px;max-height:94px;overflow-y:auto;line-height:1.35;font-size:.7rem;color:#d5e8f2;background:#082a46;border:1px solid #49748c;border-radius:8px;padding:7px}
+.afterSevenDetails .afterSevenRecord{padding:3px 0;border-bottom:1px solid #365a71}
+@media(max-height:630px){.afterSevenCard{padding:5px 7px;gap:2px}.afterSevenCard strong{font-size:.74rem}.afterSevenCard span{font-size:.61rem}.afterSevenDetails{max-height:58px}.afterSevenTop button{font-size:.66rem}}
 </style>
 </head>
 <body>
@@ -904,8 +924,25 @@ main:not(.roomMode) #centralRoundPanel label{font-size:.68rem!important}
  <p class="materialsNote">원문·자동조합의 생성 및 확정은 실제 V3 앱에서 수행합니다. 중앙통제실은 방별 원본보고서 자동조회만 담당하며, 인증되지 않은 결과를 추첨 전 공식 실적으로 표시하지 않습니다.</p>
 </section>
 <div id="homeMaterialsPanel" hidden aria-label="V7 V3 항행의자유 통합 자료방">
- <div class="homePaneTop"><strong>📚 V3 + V7 + V4 · 결과전 보고서</strong><button id="homeMaterialsBack" type="button" class="secondary">홈으로</button></div>
+ <div class="homePaneTop"><strong id="materialsRoomTitle">📑 결과후 보고서 · 전체 7개</strong><button id="homeMaterialsBack" type="button" class="secondary">홈으로</button></div>
  <div id="materialsBody">
+ <div id="afterSevenDashboard" aria-label="전체 7개 결과후 보고서">
+  <div class="afterSevenTop">
+   <div class="afterSevenRound"><label for="afterSevenRound">조회 회차</label><input id="afterSevenRound" type="number" min="1" max="1247" inputmode="numeric" placeholder="전체"><button type="button" id="afterSevenRefresh">조회</button></div>
+   <button type="button" id="afterSevenToBefore" class="secondary">결과전 보기</button>
+  </div>
+  <div id="afterSevenStatus" role="status" aria-live="polite">선장 인증 후 결과후 원본을 조회합니다.</div>
+  <div id="afterSevenCards" class="afterSevenCards" aria-label="종합 1개와 6개 방의 결과후 현황">
+   <button type="button" data-after-seven="all" class="afterSevenCard selected"><strong>🌐 전체 종합</strong><span data-after-seven-status="all">조회 대기</span></button>
+   <button type="button" data-after-seven="v3-1" class="afterSevenCard"><strong>🧭 V3 제1방</strong><span data-after-seven-status="v3-1">조회 대기</span></button>
+   <button type="button" data-after-seven="v3-2" class="afterSevenCard"><strong>🧭 V3 제2방</strong><span data-after-seven-status="v3-2">조회 대기</span></button>
+   <button type="button" data-after-seven="v3-3" class="afterSevenCard"><strong>🧭 V3 제3방</strong><span data-after-seven-status="v3-3">조회 대기</span></button>
+   <button type="button" data-after-seven="v3-4" class="afterSevenCard"><strong>🧭 V3 제4방</strong><span data-after-seven-status="v3-4">조회 대기</span></button>
+   <button type="button" data-after-seven="v7" class="afterSevenCard"><strong>🛡️ V7 통제관방</strong><span data-after-seven-status="v7">조회 대기</span></button>
+   <button type="button" data-after-seven="v4" class="afterSevenCard"><strong>🚢 V4 항해의자유방</strong><span data-after-seven-status="v4">조회 대기</span></button>
+  </div>
+  <div id="afterSevenDetails" class="afterSevenDetails" role="region" aria-live="polite">전체 결과후 · 기록을 조회하면 확인된 자료만 표시합니다.</div>
+</div>
   <div id="materialsAuthGate" class="materialsAuthGate" hidden></div>
   <p class="materialsNote"><b>새 분석 기준: 제1회차부터 3앱 공동 재분석.</b> V3 4개 방에서 원문 15·자동 5조합, V7 원문 5조합, V4 원문 10조합으로 구분합니다. <b>V3의 과거 350회 누적 분석은 별도 보존</b>하며, 과거 재분석 결과는 추첨 전에 확정한 공식 결과전과 구분합니다.</p>
   <div id="materialsAppSelector" class="materialsGrid" aria-label="세 앱 독립 자료 원본" hidden>
@@ -1129,7 +1166,7 @@ function homeView(which){
  }
  if(which==='live'&&token)threeRoomRefresh();
  if(which==='reports'&&token)refreshV7Reports();
- if(which==='materials')startMaterialsMonitor();
+ if(which==='materials'){startMaterialsMonitor();if($('materialsBody').classList.contains('afterOverviewMode'))loadAfterSevenReports();}
  if(which==='more')$('homeMorePanel').scrollTop=0;
  if(which==='live'||which==='reports'){
    $('homeWorkspace').scrollTop=0;
@@ -1147,6 +1184,93 @@ function homeView(which){
 window.captainV4Route=function(which){if(['v4','home','materials'].includes(which))homeView(which);};
 window.captainV4Select=function(kind,value){if((kind==='app'&&value==='freedom')||(kind==='stage'&&value==='db'))materialsSelect(kind,value);};
 var materialApp='v3',materialStage='before',materialLast=null;
+var afterSevenSelected='all',afterSevenSerial=0,afterSevenSnapshot=null;
+var AFTER_SEVEN_ROOMS=['all','v3-1','v3-2','v3-3','v3-4','v7','v4'];
+function afterSevenRoomForRow(row,app){
+ var raw=String(row.room_key||row.room_id||'').trim().toLowerCase();
+ if(app==='v7'&&['v7','v7-control','control'].includes(raw))return 'v7';
+ if(app==='freedom'&&['v4','freedom','hanghae'].includes(raw))return 'v4';
+ if(app==='v3'&&['v3-1','v3-2','v3-3','v3-4'].includes(raw))return raw;
+ return null;
+}
+function afterSevenSetStatus(room,message){
+ var el=document.querySelector('[data-after-seven-status="'+room+'"]');
+ if(el)el.textContent=message;
+}
+function afterSevenShowDetails(){
+ var out=$('afterSevenDetails');out.replaceChildren();
+ if(!afterSevenSnapshot){out.textContent='결과후 원본 조회 대기';return;}
+ var scope=afterSevenSelected,records=afterSevenSnapshot.records;
+ var matches=scope==='all'?records:records.filter(function(x){return x.room===scope;});
+ var unknown=scope==='all'?afterSevenSnapshot.unassigned:afterSevenSnapshot.unassigned.filter(function(x){return (scope.indexOf('v3-')===0&&x.app==='v3')||(scope==='v7'&&x.app==='v7')||(scope==='v4'&&x.app==='freedom');});
+ var title=document.createElement('strong');
+ title.textContent=(scope==='all'?'전체 종합':({'v3-1':'V3 제1방','v3-2':'V3 제2방','v3-3':'V3 제3방','v3-4':'V3 제4방','v7':'V7 통제관방','v4':'V4 항해의자유방'}[scope]))+' · 결과후 기록 '+matches.length+'건';
+ out.append(title);
+ matches.slice(0,12).forEach(function(x){
+  var line=document.createElement('div');line.className='afterSevenRecord';
+  line.textContent='제'+x.row.round_no+'회 · '+x.room.toUpperCase()+' · '+(x.row.status||'상태 미등록')+' · '+(x.row.graded_at||x.row.created_at||'날짜 미등록');
+  out.append(line);
+ });
+ if(unknown.length){var hint=document.createElement('div');hint.className='afterSevenRecord';hint.textContent='앱 단위 기록 '+unknown.length+'건은 방 구분이 확인되지 않아 개별 방에 합산하지 않습니다.';out.append(hint);}
+ if(!matches.length&&!unknown.length){var hint=document.createElement('div');hint.textContent='연결된 결과후 원본 기록 없음 · 0점 또는 미분석으로 간주하지 않음';out.append(hint);}
+}
+function afterSevenChoose(room){
+ if(!AFTER_SEVEN_ROOMS.includes(room))return;
+ afterSevenSelected=room;
+ document.querySelectorAll('[data-after-seven]').forEach(function(el){el.classList.toggle('selected',el.getAttribute('data-after-seven')===room);});
+ afterSevenShowDetails();
+}
+document.querySelectorAll('[data-after-seven]').forEach(function(el){el.addEventListener('click',function(){afterSevenChoose(el.getAttribute('data-after-seven'));});});
+function afterSevenShowMode(active){
+ $('materialsBody').classList.toggle('afterOverviewMode',active);
+ $('afterSevenDashboard').hidden=!active;
+ $('materialsRoomTitle').textContent=active?'📑 결과후 보고서 · 전체 7개':'📚 V3 + V7 + V4 · 결과전 보고서';
+ if(active)loadAfterSevenReports();else{++afterSevenSerial;materialsSelect('stage','before');}
+}
+$('afterSevenToBefore').addEventListener('click',function(){afterSevenShowMode(false);});
+async function loadAfterSevenReports(){
+ var serial=++afterSevenSerial;
+ if(HOME_SELECTED!=='materials'||!$('materialsBody').classList.contains('afterOverviewMode'))return;
+ var round=String($('afterSevenRound').value||'').trim();
+ if(round&&(!/^[1-9][0-9]*$/.test(round)||Number(round)>1247)){
+  $('afterSevenStatus').textContent='회차는 1~1247 사이로 입력하세요.';return;
+ }
+ afterSevenSnapshot=null;
+ AFTER_SEVEN_ROOMS.forEach(function(room){afterSevenSetStatus(room,'조회 중…');});
+ $('afterSevenDetails').textContent='결과후 원본 조회 중…';
+ if(!token){
+  AFTER_SEVEN_ROOMS.forEach(function(room){afterSevenSetStatus(room,'선장 인증 필요');});
+  $('afterSevenStatus').textContent='선장 인증 후 3앱 결과후 기록을 조회합니다.';
+  $('afterSevenDetails').textContent='아직 인증된 결과후 기록을 표시할 수 없습니다.';return;
+ }
+ $('afterSevenStatus').textContent='V3 · V7 · V4 결과후 원본 조회 중…';
+ var apps=['v3','v7','freedom'];
+ var results=await Promise.all(apps.map(function(app){return fetchThreeAppMetadata(app,'after',round||null).then(function(data){return {app:app,data:data};},function(error){return {app:app,error:String(error&&error.message||error)};});}));
+ if(serial!==afterSevenSerial||HOME_SELECTED!=='materials'||!$('materialsBody').classList.contains('afterOverviewMode'))return;
+ var records=[],unassigned=[],states={};
+ results.forEach(function(x){
+  if(x.error){states[x.app]='조회 실패';return;}
+  if(!x.data.linked){states[x.app]='원본 연동 대기';return;}
+  states[x.app]='연동됨';
+  x.data.items.forEach(function(row){
+   var room=afterSevenRoomForRow(row,x.app);
+   if(room)records.push({app:x.app,room:room,row:row});
+   else unassigned.push({app:x.app,row:row});
+  });
+ });
+ afterSevenSnapshot={records:records,unassigned:unassigned,states:states};
+ AFTER_SEVEN_ROOMS.forEach(function(room){
+  if(room==='all'){afterSevenSetStatus(room,records.length+'건 확인 · 미분류 '+unassigned.length+'건');return;}
+  var app=room.indexOf('v3-')===0?'v3':room==='v7'?'v7':'freedom';
+  var count=records.filter(function(x){return x.room===room;}).length;
+  afterSevenSetStatus(room,states[app]==='연동됨'?(count?count+'건 확인':'기록 없음 / 방별 확인 대기'):states[app]);
+ });
+ $('afterSevenStatus').textContent='결과후 메타 조회 · 7개 화면 · 원본 수정 없음';
+ afterSevenShowDetails();
+}
+$('afterSevenRefresh').addEventListener('click',loadAfterSevenReports);
+$('afterSevenRound').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();loadAfterSevenReports();}});
+
 var selectedBeforeRoom='all';
 var SIX_ROOM_FEED='https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/crew-six-room-before-feed';
 var SIX_ROOMS=['v3-1','v3-2','v3-3','v3-4','v7','v4'];
@@ -1387,7 +1511,7 @@ document.querySelectorAll('[data-v3-report]').forEach(function(button){
   loadIntegratedMaterials();
  });
 });
-$('homeMaterialsBtn').addEventListener('click',function(){homeView(HOME_SELECTED==='materials'?'home':'materials');if(HOME_SELECTED==='materials')loadIntegratedMaterials();});
+$('homeMaterialsBtn').addEventListener('click',function(){homeView(HOME_SELECTED==='materials'?'home':'materials');if(HOME_SELECTED==='materials')afterSevenShowMode(true);});
 $('homeMaterialsBack').addEventListener('click',function(){homeView('home');});
 $('homeApprovalBackBtn').addEventListener('click',function(){homeView('home');});
 $('homeLiveBtn').addEventListener('click',function(){homeView('live');});
@@ -1402,6 +1526,9 @@ document.querySelectorAll('#appCommandDeck [data-open-material]').forEach(functi
   var app=button.getAttribute('data-open-material');
   if(!['v3','v7','freedom'].includes(app))return;
   homeView('materials');
+  $('materialsBody').classList.remove('afterOverviewMode');
+  $('afterSevenDashboard').hidden=true;
+  $('materialsRoomTitle').textContent='📚 V3 + V7 + V4 · 결과전 보고서';
   materialsSelect('app',app);
  });
 });
