@@ -884,7 +884,7 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
 <nav id="homeQuickActions" aria-label="홈 주요 기능">
  <button type="button" id="homeLiveBtn" aria-controls="homeWorkspace">📡<span>실시간 소통방</span></button>
  <button type="button" id="homeReportBtn" aria-controls="homeWorkspace">📑<span>보고서</span></button>
- <a id="crewUpdateOpen" href="https://drive.google.com/file/d/1Ddg-fGo2q3JfowTjRTNUxmXPQ46CkUZL/view?usp=drivesdk" aria-label="구글드라이브 공동회의 최신 APK 업데이트">⬇️<span>업데이트</span></a>
+ <a id="crewUpdateOpen" href="https://drive.google.com/file/d/1NtFkXk2HPqUOPsp2K-as29r9SHgKJmYc/view?usp=drivesdk" aria-label="구글드라이브 공동회의 최신 APK 업데이트">⬇️<span>업데이트</span></a>
  <button type="button" id="homeMoreBtn" aria-controls="homeMorePanel" aria-expanded="false">☰<span>더보기</span></button>
 </nav>
 <!-- Captain-only three-app management deck. Public Freedom APK is distributed elsewhere. -->
@@ -894,7 +894,7 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
   <strong>🔁 제1회차부터 재분석 · 새 연구 시작 기준</strong>
   <span><b>V3</b> 새 분석 준비 <em>제1회차부터</em></span>
   <span><b>V7</b> 새 연구 1회차부터 <em>시작 전</em></span>
-  <span><b>V4</b> 새 연구 1회차부터 <em>시작 전</em></span>
+  <span><b>V4</b> 선장 R46 수신증 조회 <em>연락관 원본 대기</em></span>
  </div>
  <div id="installedAppBar" aria-label="세 앱의 독립 관리 카드">
   <div class="installedAppUnit appDeckCard" data-app-card="v3">
@@ -1090,9 +1090,9 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
 <div class="scoreGrade" data-grade="5"><strong>5/6</strong><output data-score-grade="5">—</output><small data-score-grade-percent="5">—%</small></div>
 <div class="scoreGrade" data-grade="6"><strong>5/6+보너스</strong><output data-score-grade="6">—</output><small data-score-grade-percent="6">—%</small></div>
 <div class="scoreGrade" data-grade="7"><strong>6/6</strong><output data-score-grade="7">—</output><small data-score-grade-percent="7">—%</small></div></div>
-  <div class="scoreTotals"><div><small>총회수 (채점 완료 조합)</small><strong id="scoreTotalCount">미집계</strong></div><div><small>총성공확률</small><strong id="scoreSuccessPercent">—%</strong></div></div>
+  <div class="scoreTotals"><div><small>총회수 (검증된 연구 조합)</small><strong id="scoreTotalCount">미집계</strong></div><div><small>총성공확률 · 연구 표본만</small><strong id="scoreSuccessPercent">—%</strong></div></div>
   <div class="scoreThreshold"><label for="scoreSuccessThreshold">성공 기준</label><select id="scoreSuccessThreshold"><option value="3">3/6 이상</option><option value="4">4/6 이상</option><option value="5">5/6 이상 (보너스 포함)</option><option value="6">6/6</option></select></div>
-  <div class="scoreHint">백분율 = 해당 적중등급 조합수 ÷ 채점 완료 조합수 × 100<br>총성공확률 = 선택한 성공 기준 이상 적중 조합수 ÷ 채점 완료 조합수 × 100<br>동일 회차·방·조합의 중복 기록은 합산하지 않습니다.</div>
+  <div class="scoreHint">과거 재분석 성적은 추첨 전 공식 구매 성적이나 미래 당첨 확률이 아닙니다. 미수신 방은 미집계로 표시합니다. 백분율 = 해당 적중등급 조합수 ÷ 채점 완료 조합수 × 100<br>총성공확률 = 선택한 성공 기준 이상 적중 조합수 ÷ 채점 완료 조합수 × 100<br>동일 회차·방·조합의 중복 기록은 합산하지 않습니다.</div>
   <div class="scoreRoomTitle">방별 누적 성적</div>
   <div class="scoreRooms" aria-label="7방과 전체 합계 누적 성적"><article class="scoreRoom" data-score-room="all"><strong>전체 7방 합계</strong><span>채점 <output data-score-total="all">미집계</output></span><span>성공 <output data-score-success="all">—%</output></span></article>
 <article class="scoreRoom" data-score-room="v3-1"><strong>V3 도사방</strong><span>채점 <output data-score-total="v3-1">미집계</output></span><span>성공 <output data-score-success="v3-1">—%</output></span></article>
@@ -1380,6 +1380,17 @@ window.captainEngineRoundRead=async function(round){
  var response=await fetch(url.href,{method:'GET',headers:{Authorization:'Bearer '+token},cache:'no-store'});
  if(!response.ok)throw Error('ROUND_RECEIPTS_HTTP_'+response.status);
  return response.json();
+};
+window.captainSevenRoomScoreRead=async function(round){
+ if(!token)throw Error('CAPTAIN_AUTH_REQUIRED');
+ if(round!==null&&(!Number.isInteger(round)||round<1||round>1247))throw Error('INVALID_ROUND');
+ var url=new URL('https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/crew-seven-room-research-scores');
+ if(round!==null)url.searchParams.set('round',String(round));
+ var response=await fetch(url.href,{method:'GET',headers:{Authorization:'Bearer '+token},cache:'no-store'});
+ if(!response.ok)throw Error('SEVEN_ROOM_SCORES_HTTP_'+response.status);
+ var result=await response.json();
+ if(!result||result.ok!==true||result.read_only!==true||result.scope!=='SEVEN_ROOM_RESEARCH_ONLY'||result.official_eligible!==false)throw Error('UNVERIFIED_SCORE_CONTRACT');
+ return result;
 };
 window.captainEngineRoundSave=async function(detail){
  if(!token)throw Error('CAPTAIN_AUTH_REQUIRED');
@@ -1720,7 +1731,7 @@ async function loadSixRoomResultBefore(serial,round){
   result.items.forEach(function(item){
    var tile=document.createElement('div');tile.className='matRecord';
    tile.textContent=item.room_id.toUpperCase()+' · 제'+item.round_no+'회 · 결과전 형식 · '+item.filename+
-     ' · '+(item.verification==='PRE_DRAW_METADATA_ONLY'?'추첨 전 등록 메타(독립 감사 대기)':'과거 재분석/시점 미검증')+
+     ' · '+(item.verification==='PRE_DRAW_METADATA_ONLY'?'추첨 전 등록 메타(독립 감사 대기)':item.verification==='RETROSPECTIVE_R46_DB1_RECEIPT_VERIFIED'?'R46 DB-1 연구 수신증 무결성 검증(공식 아님)':'과거 재분석/시점 미검증')+
      ' · '+(item.created_at||'등록시각 확인 전');
    $('materialsList').append(tile);
   });
