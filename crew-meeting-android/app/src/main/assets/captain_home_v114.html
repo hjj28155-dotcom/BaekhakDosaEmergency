@@ -881,7 +881,6 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
 <div id="originalChatBar" role="navigation" aria-label="선장·항해사·통제관·통제실장 원본 ChatGPT 대화방 바로가기">
 <button type="button" id="originalCaptain">⚓ 선장<br>원본방</button>
 <button type="button" id="originalNavigator">🧭 항해사<br>V3 전담</button>
-<button type="button" id="originalController">🛡️ 통제관<br>V7 전담</button>
 <button type="button" id="originalLinkofficer">🔗 통제실장<br>원본방</button>
  </div>
  <button type="button" id="v8ConnectionCheck" aria-controls="v8LinkDiagnostics" aria-label="중앙통제실 실제 연결 상태 확인">원본방 주소 확인 · 앱 실행 점검</button>
@@ -890,7 +889,7 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
  <nav id="homeQuickActions" aria-label="홈 주요 기능">
  <button type="button" id="homeLiveBtn" aria-controls="homeWorkspace">📡<span>실시간 소통방</span></button>
  <button type="button" id="homeReportBtn" aria-controls="homeWorkspace">📑<span>보고서</span></button>
- <button id="crewUpdateOpen" type="button" disabled aria-label="V8 정식 APK 배포 링크 미검증. 선장 확인 전 업데이트 차단">🔒<span>V8 배포대기</span></button>
+ <button id="crewUpdateOpen" type="button" aria-label="V8 업데이트 상태 확인">⬇️<span>업데이트 확인</span></button>
  <button type="button" id="homeMoreBtn" aria-controls="homeMorePanel" aria-expanded="false">☰<span>더보기</span></button>
 </nav>
 <!-- Captain-only three-app management deck. Public Freedom APK is distributed elsewhere. -->
@@ -899,10 +898,9 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
  <div id="captainAnalysisBaseline" class="analysisBaseline" role="status" aria-label="선장이 확인한 분석 진행 현황">
   <strong>🔁 제1회차부터 재분석 · 새 연구 시작 기준</strong>
   <span><b>V3</b> 새 분석 준비 <em>제1회차부터</em></span>
-  <span><b>V7</b> 새 연구 1회차부터 <em>시작 전</em></span>
   <span><b>V4</b> 선장 R46 수신증 조회 <em>통제실장 원본 대기</em></span>
  </div>
- <div id="installedAppBar" aria-label="세 앱의 독립 관리 카드">
+ <div id="installedAppBar" aria-label="V3·V4·V8 독립 관리 카드">
   <div class="installedAppUnit appDeckCard" data-app-card="v3">
    <div class="deckAppIcon" aria-hidden="true">🧭</div>
    <strong>항해사 V3</strong>
@@ -910,15 +908,6 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
    <div class="deckCardActions">
     <button type="button" id="openV3Rooms" class="deckAction" aria-controls="homeV3RoomsPanel" aria-label="V3 항해사 4개 방 관리 화면 열기">4개 방 관리</button>
     <button type="button" id="openInstalledV3" class="deckAction deckSecondary" aria-label="기존 설치된 항해사 V3 앱 열기">V3 앱 열기</button>
-   </div>
-  </div>
-  <div class="installedAppUnit appDeckCard" data-app-card="v7">
-   <div class="deckAppIcon" aria-hidden="true">🛡️</div>
-   <strong>통제관 V7</strong>
-   <small>원문 5조합 · 제1회차부터</small>
-   <div class="deckCardActions">
-    <button type="button" id="openInstalledV7" class="deckAction" aria-label="설치된 통제관 V7 앱 열기">앱 열기</button>
-    <button type="button" class="deckAction deckSecondary" data-open-material="v7" aria-label="V7 읽기 전용 자료 관리방 열기">기록 보기</button>
    </div>
   </div>
   <div class="installedAppUnit appDeckCard" data-app-card="freedom">
@@ -937,6 +926,15 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
    <div class="deckCardActions">
     <button type="button" id="v8DirectorQuick" class="deckAction" aria-label="통제실장 원본 대화방 열기">통제실장방</button>
     <button type="button" id="v8RoomQuick" class="deckAction deckSecondary" aria-label="V8 실시간 소통방 열기">소통방</button>
+   </div>
+  </div>
+  <div class="installedAppUnit appDeckCard" data-app-card="v3server">
+   <div class="deckAppIcon" aria-hidden="true">📡</div>
+   <strong>V3 서버 연결</strong>
+   <small>V8 독립 결과전 수신기</small>
+   <div class="deckCardActions">
+    <button type="button" id="v8ServerQuick" class="deckAction">서버 점검</button>
+    <button type="button" id="v8DeviceQuick" class="deckAction deckSecondary">단말 등록</button>
    </div>
   </div>
  </div>
@@ -1009,11 +1007,11 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
   <button id="centralRoundLookup" type="button">회차 조회</button>
   <button id="centralRoundAll" type="button" class="secondary">전체 목록</button>
  </div>
- <small>세 앱의 원본은 각 앱에 보존합니다. V7은 인증된 읽기 전용 조회, V3는 내보낸 자료 조회입니다. 배포판은 현회차 포함 최근 5회차만 이용합니다.</small>
+ <small>기존 원본은 각각 보존합니다. V3는 내보낸 자료 조회이며 자동전송은 아직 연결되지 않았습니다. 배포판은 현회차 포함 최근 5회차만 이용합니다.</small>
 </div>
 <div id="homeOverview">
  <div class="homeShip">⚓</div>
- <strong>V3 350회 분석 보고 · V7/V4 원본 연결 점검</strong>
+ <strong>V3 350회 분석 보고 · V4 원본 연결 점검</strong>
  <p>담당자를 선택하거나 아래 메뉴를 이용하세요.</p>
  <small>실시간 기록은 공유 서버에서 확인합니다.</small>
 </div>
@@ -1203,9 +1201,9 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
    <div class="v8DiagnosticActions">
     <button type="button" id="v8SetupOriginals">원본방 주소 등록</button>
     <button type="button" id="v8PickV3">V3 앱 실행/선택</button>
-    <button type="button" id="v8PickV7">V7 앱 선택</button>
+    <button type="button" id="v8CheckV3Server">V3 수신기 점검</button>
    </div>
-   <small>원본 ChatGPT 대화방은 주소 등록 후 외부 앱에서 열립니다. V3/V7 앱 실행은 데이터 자동 동기화가 아닙니다. V3 결과전 자동전송·서버 공식접수는 별도 미구현이며, V7 서버 자료는 인증 후 읽기 전용으로 조회합니다.</small>
+   <small>원본 ChatGPT 대화방은 주소 등록 후 외부 앱에서 열립니다. V3 앱 실행은 데이터 자동 동기화가 아닙니다. V8 수신 서버는 운영 중이지만 V3 R60 자동송신·단말 인증은 미연결입니다.</small>
   </section>
   <div id="homeMoreTools"></div>
  <details id="homeTrialDrawer"><summary>시험 대화 · 파일 · 세부 점검</summary><div id="homeTrialDock"></div></details>
@@ -1278,7 +1276,7 @@ main.roomMode > #freedomAnalysisPanel:not([hidden]){padding:4px!important;gap:5p
 <div id="originalRolePicker" class="actions" aria-label="선장과 세 담당자 원본방 선택">
 <button type="button" data-original-role="captain" class="secondary">⚓ 선장</button>
 <button type="button" data-original-role="navigator" class="secondary">🧭 항해사</button>
-<button type="button" data-original-role="controller" class="secondary">🛡️ 통제관</button>
+
 <button type="button" data-original-role="linkofficer" class="secondary">🔗 통제실장</button>
 </div>
 <div class="actions"><button id="originalChatSave" type="button">현재방 주소 저장</button><button id="previousOriginalChat" type="button" class="secondary" hidden>이전방 열기</button><button id="originalChatCancel" type="button" class="secondary">닫기</button></div>
@@ -1875,7 +1873,6 @@ function requestInstalledLaunch(role,selectAgain){
  }
 }
 $('openInstalledV3').addEventListener('click',function(){requestInstalledLaunch('v3',false);});
-$('openInstalledV7').addEventListener('click',function(){requestInstalledLaunch('v7',false);});
 /* Central-control lookup uses existing read-only reports; no report duplication or edits. */
 (function(){
  var input=$('centralRoundInput'),lookup=$('centralRoundLookup'),all=$('centralRoundAll');
@@ -1903,7 +1900,7 @@ var ORIGINAL_ROLE_PREFIX='crew_meeting_direct_original_';
 var ORIGINAL_HISTORY_PREFIX='crew_meeting_original_history_v1_';
 var originalLinks={},editingRole=null;
 var origNames={captain:'⚓ 선장',navigator:'🧭 항해사',controller:'🛡️ 통제관',linkofficer:'🔗 통제실장'};
-var origButtons={captain:'originalCaptain',navigator:'originalNavigator',controller:'originalController',linkofficer:'originalLinkofficer'};
+var origButtons={captain:'originalCaptain',navigator:'originalNavigator',linkofficer:'originalLinkofficer'};
 function validOriginalUrl(input){
  var u=new URL(String(input||'').trim()),p=u.pathname.split('/').filter(Boolean),uid=/^[0-9a-f-]{36}$/i;
  var ok=(p.length===2&&p[0]==='c'&&uid.test(p[1]))||(p.length===4&&p[0]==='g'&&/^g-[a-z0-9-]+$/i.test(p[1])&&p[2]==='c'&&uid.test(p[3]));
@@ -1958,14 +1955,14 @@ function rememberRoleUrl(role,url){
    var response=JSON.parse(window.CrewInstalledApps.getLaunchState());
    if(response&&typeof response==='object')nativeStates=response;
   }}catch(e){}
-  var selected=['v3','v7'].filter(function(role){return nativeStates[role]==='SELECTED';}).length;
+  var selected=nativeStates.v3==='SELECTED'?1:0;
   var available=nativeStates.v3==='AVAILABLE';
-  var summary='원본방 '+registered+'/4 주소 · 설치 앱 '+selected+'/2 지정 · 서버 '+(captainServerVerified?'인증됨':'인증 전');
+  var summary='원본방 '+registered+'/3 주소 · V3 앱 '+selected+'/1 지정 · 서버 '+(captainServerVerified?'인증됨':'인증 전');
   $('v8ConnectionCheck').textContent='🔎 '+summary;
   $('v8DiagnosticSummary').textContent=summary;
-  $('v8DiagnosticOriginal').textContent=registered===4?'원본방 4개 주소 등록됨 · 외부 ChatGPT에서 실제 대화 가능 여부는 별도 확인':'원본방 '+(4-registered)+'개 주소 미등록 · 해당 바로가기 터치 시 주소 설정 화면으로 이동';
-  $('v8DiagnosticNative').textContent='V3: '+(nativeStates.v3==='SELECTED'?'실행 대상 지정됨':available?'설치된 V3 감지 · 터치 시 직접 실행':'실행 대상 미지정')+' / V7: '+(nativeStates.v7==='SELECTED'?'실행 대상 지정됨':'실행 대상 미지정 · 첫 실행 때 선택 필요')+' · 앱 간 DB 자동 공유 없음';
-  $('v8DiagnosticServer').textContent=captainServerVerified?'공동회의 서버 인증 확인됨 · V7 자료는 별도 조회 필요':'공동회의 서버 인증 전 · 실시간 소통·V7 기록 조회에 입장키 인증 필요';
+  $('v8DiagnosticOriginal').textContent=registered===3?'원본방 3개 주소 등록됨 · 외부 ChatGPT에서 실제 대화 가능 여부는 별도 확인':'원본방 '+(3-registered)+'개 주소 미등록 · 해당 바로가기 터치 시 주소 설정 화면으로 이동';
+  $('v8DiagnosticNative').textContent='V3: '+(nativeStates.v3==='SELECTED'?'실행 대상 지정됨':available?'설치된 V3 감지 · 터치 시 직접 실행':'실행 대상 미지정')+' · V3 보고서 자동전송은 별도 연결 필요';
+  $('v8DiagnosticServer').textContent=captainServerVerified?'V8 공동회의 서버 인증 확인됨 · V3 전송은 별도 인증 필요':'V8 공동회의 서버 인증 전 · V3 수신기는 아래에서 개별 확인';
  }
  function redrawOriginalButtons(){
  Object.keys(origButtons).forEach(function(role){
@@ -2040,9 +2037,20 @@ $('originalChatSave').addEventListener('click',async function(){
 });
  redrawOriginalButtons();
  $('v8ConnectionCheck').addEventListener('click',function(){homeView('more');refreshV8ConnectionStatus();$('v8LinkDiagnostics').scrollIntoView({block:'start'});});
+ $('crewUpdateOpen').addEventListener('click',function(){homeView('more');refreshV8ConnectionStatus();$('v8DiagnosticServer').textContent='V8 업데이트 상태: 동일 서명 정식 APK 배포 링크 검증 전 · 기존 앱은 삭제하지 마세요.';$('v8LinkDiagnostics').scrollIntoView({block:'start'});});
  $('v8SetupOriginals').addEventListener('click',function(){editOriginalRole('captain');});
  $('v8PickV3').addEventListener('click',function(){requestInstalledLaunch('v3',true);});
- $('v8PickV7').addEventListener('click',function(){requestInstalledLaunch('v7',true);});
+ $('v8CheckV3Server').addEventListener('click',async function(){
+  var target=$('v8DiagnosticServer');target.textContent='V3 결과전 수신 서버 확인 중…';
+  try{var response=await fetch('https://jyqkohpeowkhuaohlezc.supabase.co/functions/v1/v8-v3-resultbefore-receive/health',{cache:'no-store'});
+   var data=await response.json();
+   target.textContent=response.ok&&data.ok===true&&data.v7_dependency===false?
+    'V8 V3 수신기 서버 정상 · V3 R60 휴대전화 자동송신·인증은 아직 미연결':
+    'V8 V3 수신기 응답 검증 실패 · 자동연동 확인 전';
+  }catch(e){target.textContent='V8 V3 수신기 네트워크 확인 실패 · 자동연동 확인 전';}
+ });
+ $('v8ServerQuick').addEventListener('click',function(){homeView('more');$('v8CheckV3Server').click();$('v8LinkDiagnostics').scrollIntoView({block:'start'});});
+ $('v8DeviceQuick').addEventListener('click',function(){homeView('more');$('v8DiagnosticServer').textContent='V3 R60에는 단말별 인증 등록 및 자동송신 기능이 아직 없습니다. V3 동일 서명 업데이트가 필요합니다.';$('v8LinkDiagnostics').scrollIntoView({block:'start'});});
  window.addEventListener('focus',refreshV8ConnectionStatus);
  document.addEventListener('visibilitychange',function(){if(!document.hidden)refreshV8ConnectionStatus();});
 
