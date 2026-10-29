@@ -77,6 +77,7 @@ const root={
 };
 vm.createContext(root);
 vm.runInContext(gameFunctions+'\n'+groupFunctions+'\n'+newest,root,{timeout:10000});
+root.v4053ResearchVoice=(round,outcome)=>played.push({type:'research',args:[round,outcome]});
 function drain(){let limit=500;while(queue.length&&limit-->0)queue.shift()();assert.ok(limit>0,'queued task loop must finish')}
 function copyData(x){return JSON.parse(JSON.stringify(x))}
 const lockedBefore=copyData(D.rounds['1247']);
@@ -140,8 +141,8 @@ assert.deepEqual(copyData(D.rounds['1247']),lockedBefore);
 assert.deepEqual(researchBefore,{});
 
 // Extra voice checks: draw pending must remain silent; bonus-based second place
-// must use "2등", replay only on a real user action, and afterdraw research never
-// produces a false purchased-ticket celebration or consolation.
+// must use "2등", replay only on a real user action, and afterdraw research
+// must speak in an explicitly labelled non-purchased comparison mode.
 selection=1248;
 assert.equal(root.v4049Announce(1248,false),false,'before official draw no voice');
 assert.equal(played.length,0);
@@ -165,8 +166,9 @@ assert.equal(played.at(-1).args[1],0,'best matching count reported honestly');
 const prior=played.length;
 D.rounds['1245']={analysisResearch:{auto20:test20},score:{source:'동행복권 자동조회',result:draw,bonus:String(bon)}};
 selection=1245;
-assert.equal(root.v4049Announce(1245,true),false,'afterdraw research cannot imitate saved purchase result');
-assert.equal(played.length,prior);
+assert.equal(root.v4049Announce(1245,true),true,'afterdraw research receives an explicit research-only voice comparison');
+assert.equal(played.length,prior+1);
+assert.equal(played.at(-1).type,'research','never count retrospective comparison as purchased 1~5등 result');
 D.rounds['1245']={};
 assert.equal(root.v4049Announce(1245,true),false,'missing original tickets must remain silent');
 selection=1248;
