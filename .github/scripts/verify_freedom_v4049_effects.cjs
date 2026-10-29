@@ -29,8 +29,8 @@ for(const [g,source] of [[[1,2,8,9,10,11],'saved'],[[1,8,9,10,11,12],'saved'],[[
  runTimers();
  assert.equal(output().length,before+1);
  const last=output().at(-1);assert.equal(last[0],'lose','ONLY speak consolation');
- if(source==='research'){assert.match(last[1],/사후 연구/);assert.doesNotMatch(last[1],/실제 구매 당첨 기록/)}
- else assert.match(last[1],/낙첨입니다/);
+ assert.equal(last[1],`아쉽습니다. 제${round}회는 낙첨입니다. 다음 회차에는 더 좋은 결과를 기대하겠습니다.`,'saved and research must use EXACT SAME SPOKEN TEXT');
+ if(source==='research')assert.match(nodes.comfortBottom.textContent,/실제 구매 성적 아님/,'research provenance remains visual');
  assert.equal(ctx.v4049Announce(round,false),false,'same loss must not repeat automatically');runTimers();assert.equal(output().length,before+1);
  assert.equal(ctx.v4049Announce(round,true),true,'explicit losing message replay');runTimers();assert.equal(output().length,before+2);
 }
@@ -49,7 +49,7 @@ for(const [n,source,combo,sounds] of [
  round=n;const prior=output().length;
  assert.equal(announce(games(combo),winning,source),sounds,'each round follows only-loss policy');
  runTimers();assert.equal(output().length,prior+(sounds?1:0));
- if(sounds)assert.match(output().at(-1)[1],new RegExp('제'+n+'회'));
+ if(sounds)assert.equal(output().at(-1)[1],`아쉽습니다. 제${n}회는 낙첨입니다. 다음 회차에는 더 좋은 결과를 기대하겠습니다.`,'all five rounds use identical template');
 }
 // Home cancellation must abort queued losing speech and not modify tickets.
 const prior=output().length;
@@ -70,7 +70,7 @@ assert.match(html,/if\(outcome[.]wins>0\)return false/);
 assert.doesNotMatch(html,/if\(researchOnly\)v4053ResearchVoice/);
 const java=fs.readFileSync(base+'src/main/java/com/baekhak/centralcontrol/MainActivity.java','utf8');
 assert.match(java,/scoreVoiceHandler.removeCallbacksAndMessages\(null\);\s*pendingScoreSpeech = null;/);
-console.log('PASS: V4.0.54 only one concise 낙첨 voice for zero wins, saved/research provenance, consecutive rounds, 1~5 visual ranks, winning silence, repeat control, browser/native TTS, Home cancel, originals preserved.');
+console.log('PASS: V4.0.55 uniform concise 낙첨 voice for zero wins, saved/research provenance, consecutive rounds, 1~5 visual ranks, winning silence, repeat control, browser/native TTS, Home cancel, originals preserved.');
 // V4.0.52 regression: same-score redraw preserves a losing TTS queued or playing.
 ctx.window.BaekhakNative=native;
 ctx.window.innerHeight=768;ctx.window.addEventListener=()=>{};
