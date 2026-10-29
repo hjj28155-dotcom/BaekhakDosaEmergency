@@ -12,3 +12,11 @@
 - V3 자동연동 미완료, V7 서버 삭제 미실행 상태 유지. 원본/인증/잠금 삭제나 초기화 없음.
 
 검증 예정: 360/390/412px에서 원문분석의 통제실장 진입/복귀, 배포판 화면 분리, mock native 설치/미설치 및 실행요청, 고정 Drive href, 기존 간소화 기능 회귀. 실제 폰 설치/다른 앱 실행은 CI 모의 브리지와 구분.
+
+## 최종 검증 및 이사 인계
+- 최종 기능 소스 d98690cc3243bb81a6cc60a062b22b856472b38c. PNG 제목도 통제실장 원문분석으로 변경하고 확대/저장 버튼 줄바꿈 개선.
+- 최종 동일서명 APK CI 40732820098, browser+Android library CI40732813824 전체 성공. 360/390/412px 원문분석/복귀/배포판 분리/모의설치 및 미설치/실행요청/Drive주소 및 기존 간소화 회귀 통과. 렌더 직접 확인.
+- 최종 APK 6,596,200 bytes, SHA-256 225de7c3aabdd45a1f91248ad37a4808976c76fa020714b75fd94c29e062dfa6. HTML/CSS/renderer 바이트 일치, multidex 전체에서 native 배포판 bridge 존재 확인. 실제 휴대전화 설치/다른 앱 실행 미검증.
+- APK Drive1rpQKIVuSWo92dL0QCY6dGL64JlRpJ0Ty, 업로드와 메타데이터 크기 재확인 완료.
+- 선장 새 대화방 이사 지시. 인계서 https://drive.google.com/file/d/1g4p1EPxRAXb9MIyKHZ-4cfoTO-fEuDF6/view 저장·메타데이터 확인 완료. 저장소 worklogs/2026-10-29-chat-move-handoff-v8-806.md에도 보존.
+- 다음: V8.0.6 폰 검증/필요 수정 → V3 native host통합·동일서명APK·단말인증·실제자동전송 검증. V7 서버원본 삭제 미실행, 기존자료 보존.
