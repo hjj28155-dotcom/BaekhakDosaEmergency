@@ -2007,9 +2007,8 @@ function v4054LossVoice(round,outcome,researchOnly){
  stopScoreAudio();
  const overlay=document.getElementById('comfortOverlay');
  if(!overlay)return false;
- const text=researchOnly
-  ?'아쉽습니다. 제'+round+'회 사후 연구 20조합은 3개 이상 일치한 조합이 없습니다. 다음 회차를 기대하겠습니다.'
-  :'아쉽습니다. 제'+round+'회는 낙첨입니다. 다음 회차에는 더 좋은 결과를 기대하겠습니다.';
+ // All five rounds use the exact same short spoken script. Research status stays visual-only.
+ const text='아쉽습니다. 제'+round+'회는 낙첨입니다. 다음 회차에는 더 좋은 결과를 기대하겠습니다.';
  document.getElementById('comfortTitle').textContent='제'+round+'회 · 낙첨 안내';
  document.getElementById('comfortText').textContent=researchOnly
   ?'사후 연구 결과 · 3개 이상 일치한 조합 없음'
