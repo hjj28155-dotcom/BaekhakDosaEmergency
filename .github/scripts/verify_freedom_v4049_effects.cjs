@@ -24,7 +24,28 @@ for(const [g,rank] of [[[1,2,3,4,5,6],1],[[1,2,3,4,5,7],2],[[1,2,3,4,5,8],3],[[1
 for(const g of [[1,2,8,9,10,11],[1,8,9,10,11,12],[8,9,10,11,12,13]]){announce(games(g),winning,'saved');runTimers();assert.equal(output().at(-1)[0],'lose')}
 const n=output().length;
 for(const [g,w] of [[[],winning],[games([1,2,3,4,5,6]),null]])announce(g,w,'saved');runTimers();assert.equal(output().length,n,'missing draw/tickets stay silent');
-assert.equal(announce(games([1,2,3,4,5,7]),winning,'research'),false);runTimers();assert.equal(output().length,n,'research never imitates purchased wins');
+assert.equal(announce(games([1,2,3,4,5,7]),winning,'research'),true,'research comparison needs a voice announcement on the next round');
+runTimers();
+assert.equal(output().length,n+1,'research comparison is announced once');
+assert.equal(output().at(-1)[0],'lose','research must NOT use purchased-ticket win fanfare');
+assert.match(output().at(-1)[1],/사후 연구/);
+assert.match(output().at(-1)[1],/실제 구매 당첨 기록은 아닙니다/);
+const noRepeats=output().length;
+assert.equal(ctx.v4049Announce(round,false),false,'same research result must not repeat automatically');
+runTimers();assert.equal(output().length,noRepeats);
+assert.equal(ctx.v4049Announce(round,true),true,'research replay button must work');
+runTimers();assert.equal(output().length,noRepeats+1);
+
+// Verify explicit sequential round switching: saved → research → saved → no draw.
+round=1244;assert.equal(announce(games([8,9,10,11,12,13]),winning,'saved'),true);
+runTimers();assert.equal(output().at(-1)[0],'lose');
+round=1245;assert.equal(announce(games([1,2,3,4,5,7]),winning,'research'),true);
+runTimers();assert.match(output().at(-1)[1],/제1245회 사후 연구/);
+round=1246;assert.equal(announce(games([1,2,3,4,5,6]),winning,'saved'),true);
+runTimers();assert.equal(output().at(-1)[0],'win');
+round=1247;assert.equal(announce(games([1,2,3,4,5,6]),null,'research'),false);
+runTimers();
+round=1248;
 // Home cancellation removes queued score effects before they can fire.
 const before=output().length;
 ctx.v4049Later(()=>ctx.showComfort(round,0),120);ctx.stopScoreAudio();runTimers();assert.equal(output().length,before);
@@ -38,12 +59,14 @@ ctx.showFanfare(round,5,20,2);runTimers();assert.match(spoken.at(-1),/2등/);
 ctx.showComfort(round,2);ctx.stopScoreAudio();let spokenCount=spoken.length;runTimers();assert.equal(spoken.length,spokenCount);
 assert.match(html,/function closeM\(\)\{stopScoreAudio\(\)/);
 assert.match(html,/function modal\(title,html\)\{v4052PrepareModal\(title,html\)/);
-assert.match(html,/source!=='research'\)v4049Later/);
+assert.match(html,/if\(win&&display20\)v4049Later/);
+assert.match(html,/function v4053ResearchVoice/);
+assert.match(html,/source!=='research'/);
 assert.match(fs.readFileSync(base+'src/freedom/assets/v4047_compact.css','utf8'),/z-index:2147483647!important/);
 const java=fs.readFileSync(base+'src/main/java/com/baekhak/centralcontrol/MainActivity.java','utf8');
 assert.match(java,/scoreVoiceHandler.removeCallbacksAndMessages\(null\);\s*pendingScoreSpeech = null;/);
 assert.match(java,/scoreVoiceHandler.postDelayed\(\(\) -> speakScoreNow\(text, rankNo\), 650L\)/);
-console.log('PASS: V4.0.49 ranks 1-5 with bonus 2nd; 0-2 hit consolation; native + browser fanfare/voice; research excluded; repeat suppression; pending/missing silence; navigation and audio cancellation; originals unchanged.');
+console.log('PASS: V4.0.53 sequential rounds, research-identified voice, ranks 1-5 with bonus 2nd; 0-2 hit consolation; native + browser fanfare/voice; research excluded; repeat suppression; pending/missing silence; navigation and audio cancellation; originals unchanged.');
 // V4.0.52 regression: a delayed official-result redraw must not cancel speech.
 ctx.window.innerHeight=768;ctx.window.addEventListener=()=>{};
 ctx.document.documentElement={style:{setProperty(){}}};
