@@ -10,8 +10,8 @@ android {
         applicationId 'com.navigator.freedom.v3final'
         minSdk 23
         targetSdk 35
-        versionCode 40053
-        versionName "4.0.53-NEXT-ROUND-VOICE"
+        versionCode 40054
+        versionName "4.0.54-LOSS-ONLY-DRIVE"
     }
 
     buildFeatures {
@@ -61,7 +61,7 @@ android {
 
     applicationVariants.all { variant ->
         variant.outputs.all {
-            outputFileName = "HANGHAE_FREEDOM_V4_0_53_NEXT_ROUND_VOICE_TEST_CANDIDATE.apk"
+            outputFileName = "HANGHAE_FREEDOM_V4_0_54_LOSS_ONLY_DRIVE_TEST_CANDIDATE.apk"
         }
     }
 }
