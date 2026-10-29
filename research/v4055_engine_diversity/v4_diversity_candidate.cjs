@@ -3,7 +3,7 @@
 function seedHash(text){let h=2166136261>>>0;for(const c of String(text)){h^=c.charCodeAt(0);h=Math.imul(h,16777619)>>>0;}return h>>>0}
 function rngFor(text){let seed=seedHash(text)||1;return()=>{seed=(Math.imul(1664525,seed)+1013904223)>>>0;return seed/4294967296}}
 function shuffled(vals,rng){const x=[...vals];for(let i=x.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[x[i],x[j]]=[x[j],x[i]];}return x}
-function checkGames(games){return games.length===20 && games.every(g=>g.length===6&&g.every(n=>Number.isInteger(n)&&n>=1&&n<=45)&&new Set(g).size===6) && new Set(games.map(g=>g.join(',')).size===20}
+function checkGames(games){return games.length===20 && games.every(g=>g.length===6&&g.every(n=>Number.isInteger(n)&&n>=1&&n<=45)&&new Set(g).size===6) && new Set(games.map(g=>g.join(','))).size===20}
 function scoreGames(group,prior){
  let penalty=0;const seen=new Set(prior.map(g=>g.join(',')));
  for(const game of group){
