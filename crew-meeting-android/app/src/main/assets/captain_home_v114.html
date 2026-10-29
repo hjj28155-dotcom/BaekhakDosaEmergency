@@ -2776,7 +2776,7 @@ try{
   if(DB1)return DB1;
   if(!dbPromise)dbPromise=(async function(){
    $('freedomDbStatus').textContent='내장 DB-1 원문 1~1247회차 확인 중…';
-   var response=await fetch(new URL('crew-db1-1-1247.json',document.baseURI).href,{cache:'no-store'});
+   var response=await fetch(new URL('db1_rounds_1_1247.json',document.baseURI).href,{cache:'no-store'});
    if(!response.ok)throw Error('내장 DB-1 파일 조회 실패: HTTP '+response.status);
    var snap=await response.json();
    if(!snap||snap.schema!=='CAPTAIN_DB1_SNAPSHOT_V1'||snap.count!==1247||!Array.isArray(snap.rows)||snap.rows.length!==1247)throw Error('DB-1 전체 회차 누락');
@@ -2803,7 +2803,7 @@ try{
  }
  function bootCaptain(){
   var f=$('freedomCaptainFrame');if(f.getAttribute('src'))return;
-  f.setAttribute('src',new URL('crew-captain-engine-r46.html',document.baseURI).href);
+  f.setAttribute('src',new URL('captain_engine_r46.html',document.baseURI).href);
  }
  function sendCaptain(){if(!pending||!engineReady)return;
   var p=pending,f=$('freedomCaptainFrame');pending=null;
@@ -2845,7 +2845,7 @@ try{
   // The original R1 engine REQUIRES independently attested V3 and DOSA
   // pre-target archives. The DB-1 clue alone is not such an attestation.
   try{
-   var module=await import(new URL('crew-liaison-blind-r1.mjs',document.baseURI).href);
+   var module=await import(new URL('liaison-blind-engine.mjs',document.baseURI).href);
    if(runId!==currentRun)return;
    var raw=entry.source_text.split('\n');
    var result=module.runLiaisonBlind({round:n,raw:raw,asOfMs:Date.now()});
