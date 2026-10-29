@@ -15,7 +15,7 @@ jobs:
       - name: Checkout exact isolated V4.0.54 source, never modify original branch sources
         uses: actions/checkout@v4
         with:
-          ref: a150e40b36a88a584bbaabd484038db79a28ec84
+          ref: 09f8fcf86ef52c8aca41f5f87dde37e1a336d0d8
           persist-credentials: false
       - name: Set up Java 17
         uses: actions/setup-java@v4
@@ -40,7 +40,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD)" = 'a150e40b36a88a584bbaabd484038db79a28ec84'
+          test "$(git rev-parse HEAD)" = '09f8fcf86ef52c8aca41f5f87dde37e1a336d0d8'
           node .github/scripts/validate_freedom_r14.cjs
           node .github/scripts/verify_freedom_v4043.cjs
           node .github/scripts/verify_freedom_v4043_references.cjs
