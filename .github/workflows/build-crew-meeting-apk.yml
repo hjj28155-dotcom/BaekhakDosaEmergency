@@ -1,4 +1,4 @@
-name: Build same-signer V8.0.6 analysis-distribution staging APK
+name: Build same-signer V8.0.7 analysis-distribution staging APK
 on:
   push:
     branches:
@@ -238,11 +238,22 @@ jobs:
           grep -Fq 'data-material-stage="after"' "$HOME_HTML"
           grep -Fq 'V3의 과거 350회 누적 분석은 별도 보존' "$HOME_HTML"
           grep -Fq 'loadCaptainDashboard()' crew-meeting-android/app/src/main/java/kr/hanghae/crewmeeting/MainActivity.java
-          grep -Fq "versionCode 806" crew-meeting-android/app/build.gradle
+          grep -Fq "versionCode 807" crew-meeting-android/app/build.gradle
           test "$(grep -c 'data-before-room=' "$HOME_HTML")" -eq 7
           test "$(grep -c 'data-v3-room-card=' "$HOME_HTML")" -eq 4
           test "$(grep -c 'data-v3-report=' "$HOME_HTML")" -eq 4
           echo 'Embedded captain-only report-before and report-after modules: present'
+          python3 - <<'PY'
+          import pathlib
+          root=pathlib.Path('crew-meeting-android/app/src/main/assets')
+          html=(root/'captain_home_v114.html').read_text()
+          for path in ['db1_rounds_1_1247.json','captain_engine_r46.html','liaison-blind-engine.mjs']:
+              assert path in html, 'missing HTML asset reference: '+path
+              assert (root/path).is_file(), 'missing APK asset: '+path
+          for obsolete in ['crew-db1-1-1247.json','crew-captain-engine-r46.html','crew-liaison-blind-r1.mjs']:
+              assert obsolete not in html, 'obsolete asset reference: '+obsolete
+          print('V8 original-analysis assets verified')
+          PY
       - name: Assemble separate app
         working-directory: crew-meeting-android
         run: gradle :app:assembleDebug --no-daemon --stacktrace
@@ -259,24 +270,24 @@ jobs:
           test "$NEW_CERT" = "e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be"
           echo "Recovery app signer pinned: $NEW_CERT"
           "$AAPT" dump badging "$APK" | head -5
-          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting.compact' versionCode='806'"
+          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting.compact' versionCode='807'"
           ! "$AAPT" dump badging "$APK" | grep -q "package: name='com.baekhak.dosa.v4'"
           mkdir -p crew-meeting-android/releases
-          cp "$APK" crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.6_DIRECTOR_ANALYSIS_DISTRIBUTION.apk
-          (cd crew-meeting-android/releases && sha256sum HANGHAE_CREW_MEETING_V8_8.0.6_DIRECTOR_ANALYSIS_DISTRIBUTION.apk > HANGHAE_CREW_MEETING_V8_8.0.6_DIRECTOR_ANALYSIS_DISTRIBUTION.apk.sha256)
+          cp "$APK" crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.7_DIRECTOR_ANALYSIS_DISTRIBUTION.apk
+          (cd crew-meeting-android/releases && sha256sum HANGHAE_CREW_MEETING_V8_8.0.7_DIRECTOR_ANALYSIS_DISTRIBUTION.apk > HANGHAE_CREW_MEETING_V8_8.0.7_DIRECTOR_ANALYSIS_DISTRIBUTION.apk.sha256)
       - uses: actions/upload-artifact@v4
         with:
-          name: HANGHAE-CREW-MEETING-V8-8.0.6-DIRECTOR-ANALYSIS-DISTRIBUTION-APK
+          name: HANGHAE-CREW-MEETING-V8-8.0.7-DIRECTOR-ANALYSIS-DISTRIBUTION-APK
           path: |
-            crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.6_DIRECTOR_ANALYSIS_DISTRIBUTION.apk
-            crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.6_DIRECTOR_ANALYSIS_DISTRIBUTION.apk.sha256
+            crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.7_DIRECTOR_ANALYSIS_DISTRIBUTION.apk
+            crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.7_DIRECTOR_ANALYSIS_DISTRIBUTION.apk.sha256
           if-no-files-found: error
           retention-days: 30
       - name: Verify isolated APK artifact packaging
         run: |
           set -euo pipefail
-          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.6_DIRECTOR_ANALYSIS_DISTRIBUTION.apk
-          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.6_DIRECTOR_ANALYSIS_DISTRIBUTION.apk.sha256
-          (cd crew-meeting-android/releases && sha256sum --check HANGHAE_CREW_MEETING_V8_8.0.6_DIRECTOR_ANALYSIS_DISTRIBUTION.apk.sha256)
+          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.7_DIRECTOR_ANALYSIS_DISTRIBUTION.apk
+          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.7_DIRECTOR_ANALYSIS_DISTRIBUTION.apk.sha256
+          (cd crew-meeting-android/releases && sha256sum --check HANGHAE_CREW_MEETING_V8_8.0.7_DIRECTOR_ANALYSIS_DISTRIBUTION.apk.sha256)
           echo "TEST artifact verified. Do NOT replace the stable fixed Google Drive APK without device verification."
 
