@@ -35,3 +35,17 @@
 2. GitHub artifact ZIP 추출, APK CRC/바이트/서명/버전/해시 직접 검증.
 3. 선장 휴대전화 V4.0.52를 삭제하지 않고 V4.0.53으로 업데이트하여 1244→1245→1246회 멘트와 사후 연구 구분 확인.
 4. 확인/명시 승인 시에만 기존 V4 신규설치·업데이트 경로를 각각 다뤄 정식 배포 검토.
+
+## 최종 시험 APK 자체 검증 — 2026-10-29 KST
+
+- 원본 동일서명 GitHub Actions **전체 성공**: https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/actions/runs/40800755518. DB-1·20조합·연속회차 음성·기존 잠금 불변·6개 해상도 화면 렌더·Android 컴파일·서명·APK 내부 에셋 검사·아티팩트 업로드 모든 단계 성공.
+- CI 아티팩트 이름: `Freedom_V4053_NEXT_ROUND_VOICE_OriginalSigned_TEST_ONLY`, artifact ID **12865544016**.
+- APK 이름: `HANGHAE_FREEDOM_V4053_NEXT_ROUND_VOICE_ORIGINAL_SIGNED_TEST_ONLY.apk`.
+- ChatGPT 작업 환경에서 내려받은 ZIP 테스트: 총 17개 항목, `ZipFile.testzip() is None` (CRC 문제 없음).
+- APK 바이트 크기 **48,014,831**, SHA-256 **`f67d78f755eead5ed44fd3dd90195133b623fb86715b621ada5e6b7bfdee27b0`**; ZIP 포함 `SHA256.txt` 원문 기대값과 **정확히 일치**.
+- Android `package.txt`: `com.navigator.freedom.v3final`, `versionCode='40053'`, `versionName='4.0.53-NEXT-ROUND-VOICE'`.
+- APK ZIP 내부 원문·DB-1·참조사전·compact CSS 등 핵심 파일 존재 확인. `assets/index.html`의 `v4053ResearchVoice`/연구 전용 음성 분기 내장 확인.
+- APK 실제 `META-INF/CERT.RSA`를 X.509 PKCS7로 직접 파싱한 서명 인증서 SHA-256 = **`bf281903f422fe925a23a7e72e82d690eaef899236e6d10365143ff32d9beb00`**, 기존 V4 원본 배포판 서명과 일치.
+- 다운로드용 시험 파일: `/mnt/data/HanghaeFreedom_V4.0.53_NEXT_ROUND_VOICE_TEST_ONLY.apk`; 이미 실제 파일 생성·무결성 확인.
+- **실기기 설치·회차별 실제 한국어 TTS 청취·기존 기기 내 저장값 보존은 미검증.** 기존 앱 삭제/초기화 금지.
+- V4 신규설치/업데이트 독립 링크는 계속 미변경. 실사용 검증 및 선장 승인 전 정식 공급 승격 안 함.
