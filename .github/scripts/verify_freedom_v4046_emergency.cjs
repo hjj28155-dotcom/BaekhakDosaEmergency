@@ -4,7 +4,7 @@ const base='build405/FREEDOM_V402_BUILD_THIS/app/';
 const html=fs.readFileSync(base+'src/freedom/assets/index.html','utf8');
 const gradle=fs.readFileSync(base+'build.gradle','utf8');
 assert.match(gradle,/applicationId 'com[.]navigator[.]freedom[.]v3final'/);
-assert.match(gradle,/versionCode 40052/);
+assert.match(gradle,/versionCode 40053/);
 assert.match(gradle,/signingConfig signingConfigs[.]distribution/);
 assert.match(html,/const V4046_VISIBLE=\[1244,1245,1246,1247,1248\]/);
 assert.match(html,/function rawPage[(][)]\{return v4044ReviewRound[(]1248,true[)]\}/);
