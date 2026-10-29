@@ -13,76 +13,81 @@ vm.runInContext(range('function v4044ValidSets(games,count){','function v4044Aut
 // The last range above ends after all score-audio functions (one-line declarations).
 const winning={nums:[1,2,3,4,5,6],bonus:7};
 const games=g=>Array.from({length:20},()=>g.slice());
-function runTimers(){let count=0;while(timers.size){const [id,t]=[...timers.entries()].sort((a,b)=>a[1].ms-b[1].ms)[0];timers.delete(id);t.fn();assert.ok(++count<100)}}
+function runTimers(){let count=0;while(timers.size){const [id,t]=[...timers.entries()].sort((a,b)=>a[1].ms-b[1].ms)[0];timers.delete(id);t.fn();assert.ok(++count<150)}}
 function output(){return calls.filter(c=>c[0]!=='stop')}
 function announce(sets,w,source){ctx.D.rounds[round]={draw:w,...(source==='research'?{analysisResearch:{auto20:sets}}:{analysis:{auto20:sets}})};return ctx.v4049Announce(round,false)}
 for(const [g,rank] of [[[1,2,3,4,5,6],1],[[1,2,3,4,5,7],2],[[1,2,3,4,5,8],3],[[1,2,3,4,8,9],4],[[1,2,3,8,9,10],5]]){
- const sets=games(g),before=JSON.stringify(sets);assert.equal(ctx.v4049ScoreSummary(sets,winning).bestRank,rank);
- announce(sets,winning,'locked');runTimers();const last=output().at(-1);assert.equal(last[0],'win');assert.equal(last[2],rank);assert.match(last[1],new RegExp(rank+'등'));assert.equal(JSON.stringify(sets),before);
- const n=output().length;announce(sets,winning,'locked');runTimers();assert.equal(output().length,n,'revisit must not replay same saved result');
+ const tickets=games(g),before=JSON.stringify(tickets);
+ assert.equal(ctx.v4049ScoreSummary(tickets,winning).bestRank,rank,'prize rank preserved in visual table');
+ assert.equal(announce(tickets,winning,'saved'),false,'captain requested no winning voice or fanfare');
+ runTimers();assert.equal(output().length,0);
+ assert.equal(JSON.stringify(tickets),before,'original twenty tickets immutable');
 }
-for(const g of [[1,2,8,9,10,11],[1,8,9,10,11,12],[8,9,10,11,12,13]]){announce(games(g),winning,'saved');runTimers();assert.equal(output().at(-1)[0],'lose')}
-const n=output().length;
-for(const [g,w] of [[[],winning],[games([1,2,3,4,5,6]),null]])announce(g,w,'saved');runTimers();assert.equal(output().length,n,'missing draw/tickets stay silent');
-assert.equal(announce(games([1,2,3,4,5,7]),winning,'research'),true,'research comparison needs a voice announcement on the next round');
-runTimers();
-assert.equal(output().length,n+1,'research comparison is announced once');
-assert.equal(output().at(-1)[0],'lose','research must NOT use purchased-ticket win fanfare');
-assert.match(output().at(-1)[1],/사후 연구/);
-assert.match(output().at(-1)[1],/실제 구매 당첨 기록은 아닙니다/);
-const noRepeats=output().length;
-assert.equal(ctx.v4049Announce(round,false),false,'same research result must not repeat automatically');
-runTimers();assert.equal(output().length,noRepeats);
-assert.equal(ctx.v4049Announce(round,true),true,'research replay button must work');
-runTimers();assert.equal(output().length,noRepeats+1);
-
-// Verify explicit sequential round switching: saved → research → saved → no draw.
-round=1244;assert.equal(announce(games([8,9,10,11,12,13]),winning,'saved'),true);
-runTimers();assert.equal(output().at(-1)[0],'lose');
-round=1245;assert.equal(announce(games([1,2,3,4,5,7]),winning,'research'),true);
-runTimers();assert.match(output().at(-1)[1],/제1245회 사후 연구/);
-round=1246;assert.equal(announce(games([1,2,3,4,5,6]),winning,'saved'),true);
-runTimers();assert.equal(output().at(-1)[0],'win');
-round=1247;assert.equal(announce(games([1,2,3,4,5,6]),null,'research'),false);
-runTimers();
-round=1248;
-// Home cancellation removes queued score effects before they can fire.
-const before=output().length;
-ctx.v4049Later(()=>ctx.showComfort(round,0),120);ctx.stopScoreAudio();runTimers();assert.equal(output().length,before);
-// Browser speech fallback cancellation and actual fanfare oscillators.
-let closed=0,started=0,spoken=[];
-ctx.window.BaekhakNative=null;
-ctx.window.AudioContext=function(){this.currentTime=0;this.destination={};this.close=()=>{closed++};this.createOscillator=()=>({frequency:{},connect(){return this},start(){started++},stop(){}});this.createGain=()=>({gain:{setValueAtTime(){},exponentialRampToValueAtTime(){}},connect(){return this}})};
+for(const [g,source] of [[[1,2,8,9,10,11],'saved'],[[1,8,9,10,11,12],'saved'],[[8,9,10,11,12,13],'research']]){
+ const before=output().length;
+ assert.equal(announce(games(g),winning,source),true,'losing result must announce');
+ runTimers();
+ assert.equal(output().length,before+1);
+ const last=output().at(-1);assert.equal(last[0],'lose','ONLY speak consolation');
+ if(source==='research'){assert.match(last[1],/사후 연구/);assert.doesNotMatch(last[1],/실제 구매 당첨 기록/)}
+ else assert.match(last[1],/낙첨입니다/);
+ assert.equal(ctx.v4049Announce(round,false),false,'same loss must not repeat automatically');runTimers();assert.equal(output().length,before+1);
+ assert.equal(ctx.v4049Announce(round,true),true,'explicit losing message replay');runTimers();assert.equal(output().length,before+2);
+}
+const count=output().length;
+assert.equal(announce([],winning,'saved'),false,'no stored tickets means silence');
+assert.equal(announce(games([8,9,10,11,12,13]),null,'saved'),false,'unannounced draw silent');
+assert.equal(announce(games([1,2,3,4,5,7]),winning,'research'),false,'research with 3+ matches must not be called a loss');
+runTimers();assert.equal(output().length,count);
+for(const [n,source,combo,sounds] of [
+ [1244,'saved',[8,9,10,11,12,13],true],
+ [1245,'research',[8,9,10,11,12,13],true],
+ [1246,'saved',[1,2,3,4,5,7],false],
+ [1247,'research',[8,9,10,11,12,13],true],
+ [1248,'saved',[1,2,3,4,5,6],false]
+]){
+ round=n;const prior=output().length;
+ assert.equal(announce(games(combo),winning,source),sounds,'each round follows only-loss policy');
+ runTimers();assert.equal(output().length,prior+(sounds?1:0));
+ if(sounds)assert.match(output().at(-1)[1],new RegExp('제'+n+'회'));
+}
+// Home cancellation must abort queued losing speech and not modify tickets.
+const prior=output().length;
+ctx.v4049Later(()=>ctx.v4054LossVoice(round,{wins:0,highestHits:0},false),120);
+ctx.stopScoreAudio();runTimers();assert.equal(output().length,prior);
+// Native unavailable: short browser consolation fallback.
+const spoken=[];ctx.window.BaekhakNative=null;
 ctx.window.speechSynthesis={cancel(){},speak:u=>spoken.push(u.text)};
-ctx.showFanfare(round,5,20,2);assert.ok(started>0);ctx.stopScoreAudio();runTimers();assert.equal(spoken.length,0);assert.ok(closed>0,'Home stops active fanfare');
-ctx.showFanfare(round,5,20,2);runTimers();assert.match(spoken.at(-1),/2등/);
-ctx.showComfort(round,2);ctx.stopScoreAudio();let spokenCount=spoken.length;runTimers();assert.equal(spoken.length,spokenCount);
+ctx.v4054LossVoice(round,{wins:0,highestHits:1},false);runTimers();
+assert.match(spoken.at(-1),/낙첨입니다/);
+ctx.v4054LossVoice(round,{wins:0,highestHits:1},true);ctx.stopScoreAudio();
+const unchanged=spoken.length;runTimers();assert.equal(spoken.length,unchanged);
 assert.match(html,/function closeM\(\)\{stopScoreAudio\(\)/);
 assert.match(html,/function modal\(title,html\)\{v4052PrepareModal\(title,html\)/);
-assert.match(html,/if\(win&&display20\)v4049Later/);
-assert.match(html,/function v4053ResearchVoice/);
-assert.match(html,/if\(researchOnly\)v4053ResearchVoice\(n,outcome\)/);
-assert.match(fs.readFileSync(base+'src/freedom/assets/v4047_compact.css','utf8'),/z-index:2147483647!important/);
+assert.match(html,/if\(win&&display20&&v4049ScoreSummary\(display20,win\)[.]wins===0\)v4049Later/);
+assert.match(html,/function v4054LossVoice/);
+assert.match(html,/if\(outcome[.]wins>0\)return false/);
+assert.doesNotMatch(html,/if\(researchOnly\)v4053ResearchVoice/);
 const java=fs.readFileSync(base+'src/main/java/com/baekhak/centralcontrol/MainActivity.java','utf8');
 assert.match(java,/scoreVoiceHandler.removeCallbacksAndMessages\(null\);\s*pendingScoreSpeech = null;/);
-assert.match(java,/scoreVoiceHandler.postDelayed\(\(\) -> speakScoreNow\(text, rankNo\), 650L\)/);
-console.log('PASS: V4.0.53 sequential rounds, research-identified voice, ranks 1-5 with bonus 2nd; 0-2 hit consolation; native + browser fanfare/voice; research excluded; repeat suppression; pending/missing silence; navigation and audio cancellation; originals unchanged.');
-// V4.0.52 regression: a delayed official-result redraw must not cancel speech.
+console.log('PASS: V4.0.54 only one concise 낙첨 voice for zero wins, saved/research provenance, consecutive rounds, 1~5 visual ranks, winning silence, repeat control, browser/native TTS, Home cancel, originals preserved.');
+// V4.0.52 regression: same-score redraw preserves a losing TTS queued or playing.
+ctx.window.BaekhakNative=native;
 ctx.window.innerHeight=768;ctx.window.addEventListener=()=>{};
 ctx.document.documentElement={style:{setProperty(){}}};
 vm.runInContext(range('function v4052SyncViewport(){','function modal(title,html){'),ctx);
-ctx.window.BaekhakNative=native;
 const scoreHtml='<div class="v4047Select">same verified draw and tickets</div>';
+nodes.modal.style.display='block';
 ctx.v4052PrepareModal('결과',scoreHtml);
-ctx.showFanfare(round,5,20,2);
+ctx.v4054LossVoice(round,{wins:0,highestHits:2},false);
 const stops=calls.filter(c=>c[0]==='stop').length;
 ctx.v4052PrepareModal('결과',scoreHtml);
-assert.equal(calls.filter(c=>c[0]==='stop').length,stops,'identical native callback redraw preserves fanfare and queued TTS');
+assert.equal(calls.filter(c=>c[0]==='stop').length,stops,'identical draw callback redraw must preserve consolation speech');
 ctx.v4052PrepareModal('원문','<textarea>source</textarea>');
-assert.equal(calls.filter(c=>c[0]==='stop').length,stops+1,'leaving the result cancels speech');
+assert.equal(calls.filter(c=>c[0]==='stop').length,stops+1,'leaving results stops speech');
 ctx.document.querySelectorAll=()=>[];ctx.document.body={style:{}};
-const close=html.match(/function closeM\(\)\{[^\n]+/)[0];vm.runInContext(close,ctx);
-round=1248;ctx.D.rounds[round]={draw:winning,analysis:{auto20:games([1,2,3,4,5,7])}};
+vm.runInContext(html.match(/function closeM\(\)\{[^\n]+/)[0],ctx);
+ctx.D.rounds[round]={draw:winning,analysis:{auto20:games([8,9,10,11,12,13])}};
 ctx.v4049Announce(round,true);ctx.closeM();nodes.modal.style.display='block';
-assert.equal(ctx.v4049Announce(round,false),true,'returning from Home automatically announces again');
-console.log('PASS: delayed identical draw redraw preserves native audio; navigation cancels; Home re-entry automatically replays.');
+assert.equal(ctx.v4049Announce(round,false),true,'home revisit may replay missing prior losing message');
+console.log('PASS: replay after Home and same score redraw preserves native consolation, navigation cancels.');
