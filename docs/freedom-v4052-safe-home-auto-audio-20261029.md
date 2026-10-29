@@ -17,3 +17,19 @@
 - 원격 빌드용 동일서명 검사 워크플로 파일을 로컬 준비. 기존 서명 캐시가 있는 원래 빌드 브랜치에서 정확한 수정 SHA를 checkout하여 시험 APK만 만들도록 구성.
 - 다음 1순위: 선장 GitHub 게시 승인 → 수정 브랜치 업로드 → 원래 빌드 브랜치에 시험 전용 워크플로 추가 → 브라우저 검사·동일서명 빌드 결과 확인 → Drive 시험 APK 단일파일 업로드 및 메타데이터 재확인.
 - 최종 상태: 소스 수정 및 로컬 기능 회귀검사 완료, 화면 렌더/새 APK/Drive 배포/실기기 설치·음성 미완료.
+
+## 2026-10-29 · 선장 실기기 버전 확인과 V4.0.52 실제 APK 검증
+
+- 선장 휴대전화 앱 정보 화면은 **V4.0.51-DRIVE-READABLE-HOME**. 이전 V4.0.49 APK는 구버전으로서 업그레이드 설치 불가. 기존 앱/자료 삭제 금지.
+- 기존 V4.0.52 전체 회귀검사/동일서명 빌드 차단은 실제 소스에서 `v330GroupsResult`가 `v330GroupsPurchase`보다 앞에 있는데 화면 검증 스크립트가 순서를 반대로 찾던 문제. 테스트 소스만 고친 커밋 `2463490113af626a937fde1e99d2987334b9fdec`. 앱 실코드 및 최초잠금/DB-1 변경 없음.
+- **성공한 GitHub Actions**: https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/actions/runs/40799166071 . 정상 통과: 기존 서명캐시와 인증서 지문, DB-1 및 최근 5회 원문/20조합, 팡파레·축하·낙선 오디오 회귀, 6개 화면 크기 Chromium 점검, Android 컴파일, 실제 APK 버전/서명/내장소스, 시험 아티팩트 업로드.
+- GitHub artifact ID **12865496715**, `Freedom_V4052_SAFE_HOME_AUTO_AUDIO_OriginalSigned_TEST_ONLY`. 실제 APK 이름 `HANGHAE_FREEDOM_V4052_SAFE_HOME_AUTO_AUDIO_ORIGINAL_SIGNED_TEST_ONLY.apk`, **48,014,248 바이트**, SHA-256 **`f7bcdf3c5a49fde2c3278b1ad03de3d1d9c01ac2db8a053d17cc01e0c87b562d`**.
+- GitHub 시험 아티팩트 ZIP 및 APK 재추출 CRC 검사 모두 통과. 필수 `assets/index.html`, `assets/v4047_compact.css`, `assets/raw_bank.js`, `assets/db1_v1247_patch.js`, `assets/freedom_reference_v4043.js` 내장 확인. `applicationId com.navigator.freedom.v3final`, `versionCode 40052`, 원본 서명 지문 `bf281903f422fe925a23a7e72e82d690eaef899236e6d10365143ff32d9beb00`.
+- **정식 업데이트/신규설치 URL은 그대로 보존**. 휴대전화 실제 업데이트 성공, 기록/자료 보존 및 팡파레 실제 청취는 아직 미검증.
+
+## 선장 신규 지시 — V4 완료 후 별도 후속 사업
+
+- 선장 지시: **“V4 작업이 끝나면 항해사앱을 중앙통제실로 바꾸고자하니 홈화면 전면 변경해야 합니다.”**
+- V4 기능/실기기 검증 완료 후 **기존 V3 항해사앱**을 중앙통제실형 홈 화면으로 **전면 재설계**하는 별도 작업을 준비할 것. 단순 명칭 변경이 아닌 홈 정보 구조, 컨트롤 배치, 주요 작업 동선 재설계가 범위.
+- **V7 중앙통제실은 현재 별개 시스템이며 통합/교체를 이미 승인받았다고 간주하지 않음.** V3 원본/서명/기능/데이터는 기존 상태로 보존하고, 안전한 격리 브랜치에서 화면 개선 후 실기기·서명 검증.
+- 현재는 V3·V7 및 중앙통제실 전환 작업을 **시작하지 않았으며** V4 시험 APK 기능 검증과 사용자 설치가 최우선.
