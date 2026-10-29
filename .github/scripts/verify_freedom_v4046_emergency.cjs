@@ -77,7 +77,7 @@ const root={
 };
 vm.createContext(root);
 vm.runInContext(gameFunctions+'\n'+groupFunctions+'\n'+newest,root,{timeout:10000});
-root.v4053ResearchVoice=(round,outcome)=>played.push({type:'research',args:[round,outcome]});
+root.v4054LossVoice=(round,outcome,isResearch)=>{played.push({type:'loss',args:[round,outcome,isResearch]});return true};
 function drain(){let limit=500;while(queue.length&&limit-->0)queue.shift()();assert.ok(limit>0,'queued task loop must finish')}
 function copyData(x){return JSON.parse(JSON.stringify(x))}
 const lockedBefore=copyData(D.rounds['1247']);
@@ -140,37 +140,30 @@ assert.equal(D.rounds['1246'].analysisResearch.historicalResultExcluded,true);
 assert.deepEqual(copyData(D.rounds['1247']),lockedBefore);
 assert.deepEqual(researchBefore,{});
 
-// Extra voice checks: draw pending must remain silent; bonus-based second place
-// must use "2등", replay only on a real user action, and afterdraw research
-// must speak in an explicitly labelled non-purchased comparison mode.
+// Only losing outcomes may have a voice; 1~5등 remains display-only.
 selection=1248;
-assert.equal(root.v4049Announce(1248,false),false,'before official draw no voice');
+assert.equal(root.v4049Announce(1248,false),false);
 assert.equal(played.length,0);
 const draw='1 2 3 4 5 6',bon=7;
 const test20=[[1,2,3,4,5,7],...Array.from({length:19},(_,i)=>[8+i,9+i,10+i,11+i,12+i,13+i])];
 D.rounds['1248'].analysis.auto20=test20;
 D.rounds['1248'].score={source:'동행복권 자동조회',result:draw,bonus:String(bon)};
-assert.equal(root.v4049Announce(1248,false),true,'verified draw and stored tickets trigger message');
-assert.equal(played.length,1);
-assert.equal(played[0].type,'win');
-assert.equal(played[0].args[3],2,'5 matching + bonus is second prize');
-assert.equal(played[0].args[2],1,'one winning ticket');
-assert.equal(root.v4049Announce(1248,false),false,'reopening same draw/tickets must not repeat');
-assert.equal(played.length,1);
-assert.equal(root.v4049Announce(1248,true),true,'explicit replay allows repeat');
-assert.equal(played.length,2);
+assert.equal(root.v4049Announce(1248,false),false,'second prize must not play voice');
+assert.equal(played.length,0);
 D.rounds['1248'].analysis.auto20=Array.from({length:20},(_,i)=>[8+i,9+i,10+i,11+i,12+i,13+i]);
-assert.equal(root.v4049Announce(1248,false),true,'changed verified ticket set triggers revised result');
-assert.equal(played.at(-1).type,'loss','no 3+ combos must play consolation');
-assert.equal(played.at(-1).args[1],0,'best matching count reported honestly');
-const prior=played.length;
-D.rounds['1245']={analysisResearch:{auto20:test20},score:{source:'동행복권 자동조회',result:draw,bonus:String(bon)}};
+assert.equal(root.v4049Announce(1248,false),true,'all-losing stored tickets need concise consolation');
+assert.equal(played.length,1);assert.equal(played.at(-1).type,'loss');
+assert.equal(played.at(-1).args[2],false);
+assert.equal(root.v4049Announce(1248,false),false,'reopening same 20 tickets must not re-play');
+assert.equal(root.v4049Announce(1248,true),true,'explicit replay should work');
+D.rounds['1245']={analysisResearch:{auto20:Array.from({length:20},(_,i)=>[8+i,9+i,10+i,11+i,12+i,13+i])},score:{source:'동행복권 자동조회',result:draw,bonus:String(bon)}};
 selection=1245;
-assert.equal(root.v4049Announce(1245,true),true,'afterdraw research receives an explicit research-only voice comparison');
-assert.equal(played.length,prior+1);
-assert.equal(played.at(-1).type,'research','never count retrospective comparison as purchased 1~5등 result');
+assert.equal(root.v4049Announce(1245,true),true,'losing research comparisons get a clearly labelled concise consolation');
+assert.equal(played.at(-1).args[2],true);
+D.rounds['1245'].analysisResearch.auto20=test20;
+assert.equal(root.v4049Announce(1245,true),false,'retrospective winning research must not claim a lottery loss');
 D.rounds['1245']={};
-assert.equal(root.v4049Announce(1245,true),false,'missing original tickets must remain silent');
+assert.equal(root.v4049Announce(1245,true),false,'no original tickets must be silent');
 selection=1248;
 
 console.log('PASS: V4.0.51 complete 1247-history analysis, optional dominant 1248 primary, 4x5 groups, result pending and graded, 5 visible rounds, future wins not fabricated, locked original preserved, historical research segregated, six JS syntax checks.');
