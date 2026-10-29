@@ -91,7 +91,7 @@ jobs:
             if b'v4044SmallScreenModalTitleFix' not in embedded or b'v4044ReviewRound' not in embedded: raise SystemExit('Original/auto-grade fix not packaged')
             if b'href="v4047_compact.css"' not in embedded or b"v4047Compact" not in embedded: raise SystemExit('Compact layout not packaged')
             if b'function v4054LossVoice' not in embedded or b'if(outcome.wins>0)return false' not in embedded or b'v4049Announce(n,false)' not in embedded: raise SystemExit('Short loss-only voice missing in signed APK')
-            if embedded.count('제\'+round+\'회는 낙첨입니다.') != 1: raise SystemExit('Unified spoken text not found exactly once')
+            if embedded.count('회는 낙첨입니다.'.encode('utf-8')) != 1: raise SystemExit('Unified spoken text not found exactly once')
             css=apk.read('assets/v4047_compact.css')
             original_css=pathlib.Path('build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/v4047_compact.css').read_bytes()
             if css!=original_css or b'grid-template-columns:repeat(2,minmax(0,1fr))' not in css: raise SystemExit('Compact CSS missing or mismatch')
