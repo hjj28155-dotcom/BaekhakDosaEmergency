@@ -2002,30 +2002,30 @@ function v4049ScoreSummary(games,win){
  const highestHits=Math.max(...results.map(x=>x.hits));
  return {highestHits,wins:winningRows.length,bestRank};
 }
-function v4053ResearchVoice(round,outcome){
- // This is retrospective comparison ONLY. Never announce as a purchased or locked win.
+/* V4.0.54: One short losing announcement only; never treat retrospective comparisons as purchased tickets. */
+function v4054LossVoice(round,outcome,researchOnly){
  stopScoreAudio();
  const overlay=document.getElementById('comfortOverlay');
- if(!overlay)return;
- const matched=outcome.wins,highest=outcome.highestHits;
- const title='제'+round+'회 사후 연구 비교 안내';
- const message=matched>0
-  ?'제'+round+'회 사후 연구 20조합의 당첨번호 비교 결과입니다. 최고 '+highest+'개 일치, 3개 이상 일치한 조합은 '+matched+'개입니다. 이 조합은 추첨 후 생성된 연구용 자료로, 실제 구매 당첨 기록은 아닙니다.'
-  :'제'+round+'회 사후 연구 20조합의 당첨번호 비교 결과입니다. 최고 '+highest+'개 일치이며, 3개 이상 일치한 조합은 없습니다. 추첨 후 생성된 연구용 자료이므로 실제 구매 당첨 기록은 아닙니다.';
- document.getElementById('comfortTitle').textContent=title;
- document.getElementById('comfortText').textContent='20조합 비교 · 최고 '+highest+'/6 · 3개 이상 '+matched+'개';
- document.getElementById('comfortBottom').textContent='사후 연구 조합 · 추첨 전 구매 성적 아님';
+ if(!overlay)return false;
+ const text=researchOnly
+  ?'아쉽습니다. 제'+round+'회 사후 연구 20조합은 3개 이상 일치한 조합이 없습니다. 다음 회차를 기대하겠습니다.'
+  :'아쉽습니다. 제'+round+'회는 낙첨입니다. 다음 회차에는 더 좋은 결과를 기대하겠습니다.';
+ document.getElementById('comfortTitle').textContent='제'+round+'회 · 낙첨 안내';
+ document.getElementById('comfortText').textContent=researchOnly
+  ?'사후 연구 결과 · 3개 이상 일치한 조합 없음'
+  :'당첨 조합 없음 · 최고 '+outcome.highestHits+'/6';
+ document.getElementById('comfortBottom').textContent=researchOnly
+  ?'추첨 후 비교 자료 · 실제 구매 성적 아님'
+  :'다음 회차를 응원합니다.';
  overlay.classList.add('show');
- const host=scoreVoiceHost();let nativeOk=false;
+ const host=scoreVoiceHost();let spoken=false;
  try{
-  if(host&&typeof host.speakConsolation==='function'){
-   host.speakConsolation(message);nativeOk=true;
-  }else if(host&&typeof host.speakCelebration==='function'){
-   host.speakCelebration(message,0);nativeOk=true;
-  }
- }catch(e){nativeOk=false}
- if(!nativeOk)v4049Later(()=>speakScoreFallback(message,0),200);
- v4049Later(()=>overlay.classList.remove('show'),6500);
+  if(host&&typeof host.speakConsolation==='function'){host.speakConsolation(text);spoken=true;}
+  else if(host&&typeof host.speakCelebration==='function'){host.speakCelebration(text,0);spoken=true;}
+ }catch(e){spoken=false}
+ if(!spoken)v4049Later(()=>speakScoreFallback(text,0),200);
+ v4049Later(()=>overlay.classList.remove('show'),4200);
+ return true;
 }
 function v4049Announce(round,force){
  const n=Number(round);
@@ -2047,10 +2047,10 @@ function v4049Announce(round,force){
  if(!force&&V4049_ANNOUNCED[n]===identity)return false;
  V4049_ANNOUNCED[n]=identity;
  const outcome=v4049ScoreSummary(tickets,win);
- if(researchOnly)v4053ResearchVoice(n,outcome);
- else if(outcome.wins>0)showFanfare(n,outcome.highestHits,outcome.wins,outcome.bestRank);
- else showComfort(n,outcome.highestHits);
- return true;
+ // Only a verified 0-winning-ticket result produces a spoken message.
+ // Other ranks remain visible in the table, but no celebration/fanfare speech is played.
+ if(outcome.wins>0)return false;
+ return v4054LossVoice(n,outcome,researchOnly);
 }
 function v4048GoHome(){
  if(V4046_CORPUS_JOB){
@@ -2091,9 +2091,9 @@ function v4044ReviewRound(round,autoStart){
  if(display20){
   if(win){
    html+=v4045GroupedScore(display20,win,source==='research'?'사후 연구 20조합':'저장 자동 20조합',source);
-   {
+   if(v4049ScoreSummary(display20,win).wins===0){
     html=html.replace('<div class="v4047Summary">','<div class="v4047Summary v4049VoiceSummary">');
-    html=html.replace('</div><div class="r5grid">','<button class="v4049Replay" onclick="v4049Announce('+n+',true)" title="성적멘트 다시 듣기">🔊 다시듣기</button></div><div class="r5grid">');
+    html=html.replace('</div><div class="r5grid">','<button class="v4049Replay" onclick="v4049Announce('+n+',true)" title="낙첨멘트 다시 듣기">🔊 다시듣기</button></div><div class="r5grid">');
    }
   }
   else html+='<div class="v4047Summary">'+(source==='research'?'사후 연구 · 결과 전 실적 제외':'자동 분석 20조합')+
@@ -2115,7 +2115,7 @@ function v4044ReviewRound(round,autoStart){
   setTimeout(()=>{try{if(Number(cur())===n && document.getElementById('modal')?.classList.contains('v4047Compact'))v4045AutoAnalyze20(n)}catch(e){}},100);
  }
  setTimeout(()=>{try{if(Number(cur())===n)v4045MaybeRefreshWinning(n)}catch(e){}},300);
- if(win&&display20)v4049Later(()=>{
+ if(win&&display20&&v4049ScoreSummary(display20,win).wins===0)v4049Later(()=>{
   try{if(document.getElementById('modal')?.classList.contains('v4047Compact')&&Number(cur())===n)v4049Announce(n,false)}catch(e){}
  },120);
 }
