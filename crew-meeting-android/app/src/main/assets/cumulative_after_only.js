@@ -168,11 +168,11 @@
    if(serial!==seq||!root.isConnected||root.hidden)return;
    if(scored.round!==n||!Array.isArray(scored.details))throw Error('SCORE_CONTRACT');
    var found=0;
-   ['v4-1','v4-2'].forEach(function(key){
+   roomIds.forEach(function(key){
     var item=scored.details.find(function(x){return x.room_key===key&&x.official_eligible===false&&
      x.provenance==='RETROSPECTIVE_RESEARCH_ONLY'&&Array.isArray(x.rows)&&x.rows.length===5;});
     if(!item){
-     state(key,key==='v4-2'?'통제실장 R1 독립 원본 미수신 · 0점 아님':'선장 R46 검증 연구 원본 미수신 · 0점 아님');return;
+     if(key==='v4-1'||key==='v4-2')state(key,key==='v4-2'?'통제실장 R1 독립 원본 미수신 · 0점 아님':'선장 R46 검증 연구 원본 미수신 · 0점 아님');return;
     }
     if(!draw||!item.draw||!Array.isArray(item.draw.numbers)||
       draw.numbers.slice().sort(function(a,b){return a-b;}).join(',')!==
@@ -189,14 +189,13 @@
      hit.textContent=row.bucket===6?'5+보':row.hits+'/6';
      hit.classList.remove('pending');
     });
-    state(key,(key==='v4-1'?'선장 R46':'통제실장 R1')+' · 검증 연구 5조합 사후 대조 · 공식 잠금 아님');
+    state(key,(key==='v4-1'?'선장 R46':key==='v4-2'?'통제실장 R1':key.toUpperCase())+' · 검증 연구 5조합 사후 대조 · 공식 잠금 아님');
     found++;
    });
-   $('cumStatus').textContent+=' · V4 '+found+'/2방 실제 원본 '+(found*5)+'조합 검증된 연구 사후 대조';
+   $('cumStatus').textContent+=' · '+found+'/7방 실제 원본 '+(found*5)+'조합 검증된 연구 사후 대조';
   }catch(e){
    if(serial!==seq)return;
-   state('v4-1','연구 채점 서버 조회 실패 · 원본 보존');
-   state('v4-2','독립 원본 검증 대기 · 0점 아님');
+   roomIds.forEach(function(key){state(key,'연구 채점 서버 조회 실패 · 원본 보존');});
   }
   // Separate legacy V7 captain archive reference, NOT V7 controller room.
   try{

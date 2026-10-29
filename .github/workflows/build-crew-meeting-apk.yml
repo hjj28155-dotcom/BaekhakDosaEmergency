@@ -1,6 +1,13 @@
-name: Build same-signer V8.0.1 cinematic one-screen command APK
+name: Build same-signer V8.0.7 analysis-distribution staging APK
 on:
   push:
+    branches:
+      - feature/crew-meeting-standalone-apk-20261025
+      - feature/v8-v7-retirement-v3-link-20261029
+    paths:
+      - 'crew-meeting-android/**'
+      - '.github/workflows/build-crew-meeting-apk.yml'
+  pull_request:
     branches:
       - feature/crew-meeting-standalone-apk-20261025
     paths:
@@ -73,6 +80,7 @@ jobs:
       - name: Verify bundled six-room captain research dashboard is present
         run: |
           set -euo pipefail
+          set -x
           HOME_HTML=crew-meeting-android/app/src/main/assets/captain_home_v114.html
           test -s "$HOME_HTML"
           grep -Fq 'id="appCommandDeck"' "$HOME_HTML"
@@ -125,9 +133,9 @@ jobs:
           grep -Fq 'new V4PngSaver()' crew-meeting-android/app/src/main/java/kr/hanghae/crewmeeting/MainActivity.java
           grep -Fq 'SAVE_V4_PNG_CODE' crew-meeting-android/app/src/main/java/kr/hanghae/crewmeeting/MainActivity.java
           grep -Fq 'name="v4_png_report.js";mime="text/javascript"' crew-meeting-android/app/src/main/java/kr/hanghae/crewmeeting/MainActivity.java
-          grep -Fq 'crew-db1-1-1247.json' "$HOME_HTML"
-          grep -Fq 'crew-captain-engine-r46.html' "$HOME_HTML"
-          grep -Fq 'crew-liaison-blind-r1.mjs' "$HOME_HTML"
+          grep -Fq 'db1_rounds_1_1247.json' "$HOME_HTML"
+          grep -Fq 'captain_engine_r46.html' "$HOME_HTML"
+          grep -Fq 'liaison-blind-engine.mjs' "$HOME_HTML"
           grep -Fq '선장엔진 R46 · 5조합' "$HOME_HTML"
           grep -Fq '통제실장엔진 R1 · 5조합' "$HOME_HTML"
           grep -Fq 'DB1_SHA256_INVALID_' crew-meeting-android/app/src/main/java/kr/hanghae/crewmeeting/MainActivity.java
@@ -176,6 +184,10 @@ jobs:
           node --check crew-meeting-android/app/src/main/assets/cumulative_after_only.js
           grep -Fq 'CAPTAIN_NAVAL_THEME_R30' crew-meeting-android/app/src/main/assets/cumulative_after_only.css
           grep -Fq 'id="v8Hero"' "$HOME_HTML"
+           ! grep -Fq 'data-app-card="v7"' "$HOME_HTML"
+           ! grep -Fq 'id="originalController"' "$HOME_HTML"
+           grep -Fq 'id="v8ServerQuick"' "$HOME_HTML"
+           grep -Fq 'id="v8CheckV3Server"' "$HOME_HTML"
           grep -Fq 'data-app-card="v8"' "$HOME_HTML"
           grep -Fq '항행의자유 중앙통제실 V8' "$HOME_HTML"
           grep -Fq '통제실장' "$HOME_HTML"
@@ -189,6 +201,9 @@ jobs:
           grep -Fq 'crew-v8-cinematic.webp' crew-meeting-android/app/src/main/assets/captain_v8.css
           grep -Fq 'captain_v8_cinematic.webp' crew-meeting-android/app/src/main/java/kr/hanghae/crewmeeting/MainActivity.java
           grep -Fq 'id="v8ExitBtn"' "$HOME_HTML"
+          grep -Fq 'id="homeDirectorRoomOpen"' "$HOME_HTML"
+          grep -Fq 'id="homeDirectorRoom"' "$HOME_HTML"
+          grep -Fq 'id="directorOriginalEdit"' "$HOME_HTML"
           grep -Fq 'v8AdvancedOperations' "$HOME_HTML"
           grep -Fq 'V8 통합 지휘본부' "$HOME_HTML"
           grep -Fq '⚓ 중앙통제실 V8' "$HOME_HTML"
@@ -197,8 +212,8 @@ jobs:
           grep -Fq 'android:label="항행의자유 중앙통제실 V8"' crew-meeting-android/app/src/main/AndroidManifest.xml
           grep -Fq 'captainSevenRoomScoreRead=async function' "$HOME_HTML"
           grep -Fq 'researchRate(grades,threshold)' crew-meeting-android/app/src/main/assets/cumulative_after_only.js
-          grep -Fq 'id="crewUpdateOpen" type="button" disabled' "$HOME_HTML"
-          grep -Fq 'V8 배포대기' "$HOME_HTML"
+          grep -Fq 'id="crewUpdateOpen" type="button" aria-label="V8 업데이트 상태 확인"' "$HOME_HTML"
+          grep -Fq '업데이트 확인' "$HOME_HTML"
           ! grep -Fq '1NtFkXk2HPqUOPsp2K-as29r9SHgKJmYc' "$HOME_HTML"
           python3 - <<'PY'
           import json
@@ -215,7 +230,7 @@ jobs:
           grep -Fq 'id="freedomFirstList"' "$HOME_HTML"
           grep -Fq 'id="freedomSecondList"' "$HOME_HTML"
           grep -Fq "window.captainV4Route('v4')" "$HOME_HTML"
-          grep -Fq "window.captainV4Route('home')" "$HOME_HTML"
+          grep -Fq "window.captainV4Route('director')" "$HOME_HTML"
           grep -Fq 'main.roomMode > #freedomAnalysisPanel:not([hidden])' "$HOME_HTML"
           grep -Fq '선장엔진 R46 · 통제실장엔진 R1 검증 대기' "$HOME_HTML"
           ! grep -Fq 'openFreedomApprovalShortcut' "$HOME_HTML"
@@ -224,11 +239,22 @@ jobs:
           grep -Fq 'data-material-stage="after"' "$HOME_HTML"
           grep -Fq 'V3의 과거 350회 누적 분석은 별도 보존' "$HOME_HTML"
           grep -Fq 'loadCaptainDashboard()' crew-meeting-android/app/src/main/java/kr/hanghae/crewmeeting/MainActivity.java
-          grep -Fq "versionCode 801" crew-meeting-android/app/build.gradle
+          grep -Fq "versionCode 807" crew-meeting-android/app/build.gradle
           test "$(grep -c 'data-before-room=' "$HOME_HTML")" -eq 7
           test "$(grep -c 'data-v3-room-card=' "$HOME_HTML")" -eq 4
           test "$(grep -c 'data-v3-report=' "$HOME_HTML")" -eq 4
           echo 'Embedded captain-only report-before and report-after modules: present'
+          python3 - <<'PY'
+          import pathlib
+          root=pathlib.Path('crew-meeting-android/app/src/main/assets')
+          html=(root/'captain_home_v114.html').read_text()
+          for path in ['db1_rounds_1_1247.json','captain_engine_r46.html','liaison-blind-engine.mjs']:
+              assert path in html, 'missing HTML asset reference: '+path
+              assert (root/path).is_file(), 'missing APK asset: '+path
+          for obsolete in ['crew-db1-1-1247.json','crew-captain-engine-r46.html','crew-liaison-blind-r1.mjs']:
+              assert obsolete not in html, 'obsolete asset reference: '+obsolete
+          print('V8 original-analysis assets verified')
+          PY
       - name: Assemble separate app
         working-directory: crew-meeting-android
         run: gradle :app:assembleDebug --no-daemon --stacktrace
@@ -245,23 +271,24 @@ jobs:
           test "$NEW_CERT" = "e24e9573e5e98567ea2e5abddac427126c43d8f1e46b37e4099dabc911cf70be"
           echo "Recovery app signer pinned: $NEW_CERT"
           "$AAPT" dump badging "$APK" | head -5
-          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting.compact' versionCode='801'"
+          "$AAPT" dump badging "$APK" | grep -q "package: name='kr.hanghae.crewmeeting.compact' versionCode='807'"
           ! "$AAPT" dump badging "$APK" | grep -q "package: name='com.baekhak.dosa.v4'"
           mkdir -p crew-meeting-android/releases
-          cp "$APK" crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.1_ONE_SCREEN_CINEMATIC.apk
-          (cd crew-meeting-android/releases && sha256sum HANGHAE_CREW_MEETING_V8_8.0.1_ONE_SCREEN_CINEMATIC.apk > HANGHAE_CREW_MEETING_V8_8.0.1_ONE_SCREEN_CINEMATIC.apk.sha256)
+          cp "$APK" crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.7_DIRECTOR_ANALYSIS_DISTRIBUTION.apk
+          (cd crew-meeting-android/releases && sha256sum HANGHAE_CREW_MEETING_V8_8.0.7_DIRECTOR_ANALYSIS_DISTRIBUTION.apk > HANGHAE_CREW_MEETING_V8_8.0.7_DIRECTOR_ANALYSIS_DISTRIBUTION.apk.sha256)
       - uses: actions/upload-artifact@v4
         with:
-          name: HANGHAE-CREW-MEETING-V8-8.0.1-ONE-SCREEN-CINEMATIC-APK
+          name: HANGHAE-CREW-MEETING-V8-8.0.7-DIRECTOR-ANALYSIS-DISTRIBUTION-APK
           path: |
-            crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.1_ONE_SCREEN_CINEMATIC.apk
-            crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.1_ONE_SCREEN_CINEMATIC.apk.sha256
+            crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.7_DIRECTOR_ANALYSIS_DISTRIBUTION.apk
+            crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.7_DIRECTOR_ANALYSIS_DISTRIBUTION.apk.sha256
           if-no-files-found: error
           retention-days: 30
       - name: Verify isolated APK artifact packaging
         run: |
           set -euo pipefail
-          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.1_ONE_SCREEN_CINEMATIC.apk
-          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.1_ONE_SCREEN_CINEMATIC.apk.sha256
-          (cd crew-meeting-android/releases && sha256sum --check HANGHAE_CREW_MEETING_V8_8.0.1_ONE_SCREEN_CINEMATIC.apk.sha256)
+          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.7_DIRECTOR_ANALYSIS_DISTRIBUTION.apk
+          test -s crew-meeting-android/releases/HANGHAE_CREW_MEETING_V8_8.0.7_DIRECTOR_ANALYSIS_DISTRIBUTION.apk.sha256
+          (cd crew-meeting-android/releases && sha256sum --check HANGHAE_CREW_MEETING_V8_8.0.7_DIRECTOR_ANALYSIS_DISTRIBUTION.apk.sha256)
           echo "TEST artifact verified. Do NOT replace the stable fixed Google Drive APK without device verification."
+

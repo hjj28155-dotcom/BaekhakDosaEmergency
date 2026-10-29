@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- Android 11+ visibility only for the captain-verified V3 R60 package. -->
-    <queries><package android:name="com.baekhak.dosa.f6" /></queries>
+    <queries><package android:name="com.baekhak.dosa.f6" /><package android:name="com.navigator.freedom.v3final" /></queries>
     <application android:label="항행의자유 중앙통제실 V8" android:icon="@drawable/ic_crew_flagship"
         android:usesCleartextTraffic="false"
         android:allowBackup="false"
@@ -16,3 +16,4 @@
         </activity>
     </application>
 </manifest>
+

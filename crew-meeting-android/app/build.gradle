@@ -6,10 +6,11 @@ android {
         applicationId 'kr.hanghae.crewmeeting.compact'
         minSdk 24
         targetSdk 34
-        versionCode 801
-        versionName '8.0.1-ONE-SCREEN-CINEMATIC'
+        versionCode 807
+        versionName '8.0.7-DIRECTOR-ASSET-FIX'
     }
     compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
     signingConfigs { debug { storeFile file(System.getProperty('user.home') + '/.android/debug.keystore'); storePassword 'android'; keyAlias 'androiddebugkey'; keyPassword 'android' } }
     buildTypes { debug { minifyEnabled false; signingConfig signingConfigs.debug }; release { minifyEnabled false } }
 }
+

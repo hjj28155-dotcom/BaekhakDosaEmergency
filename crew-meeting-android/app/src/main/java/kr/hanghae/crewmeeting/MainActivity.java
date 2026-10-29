@@ -35,6 +35,7 @@ public final class MainActivity extends Activity {
     private static final int PICK_V7_APP = 504;
     private static final int SAVE_V4_PNG_CODE = 505;
     private static final String LINK_PREFS = "crew_meeting_installed_app_links_v1";
+    private static final String FREEDOM_DISTRIBUTION_PACKAGE = "com.navigator.freedom.v3final";
     private WebView web;
     private ValueCallback<Uri[]> fileCallback;
     private volatile byte[] pendingV4Png;
@@ -54,7 +55,7 @@ public final class MainActivity extends Activity {
         web = new WebView(this);
         web.setVerticalScrollBarEnabled(false);
         setContentView(web);
-        // Only two fixed roles can be opened. The web layer never supplies package names.
+        // Fixed native app targets only. The web layer never supplies package names.
         web.addJavascriptInterface(new InstalledAppLauncher(), "CrewInstalledApps");
         web.addJavascriptInterface(new V4PngSaver(), "CrewPngSaver");
         WebSettings settings = web.getSettings();
@@ -221,6 +222,29 @@ public final class MainActivity extends Activity {
      * explicitly chosen by the captain are stored.
      */
     public final class InstalledAppLauncher {
+        @JavascriptInterface public String getFreedomDistributionState() {
+            JSONObject state = new JSONObject();
+            try {
+                Intent launch = getPackageManager().getLaunchIntentForPackage(FREEDOM_DISTRIBUTION_PACKAGE);
+                if (launch == null) return "{\"status\":\"NOT_INSTALLED\"}";
+                android.content.pm.PackageInfo info = getPackageManager().getPackageInfo(FREEDOM_DISTRIBUTION_PACKAGE, 0);
+                state.put("status", "INSTALLED");
+                state.put("versionName", info.versionName == null ? "" : info.versionName);
+                state.put("versionCode", info.versionCode);
+                return state.toString();
+            } catch (android.content.pm.PackageManager.NameNotFoundException e) {
+                return "{\"status\":\"NOT_INSTALLED\"}";
+            } catch (Exception e) { return "{\"status\":\"UNAVAILABLE\"}"; }
+        }
+        @JavascriptInterface public String openFreedomDistribution() {
+            final Intent launch = getPackageManager().getLaunchIntentForPackage(FREEDOM_DISTRIBUTION_PACKAGE);
+            if (launch == null) return "{\"status\":\"NOT_INSTALLED\"}";
+            runOnUiThread(() -> {
+                try { startActivity(launch); }
+                catch (Exception e) { Toast.makeText(MainActivity.this, "항해의자유 배포판을 열 수 없습니다.", Toast.LENGTH_LONG).show(); }
+            });
+            return "{\"status\":\"LAUNCH_REQUESTED\"}";
+        }
         @JavascriptInterface public void openInstalled(String role, boolean chooseAgain) {
             if (!"v3".equals(role) && !"v7".equals(role)) return;
             runOnUiThread(() -> openSelectedApp(role, chooseAgain));
@@ -417,3 +441,4 @@ public final class MainActivity extends Activity {
         super.onDestroy();
     }
 }
+
