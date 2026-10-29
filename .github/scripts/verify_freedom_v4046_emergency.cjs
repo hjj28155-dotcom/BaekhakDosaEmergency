@@ -22,7 +22,7 @@ assert.match(compactCss,/grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
 assert.match(html,/function v4048GoHome/);
 assert.match(html,/function v4049Announce/);
 assert.match(html,/function v4049ScoreSummary/);
-assert.match(html,/source!=='research'/);
+assert.match(html,/if\(researchOnly\)v4053ResearchVoice\(n,outcome\)/);
 assert.match(html,/showFanfare\(n,outcome[.]highestHits,outcome[.]wins,outcome[.]bestRank\)/);
 assert.match(html,/showComfort\(n,outcome[.]highestHits\)/);
 assert.match(compactCss,/#fanfareOverlay[.]show,#comfortOverlay[.]show/);
