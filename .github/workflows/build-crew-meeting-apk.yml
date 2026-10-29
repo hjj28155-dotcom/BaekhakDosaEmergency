@@ -133,9 +133,9 @@ jobs:
           grep -Fq 'new V4PngSaver()' crew-meeting-android/app/src/main/java/kr/hanghae/crewmeeting/MainActivity.java
           grep -Fq 'SAVE_V4_PNG_CODE' crew-meeting-android/app/src/main/java/kr/hanghae/crewmeeting/MainActivity.java
           grep -Fq 'name="v4_png_report.js";mime="text/javascript"' crew-meeting-android/app/src/main/java/kr/hanghae/crewmeeting/MainActivity.java
-          grep -Fq 'crew-db1-1-1247.json' "$HOME_HTML"
-          grep -Fq 'crew-captain-engine-r46.html' "$HOME_HTML"
-          grep -Fq 'crew-liaison-blind-r1.mjs' "$HOME_HTML"
+          grep -Fq 'db1_rounds_1_1247.json' "$HOME_HTML"
+          grep -Fq 'captain_engine_r46.html' "$HOME_HTML"
+          grep -Fq 'liaison-blind-engine.mjs' "$HOME_HTML"
           grep -Fq '선장엔진 R46 · 5조합' "$HOME_HTML"
           grep -Fq '통제실장엔진 R1 · 5조합' "$HOME_HTML"
           grep -Fq 'DB1_SHA256_INVALID_' crew-meeting-android/app/src/main/java/kr/hanghae/crewmeeting/MainActivity.java
