@@ -80,6 +80,7 @@ jobs:
       - name: Verify bundled six-room captain research dashboard is present
         run: |
           set -euo pipefail
+          set -x
           HOME_HTML=crew-meeting-android/app/src/main/assets/captain_home_v114.html
           test -s "$HOME_HTML"
           grep -Fq 'id="appCommandDeck"' "$HOME_HTML"
