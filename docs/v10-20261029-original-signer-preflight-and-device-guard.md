@@ -42,3 +42,13 @@
 - 안전 서명/기기호환성 스크립트 **제작·문법·차단 모의검사 완료**.
 - Drive 원본/검증 도구 업로드 및 확인 **완료**.
 - 원본키로 signed APK 제작, 실제 휴대전화 실사용 확인, 설치용 Drive V10 APK 업로드 **미완료**.
+
+
+## 2026-10-29 선장 공유 파일 실물 대조
+
+- 선장이 업로드한 `공유` 파일을 Python/ZIP·Android 이진 XML·PKCS7 인증서로 직접 검증: **서명된 V3 R60 원본 APK**이며 개인키(PKCS12)가 아님.
+- 파일 크기 **15,435,430 bytes**, SHA-256 **`87ccc77af2a1bd2e5a3b19f31ef84e5e21eccffda717daf2e183c726f9f58026`** — 작업환경의 기존 원본 `항행의자유_V3_R60_설치정보복구_U10연구보완_30193_동일서명.apk`와 정확히 동일.
+- ZIP **71개 항목**, CRC 정상, 이진 AndroidManifest 직접 파싱 결과 package `com.baekhak.dosa.f6`, versionCode **30193**, versionName `V3-R60-U10F-30193-F6--------------`.
+- `META-INF/V3R33-F2.RSA`의 PKCS#7 공개 인증서 SHA-256 **`eedcfd3730f650e55defee1b0c971b77117b241211d73eb02a8fd9982245a48c`**. `jarsigner -verify` **jar verified** (v1 검증 통과), APK Signing Block 42 (v2 서명 블록) 존재. v2 암호학적 독립 재검증은 이전 `R60_SIGNED_VERIFICATION.json`에 성공으로 기록되어 있으며, 이번 호출에서 새로 실시했다고 주장하지 않음.
+- 보완된 V10 서명 전 후보 `HANGHAE_CENTRAL_V10_30194_ASSETS_FIXED_UNSIGNED_DO_NOT_INSTALL.apk.unsigned`: **70개 ZIP 항목, CRC 정상**, `assets/v10_icon_draft.png`, `assets/v10_reference_banner.jpg` 내장, SHA-256 `4101a642f70676a37b68fb94d8df4704c80a3b937180f7ffa7797054eedb1856`, 서명파일 없음.
+- 결론: 공유 파일은 진품 R60 기준 APK임을 확인했으나 **서명에 필요한 개인키가 APK에 포함되지 않으므로 V10 서명 장애물은 해소되지 않음**. 기존 V3/V4/V7 설치·데이터·Drive 배포 미변경. 원본 APK에서 개인키 추출이나 새 키로 서명하는 우회 금지.
