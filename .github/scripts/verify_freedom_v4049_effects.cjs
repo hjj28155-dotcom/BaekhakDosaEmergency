@@ -61,7 +61,7 @@ assert.match(html,/function closeM\(\)\{stopScoreAudio\(\)/);
 assert.match(html,/function modal\(title,html\)\{v4052PrepareModal\(title,html\)/);
 assert.match(html,/if\(win&&display20\)v4049Later/);
 assert.match(html,/function v4053ResearchVoice/);
-assert.match(html,/source!=='research'/);
+assert.match(html,/if\(researchOnly\)v4053ResearchVoice\(n,outcome\)/);
 assert.match(fs.readFileSync(base+'src/freedom/assets/v4047_compact.css','utf8'),/z-index:2147483647!important/);
 const java=fs.readFileSync(base+'src/main/java/com/baekhak/centralcontrol/MainActivity.java','utf8');
 assert.match(java,/scoreVoiceHandler.removeCallbacksAndMessages\(null\);\s*pendingScoreSpeech = null;/);
