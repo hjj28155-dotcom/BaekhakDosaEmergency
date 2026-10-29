@@ -2002,6 +2002,31 @@ function v4049ScoreSummary(games,win){
  const highestHits=Math.max(...results.map(x=>x.hits));
  return {highestHits,wins:winningRows.length,bestRank};
 }
+function v4053ResearchVoice(round,outcome){
+ // This is retrospective comparison ONLY. Never announce as a purchased or locked win.
+ stopScoreAudio();
+ const overlay=document.getElementById('comfortOverlay');
+ if(!overlay)return;
+ const matched=outcome.wins,highest=outcome.highestHits;
+ const title='제'+round+'회 사후 연구 비교 안내';
+ const message=matched>0
+  ?'제'+round+'회 사후 연구 20조합의 당첨번호 비교 결과입니다. 최고 '+highest+'개 일치, 3개 이상 일치한 조합은 '+matched+'개입니다. 이 조합은 추첨 후 생성된 연구용 자료로, 실제 구매 당첨 기록은 아닙니다.'
+  :'제'+round+'회 사후 연구 20조합의 당첨번호 비교 결과입니다. 최고 '+highest+'개 일치이며, 3개 이상 일치한 조합은 없습니다. 추첨 후 생성된 연구용 자료이므로 실제 구매 당첨 기록은 아닙니다.';
+ document.getElementById('comfortTitle').textContent=title;
+ document.getElementById('comfortText').textContent='20조합 비교 · 최고 '+highest+'/6 · 3개 이상 '+matched+'개';
+ document.getElementById('comfortBottom').textContent='사후 연구 조합 · 추첨 전 구매 성적 아님';
+ overlay.classList.add('show');
+ const host=scoreVoiceHost();let nativeOk=false;
+ try{
+  if(host&&typeof host.speakConsolation==='function'){
+   host.speakConsolation(message);nativeOk=true;
+  }else if(host&&typeof host.speakCelebration==='function'){
+   host.speakCelebration(message,0);nativeOk=true;
+  }
+ }catch(e){nativeOk=false}
+ if(!nativeOk)v4049Later(()=>speakScoreFallback(message,0),200);
+ v4049Later(()=>overlay.classList.remove('show'),6500);
+}
 function v4049Announce(round,force){
  const n=Number(round);
  if(!V4046_VISIBLE.includes(n)||Number(cur())!==n)return false;
@@ -2014,13 +2039,16 @@ function v4049Announce(round,force){
  const originals=Array.isArray(groups)&&groups.length?groups:(Array.isArray(legacy)?legacy:[]);
  const archivedRows=originals.flatMap(g=>Array.isArray(g&&g.rows)?g.rows.map(x=>x&&('game' in x?x.game:x.numbers)):[]);
  const archive=archivedRows.length===20?v4044ValidSets(archivedRows,20):null;
- const tickets=locked||analysis||archive;
- if(!tickets)return false; // In particular, post-draw analysisResearch never gets celebratory purchase language.
- const identity=n+'|'+win.nums.join(',')+'|'+win.bonus+'|'+tickets.map(x=>x.join(',')).join(';');
+ const storedResearch=v4044ValidSets((rec.analysisResearch||{}).auto20,20);
+ const tickets=locked||analysis||archive||storedResearch;
+ if(!tickets)return false; // A record without verified six-number tickets must stay silent.
+ const researchOnly=!!storedResearch&&!locked&&!analysis&&!archive;
+ const identity=n+'|'+(researchOnly?'research':'saved')+'|'+win.nums.join(',')+'|'+win.bonus+'|'+tickets.map(x=>x.join(',')).join(';');
  if(!force&&V4049_ANNOUNCED[n]===identity)return false;
  V4049_ANNOUNCED[n]=identity;
  const outcome=v4049ScoreSummary(tickets,win);
- if(outcome.wins>0)showFanfare(n,outcome.highestHits,outcome.wins,outcome.bestRank);
+ if(researchOnly)v4053ResearchVoice(n,outcome);
+ else if(outcome.wins>0)showFanfare(n,outcome.highestHits,outcome.wins,outcome.bestRank);
  else showComfort(n,outcome.highestHits);
  return true;
 }
@@ -2063,7 +2091,7 @@ function v4044ReviewRound(round,autoStart){
  if(display20){
   if(win){
    html+=v4045GroupedScore(display20,win,source==='research'?'사후 연구 20조합':'저장 자동 20조합',source);
-   if(source!=='research'){
+   {
     html=html.replace('<div class="v4047Summary">','<div class="v4047Summary v4049VoiceSummary">');
     html=html.replace('</div><div class="r5grid">','<button class="v4049Replay" onclick="v4049Announce('+n+',true)" title="성적멘트 다시 듣기">🔊 다시듣기</button></div><div class="r5grid">');
    }
@@ -2087,7 +2115,7 @@ function v4044ReviewRound(round,autoStart){
   setTimeout(()=>{try{if(Number(cur())===n && document.getElementById('modal')?.classList.contains('v4047Compact'))v4045AutoAnalyze20(n)}catch(e){}},100);
  }
  setTimeout(()=>{try{if(Number(cur())===n)v4045MaybeRefreshWinning(n)}catch(e){}},300);
- if(win&&display20&&source!=='research')v4049Later(()=>{
+ if(win&&display20)v4049Later(()=>{
   try{if(document.getElementById('modal')?.classList.contains('v4047Compact')&&Number(cur())===n)v4049Announce(n,false)}catch(e){}
  },120);
 }
