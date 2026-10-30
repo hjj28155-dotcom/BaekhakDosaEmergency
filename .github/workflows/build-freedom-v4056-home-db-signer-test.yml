@@ -15,7 +15,7 @@ jobs:
       - name: Checkout exact isolated V4.0.56 source, never modify original branch sources
         uses: actions/checkout@v4
         with:
-          ref: f283e06210ea06e54636b95c122252f1932da43d
+          ref: 7afd6f2f8e308fb19f3741fc3b6b0ceb8e9eb1d4
           persist-credentials: false
       - name: Set up Java 17
         uses: actions/setup-java@v4
@@ -40,7 +40,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD)" = 'f283e06210ea06e54636b95c122252f1932da43d'
+          test "$(git rev-parse HEAD)" = '7afd6f2f8e308fb19f3741fc3b6b0ceb8e9eb1d4'
           node .github/scripts/validate_freedom_r14.cjs
           node .github/scripts/verify_freedom_v4043.cjs
           node .github/scripts/verify_freedom_v4043_references.cjs
@@ -96,6 +96,7 @@ jobs:
             if b'function v4054LossVoice' not in embedded or b'if(outcome.wins>0)return false' not in embedded or b'v4049Announce(n,false)' not in embedded: raise SystemExit('Short loss-only voice missing in signed APK')
             if embedded.count('회는 낙첨입니다.'.encode('utf-8')) != 1: raise SystemExit('Unified spoken text not found exactly once')
             if embedded.count(b'id="v4056HomeCumulativeDb"') != 1 or b'onclick="openM(\'db\')"' not in embedded: raise SystemExit('V4 home cumulative DB entry not in APK')
+            if b'<div class="simpleVersion">V4.0.56</div>' not in embedded: raise SystemExit('Stale home version badge in APK')
             css=apk.read('assets/v4047_compact.css')
             original_css=pathlib.Path('build405/FREEDOM_V402_BUILD_THIS/app/src/freedom/assets/v4047_compact.css').read_bytes()
             if css!=original_css or b'grid-template-columns:repeat(2,minmax(0,1fr))' not in css: raise SystemExit('Compact CSS missing or mismatch')
