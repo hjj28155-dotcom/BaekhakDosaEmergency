@@ -172,7 +172,7 @@ function checkFreedomInstalledVersion(){
  if(!msg||!details||!dl)return;
  msg.textContent='현재 설치된 APK 버전을 확인하고 있습니다…';
  details.textContent='';
- dl.hidden=false;dl.textContent='드라이브 업데이트 파일 열기';
+ dl.hidden=true;dl.textContent='공식 APK 링크 열기';
  try{
   const h=native();
   if(!h||typeof h.checkLatestFreedomVersion!=='function'){
@@ -203,8 +203,13 @@ function homeIsVisible(){
  return true;
 }
 function openFreedomUpdate(){
- try{const h=native();if(h&&h.openOfficialUpdateLink){h.openOfficialUpdateLink();return}const url=verifiedDriveUpdateUrl||UPDATE_DRIVE_FOLDER;if(h&&h.openRadioPage){h.openRadioPage(url);return}window.open(url,'_blank')}
- catch(e){alert('공식 업데이트 링크를 열지 못했습니다.')}
+ const url=verifiedDriveUpdateUrl;
+ if(!url){alert('검증된 업데이트 APK 파일이 아직 등록되지 않았습니다. 기존 앱을 삭제하지 마세요.');return}
+ try{
+  const h=native();
+  if(h&&typeof h.openRadioPage==='function'){h.openRadioPage(url);return}
+  window.open(url,'_blank','noopener,noreferrer');
+ }catch(e){alert('APK 링크를 열지 못했습니다. 인터넷 연결을 확인하세요.')}
 }
 function showHomeUpdate(){
  const q=homeUpdatePending;
@@ -219,7 +224,8 @@ function showHomeUpdate(){
  const previous=document.activeElement;
  function close(){o.remove();if(previous&&typeof previous.focus==='function')previous.focus()}
  const later=o.querySelector('#freedomHomeUpdateLater'),now=o.querySelector('#freedomHomeUpdateNow');
- later.onclick=close;now.onclick=()=>{close();openFreedomUpdate()};
+ if(!verifiedDriveUpdateUrl){now.disabled=true;now.textContent='APK 준비 중';now.style.opacity='.55'}
+ later.onclick=close;now.onclick=()=>{if(!verifiedDriveUpdateUrl)return;close();openFreedomUpdate()};
  o.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();close()}else if(e.key==='Tab'){e.preventDefault();(document.activeElement===later?now:later).focus()}});
  if(typeof now.focus==='function')now.focus();
 }
@@ -242,7 +248,7 @@ window.onFreedomVersionStatus=function(payload){
  const details=document.getElementById('freedomVersionDetails');
  const dl=document.getElementById('freedomVersionDownload');
  if(!msg||!details||!dl)return;
- dl.hidden=false;dl.textContent='드라이브 업데이트 파일 열기';
+ dl.hidden=true;dl.textContent='공식 APK 링크 열기';
  const installed=Number(q.installed_code)||0,latest=Number(q.latest_code)||0;
  if(q.status==='latest'&&installed>=latest&&latest>=40041){
   msg.textContent='✅ 최신 APK가 설치되어 있습니다. 업데이트할 필요가 없습니다.';
