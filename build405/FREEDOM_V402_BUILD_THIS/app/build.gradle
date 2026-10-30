@@ -10,8 +10,8 @@ android {
         applicationId 'com.navigator.freedom.v3final'
         minSdk 23
         targetSdk 35
-        versionCode 40055
-        versionName "4.0.55-UNIFORM-LOSS-VOICE"
+        versionCode 40056
+        versionName "4.0.56-HOME-CUMULATIVE-DB"
     }
 
     buildFeatures {
@@ -61,7 +61,7 @@ android {
 
     applicationVariants.all { variant ->
         variant.outputs.all {
-            outputFileName = "HANGHAE_FREEDOM_V4_0_55_UNIFORM_LOSS_VOICE_TEST_CANDIDATE.apk"
+            outputFileName = "HANGHAE_FREEDOM_V4_0_56_HOME_CUMULATIVE_DB_TEST_CANDIDATE.apk"
         }
     }
 }
