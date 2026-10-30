@@ -846,6 +846,24 @@ body:has(#modal[style*="display:block"]) .simpleHot{
 }
 </style>
 <link rel="stylesheet" href="v4047_compact.css">
+<style id="v4056HomeCumulativeDbStyle">
+/* V4.0.56: Visible entry to existing cumulative DB; no engine or storage changes. */
+.simpleHome #v4056HomeCumulativeDb{
+  position:absolute!important;left:4%!important;bottom:9%!important;
+  width:42%!important;max-width:215px!important;min-height:48px!important;
+  border:2px solid #e1bd59!important;border-radius:13px!important;
+  background:linear-gradient(180deg,#15547a,#08283f)!important;
+  color:#ffe9a0!important;font:900 clamp(15px,4vw,20px)/1.2 system-ui,-apple-system,'Noto Sans KR',sans-serif!important;
+  box-shadow:0 5px 16px #000a, inset 0 1px 0 #ffffff24!important;
+  z-index:214748100!important;display:flex!important;align-items:center!important;
+  justify-content:center!important;cursor:pointer!important;touch-action:manipulation!important;
+  -webkit-tap-highlight-color:transparent!important;
+}
+.simpleHome #v4056HomeCumulativeDb:active{filter:brightness(1.18)!important}
+body:has(#modal[style*="display: block"]) #v4056HomeCumulativeDb,
+body:has(#modal[style*="display:block"]) #v4056HomeCumulativeDb{pointer-events:none!important}
+@media(max-width:360px){.simpleHome #v4056HomeCumulativeDb{min-height:44px!important}}
+</style>
 </head><body><div id="wrap">
   <main class="finalHome simpleHome" aria-label="항행의자유 V3.3.5 단순 홈화면">
     <img class="finalHomeBg" src="v3_simple_home_107.png" alt="흰 독수리와 바다 항행의자유 홈화면">
@@ -853,6 +871,7 @@ body:has(#modal[style*="display:block"]) .simpleHot{
     <button id="homeNoticeHot" class="simpleHot notice" aria-label="공지사항" onclick="openM('notice')"></button>
     <button id="homeUpdateHot" class="simpleHot update" aria-label="업데이트" onclick="openM('update')"></button>
     <button id="homeExitHot" class="simpleHot exit" aria-label="종료" onclick="exitV3()"></button>
+    <button id="v4056HomeCumulativeDb" type="button" aria-label="누적DB 열기" onclick="openM('db')">🗄 누적DB</button>
     <div class="simpleVersion">V4.0.6 FINAL</div>
     <div class="finalHiddenState" aria-hidden="true">
       <div id="approvalMessage"></div>
