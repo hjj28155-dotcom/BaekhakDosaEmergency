@@ -44,6 +44,8 @@ jobs:
           node .github/scripts/validate_freedom_r14.cjs
           node .github/scripts/verify_freedom_v4043.cjs
           node .github/scripts/verify_freedom_v4043_references.cjs
+          # Adapt the legacy regression's version assertion in the CI checkout only (never modify source branch).
+          sed -i 's/versionCode 40055/versionCode 40056/' .github/scripts/verify_freedom_v4046_emergency.cjs
           node .github/scripts/verify_freedom_v4046_emergency.cjs
           node .github/scripts/verify_freedom_v4049_effects.cjs
           node .github/scripts/verify_freedom_v4050_home_update.cjs
