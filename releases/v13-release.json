@@ -4,16 +4,16 @@
   "latestVersionCode": 31337,
   "versionName": "V13 R8.29",
   "downloadUrl": "https://drive.google.com/file/d/1zBa-KXjceUxj7gbwUp_RTHTCadVoTm0S/view?usp=drivesdk",
-  "notes": "V13 R8.29 원격 수정 14회차: 성적 관리와 누적 DB를 화면 맨 위에서 전체 화면·전체 너비로 표시. 기존 데이터·4방 결과전·승인 기능·추첨번호 연동 유지.",
+  "notes": "V13 R8.29 원격 15회차: 누적 DB 전체화면 상단에 V13 기존 결과전·추첨후 로컬 원장의 읽기 전용 회차별 현황 추가, 공식 확인 번호와 30조합이 모두 있는 회차만 등수 집계. 기존 DB-1 화면과 14회차 전체화면 유지. 독립 엔진 연결은 미완료.",
   "publishedAt": "2026-10-31",
   "status": "published",
   "deploymentMode": "remote_ui_opt_in",
   "announcement": null,
   "uiUpdate": {
-    "revision": 14,
+    "revision": 15,
     "minVersionCode": 31337,
-    "url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/releases/ui/v13-ui-r14.html",
-    "sha256": "5bc8ed1a3905c86f3e863cc9b3f47315d151717f1354eaa7f30676d5929bc967"
+    "url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/releases/ui/v13-ui-r15.html",
+    "sha256": "e7a0cc928dea4bbadd762ed3d827a678d16a0227186baf07537d22b19bcbb648"
   },
-  "remoteUiNotes": "원격 화면 13회차: 항행의자유방 실제 결과전 PNG 렌더 경로 복원, 연구용 출력과 정식 결과전 구분."
+  "remoteUiNotes": "누적 DB: 읽기 전용 기존 기록 요약/회차별 검증·채점 현황. 원문 DB-1은 아래 보존."
 }
