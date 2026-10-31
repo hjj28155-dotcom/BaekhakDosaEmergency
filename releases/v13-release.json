@@ -1,10 +1,10 @@
 {
   "schema": 1,
   "packageName": "com.baekhak.dosa.v13r3preview",
-  "latestVersionCode": 31307,
-  "versionName": "V13 R7",
-  "downloadUrl": "",
-  "notes": "R7 기준. 이후 동일 서명으로 검증된 APK가 Google Drive에 올라온 뒤 버전 번호와 다운로드 주소를 갱신합니다.",
+  "latestVersionCode": 31318,
+  "versionName": "V13 R8.10",
+  "downloadUrl": "https://drive.google.com/file/d/1tz-AxhucJdgZEF3Ad6pz_9rR8AxPyXFL/view",
+  "notes": "V13 R8.10: 홈 업데이트 팝업·항해사 원본 채팅방·원문 분석 실행·DB-1 로컬 회차/입력 동기화·오른쪽 화면만 닫기·30조합 PNG 결과전 수집 화면. 실제 독립 엔진의 실분석 및 30조합 생성은 별도 검증 필요.",
   "publishedAt": "2026-10-31",
-  "status": "no-new-update"
+  "status": "published"
 }
