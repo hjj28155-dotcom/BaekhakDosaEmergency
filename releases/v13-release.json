@@ -8,12 +8,5 @@
   "publishedAt": "2026-10-31",
   "status": "published",
   "deploymentMode": "manual_apk_v1",
-  "announcement": null,
-  "uiUpdate": {
-    "revision": 6,
-    "minVersionCode": 31337,
-    "url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/releases/ui/v13-ui-r6.html",
-    "sha256": "07126717a8734b887a070d7f008c8d97aac50c260ba8b4ba5631f70d61874668"
-  },
-  "remoteUiStatus": "pending_native_bootstrap_31337"
+  "announcement": null
 }
