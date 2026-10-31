@@ -1,0 +1,21 @@
+const test=require('node:test'),assert=require('node:assert/strict');
+const {scoreVerified}=require('./v13-official-score-gate.cjs');
+const counts={captain:5,dosa:5,freedom:15,navigator:5},round=1250,rawFingerprint='TEST-RAW',cutoffMs=1700000000000;
+const seq=i=>Array.from({length:6},(_,j)=>(i+j-1)%45+1);
+function reports(){let i=0;return Object.keys(counts).map(roomKey=>{const combinations=Array.from({length:counts[roomKey]},()=>seq(++i));return {schema:'V13_PREDRAW_ROOM_REPORT_V1',phase:'BEFORE',round,roomKey,rawFingerprint,combinations,sourceId:'TEST_ONLY',groups:roomKey==='freedom'?['RAW5','AUTO_A5','AUTO_B5'].map((id,j)=>({id,combinations:combinations.slice(j*5,j*5+5)})):undefined};});}
+const draw={winning:[1,2,3,4,5,6],bonus:7};
+const verified={verifyOfficialDraw:({drawHash})=>({verified:true,drawHash}),verifyBeforeLock:({reportHash})=>({verified:true,reportHash,lockedAtMs:cutoffMs-1})};
+const args=p=>({reports:reports(),round,rawFingerprint,draw,cutoffMs,...p});
+test('no verifier -> blocked',()=>assert.equal(scoreVerified(args()).reason,'TRUSTED_VERIFIER_NOT_CONNECTED'));
+test('client verifiedOfficial ignored',()=>assert.equal(scoreVerified(args({draw:{...draw,verifiedOfficial:true}})).ready,false));
+test('no official verifier blocked',()=>assert.equal(scoreVerified(args({verifyBeforeLock:verified.verifyBeforeLock})).ready,false));
+test('official bad digest blocked',()=>assert.equal(scoreVerified(args({...verified,verifyOfficialDraw:()=>({verified:true,drawHash:'bad'})})).reason,'OFFICIAL_DRAW_NOT_ATTESTED'));
+test('lock after cutoff blocked',()=>assert.match(scoreVerified(args({...verified,verifyBeforeLock:({reportHash})=>({verified:true,reportHash,lockedAtMs:cutoffMs})})).reason,/BEFORE_LOCK_NOT_ATTESTED/));
+test('lock bad digest blocked',()=>assert.match(scoreVerified(args({...verified,verifyBeforeLock:()=>({verified:true,reportHash:'bad',lockedAtMs:cutoffMs-1})})).reason,/BEFORE_LOCK_NOT_ATTESTED/));
+test('before contamination blocked',()=>{const a=args(verified);a.reports[0].winningNumbers=[1,2,3,4,5,6];assert.equal(scoreVerified(a).ready,false)});
+test('duplicate winning blocked',()=>assert.equal(scoreVerified(args({...verified,draw:{winning:[1,1,2,3,4,5],bonus:7}})).reason,'INVALID_DRAW'));
+test('bonus in winning blocked',()=>assert.equal(scoreVerified(args({...verified,draw:{winning:[1,2,3,4,5,6],bonus:6}})).reason,'INVALID_DRAW'));
+test('room duplicate blocked',()=>{const a=args(verified);a.reports[1].combinations[0]=a.reports[0].combinations[0];assert.equal(scoreVerified(a).ready,false)});
+test('three group mismatch blocked',()=>{const a=args(verified);a.reports[2].groups.reverse();assert.equal(scoreVerified(a).ready,false)});
+test('mock attestation: 30 shaped scores only',()=>{const x=scoreVerified(args(verified));assert.equal(x.ready,true);assert.equal(x.total,30);assert.equal(x.rows[0].grade,1)});
+test('zero winners best=0',()=>{const x=scoreVerified(args({...verified,draw:{winning:[1,8,15,22,29,36],bonus:43}}));assert.equal(x.winners.length,0);assert.equal(x.best,0)});
