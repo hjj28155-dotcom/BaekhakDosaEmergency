@@ -4,16 +4,16 @@
   "latestVersionCode": 31337,
   "versionName": "V13 R8.29",
   "downloadUrl": "https://drive.google.com/file/d/1zBa-KXjceUxj7gbwUp_RTHTCadVoTm0S/view?usp=drivesdk",
-  "notes": "V13 R8.29 원격 수정 13회차: 항행의자유방 실제 수신된 결과전 15조합 PNG 우선 표시·저장, 미수신 원인 안내, 1247회 이전 연구용 PNG 분리. 기존 결과전/승인/자동당첨번호/DB 보존. 4방 정식 독립엔진 연결은 미완료.",
+  "notes": "V13 R8.29 원격 수정 14회차: 성적 관리와 누적 DB를 화면 맨 위에서 전체 화면·전체 너비로 표시. 기존 데이터·4방 결과전·승인 기능·추첨번호 연동 유지.",
   "publishedAt": "2026-10-31",
   "status": "published",
   "deploymentMode": "remote_ui_opt_in",
   "announcement": null,
   "uiUpdate": {
-    "revision": 13,
+    "revision": 14,
     "minVersionCode": 31337,
-    "url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/releases/ui/v13-ui-r13.html",
-    "sha256": "3d90ab275d56463bb60b113a65f07cdc8025e16c5424889d190efdc036b0a69c"
+    "url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/releases/ui/v13-ui-r14.html",
+    "sha256": "5bc8ed1a3905c86f3e863cc9b3f47315d151717f1354eaa7f30676d5929bc967"
   },
   "remoteUiNotes": "원격 화면 13회차: 항행의자유방 실제 결과전 PNG 렌더 경로 복원, 연구용 출력과 정식 결과전 구분."
 }
