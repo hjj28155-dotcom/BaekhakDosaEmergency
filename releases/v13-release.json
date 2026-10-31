@@ -4,16 +4,16 @@
   "latestVersionCode": 31337,
   "versionName": "V13 R8.29",
   "downloadUrl": "https://drive.google.com/file/d/1zBa-KXjceUxj7gbwUp_RTHTCadVoTm0S/view?usp=drivesdk",
-  "notes": "V13 R8.29 원격 화면 11회차: 성적관리 4방 5+5+15+5=30조합, 추첨 후 당첨번호 자동 조회(동행복권 개편 조회 경로 우선, 공개자료 대체시 공식 미검증으로 구분), 수동 당첨번호 입력 제거, 결과전 원장 보존, 공식 직접 수신 축하 빵빠레. 4방 독립 정식 엔진 연결은 미완료.",
+  "notes": "V13 R8.29 원격 화면 12회차: 선장방 등 PNG 미수신 시 빈 화면 대신 실제 상태 안내 및 원문 화면 이동, 실제 PNG 수신 시 저장 버튼, 성적관리 모바일 글씨 줄바꿈 개선. 11회차 자동 당첨번호 조회 및 데이터 보존.",
   "publishedAt": "2026-10-31",
   "status": "published",
   "deploymentMode": "remote_ui_opt_in",
   "announcement": null,
   "uiUpdate": {
-    "revision": 11,
+    "revision": 12,
     "minVersionCode": 31337,
-    "url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/releases/ui/v13-ui-r11.html",
-    "sha256": "b3b3980d9ab07d7b22b09d1b7062a7659f7149e95b15106e8353e47d6f26e78f"
+    "url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/releases/ui/v13-ui-r12.html",
+    "sha256": "f3e9244d740fb462c84adabea95b5c08ecb11d6f3341ae0ca09bcdd52a1a64af"
   },
-  "remoteUiNotes": "원격 화면 7회차: 좌측 메뉴의 30조합 구성 버튼 숨김, 성적 관리 ↔ 누적 DB 버튼 위치 교환. 각 버튼의 기존 기능 유지."
+  "remoteUiNotes": "원격 화면 12회차: 선장방·도사방·항해사방 빈 결과전 화면 보완, 실제 PNG 다운로드 제공, 성적관리 가독성 개선. 정식 독립 엔진 연결은 여전히 미완료."
 }
