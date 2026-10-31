@@ -1,10 +1,10 @@
 {
   "schema": 1,
   "packageName": "com.baekhak.dosa.v13r3preview",
-  "latestVersionCode": 31323,
-  "versionName": "V13 R8.15",
-  "downloadUrl": "https://drive.google.com/file/d/1sPm_sMk35F-qJZq_9dQhzIn9x-gTG5Sy/view",
-  "notes": "V13 R8.15: 항행의자유방에 V3 R62 원본 화면 및 자산 내장. 기존 회차 적용·원문 분석 UI 유지. 4방 실엔진 결과전·30조합 자동 생성의 종단간 검증은 별도 필요. 기존 앱 삭제 없이 업데이트 설치.",
+  "latestVersionCode": 31327,
+  "versionName": "V13 R8.19",
+  "downloadUrl": "https://drive.google.com/file/d/1toeL4VCjBnnROqcflhn13JAVh4UbEmb6/view",
+  "notes": "V13 R8.19: 항행의자유방의 V3 항해사앱 원본 화면을 상단에 우선 배치하고 방별 PNG 상태 영역 유지. 4방 독립 공식 결과전 자동생성 및 30조합 종단간 동작은 아직 검증되지 않음.",
   "publishedAt": "2026-10-31",
   "status": "published"
 }
