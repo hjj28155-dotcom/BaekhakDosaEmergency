@@ -6,5 +6,11 @@
   "downloadUrl": "https://drive.google.com/file/d/1mT8gPK3ZZboQZAGf7-GVH1OQO8GubjUt/view",
   "notes": "V13 R8.25: GitHub APK 직접 링크 허용 및 원격 UI 갱신 기능 준비, V12 V3 항해사앱 필수 JS 2종 복구, 4방 결과전 상태 표시 정정. 실제 4방 독립 공식 분석 보고서·30조합 생성은 미완료.",
   "publishedAt": "2026-10-31",
-  "status": "published"
+  "status": "published",
+  "uiUpdate": {
+    "revision": 1,
+    "minVersionCode": 31333,
+    "url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/releases/ui/v13-ui-verified.html",
+    "sha256": "4fd65bff5cc19f8d3f40b081737f46a13a7487bf68a5c5480a28b29cd02a1fac"
+  }
 }
