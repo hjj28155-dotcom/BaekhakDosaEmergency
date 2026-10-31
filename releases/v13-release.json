@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "packageName": "com.baekhak.dosa.v13r3preview",
+  "latestVersionCode": 31307,
+  "versionName": "V13 R7",
+  "downloadUrl": "",
+  "notes": "R7 기준. 이후 동일 서명으로 검증된 APK가 Google Drive에 올라온 뒤 버전 번호와 다운로드 주소를 갱신합니다.",
+  "publishedAt": "2026-10-31",
+  "status": "no-new-update"
+}
