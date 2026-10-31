@@ -1,10 +1,10 @@
 {
   "schema": 1,
   "packageName": "com.baekhak.dosa.v13r3preview",
-  "latestVersionCode": 31328,
-  "versionName": "V13 R8.20",
-  "downloadUrl": "https://drive.google.com/file/d/1ob-MrYBDbVJ1apIONmynZd9DZmFTvWc5/view",
-  "notes": "V13 R8.20: 업데이트 화면에 현재 설치 버전코드·배포 최신 버전코드 표시. V3 원본 화면 우선 배치 유지. 4방 독립 공식 결과전·30조합 종단간 검증 미완료.",
+  "latestVersionCode": 31329,
+  "versionName": "V13 R8.21",
+  "downloadUrl": "https://drive.google.com/file/d/1gw-ktYDDywISHUyKZ_JzA1Ve4oXlhQUz/view",
+  "notes": "V13 R8.21: 원문 분석 회차 −/+ 버튼 이동 및 선택 회차 표시 동기화 수정. 기존 1~1248회차 DB-1 보존, 1249회차 원문 미등록. 4방 독립 공식 결과전·30조합 종단간 검증 미완료.",
   "publishedAt": "2026-10-31",
   "status": "published"
 }
