@@ -10,10 +10,10 @@
   "deploymentMode": "remote_ui_opt_in",
   "announcement": null,
   "uiUpdate": {
-    "revision": 7,
+    "revision": 8,
     "minVersionCode": 31337,
-    "url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/releases/ui/v13-ui-r7.html",
-    "sha256": "335d7a4dac4869bc2be4c35c4da70ee09cfdd9251e5645e9a1be6bb94feb3d31"
+    "url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/releases/ui/v13-ui-r8.html",
+    "sha256": "20bae9059ea5cab31b1533593c9efd8a56d4ebba1973cc9eca94df646c8994c8"
   },
   "remoteUiNotes": "원격 화면 7회차: 좌측 메뉴의 30조합 구성 버튼 숨김, 성적 관리 ↔ 누적 DB 버튼 위치 교환. 각 버튼의 기존 기능 유지."
 }
