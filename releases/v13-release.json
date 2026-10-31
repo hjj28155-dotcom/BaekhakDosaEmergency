@@ -1,12 +1,18 @@
 {
   "schema": 1,
   "packageName": "com.baekhak.dosa.v13r3preview",
-  "latestVersionCode": 31335,
-  "versionName": "V13 R8.27",
-  "downloadUrl": "https://drive.google.com/file/d/1GS0IVF0AjAR-Egg1LHqRTVVDtnyd7lhe/view?usp=drivesdk",
-  "notes": "V13 R8.27: 업데이트 우측 화면 유지, 삭제 지시한 동일 패키지·동일 서명 안내문 및 불필요한 새 APK 미등록 문구 제거, 중복 업데이트 확인 버튼 정리. 수동 확인 시 최신 버전입니다 표시 유지. V1 방식의 공지·업데이트 팝업과 사용자 직접 APK 다운로드·설치 유지. 4방 정식 독립 엔진 및 30조합 실제 연결은 별도 검증 필요.",
+  "latestVersionCode": 31337,
+  "versionName": "V13 R8.29",
+  "downloadUrl": "https://drive.google.com/file/d/1zBa-KXjceUxj7gbwUp_RTHTCadVoTm0S/view?usp=drivesdk",
+  "notes": "V13 R8.29: 기존 원문 6문장 한 화면 및 결과전 현황 카드 숨김 유지, GitHub 원격 화면 업데이트 재연결. 새 화면은 HTTPS 파일을 SHA-256 검증 후 사용자 선택(적용/나중에)으로 적용. 기존 DB/4방 엔진 보존.",
   "publishedAt": "2026-10-31",
   "status": "published",
-  "deploymentMode": "manual_apk_v1",
-  "announcement": null
+  "deploymentMode": "remote_ui_opt_in",
+  "announcement": null,
+  "uiUpdate": {
+    "revision": 6,
+    "minVersionCode": 31337,
+    "url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/releases/ui/v13-ui-r6.html",
+    "sha256": "07126717a8734b887a070d7f008c8d97aac50c260ba8b4ba5631f70d61874668"
+  }
 }
