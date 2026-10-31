@@ -8,9 +8,5 @@
   "publishedAt": "2026-10-31",
   "status": "published",
   "deploymentMode": "manual_apk_v1",
-  "announcement": {
-    "id": "v13-r826-popup-check-20261031-01",
-    "title": "공지 팝업 표시 시험",
-    "message": "선장님, V13 R8.26 공지 알림 시험입니다. 이 알림은 앱을 종료하거나 다시 설치하지 않아도 표시할 수 있는 공지입니다. 화면 수정 APK는 아직 배포 전이며, 기존 데이터는 변경되지 않습니다."
-  }
+  "announcement": null
 }
