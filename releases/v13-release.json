@@ -1,10 +1,10 @@
 {
   "schema": 1,
   "packageName": "com.baekhak.dosa.v13r3preview",
-  "latestVersionCode": 31329,
-  "versionName": "V13 R8.21",
-  "downloadUrl": "https://drive.google.com/file/d/1gw-ktYDDywISHUyKZ_JzA1Ve4oXlhQUz/view",
-  "notes": "V13 R8.21: 원문 분석 회차 −/+ 버튼 이동 및 선택 회차 표시 동기화 수정. 기존 1~1248회차 DB-1 보존, 1249회차 원문 미등록. 4방 독립 공식 결과전·30조합 종단간 검증 미완료.",
+  "latestVersionCode": 31333,
+  "versionName": "V13 R8.25",
+  "downloadUrl": "https://drive.google.com/file/d/1mT8gPK3ZZboQZAGf7-GVH1OQO8GubjUt/view",
+  "notes": "V13 R8.25: GitHub APK 직접 링크 허용 및 원격 UI 갱신 기능 준비, V12 V3 항해사앱 필수 JS 2종 복구, 4방 결과전 상태 표시 정정. 실제 4방 독립 공식 분석 보고서·30조합 생성은 미완료.",
   "publishedAt": "2026-10-31",
   "status": "published"
 }
