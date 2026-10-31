@@ -8,9 +8,9 @@
   "publishedAt": "2026-10-31",
   "status": "published",
   "uiUpdate": {
-    "revision": 4,
+    "revision": 5,
     "minVersionCode": 31333,
-    "url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/releases/ui/v13-ui-r4.html",
-    "sha256": "ff52571f5ba21cfa14ba472d08fdf35e95c1c35e73f3e0746671295641899f37"
+    "url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/releases/ui/v13-ui-r5.html",
+    "sha256": "ce4b0dba4cebc3e6de50078493df71f44e7c63f3406b32e83bf6652225a3b6c6"
   }
 }
