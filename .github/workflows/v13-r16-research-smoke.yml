@@ -1,0 +1,21 @@
+name: V13 R16 Research Official Draw Smoke (no deploy)
+on:
+  push:
+    branches:
+      - research/v13-r16-engine-contract-20261101
+    paths:
+      - 'research/v13-r16-engine-contract/**'
+      - '.github/workflows/v13-r16-research-smoke.yml'
+  workflow_dispatch:
+jobs:
+  static-and-contract-tests:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Offline stage tests - no API secrets or deployments
+        run: node --test research/v13-r16-engine-contract/*.test.cjs
