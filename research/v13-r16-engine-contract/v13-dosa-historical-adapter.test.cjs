@@ -1,0 +1,16 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict');
+const {createHistoricalDosa,VALID_ENGINE_SHA256}=require('./v13-dosa-historical-adapter.cjs');
+const raw=Array.from({length:6},(_,i)=>'private RAW held by owner only '+i);
+const five=[[1,2,3,4,5,6],[1,2,3,4,5,7],[1,2,3,4,5,8],[1,2,3,4,5,9],[1,2,3,4,5,10]];
+const engine={name:'DOSA V2.4-RC',scope:'1-100 validation only',gate:{allow101Plus:false},generateFinal5:()=>five};
+const make=(e=engine,lock='DEVELOPMENT_BASELINE_NOT_50PCT_PASSED',sha=VALID_ENGINE_SHA256)=>createHistoricalDosa(e,{sourceSha256:sha,officialLockStatus:lock});
+const input=(round=100,phase='HISTORICAL_RESEARCH')=>({round,phase,raw,rawFingerprint:'0'.repeat(64)});
+test('historical 5 return flags prevent official registration',()=>{const r=make()(input());assert.equal(r.combinations.length,5);assert.equal(r.officialEligible,false);assert.equal(r.scoreEligible,false);assert.equal(r.persistPermission,false);});
+test('101 forbidden',()=>assert.throws(()=>make()(input(101)),/SCOPE/));
+test('1249 forbidden',()=>assert.throws(()=>make()(input(1249)),/SCOPE/));
+test('official BEFORE forbidden',()=>assert.throws(()=>make()(input(1,'BEFORE')),/NOT_AN_OFFICIAL/));
+test('source hash required',()=>assert.throws(()=>make(engine,'DEVELOPMENT_BASELINE_NOT_50PCT_PASSED','0'.repeat(64)),/HASH/));
+test('original lock status required',()=>assert.throws(()=>make(engine,'PASSED'),/LOCK/));
+test('duplicate source sets rejected',()=>assert.throws(()=>make({...engine,generateFinal5:()=>Array.from({length:5},()=>five[0])})(input()),/FINAL5/));
+test('malformed source six sentences rejected',()=>assert.throws(()=>make()({...input(),raw:['one']}),/RAW6/));
