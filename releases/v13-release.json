@@ -4,16 +4,16 @@
   "latestVersionCode": 31337,
   "versionName": "V13 R8.29",
   "downloadUrl": "https://drive.google.com/file/d/1zBa-KXjceUxj7gbwUp_RTHTCadVoTm0S/view?usp=drivesdk",
-  "notes": "V13 R8.29 원격 UI 18회차 표시 개선: 업데이트 화면에 APK와 원격 UI 적용 회차를 구분 표시합니다. 원격 UI 17회차의 4방 호출 상태·성적관리 30칸·축하/낙선/빵빠레 기능 포함. 정식 네 엔진 30조합 자동생성은 미완료.",
+  "notes": "V13 R8.29 원격 UI 19회차: 홈 원문분석 실행 버튼 및 항행의자유 V3 원본 전체화면(최상단) 연결. 원격 18회차의 4방 병렬 호출, 공식 당첨번호 자동조회, 30조합 성적표, 축하·낙선·빵빠레 기능 보존. 실제 4방 독립 엔진의 최신 회차 30조합 공식 확정은 아직 미완료.",
   "publishedAt": "2026-11-01",
   "status": "published",
   "deploymentMode": "remote_ui_opt_in",
-  "announcement": "⚓ 원격 UI 18회차: 업데이트 화면에 '현재 열린 UI 회차 / 휴대전화 적용 기록 / 원격 UI 17회차 기능 포함'을 표시합니다. 기존 V13 R8.29 APK와 자료는 유지합니다.",
+  "announcement": "⚓ V13 원격 화면 19회차: 홈에서 원문분석 실행, 항행의자유 V3 전체화면 상단 펼침을 추가했습니다. 기존 성적관리 자동조회·축하·낙선·빵빠레 기능은 유지합니다. 원문 없는 회차·미연결 엔진의 조합은 임의 생성하지 않습니다. 새 APK 설치는 필요하지 않습니다.",
   "uiUpdate": {
-    "revision": 18,
+    "revision": 19,
     "minVersionCode": 31337,
-    "url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/releases/ui/v13-ui-r18.html",
-    "sha256": "8138d1bcd4e68e9f89b015b84ca5c6072373fd51baf63c91684751d26849256b"
+    "url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/releases/ui/v13-ui-r19.html",
+    "sha256": "4470b0d5b1308f7fb72a114cbf7ea20eee9f452738e3c1e461fb8f0fd7f51619"
   },
-  "remoteUiNotes": "Android native getUiRevision()으로 실제 기기 적용 회차를 읽고 확인할 수 없으면 확인 불가로 표시합니다. R17 기능은 R18에 그대로 보존됩니다."
+  "remoteUiNotes": "현재 UI 19회차는 기존 V13 R8.29 앱에서 원격 화면 적용으로 갱신됩니다. 기기 원격 적용 버전은 네이티브 앱 업데이트 화면에서 확인합니다. 네 방 결과는 실제 엔진 응답에 한하며, 성적 확정은 공식 당첨번호 확인 이후에만 가능합니다."
 }
