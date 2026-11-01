@@ -382,6 +382,30 @@ const PREDRAW_ROOM_COUNTS=Object.freeze({captain:5,dosa:5,freedom:15,navigator:5
 const PREDRAW_FREEDOM_GROUPS=Object.freeze(['RAW5','AUTO_A5','AUTO_B5']);
 let predrawReports=Object.create(null), predrawNotice='', predrawPNG='', predrawPNGKey='', predrawBusy=false;
 const predrawEngines=new Map();
+// Navigator V1 research: volatile memory only, never written to the first-report registry.
+let navigatorResearchPreviewMemory=null;
+function navigatorResearchPreviewFor(roundNo){
+ const raw=getDb1Raw(roundNo);
+ return raw&&navigatorResearchPreviewMemory&&navigatorResearchPreviewMemory.round===roundNo&&
+   navigatorResearchPreviewMemory.rawFingerprint===db1Fingerprint(raw)?navigatorResearchPreviewMemory:null;
+}
+function runNavigatorResearchPreview(roundNo){
+ const raw=getDb1Raw(roundNo);
+ if(!Number.isInteger(roundNo)||roundNo<1||roundNo>9999||!raw)throw Error('DB-1 원문 6문장 미등록');
+ const engine=window.V13_NAVIGATOR_INDEPENDENT_V1;
+ if(!engine||typeof engine.generate!=='function')throw Error('항해사 독립 V1 엔진 미로드');
+ const fingerprint=db1Fingerprint(raw);
+ const result=engine.generate({round:roundNo,raw:[...raw],rawFingerprint:fingerprint,phase:'BEFORE'});
+ if(result.roomKey!=='navigator'||result.round!==roundNo||result.rawFingerprint!==fingerprint||
+    result.researchOnly!==true||result.officialEligible!==false||result.officialLocked!==false||
+    !Array.isArray(result.combinations)||result.combinations.length!==5||
+    !result.combinations.every(validSixNumbers)||
+    new Set(result.combinations.map(s=>[...s].sort((a,b)=>a-b).join('-'))).size!==5)
+   throw Error('항해사 연구 V1 5조합 형식 검증 실패');
+ navigatorResearchPreviewMemory={round:roundNo,rawFingerprint:fingerprint,sourceId:result.sourceId,
+   combinations:result.combinations.map(s=>[...s].sort((a,b)=>a-b)),researchOnly:true,officialEligible:false};
+ return navigatorResearchPreviewMemory;
+}
 try {
  const rec=JSON.parse(localStorage.getItem(PREDRAW_STORAGE)||'{}');
  if(rec && typeof rec==='object' && !Array.isArray(rec)){
@@ -409,6 +433,10 @@ function validBeforeReport(report,expectedRound,roomKey){
    researchOnly:report.researchOnly===true||/RESEARCH|RECONSTRUCT|LEGACY|UNVERIFIED/i.test(report.sourceId)};
 }
 function importBeforeReport(report,origin){
+ // Fail closed: research and legacy reports cannot occupy an immutable official slot.
+ if(report?.researchOnly===true||report?.officialEligible===false||
+    /RESEARCH|RECONSTRUCT|LEGACY|UNVERIFIED/i.test(String(report?.sourceId||'')))
+   throw Error('연구·구형·미검증 출력은 결과전 최초등록 원장에 저장할 수 없습니다.');
  const roundNo=report?.round, key=report?.roomKey;
  if(roundNo!==round)throw Error('현재 선택한 회차의 결과전만 가져올 수 있습니다.');
  const clean=validBeforeReport(report,roundNo,key);
@@ -430,7 +458,8 @@ const fourRoomPNGCache=new Map();
 function acceptedRoomPredraw(roomKey,roundNo){
  if(!FOUR_RESULT_ROOMS.includes(roomKey))return null;
  const candidate=predrawFor(roundNo)[roomKey];
- if(!candidate)return null;
+ if(!candidate||candidate.researchOnly===true||
+    /RESEARCH|RECONSTRUCT|LEGACY|UNVERIFIED/i.test(String(candidate.sourceId||'')))return null;
  try{validBeforeReport(candidate,roundNo,roomKey);return candidate;}catch(e){return null;}
 }
 function makeRoomPredrawPNG(roomKey,roundNo){
@@ -914,8 +943,16 @@ function render(){
     if(report){try{roomPNG=makeRoomPredrawPNG(roomKey,round)}catch(e){roomPNG='';}}
     // A missing genuine report must not render as a blank page.
     const roomState=fourRoomStatusDetails(roomKey,round);
+    const navData=roomKey==='navigator'?navigatorResearchPreviewFor(round):null;
+    const navBlock=roomKey==='navigator'?`<div id="navigatorResearchV1" class="goldCard" aria-label="항해사 독립 엔진 V1 연구">
+      <h3>⚓ 항해사 독립 엔진 V1 (연구 전용)</h3>
+      <p class="note">원문 6문장 기반 5조합입니다. 공식 결과전·30조합·성적관리·최초등록 잠금에는 포함되지 않습니다.</p>
+      <div class="actions"><button type="button" class="goldBtn" data-nav-research-run>연구 5조합 생성</button></div>
+      ${navData?`<table class="reportTable"><thead><tr><th>순서</th><th>번호 6개</th></tr></thead><tbody>${navData.combinations.map((s,i)=>`<tr><td>${i+1}</td><td>${s.map(n=>String(n).padStart(2,'0')).join(' · ')}</td></tr>`).join('')}</tbody></table><p class="note">${escape(navData.sourceId)} · 연구 전용 · 공식 미등록</p>`:'<p class="note">연구 조합 미생성 · 해당 회차의 DB-1 원문이 필요합니다.</p>'}
+    </div>`:'';
     body=`<section class="goldCard cleanRoom cleanPngRoom" id="roomPngOnly" data-room-key="${roomKey}" aria-label="${escape(title)}의 결과전 확인">
       ${roomPNG?`<img class="roomPredrawImage" id="roomPredrawPNG" src="${roomPNG}" alt="제 ${round}회 ${escape(title)} 실제 수신 조합 PNG"><div class="roomPngSave"><a class="goldBtn" href="${roomPNG}" download="V13_${round}_${roomKey}_결과전_공식미검증.png">PNG 저장</a></div>`:`<div class="roomPngMissing" role="status"><strong>${escape(title)} · 제 ${round}회</strong><p>결과전 PNG 미수신</p><p>${escape(roomState.text)}</p><small>${escape(roomState.hint)}. 실제 수신한 조합만 PNG로 표시하며 임의 번호를 만들지 않습니다.</small><div class="actions"><button type="button" class="goldBtn" data-goto="0">원문 분석 화면</button></div></div>`}
+      ${navBlock}
     </section>`;
   }else if(view===3){
    const cumulativeLedger=v13CumulativeReadOnlyView();
@@ -973,7 +1010,10 @@ function render(){
     const characters=lengths.reduce((a,b)=>a+b,0);
     const words=raw.reduce((a,line)=>a+line.trim().split(/\s+/).filter(Boolean).length,0);
     rawAnalysisReceipt={round, lengths, characters, words};
-    render();setStatus('제 '+round+'회 원문 6문장 확인 · 결과전 수집 시작 (연결된 실제 엔진만 실행)');void runConnectedPredraw(round);
+    let navInfo='항해사 연구 출력 보류';
+    try{runNavigatorResearchPreview(round);navInfo='항해사 독립 연구 5조합 생성 (공식 미등록)';}
+    catch(e){navInfo='항해사 연구 보류: '+String(e.message||e);}
+    render();setStatus('제 '+round+'회 원문 6문장 확인 · '+navInfo+' · 결과전 수집 시작 (연결된 실제 엔진만 실행)');void runConnectedPredraw(round);
   }catch(e){setStatus('원문 기초 분석 보류: '+String(e&&e.message||e));}
  }
 function applyRound(){const input=document.querySelector('#inputRound');if(!input)return;const text=input.value.trim();const n=Number(text);if(!text||!Number.isInteger(n)||n<1||n>9999){setStatus('회차는 1~9999 사이의 정수로 입력하세요.');return}applyActiveRound(n)}
@@ -1012,6 +1052,11 @@ stage.addEventListener('click',e=>{const btn=e.target.closest('button');if(!btn)
     if(mode==='open' && typeof w?.approvalPage==='function'){w.approvalPage();return;}
   }catch(e){setStatus('보존된 MASTER 승인화면 연결 확인 필요: '+String(e.message||e));}};
  if(frame?.contentDocument?.readyState==='complete')show();else frame?.addEventListener('load',show,{once:true});
+ return;
+}
+if(btn.hasAttribute('data-nav-research-run')){
+ try{runNavigatorResearchPreview(round);render();setStatus('항해사 독립 연구 5조합 생성 · 공식 결과전 미등록');}
+ catch(e){setStatus('항해사 연구 보류: '+String(e.message||e));}
  return;
 }
 if(btn.hasAttribute('data-draw-refresh')){void fetchAutoDraw(round,true);return;}
