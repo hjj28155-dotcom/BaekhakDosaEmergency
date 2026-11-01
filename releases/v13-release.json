@@ -4,16 +4,16 @@
   "latestVersionCode": 31337,
   "versionName": "V13 R8.29",
   "downloadUrl": "https://drive.google.com/file/d/1zBa-KXjceUxj7gbwUp_RTHTCadVoTm0S/view?usp=drivesdk",
-  "notes": "V13 R8.29 / 원격 UI 검증 16회차: 기존 rev15 성적관리·DB-1 유지, 항해사 독립 V1 RAW6 연구 5조합 화면 추가. 연구 출력은 공식 결과전 최초등록·30조합 채점에서 제외. 기존 네 엔진 정식 연결은 미완료.",
+  "notes": "V13 R8.29 원격 UI 실기기 확인용 17회차: 원문분석 4개 방 병렬 호출·미연결/연구 구분, 성적관리 5+5+15+5 전체 30칸, 동행복권 2026 회차별 공식번호 조회 수정, 공식번호+실제 30조합 수신 시 1~5등/낙선·축하 빵빠레. 원본 V12 세 엔진 정식 연동은 아직 미완료이며 미수신 조합을 임의 생성하지 않음.",
   "publishedAt": "2026-11-01",
   "status": "published",
   "deploymentMode": "remote_ui_opt_in",
-  "announcement": "⚓ V13 원격 UI 16회차 검증 업데이트: 항해사방 독립 엔진 V1 연구 5조합 표시와 원문분석 실행 연동. 공식 결과전·당첨판정 미포함. 적용 후 화면을 직접 확인해 주세요.",
+  "announcement": "⚓ V13 UI 17회차 시험 업데이트: 4방 병렬 분석 상태, 성적관리 30칸, 공식 조회/축하·낙선/빵빠레 화면 개선. 단, V12 세 원본 엔진 정식 연결과 실제 30조합 자동생성은 아직 미완료입니다.",
   "uiUpdate": {
-    "revision": 16,
+    "revision": 17,
     "minVersionCode": 31337,
-    "url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/releases/ui/v13-ui-r16.html",
-    "sha256": "dec5d79b811239d2eadc278b97895abb1c6bdd6ea0751c02ec91f198ff8edaff"
+    "url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/releases/ui/v13-ui-r17.html",
+    "sha256": "ecc8c71c95cab2c887149a219d21a6cfbfeb9c72bfed353602d765ac6a913856"
   },
-  "remoteUiNotes": "연구용 실물 화면 검증: 항해사 V1 독립 5조합(메모리만), 기존 승인·DB·원장 보존. 정상 수신 테스트 전 정식 분석 아님."
+  "remoteUiNotes": "선택형 UI 시험: 4방 정식 엔진 연결은 미완료. 연구용 조합/가짜 번호 공식 30조합 수신 금지. 축하·낙선은 공식 당첨번호 및 실제 수신 30조합에만 표시."
 }
