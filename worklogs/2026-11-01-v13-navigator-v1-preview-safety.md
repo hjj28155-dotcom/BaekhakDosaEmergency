@@ -22,3 +22,8 @@
 
 ## Next highest-priority work
 Verify executable V12 captain/dosa/freedom engine contracts and source fingerprints; connect genuine 5+5+15 with independently verified 5 Navigator via a single RAW6 action without allowing research data into the formal 30 or overwriting old records. Then test browser/WebView and only after verification prepare a new APK.
+
+## Additional isolated runtime validation (2026-11-01)
+- Executed the exact staged `runNavigatorResearchPreview` and `navigatorResearchPreviewFor` functions with the staged Navigator V1 implementation in a V8 sandbox, using synthetic round 1249 RAW6.
+- Results: five valid sets generated; storage write spy = 0; mutating RAW6 invalidated the in-memory fingerprint; missing DB-1 round 1250 correctly rejected. All tested conditions passed.
+- This is a JavaScript function-level test only, not browser DOM/WebView, APK or real official round 1249 input verification.
