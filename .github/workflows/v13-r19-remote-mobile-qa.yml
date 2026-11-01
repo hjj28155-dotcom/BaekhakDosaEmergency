@@ -1,0 +1,20 @@
+name: V13 R19 Remote Phone QA (no deploy)
+on:
+  push:
+    branches: ['research/v13-r16-engine-contract-20261101']
+    paths:
+      - 'research/v13-r19-stage/**'
+      - '.github/workflows/v13-r19-remote-mobile-qa.yml'
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Static provenance and JS syntax
+        run: node --test research/v13-r19-stage/test_r19_ui.cjs
