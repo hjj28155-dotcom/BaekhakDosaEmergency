@@ -4,16 +4,16 @@
   "latestVersionCode": 31337,
   "versionName": "V13 R8.29",
   "downloadUrl": "https://drive.google.com/file/d/1zBa-KXjceUxj7gbwUp_RTHTCadVoTm0S/view?usp=drivesdk",
-  "notes": "V13 R8.29 원격 15회차: 누적 DB 전체화면 상단에 V13 기존 결과전·추첨후 로컬 원장의 읽기 전용 회차별 현황 추가, 공식 확인 번호와 30조합이 모두 있는 회차만 등수 집계. 기존 DB-1 화면과 14회차 전체화면 유지. 독립 엔진 연결은 미완료.",
-  "publishedAt": "2026-10-31",
+  "notes": "V13 R8.29 / 원격 UI 검증 16회차: 기존 rev15 성적관리·DB-1 유지, 항해사 독립 V1 RAW6 연구 5조합 화면 추가. 연구 출력은 공식 결과전 최초등록·30조합 채점에서 제외. 기존 네 엔진 정식 연결은 미완료.",
+  "publishedAt": "2026-11-01",
   "status": "published",
   "deploymentMode": "remote_ui_opt_in",
-  "announcement": null,
+  "announcement": "⚓ V13 원격 UI 16회차 검증 업데이트: 항해사방 독립 엔진 V1 연구 5조합 표시와 원문분석 실행 연동. 공식 결과전·당첨판정 미포함. 적용 후 화면을 직접 확인해 주세요.",
   "uiUpdate": {
-    "revision": 15,
+    "revision": 16,
     "minVersionCode": 31337,
-    "url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/releases/ui/v13-ui-r15.html",
-    "sha256": "e7a0cc928dea4bbadd762ed3d827a678d16a0227186baf07537d22b19bcbb648"
+    "url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/releases/ui/v13-ui-r16.html",
+    "sha256": "dec5d79b811239d2eadc278b97895abb1c6bdd6ea0751c02ec91f198ff8edaff"
   },
-  "remoteUiNotes": "누적 DB: 읽기 전용 기존 기록 요약/회차별 검증·채점 현황. 원문 DB-1은 아래 보존."
+  "remoteUiNotes": "연구용 실물 화면 검증: 항해사 V1 독립 5조합(메모리만), 기존 승인·DB·원장 보존. 정상 수신 테스트 전 정식 분석 아님."
 }
