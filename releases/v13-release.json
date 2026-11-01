@@ -4,20 +4,20 @@
   "latestVersionCode": 31337,
   "versionName": "V13 R8.29",
   "downloadUrl": "https://drive.google.com/file/d/1zBa-KXjceUxj7gbwUp_RTHTCadVoTm0S/view?usp=drivesdk",
-  "notes": "V13 R8.29 원격 UI 19회차: 홈 원문분석 실행 버튼 및 항행의자유 V3 원본 전체화면(최상단) 연결. 원격 18회차의 4방 병렬 호출, 공식 당첨번호 자동조회, 30조합 성적표, 축하·낙선·빵빠레 기능 보존. 실제 4방 독립 엔진의 최신 회차 30조합 공식 확정은 아직 미완료.",
+  "notes": "V13 R8.29 원격 UI 22회차: 네 방 결과전 5+5+15+5 표시 슬롯 고정, 실제 결과 미수신 안내, 항행의자유 V3 전체화면 수동 버튼으로 전환, DB-1 1249회 원문 보존 조회 추가. 정식 독립 엔진 30조합 수신과 공식 잠금은 별도 검증 대기.",
   "publishedAt": "2026-11-01",
   "status": "published",
   "deploymentMode": "remote_ui_opt_in",
   "announcement": {
-    "id": "v13-r19-remote-notice-20261101",
-    "title": "⚓ V13 원격 19회차 업데이트 안내",
-    "message": "원격 화면 19회차가 게시되었습니다. 상단 [업데이트] → [원격 UI 업데이트 확인] → [적용]을 누르십시오. 홈 원문분석 실행과 항행의자유 V3 최상단 펼침을 추가했고, 기존 성적관리의 축하·낙선·빵빠레는 유지했습니다. 새 APK 다운로드나 재설치는 필요 없습니다."
+    "id": "v13-r22-four-room-results-20261101",
+    "title": "⚓ V13 원격 22회차 업데이트 안내",
+    "message": "22회차 원격 화면이 등록되었습니다. 상단 [업데이트] → [원격 UI 업데이트 확인] → [적용]을 누르십시오. 선장·도사·항행의자유·항해사 네 방에서 결과전 표시 영역을 확인할 수 있고, 실제 결과가 없을 때에는 미수신으로 표시합니다. 항행의자유 V3 전체화면은 방 안의 별도 버튼으로 엽니다. 새 APK 설치는 필요 없습니다."
   },
   "uiUpdate": {
-    "revision": 19,
+    "revision": 22,
     "minVersionCode": 31337,
-    "url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/releases/ui/v13-ui-r19.html",
-    "sha256": "4470b0d5b1308f7fb72a114cbf7ea20eee9f452738e3c1e461fb8f0fd7f51619"
+    "url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/releases/ui/v13-ui-r22.html",
+    "sha256": "ca95343ee3339605bf49fcac39c07555d429a44900e1327c69fc53b4569a5589"
   },
-  "remoteUiNotes": "현재 UI 19회차는 기존 V13 R8.29 앱에서 원격 화면 적용으로 갱신됩니다. 기기 원격 적용 버전은 네이티브 앱 업데이트 화면에서 확인합니다. 네 방 결과는 실제 엔진 응답에 한하며, 성적 확정은 공식 당첨번호 확인 이후에만 가능합니다."
+  "remoteUiNotes": "원격 UI 22회차는 기존 V13 R8.29 Android 앱에서 원격 화면 적용으로 갱신됩니다. 진짜 독립 엔진 결과가 수신되기 전에는 미수신으로 표시하며 연구번호를 정식 결과전·성적관리로 등록하지 않습니다. V3 및 기존 원본·승인·잠금 기록 보존."
 }
