@@ -20,3 +20,11 @@ Captain reported: phone Freedom room shows not a proper results PNG, sees only t
 - JavaScript 2 inline scripts parsed successfully. Original DB1, prior predictions, official scoring guard, APK, manifest, engines preserved.
 - No fake PNG created. Full 15 authentic Freedom tickets cannot be generated without source/verified engine connection. Physical test pending.
 - Main release manifest remains revision 19; explicit approval required before claiming live update.
+
+## 2026-11-01 captain correction — latest preserved DB-1 source exists for 1249
+- Earlier “DB-1 has no 1249 RAW” conclusion applies ONLY to the bundled V13 APK baseline (`assets/db1_master_1_1248.json`), NOT to all latest DB-1 source records.
+- Read preserved Drive `DB1_1248_1249_V12_V3_소스패치_검증팩_20261030.zip` (Drive file id `1hcuYuUDPYFVY5UduDjcKl6a9zFplKY-a`; archive SHA256 `6c6480f90bc67692a8821d224933100a37176c912c4a2af685f6b20136467ebd`). `raw_1248_1249.json` includes six RAW sentences for each 1248 and 1249, and `db1_v1249_append.js` supplies an add-only path through 1249.
+- Reran archive-provided Node tests in isolated local temp directory: `node test_patch.cjs db1_v1249_append.js raw_1248_1249.json`: PASS first insert / idempotent repeated insert / conflict HOLD. `node test_real_assets.cjs`: PASS standalone and embedded, count 1249. These tests do NOT verify a live V13 Android deployment or phone DB overlay.
+- The older `1248_1249_실전회차_사전등록.json` saying `db1_raw_six_lines:null` is a PRE-DRAW HOLD record dated 2026-10-30, not evidence that 1249 RAW is absent from the preserved source patch.
+- Corrected next diagnosis: do not ask captain to re-enter 1249 RAW. Check whether V13 current DB reader sees the preserved/latest record and whether the formal engine adapters support 1248+; R19 guard `n>1247` remains an independent engine blocker. Do not label research fallback as official 15/30-ticket PNG.
+- No live manifest, APK, production DB, locked predraw reports, approval records, or published remote revision changed by this documentation correction.
