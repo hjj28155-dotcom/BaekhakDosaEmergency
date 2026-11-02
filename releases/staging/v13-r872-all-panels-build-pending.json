@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "packageName": "com.baekhak.dosa.v13r3preview",
+  "latestVersionCode": 31380,
+  "versionName": "V13 R8.72 (all panels body-first)",
+  "status": "BUILD_AND_DEVICE_TEST_PENDING_DO_NOT_PUBLISH",
+  "downloadUrl": null,
+  "releaseScope": "captain_only",
+  "notes": "12개 화면 진입 경로의 중복 상단 머리 제거 및 X 카드 내부 배치. 기존 6방 누적·성적·저장·분석 엔진 보존. R8.71 원격 스타일 규약으로는 DOM 구조 변경 불가능. 실제 동일서명 APK 생성 및 실기기 업데이트 확인 전 main 배포 수정 금지.",
+  "evidence": {
+    "sourceZip": "https://drive.google.com/file/d/1SMqzb2KiWuhj3QIyntHW5Dl-d9WCQkvY/view",
+    "browserQa": "https://drive.google.com/file/d/1YlxchM3uN3fYMUW3kZ9PVUa7RU8sggmQ/view",
+    "sourceAudit": "https://drive.google.com/file/d/1JjZpGOHGqPsO4yncrxnpF-6MXA-odFum/view"
+  },
+  "lastChecked": "2026-11-02"
+}
