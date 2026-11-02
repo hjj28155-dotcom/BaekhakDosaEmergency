@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "packageName": "com.baekhak.dosa.v13r3preview",
+  "latestVersionCode": 31379,
+  "versionName": "V13 R8.71 (cumulative header update)",
+  "status": "SIGNED_APK_PENDING_CAPTAIN_ONLY",
+  "releaseScope": "captain_only",
+  "downloadUrl": null,
+  "notes": "누적 DB 상단 중복 패널 헤더 제거, 안쪽 제목 우측 X 이동. 소스·브라우저 검사 완료. 기존 V13 R8.70 설치본에서 APK 업데이트 실험은 같은 서명 R8.71 APK 확보 후에만 시작합니다.",
+  "announcement": {
+    "id": "v13-r871-layout-after-signed-apk",
+    "title": "⚓ 선장 전용 누적 DB 화면 업데이트",
+    "message": "APK 배포 파일이 실제 등록된 후에만 기존 홈 업데이트 버튼에서 다운로드·설치가 가능합니다."
+  }
+}
