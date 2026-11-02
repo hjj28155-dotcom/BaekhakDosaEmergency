@@ -1,17 +1,17 @@
 {
   "schema": 1,
   "packageName": "com.baekhak.dosa.v13r3preview",
-  "latestVersionCode": 31337,
-  "versionName": "V13 R8.29",
-  "downloadUrl": "https://drive.google.com/file/d/1zBa-KXjceUxj7gbwUp_RTHTCadVoTm0S/view?usp=drivesdk",
-  "notes": "V13 R8.29 원격 UI 22회차: 네 방 결과전 5+5+15+5 표시 슬롯 고정, 실제 결과 미수신 안내, 항행의자유 V3 전체화면 수동 버튼으로 전환, DB-1 1249회 원문 보존 조회 추가. 정식 독립 엔진 30조합 수신과 공식 잠금은 별도 검증 대기.",
-  "publishedAt": "2026-11-01",
-  "status": "published",
-  "deploymentMode": "remote_ui_opt_in",
+  "latestVersionCode": 31376,
+  "versionName": "V13 R8.68 (선장 전용 업데이트 시험)",
+  "downloadUrl": "https://drive.google.com/file/d/14t33cnA1RvXgCBaO9xb106wtd2SJTUDH/view?usp=drivesdk",
+  "notes": "선장 전용 V13 R8.68 업데이트 시험 APK. 기존 설치 앱을 삭제하지 말고 앱 홈 [업데이트] → 다운로드하여 직접 설치하십시오. R8.69 상하폭 축소는 포함되지 않습니다. 설치·DB 보존 최종 검증 전입니다.",
+  "publishedAt": "2026-11-02",
+  "status": "captain_test_only",
+  "deploymentMode": "captain_only_manual_apk",
   "announcement": {
-    "id": "v13-r22-four-room-results-20261101",
-    "title": "⚓ V13 원격 22회차 업데이트 안내",
-    "message": "22회차 원격 화면이 등록되었습니다. 상단 [업데이트] → [원격 UI 업데이트 확인] → [적용]을 누르십시오. 선장·도사·항행의자유·항해사 네 방에서 결과전 표시 영역을 확인할 수 있고, 실제 결과가 없을 때에는 미수신으로 표시합니다. 항행의자유 V3 전체화면은 방 안의 별도 버튼으로 엽니다. 새 APK 설치는 필요 없습니다."
+    "id": "v13-r868-captain-only-update-test-20261102",
+    "title": "⚓ 선장 전용 V13 R8.68 업데이트 시험",
+    "message": "기존 홈 [업데이트]로 새 APK를 직접 다운로드하여 기존 앱 위에 설치하십시오. R8.68이 이미 설치된 경우에는 버전 갱신 알림이 나타나지 않습니다. R8.69 화면 축소는 아직 이 APK에 포함되지 않습니다."
   },
   "uiUpdate": {
     "revision": 22,
@@ -19,5 +19,8 @@
     "url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/releases/ui/v13-ui-r22.html",
     "sha256": "ca95343ee3339605bf49fcac39c07555d429a44900e1327c69fc53b4569a5589"
   },
-  "remoteUiNotes": "원격 UI 22회차는 기존 V13 R8.29 Android 앱에서 원격 화면 적용으로 갱신됩니다. 진짜 독립 엔진 결과가 수신되기 전에는 미수신으로 표시하며 연구번호를 정식 결과전·성적관리로 등록하지 않습니다. V3 및 기존 원본·승인·잠금 기록 보존."
+  "remoteUiNotes": "원격 UI 22회차는 기존 V13 R8.29 Android 앱에서 원격 화면 적용으로 갱신됩니다. 진짜 독립 엔진 결과가 수신되기 전에는 미수신으로 표시하며 연구번호를 정식 결과전·성적관리로 등록하지 않습니다. V3 및 기존 원본·승인·잠금 기록 보존.",
+  "releaseScope": "captain_only",
+  "apkSha256": "fe5b3022312d73b1dbe250588f38e157b02cb3627fc6599c9877cb85512ca987",
+  "apkSigningCertificateSha256": "3fe57967c15f81ee39ea2b9b88dd96a7506c1b5b9032606ecbea04bbdb15ee3c"
 }
