@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "packageName": "com.baekhak.dosa.v13r3preview",
+  "latestVersionCode": 31381,
+  "versionName": "V13 R8.73 (official draw independent of 30 games)",
+  "downloadUrl": null,
+  "status": "BUILD_SIGNING_AND_REAL_API_TEST_PENDING",
+  "releaseScope": "captain_only",
+  "notes": "성적관리에서 공식 당첨번호 조회가 30조합 수신 완료에 막히는 오류 수정. 101회차 15/30 수신 상태에서도 공식번호 자동/수동 조회. 30조합 완료 전 등수·적중 계산 금지. 검증된 Android APK 빌드 전 운영 배포 금지.",
+  "sourceZip": "https://drive.google.com/file/d/1JaWthR2Yh9LpDjiVja8L7OW-1MLi9IFA/view",
+  "browserTest": "https://drive.google.com/file/d/1s7-jp13rftMCOZ9b1dXlh5P2nnR4sX6G/view",
+  "updatedAt": "2026-11-02"
+}
