@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "packageName": "com.baekhak.dosa.v13r3preview",
+  "latestVersionCode": 31377,
+  "versionName": "V13 R8.69 (compact latest round)",
+  "downloadUrl": null,
+  "status": "BUILD_AND_SIGNING_PENDING_DO_NOT_PUBLISH",
+  "notes": "V13 R8.69 각방 최종 분석회차 6개 카드 상하폭 축소(393px 26%, 768px 27.5%), 저장원장·성적관리·공식채점 보호, 기존 홈 업데이트 버튼 유지. 실제 동일서명 APK 빌드·실기기 업데이트 검증 완료 전 운영 게시 금지.",
+  "publishedAt": null,
+  "announcement": {
+    "id": "v13-r869-compact-pending",
+    "title": "⚓ V13 R8.69 화면 업데이트",
+    "message": "서명 APK 검증 후 기존 홈 업데이트 버튼을 통해 직접 다운로드·설치합니다."
+  }
+}
