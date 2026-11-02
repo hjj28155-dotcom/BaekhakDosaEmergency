@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "packageName": "com.baekhak.dosa.v13r3preview",
+  "latestVersionCode": 31372,
+  "versionName": "V13 R8.64",
+  "status": "BUILD_PENDING_DO_NOT_PUBLISH",
+  "downloadUrl": null,
+  "notes": "V13 기존 홈 업데이트 버튼 시험 전용. AndroidIDE 실제 APK 빌드, 기존 R8.63과 동일 인증서 및 데이터 보존 검증 전 운영 게시 금지.",
+  "updatedAt": "2026-11-02",
+  "announcement": {
+    "id": "v13-r864-after-signed-apk-only",
+    "title": "⚓ V13 R8.64 성적관리 업데이트",
+    "message": "검증된 APK가 배포된 경우에만 직접 다운로드·설치하도록 안내."
+  }
+}
