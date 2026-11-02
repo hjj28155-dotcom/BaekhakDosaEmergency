@@ -1,17 +1,17 @@
 {
   "schema": 1,
   "packageName": "com.baekhak.dosa.v13r3preview",
-  "latestVersionCode": 31376,
-  "versionName": "V13 R8.68 (선장 전용 업데이트 시험)",
-  "downloadUrl": "https://drive.google.com/file/d/14t33cnA1RvXgCBaO9xb106wtd2SJTUDH/view?usp=drivesdk",
-  "notes": "선장 전용 V13 R8.68 업데이트 시험 APK. 기존 설치 앱을 삭제하지 말고 앱 홈 [업데이트] → 다운로드하여 직접 설치하십시오. R8.69 상하폭 축소는 포함되지 않습니다. 설치·DB 보존 최종 검증 전입니다.",
+  "latestVersionCode": 31379,
+  "versionName": "V13 R8.71 (remote UI bootstrap)",
+  "downloadUrl": "https://drive.google.com/file/d/1uk11vDe7QT_e3DTnHB2U1p8HBYtIrTfQ/view?usp=drivesdk",
+  "notes": "선장 전용 홈 업데이트 시험: V13 R8.71(31379). 기존 R8.70(31378) 위에 삭제 없이 설치. 최초 설치 후 홈 [업데이트]에서 [화면 수정 확인] → [화면 수정 적용]으로 허용된 스타일 패치 적용 가능. 엔진·기록 저장 변경 없음. 실기기 업데이트/원격 적용 미검증.",
   "publishedAt": "2026-11-02",
   "status": "captain_test_only",
   "deploymentMode": "captain_only_manual_apk",
   "announcement": {
-    "id": "v13-r868-captain-only-update-test-20261102",
-    "title": "⚓ 선장 전용 V13 R8.68 업데이트 시험",
-    "message": "기존 홈 [업데이트]로 새 APK를 직접 다운로드하여 기존 앱 위에 설치하십시오. R8.68이 이미 설치된 경우에는 버전 갱신 알림이 나타나지 않습니다. R8.69 화면 축소는 아직 이 APK에 포함되지 않습니다."
+    "id": "v13-r871-captain-remote-ui-bootstrap-20261102",
+    "title": "⚓ 선장 전용 V13 R8.71 업데이트",
+    "message": "홈 [업데이트]에서 R8.71 APK를 직접 다운로드해 기존 V13 위에 설치하십시오. 기존 앱은 삭제하지 마십시오. R8.71 설치 후 같은 메뉴에서 [화면 수정 확인] → [화면 수정 적용]을 누르면 원격 스타일 수정 1회차를 시험할 수 있습니다."
   },
   "uiUpdate": {
     "revision": 22,
@@ -21,6 +21,6 @@
   },
   "remoteUiNotes": "원격 UI 22회차는 기존 V13 R8.29 Android 앱에서 원격 화면 적용으로 갱신됩니다. 진짜 독립 엔진 결과가 수신되기 전에는 미수신으로 표시하며 연구번호를 정식 결과전·성적관리로 등록하지 않습니다. V3 및 기존 원본·승인·잠금 기록 보존.",
   "releaseScope": "captain_only",
-  "apkSha256": "fe5b3022312d73b1dbe250588f38e157b02cb3627fc6599c9877cb85512ca987",
+  "apkSha256": "92fbc8b4a9545e29afcd8fe28ac63d5f707e15050ba048f0d818eb531d7133eb",
   "apkSigningCertificateSha256": "3fe57967c15f81ee39ea2b9b88dd96a7506c1b5b9032606ecbea04bbdb15ee3c"
 }
