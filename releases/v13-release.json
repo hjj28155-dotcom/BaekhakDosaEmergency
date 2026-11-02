@@ -1,17 +1,17 @@
 {
   "schema": 1,
   "packageName": "com.baekhak.dosa.v13r3preview",
-  "latestVersionCode": 31379,
-  "versionName": "V13 R8.71 (remote UI bootstrap)",
-  "downloadUrl": "https://drive.google.com/file/d/1uk11vDe7QT_e3DTnHB2U1p8HBYtIrTfQ/view?usp=drivesdk",
-  "notes": "선장 전용 홈 업데이트 시험: V13 R8.71(31379). 기존 R8.70(31378) 위에 삭제 없이 설치. 최초 설치 후 홈 [업데이트]에서 [화면 수정 확인] → [화면 수정 적용]으로 허용된 스타일 패치 적용 가능. 엔진·기록 저장 변경 없음. 실기기 업데이트/원격 적용 미검증.",
+  "latestVersionCode": 31380,
+  "versionName": "V13 R8.72 (all panels body-first)",
+  "downloadUrl": "https://drive.google.com/file/d/16XpzcYK0CwxpHoRrXVbbWL8uKs-3e-s6/view?usp=drivesdk",
+  "notes": "선장 전용 V13 R8.72(31380) 업데이트 실험. 모든 버튼 내부화면의 중복 상단 머리영역 제거, 각 기능 카드 내부 오른쪽 X 버튼 유지. 기존 성적·분석·누적 DB/엔진 파일 유지. 설치 후 기록 보존 실기기 검증은 선장 확인 대기. 기존 앱 삭제 금지.",
   "publishedAt": "2026-11-02",
   "status": "captain_test_only",
   "deploymentMode": "captain_only_manual_apk",
   "announcement": {
-    "id": "v13-r871-captain-remote-ui-bootstrap-20261102",
-    "title": "⚓ 선장 전용 V13 R8.71 업데이트",
-    "message": "홈 [업데이트]에서 R8.71 APK를 직접 다운로드해 기존 V13 위에 설치하십시오. 기존 앱은 삭제하지 마십시오. R8.71 설치 후 같은 메뉴에서 [화면 수정 확인] → [화면 수정 적용]을 누르면 원격 스타일 수정 1회차를 시험할 수 있습니다."
+    "id": "v13-r872-captain-all-panels-20261102",
+    "title": "⚓ 선장 전용 V13 R8.72 화면 업데이트",
+    "message": "홈 [업데이트]로 R8.72 APK를 다운로드하여 기존 V13 앱 위에 설치하십시오. 중복 상단 머리영역이 제거되고 각 기능 카드 오른쪽 상단에서 닫을 수 있습니다. 기존 앱을 삭제하지 마십시오."
   },
   "uiUpdate": {
     "revision": 22,
@@ -21,6 +21,6 @@
   },
   "remoteUiNotes": "원격 UI 22회차는 기존 V13 R8.29 Android 앱에서 원격 화면 적용으로 갱신됩니다. 진짜 독립 엔진 결과가 수신되기 전에는 미수신으로 표시하며 연구번호를 정식 결과전·성적관리로 등록하지 않습니다. V3 및 기존 원본·승인·잠금 기록 보존.",
   "releaseScope": "captain_only",
-  "apkSha256": "92fbc8b4a9545e29afcd8fe28ac63d5f707e15050ba048f0d818eb531d7133eb",
+  "apkSha256": "e636d0c27ef232d6a4887ee8ca58ecca59709fa8a72187a000e3a280a3e0a933",
   "apkSigningCertificateSha256": "3fe57967c15f81ee39ea2b9b88dd96a7506c1b5b9032606ecbea04bbdb15ee3c"
 }
