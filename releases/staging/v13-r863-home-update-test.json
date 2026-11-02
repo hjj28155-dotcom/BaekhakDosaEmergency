@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "packageName": "com.baekhak.dosa.v13r3preview",
+  "latestVersionCode": 31371,
+  "versionName": "V13 R8.63 TEST ONLY",
+  "downloadUrl": "https://drive.google.com/file/d/1-Mn-gV6tEZVZg-ZTl93ju3WY1SU189fu/view?usp=drivesdk",
+  "notes": "[홈 업데이트 시험 전용] R8.62(31370)에서 R8.63(31371)로 이동하는 기존 버튼·사용자 직접 다운로드 절차 점검. 기존 데이터 보존 확인 전 배포 금지.",
+  "publishedAt": "2026-11-02",
+  "status": "test_only_not_production",
+  "deploymentMode": "staging_manual_apk",
+  "announcement": {
+    "id": "v13-r863-test-20261102",
+    "title": "⚓ 홈 업데이트 버튼 시험",
+    "message": "시험 APK가 준비됐습니다. 업데이트 버튼을 누른 뒤 다운로드 링크가 열리는지만 확인하세요. 기존 설치 앱을 삭제하지 마세요."
+  },
+  "expectedCurrentVersionCode": 31370,
+  "sha256": "039586224edb9442113cfb26a0edc778544533f4273c673527cf1cca5056a24f"
+}
