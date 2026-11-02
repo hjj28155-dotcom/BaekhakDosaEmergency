@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "packageName": "com.baekhak.dosa.v13r3preview",
+  "minVersionCode": 31379,
+  "revision": 1,
+  "notes": "V13 R8.71 선장 전용 원격 화면 스타일 시험: 각방 최종 저장회차 영역 여백 축소. 분석 원장 및 성적에 영향 없음.",
+  "rules": [
+    {
+      "selector": ".v13R866LatestTile",
+      "styles": {
+        "padding": "2px 1px",
+        "gap": "0px"
+      }
+    },
+    {
+      "selector": ".v13R866LatestGrid",
+      "styles": {
+        "gap": "2px"
+      }
+    },
+    {
+      "selector": ".v13R866LatestNote",
+      "styles": {
+        "margin": "2px 0 0"
+      }
+    }
+  ]
+}
