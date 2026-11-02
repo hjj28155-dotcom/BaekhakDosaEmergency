@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "packageName": "com.baekhak.dosa.v13r3preview",
+  "latestVersionCode": 31378,
+  "versionName": "V13 R8.70 (update check cache fix)",
+  "status": "BUILD_SIGNING_PENDING_DO_NOT_DEPLOY",
+  "downloadUrl": null,
+  "notes": "선장 전용 V13 R8.70 APK가 실제로 빌드되고 기존 앱과 동일 서명이 확인되기 전까지 운영 배포하지 않습니다. R8.69(31377) 설치본은 이 시험 브랜치를 자동 조회하지 않습니다.",
+  "releaseScope": "captain_only",
+  "announcement": {
+    "id": "v13-r870-captain-pending",
+    "title": "V13 R8.70 홈 업데이트 개선 대기",
+    "message": "서명 APK 검증 이후 기존 홈 [업데이트]에서 직접 다운로드·설치할 수 있습니다."
+  }
+}
