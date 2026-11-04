@@ -1,6 +1,6 @@
 {
   "schema": "v30-integration-contract/1",
-  "target": "V30 new app - isolated Android integration",
+  "target": "V30 captain-only personal Android app - not public distribution",
   "status": "HOST_BINDINGS_UNVERIFIED",
   "rooms": {
     "count": 4,
@@ -20,7 +20,9 @@
     "noForcedBackgroundInstallation": true,
     "noRemoteUIOverride": true,
     "noReinstallWithoutUserApproval": true,
-    "packageSignerContinuityRequired": true
+    "packageSignerContinuityRequired": true,
+    "noPublicRelease": true,
+    "captainOnly": true
   },
   "buttons": [
     {
@@ -124,6 +126,20 @@
       "LOCAL_DB",
       "LOCKED_ANALYSIS_RECORDS"
     ],
-    "status": "CONTRACT_ONLY_ANDROID_BINDING_NOT_VERIFIED"
+    "status": "CONTRACT_ONLY_ANDROID_BINDING_NOT_VERIFIED",
+    "audience": "CAPTAIN_ONLY",
+    "publicRelease": false,
+    "privateDownloadRequired": true
+  },
+  "audience": "CAPTAIN_ONLY",
+  "distribution": {
+    "publicRelease": false,
+    "publicStore": false,
+    "generalUsers": false,
+    "soleIntendedInstaller": "CAPTAIN",
+    "updateMode": "V1_STYLE_CAPTAIN_MANUAL_DOWNLOAD_AND_INSTALL",
+    "releaseAccess": "PRIVATE_OWNER_ACCESS_REQUIRED",
+    "apkDistribution": "OWNER_ONLY",
+    "doNotModifyV3OrV7": true
   }
 }
