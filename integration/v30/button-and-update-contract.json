@@ -1,0 +1,39 @@
+{
+  "schema": "v30-integration-contract/1",
+  "target": "V30 new app - isolated Android integration",
+  "status": "HOST_BINDINGS_UNVERIFIED",
+  "rooms": {"count": 4, "setsPerRoom": 5, "totalSets": 20, "officialEngineEnabled": false},
+  "rules": {
+    "preserveInstalledApps": true,
+    "preserveExistingDatabase": true,
+    "preserveFirstRegistrationLocks": true,
+    "requireSamePackageAndSignerForInPlaceUpdate": true,
+    "doNotUseOtherAppSigningKeys": true,
+    "noOfficialScoreUntilOfficialDrawConfirmed": true,
+    "noOfficialAnalysisUntilOriginalEnginesVerified": true,
+    "V1UpdateFlow": "launch -> notice/update popup when available -> user taps download -> user installs APK"
+  },
+  "buttons": [
+    {"id":"raw-analysis","label":"원문 분석","binding":null,"verified":false},
+    {"id":"captain-room","label":"선장 원문방","binding":null,"verified":false},
+    {"id":"sinseo-room","label":"신서방","binding":null,"verified":false},
+    {"id":"navigator-room","label":"항해사방","binding":null,"verified":false},
+    {"id":"analysis-library","label":"분석방(라이브러리)","binding":null,"verified":false},
+    {"id":"score","label":"성적 관리","binding":null,"verified":false},
+    {"id":"cumulative-db","label":"누적 DB방","binding":null,"verified":false},
+    {"id":"history","label":"분석 기록","binding":null,"verified":false},
+    {"id":"update","label":"업데이트","binding":null,"verified":false},
+    {"id":"backup-restore","label":"백업/복원","binding":null,"verified":false},
+    {"id":"library","label":"자료실","binding":null,"verified":false},
+    {"id":"notices","label":"공지사항","binding":null,"verified":false}
+  ],
+  "integrationGates": {
+    "androidSourceIdentified": false,
+    "v30PreviewAssetsRecovered": false,
+    "packageAndSignerCompared": false,
+    "existingHandlersMapped": false,
+    "dataMigrationValidated": false,
+    "apkSigned": false,
+    "deviceVerified": false
+  }
+}
