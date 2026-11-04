@@ -14,12 +14,12 @@
     "message": "홈 [업데이트]로 R8.72 APK를 다운로드하여 기존 V13 앱 위에 설치하십시오. 중복 상단 머리영역이 제거되고 각 기능 카드 오른쪽 상단에서 닫을 수 있습니다. 기존 앱을 삭제하지 마십시오."
   },
   "uiUpdate": {
-    "revision": 23,
+    "revision": 24,
     "minVersionCode": 31337,
-    "url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/releases/ui/v13-ui-r23.html",
-    "sha256": "3772d69447fa11317e7edab85a32e5dcdf8b3b9461e9c0a79efbf678e7fc8b4f"
+    "url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/releases/ui/v13-ui-r24.html",
+    "sha256": "b81448290fea62823fc2472b4e54b888f95ac90350d865b9cf196c88f2f7f428"
   },
-  "remoteUiNotes": "원격 UI 23회차: 원문분석 회차 선택기를 [◀ 이전회차 | 0000회차 | 다음회차 ▶]로 변경. 기존 회차 적용 및 DB-1 1~1249 보존 원문 읽기·1250회 이후 로컬 등록 방식 유지. 결과전/성적관리/원본 및 잠금은 변경하지 않음. 실기기 적용 확인 전이며 기존 V13 R8.72 APK 공지는 유지.",
+  "remoteUiNotes": "원격 UI 24회차: 원문분석 [◀ 이전회차 | 0000회차 | 다음회차 ▶] 버튼 및 수동 회차 선택. 이전 R23의 내부 문서 회차 표기 22 오류를 수정해 실제 회차 24로 표시. 기존 원문 DB/원본/잠금/결과전/성적관리/기존 APK 변경 없음. 선장폰 적용 미검증.",
   "releaseScope": "captain_only",
   "apkSha256": "e636d0c27ef232d6a4887ee8ca58ecca59709fa8a72187a000e3a280a3e0a933",
   "apkSigningCertificateSha256": "3fe57967c15f81ee39ea2b9b88dd96a7506c1b5b9032606ecbea04bbdb15ee3c"
