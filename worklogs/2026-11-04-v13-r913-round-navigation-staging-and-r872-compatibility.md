@@ -21,9 +21,16 @@
 - inline JS `node --check` 2개 통과. HTML 정적 검증 9/9 통과.
 - 원본 이동 함수를 Node VM에서 격리 실행: 1249→1248→1249, 1회차/9999회차 경계, 4자리 0124 수동 입력, 0000 오류 거절 **6/6 통과**.
 - Playwright 실제 페이지 렌더링 시험은 로컬 HTTP/file URL 접근이 `ERR_BLOCKED_BY_ADMINISTRATOR`로 차단되어 미완료.
-- 본 작업 사본 ZIP과 QA .md는 현재 대화 작업 공간에 저장. Google Drive 직접 업로드 미수행.
+- 본 작업 사본 ZIP과 QA .md는 현재 대화 작업 공간에 저장. Google Drive 업로드는 후속 4번 기록에서 검증 완료.
 
 ## 3. 안전성 및 다음 단계
 - R9.13은 검증용 AndroidIDE 소스 ZIP이다. APK 빌드·기존 V13 서명키 호환성 검증·설치·실기기 회차 이동은 **미완료**. 새 설치 APK라고 부르지 않는다.
 - 기존 V13 R8.72 APK/실기기 DB/잠금·성적 원장과 Drive R9.13 원본 ZIP은 변경하지 않음. 임의 새 서명키로 기존 설치자를 덮어쓰기 시도하지 않음.
 - 다음 작업 1순위: 안전한 AndroidIDE/Gradle 환경과 동일 인증서의 V13 서명키를 확보하여 R9.13 수정본을 새 APK로 빌드·서명하고, 실제 설치폰에서 원문분석 회차 이동 + 기존 기록 보존을 확인할 것. 공개 배포는 검증 뒤 선장 승인 절차를 따른다.
+
+## 4. Google Drive 신규 보관 및 재검증 (2026-11-04)
+- R9.13 Stage4 원문분석 회차이동 수정 ZIP 업로드 완료: https://drive.google.com/file/d/130y9KKJN7yONOukyGHZjI63Ga-X-DJfY/view?usp=drivesdk
+- 검증기록 .md 업로드 완료: https://drive.google.com/file/d/1DSJE0DbhXfcJPlQ8OhByj5qRNQamroA8/view?usp=drivesdk
+- 모두 V13 전용 폴더 `1KKF32iMa7l5ulap_NKjmtmZv9AfqnKGi`에 새 파일로 등록, 원본 덮어쓰기 없음. 수정 ZIP의 Drive 메타데이터 크기 21,062,727 bytes 일치.
+- 업로드본 ZIP 재다운로드 후 SHA256 `20906efa11cc68eb0ae1c4db8e99523aa85fb972f2ba270d2fca7312f4d2c280` 일치, 325항목 ZIP CRC PASS. 검증기록도 Drive 같은 파일 ID에서 최종 수정 이력 반영 및 4,253 bytes 확인.
+- 주의: 소스 ZIP의 Drive 보관이 **APK 빌드/서명/설치/원격 업데이트 적용** 성공을 뜻하지 않음.
