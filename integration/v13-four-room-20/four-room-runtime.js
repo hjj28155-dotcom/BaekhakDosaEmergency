@@ -1,11 +1,11 @@
 /* Four-room / twenty-combination candidate integration.
  * Staging only: never mutates legacy records, locks, signed APK or release manifests.
- * Room swap: remove dosa and freedom; navigator is the 항해사방.
+ * Rooms: captain / sinseo / navigator / analysis. Cross and diversify are excluded.
  */
 (function(root){
  "use strict";
- const ROOMS=Object.freeze(["captain","navigator","cross","diversify"]);
- const LABELS=Object.freeze({captain:"선장 원문",navigator:"항해사방",cross:"교차 분석",diversify:"다양화"});
+ const ROOMS=Object.freeze(["captain","sinseo","navigator","analysis"]);
+ const LABELS=Object.freeze({captain:"선장 원문방",sinseo:"신서방",navigator:"항해사방",analysis:"분석방"});
  const validSet=a=>Array.isArray(a)&&a.length===6&&new Set(a).size===6&&a.every(n=>Number.isInteger(n)&&n>=1&&n<=45);
  const validFive=a=>Array.isArray(a)&&a.length===5&&a.every(validSet)&&new Set(a.map(s=>[...s].sort((x,y)=>x-y).join(","))).size===5;
  const validRaw=a=>Array.isArray(a)&&a.length===6&&a.every(s=>typeof s==="string"&&s.trim().length>0&&s.length<=4000);
