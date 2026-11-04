@@ -2,7 +2,12 @@
   "schema": "v30-integration-contract/1",
   "target": "V30 new app - isolated Android integration",
   "status": "HOST_BINDINGS_UNVERIFIED",
-  "rooms": {"count": 4, "setsPerRoom": 5, "totalSets": 20, "officialEngineEnabled": false},
+  "rooms": {
+    "count": 4,
+    "setsPerRoom": 5,
+    "totalSets": 20,
+    "officialEngineEnabled": false
+  },
   "rules": {
     "preserveInstalledApps": true,
     "preserveExistingDatabase": true,
@@ -11,21 +16,85 @@
     "doNotUseOtherAppSigningKeys": true,
     "noOfficialScoreUntilOfficialDrawConfirmed": true,
     "noOfficialAnalysisUntilOriginalEnginesVerified": true,
-    "V1UpdateFlow": "launch -> notice/update popup when available -> user taps download -> user installs APK"
+    "V1UpdateFlow": "app launch -> check authenticated release/notice manifest -> show popup only if new notice/update -> user taps update download -> Android package installer launched by user -> manual install",
+    "noForcedBackgroundInstallation": true,
+    "noRemoteUIOverride": true,
+    "noReinstallWithoutUserApproval": true,
+    "packageSignerContinuityRequired": true
   },
   "buttons": [
-    {"id":"raw-analysis","label":"원문 분석","binding":null,"verified":false},
-    {"id":"captain-room","label":"선장 원문방","binding":null,"verified":false},
-    {"id":"sinseo-room","label":"신서방","binding":null,"verified":false},
-    {"id":"navigator-room","label":"항해사방","binding":null,"verified":false},
-    {"id":"analysis-library","label":"분석방(라이브러리)","binding":null,"verified":false},
-    {"id":"score","label":"성적 관리","binding":null,"verified":false},
-    {"id":"cumulative-db","label":"누적 DB방","binding":null,"verified":false},
-    {"id":"history","label":"분석 기록","binding":null,"verified":false},
-    {"id":"update","label":"업데이트","binding":null,"verified":false},
-    {"id":"backup-restore","label":"백업/복원","binding":null,"verified":false},
-    {"id":"library","label":"자료실","binding":null,"verified":false},
-    {"id":"notices","label":"공지사항","binding":null,"verified":false}
+    {
+      "id": "raw-analysis",
+      "label": "원문 분석",
+      "binding": null,
+      "verified": false
+    },
+    {
+      "id": "captain-room",
+      "label": "선장 원문방",
+      "binding": null,
+      "verified": false
+    },
+    {
+      "id": "sinseo-room",
+      "label": "신서방",
+      "binding": null,
+      "verified": false
+    },
+    {
+      "id": "navigator-room",
+      "label": "항해사방",
+      "binding": null,
+      "verified": false
+    },
+    {
+      "id": "analysis-library",
+      "label": "분석방(라이브러리)",
+      "binding": null,
+      "verified": false
+    },
+    {
+      "id": "score",
+      "label": "성적 관리",
+      "binding": null,
+      "verified": false
+    },
+    {
+      "id": "cumulative-db",
+      "label": "누적 DB방",
+      "binding": null,
+      "verified": false
+    },
+    {
+      "id": "history",
+      "label": "분석 기록",
+      "binding": null,
+      "verified": false
+    },
+    {
+      "id": "update",
+      "label": "업데이트",
+      "binding": null,
+      "verified": false
+    },
+    {
+      "id": "backup-restore",
+      "label": "백업/복원",
+      "binding": null,
+      "verified": false
+    },
+    {
+      "id": "library",
+      "label": "자료실",
+      "binding": null,
+      "verified": false
+    },
+    {
+      "id": "notices",
+      "label": "공지사항",
+      "binding": null,
+      "verified": false
+    }
   ],
   "integrationGates": {
     "androidSourceIdentified": false,
@@ -35,5 +104,26 @@
     "dataMigrationValidated": false,
     "apkSigned": false,
     "deviceVerified": false
+  },
+  "updatePolicy": {
+    "method": "V1_USER_DRIVEN_APK_DOWNLOAD_AND_INSTALL",
+    "trigger": "ON_APP_LAUNCH_WHEN_NEW_NOTICE_OR_NEWER_RELEASE",
+    "popupWhenNoChanges": false,
+    "downloadAction": "USER_TAPS_UPDATE_BUTTON",
+    "installAction": "USER_CONFIRMS_ANDROID_PACKAGE_INSTALLER",
+    "noticeOnly": "NOTICE_POPUP_NO_INSTALL_BUTTON",
+    "minimumValidation": [
+      "HTTPS_RELEASE_URL",
+      "VERSION_CODE_INCREASE",
+      "EXPECTED_PACKAGE_NAME",
+      "APK_SHA256_CHECK",
+      "ANDROID_SIGNATURE_COMPATIBILITY"
+    ],
+    "preserve": [
+      "INSTALLED_APP_DATA",
+      "LOCAL_DB",
+      "LOCKED_ANALYSIS_RECORDS"
+    ],
+    "status": "CONTRACT_ONLY_ANDROID_BINDING_NOT_VERIFIED"
   }
 }
