@@ -11,6 +11,8 @@
  const validRaw=a=>Array.isArray(a)&&a.length===6&&a.every(s=>typeof s==="string"&&s.trim().length>0&&s.length<=4000);
  function install({implementations,attestation}={}){
   if(!implementations||!attestation)throw Error("ENGINE_BINDINGS_REQUIRED");
+  // A single function reused under multiple room names is not independent analysis.
+  if(ROOMS.every(room=>typeof implementations[room]==="function") && new Set(ROOMS.map(room=>implementations[room])).size!==4)throw Error("ROOM_ENGINE_ALIAS_DETECTED");
   async function analyze({round,raw}={}){
    if(!Number.isInteger(round)||round<1||round>9999)throw Error("INVALID_ROUND");
    if(!validRaw(raw))throw Error("SIX_RAW_REQUIRED");
