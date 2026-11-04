@@ -1,0 +1,14 @@
+{
+  "schema": "v30-score-announcements/1",
+  "status": "CAPTAIN_APPROVED_2026-11-05",
+  "locale": "ko-KR",
+  "rules": {"officialDrawConfirmationRequired": true, "noScoreBeforeConfirmation": true, "noHonorificCaptain": true, "noFanfareForLoss": true},
+  "messages": {
+    "1": {"tone":"grand","effect":"grand-fanfare","speech":"빠바바밤! 대박입니다! 꿈에 그리던 1등 당첨! 여섯 숫자 모두 적중! 역사적인 순간입니다! 진심으로 축하드립니다!"},
+    "2": {"tone":"energetic","effect":"bright-fanfare","speech":"와아! 2등 당첨입니다! 다섯 숫자와 보너스 번호까지 적중! 엄청난 성과입니다! 축하합니다!"},
+    "3": {"tone":"joyful","effect":"short-fanfare","speech":"빠밤! 축하합니다! 다섯 숫자 적중! 당당한 3등입니다! 신나는 축하의 박수를 보내드립니다!"},
+    "4": {"tone":"cheerful","effect":"light-fanfare","speech":"빰빠라밤! 축하합니다! 네 숫자 적중! 기분 좋은 4등 당첨입니다!"},
+    "5": {"tone":"light","effect":"chime","speech":"딩동댕! 축하합니다! 세 숫자 적중! 5등 당첨입니다!"},
+    "loss": {"tone":"calm","effect":"none","speech":"이번 회차는 아쉽게도 당첨되지 않았습니다. 분석 결과는 소중한 기록으로 남기겠습니다. 다음 회차에 다시 도전해 보세요."}
+  }
+}
