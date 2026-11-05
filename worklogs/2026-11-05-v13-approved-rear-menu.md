@@ -93,3 +93,12 @@
 - 생성 커밋: 테스트 `552c75d768aee3266ba4d696f5453971421d2f0a`, workflow `26d186de8128b125cc45830e9fed60d9e8848466`.
 - Actions 실행 ID `42035408922` 시작 확인. 본 작업 기록 시점에는 진행 중이므로 테스트 통과/실패 미확정.
 - 다음 1순위: 해당 CI 결과 확인 → 실패 시 원인 수정 → 전체 HTML 시험 통과 후에도 선장 휴대전화 실제 동작은 별도 검증.
+
+## 2026-11-05 GitHub Actions 전체 R25 Chromium 시험 확정
+- Workflow: `V13 R25 Captain-only UI Browser QA`, Run `42035408922`, Job `127272143525`, 결론 `success`, 로그에서 `"result": "PASS", "checks": 18` 확인.
+- 시험 대상은 실제 R25 스테이징 전체 HTML 파일 `releases/ui/v13-ui-r25-captain-staging.html`이며 분리된 HTML fixture가 아님.
+- Playwright/Chromium: 360×780 / 920×1400 각각 9개 시나리오 PASS = **18/18 PASS**. 초기 메뉴 숨김, 중앙 원문 버튼, 메뉴 배경 위 오버레이/배경 전체 폭, 정확한 9개 메뉴 라벨, X닫기 및 홈 복귀, 중앙 원문분석 클릭, 분석 패널 닫기, 선장방 클릭, 상단 메뉴 재열기.
+- Actions 실행 및 로그 확인 근거: https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/actions/runs/42035408922
+- 외부 HTTP 요청은 시험 중 차단. 실제 Android 네이티브 브리지, 실기기 크기/서명, 기존 사용자 데이터 DB 저장/복구, 원격 업데이트 적용 여부는 아직 **미검증**.
+- R25 시험 브랜치 외 운영 파일 및 선장 전용 V13 기존 설치본을 건드리지 않음.
+- 다음 1순위: 선장 전용 기기에서 R25 원격 UI 교체 절차의 무손실 검증 및 실제 기기 클릭/DB 보존을 확인한 뒤 적용 여부 판단. 일반 배포판으로 취급하지 말 것.
