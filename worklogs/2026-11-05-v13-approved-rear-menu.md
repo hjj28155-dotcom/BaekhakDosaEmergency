@@ -71,3 +71,13 @@
 - 분리 HTML 내 JS 구문 검사(`node --check`) PASS. 과거 실제 원본 대비 14/14 소스 회귀검사는 그대로 유효하지만 기기 동작 증거가 아님.
 - 배포 설정 `main/releases/v13-release.json` 및 기존 APK 미변경.
 - 다음 작업: Android WebView/정상 브라우저가 동작하는 환경에서 R25 전체 HTML로 실기능 9개/중앙 원문 분석 확인 후 안전 승격 결정. 미검증 상태 운영 승격 금지.
+
+## 2026-11-05 브라우저 테스트 실행 성공 및 범위
+- 격리된 메뉴 fixture: `/mnt/data/v13_r25_tests/menu-browser-test.html` + `menu-browser-test.js` (실제 운영 R25 전체 HTML이 아닌 구조 재현용).
+- Chromium 실행은 `file://` 탐색 시 `ERR_BLOCKED_BY_ADMINISTRATOR`였으나 Playwright `page.set_content()` 방식으로 인메모리 HTML 삽입에 성공.
+- 실제 Chromium DOM에서 14/14 PASS (920×1700 뷰포트): 초기 드로어 숨김, 9개 메뉴, 중앙 원문 버튼, 홈 전체 폭, 드로어 열기, 배경 폭 유지, 9개 라벨, 좌측 중복/자동방 제외, 선장방 열기, 패널 닫기, 중앙 원문 진입, 상단 메뉴 재열기, X 닫기.
+- 좁은 뷰포트 360×780에서 동일 14/14 PASS 재실행 성공.
+- 4개 뷰포트를 한 번에 실행하려던 추가 검사는 Chromium `TargetClosedError`로 실패. 따라서 다른 뷰포트 결과는 미검증.
+- **주의:** 이 PASS는 분리 fixture 브라우저 동작만 입증. R25 대용량 전체 앱 HTML의 실물 클릭, Android WebView/기존 데이터 저장/엔진/업데이트 종단간 시험은 미검증.
+- 기존 main 운영 UI revision 24, APK, 서명, DB/원본 자료는 변경하지 않음. 자동 원격 배포 금지 유지.
+- 다음 1순위: 실제 R25 전체 HTML을 검증 가능한 Android/WebView 환경에 로드하고 버튼 기능·레이아웃·기존 기록 회귀 검사를 진행.
