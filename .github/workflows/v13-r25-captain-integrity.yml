@@ -1,0 +1,31 @@
+name: V13 R25 Captain UI SHA256 Integrity
+on:
+  push:
+    branches:
+      - staging/v13-approved-rear-menu-20261105
+    paths:
+      - '.github/workflows/v13-r25-captain-integrity.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  sha256:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify R24 SHA and report R25 digest
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s releases/ui/v13-ui-r24.html
+          test -s releases/ui/v13-ui-r25-captain-staging.html
+          echo "R24 official hash:"
+          sha256sum releases/ui/v13-ui-r24.html
+          echo "R25 captain candidate hash:"
+          sha256sum releases/ui/v13-ui-r25-captain-staging.html
+          echo "R25 document revision and essential UI strings:"
+          grep -Fq 'const V13_REMOTE_UI_DOCUMENT_REVISION=25;' releases/ui/v13-ui-r25-captain-staging.html
+          grep -Fq 'V13_R25_CAPTAIN_APPROVED_REAR_MENU' releases/ui/v13-ui-r25-captain-staging.html
+          echo 'V13_R25_CAPTAIN_UI_SHA_OK'
