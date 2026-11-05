@@ -27,8 +27,15 @@
 - 동일 서명 인증서로 Android APK 빌드/서명: 미완료. 설치 APK 자체는 만들지 않음.
 - 선장폰 기존 R8.72 (31380) → 새 versionCode 31421 이상의 동일 서명 APK 덮어쓰기 호환 및 실제 DB 유지 확인: 미완료.
 - 현재 작업 컨테이너에는 Android SDK/Gradle/apksigner가 없어 APK 빌드가 불가.
-- Google Drive에 수정 ZIP 신규 업로드: 미실시. 현재 대화 sandbox ZIP 생성 완료. 원본 Drive ZIP은 변경 없음.
+- Google Drive에 수정 ZIP 신규 업로드: 완료. 아래 신규 파일 메타데이터 재조회 확인. 원본 Drive ZIP은 변경 없음.
 - 선장 V13 R8.72에는 전체 HTML 원격 교체 API가 없으므로, 기존 앱에 R25 원격 HTML 등록만 해서는 업데이트 정보가 표시되지 않는 문제가 해결되지 않음.
 
 ## 다음 작업
 동일 서명키 인증서 일치 확인 → Android 빌드 환경 구성 → 새 APK 서명 및 설치 전 검증 → 선장폰 데이터 백업 확인 → 기존 앱 삭제 없이 업데이트 설치 → 실제 동작 검증.
+
+## 추가: Google Drive 신규 보관 완료
+- 선장 전용 V13 폴더에 수정 ZIP 신규 업로드 성공. 원본 ZIP 덮어쓰기 없음.
+- 새 Drive 파일 ID `1qtOQfrwAMQTKeCQze7AyWEOPLnbde8oU`
+- Google Drive 링크: https://drive.google.com/file/d/1qtOQfrwAMQTKeCQze7AyWEOPLnbde8oU/view?usp=drivesdk
+- 업로드 후 metadata 재조회: `size=21064377`, zip MIME 및 부모 `1KKF32iMa7l5ulap_NKjmtmZv9AfqnKGi` 확인.
+- 원본 소스 ZIP SHA256 `20906efa...` 보존, 수정 ZIP 로컬 SHA256 `6d56776f1dbd82960fc64e0c5cd1eea59816c37ffed499faf55c7b338733f5be`. Drive 재다운로드 해시 검증은 아직 미완료.
