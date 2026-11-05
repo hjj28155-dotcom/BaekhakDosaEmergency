@@ -38,4 +38,6 @@
 - 새 Drive 파일 ID `1qtOQfrwAMQTKeCQze7AyWEOPLnbde8oU`
 - Google Drive 링크: https://drive.google.com/file/d/1qtOQfrwAMQTKeCQze7AyWEOPLnbde8oU/view?usp=drivesdk
 - 업로드 후 metadata 재조회: `size=21064377`, zip MIME 및 부모 `1KKF32iMa7l5ulap_NKjmtmZv9AfqnKGi` 확인.
-- 원본 소스 ZIP SHA256 `20906efa...` 보존, 수정 ZIP 로컬 SHA256 `6d56776f1dbd82960fc64e0c5cd1eea59816c37ffed499faf55c7b338733f5be`. Drive 재다운로드 해시 검증은 아직 미완료.
+- 원본 소스 ZIP SHA256 `20906efa...` 보존, 수정 ZIP 로컬 SHA256 `6d56776f1dbd82960fc64e0c5cd1eea59816c37ffed499faf55c7b338733f5be`. Drive 재다운로드 해시 검증 완료.
+
+- Drive 업로드본을 다시 내려받아 SHA256 `6d56776f1dbd82960fc64e0c5cd1eea59816c37ffed499faf55c7b338733f5be` 일치, ZIP 326 엔트리 및 CRC PASS 확인. **실제 Drive 저장본 검증 완료**.
