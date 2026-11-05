@@ -1,0 +1,29 @@
+name: V13 R25 Captain-only UI Browser QA
+on:
+  push:
+    branches:
+      - staging/v13-approved-rear-menu-20261105
+    paths:
+      - '.github/workflows/v13-r25-captain-browser-qa.yml'
+      - 'tests/v13-r25-browser.cjs'
+      - 'releases/ui/v13-ui-r25-captain-staging.html'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install isolated test browser
+        run: |
+          npm install --no-save --no-package-lock playwright@1.58.2
+          npx playwright install --with-deps chromium
+      - name: Run full R25 HTML browser checks (no APK deploy, no DB)
+        run: node tests/v13-r25-browser.cjs
