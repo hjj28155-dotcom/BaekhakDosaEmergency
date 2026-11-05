@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "app_id": "com.navigator.freedom.v3final",
+  "channel": "v35-freedom",
+  "update_available": false,
+  "version_code": null,
+  "version_name": null,
+  "apk_url": null,
+  "apk_sha256": null,
+  "notice": "검증된 V35 배포용 APK가 아직 등록되지 않았습니다."
+}
