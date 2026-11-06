@@ -1,0 +1,68 @@
+name: V35 Independent Signed APK (manual)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  signed-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    defaults:
+      run:
+        working-directory: v35/independent
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Check source and immutable approved screen
+        env:
+          R9_SHA256: '80204747e3bd0ca55f54856567afa689876e040309d7185e08e064897e9177e7'
+        run: |
+          test -f app/src/main/assets/index.html || { echo 'R10 source not uploaded. Refusing build.'; exit 1; }
+          echo "$R9_SHA256  app/src/main/assets/index.html" | sha256sum --check -
+          test -f app/src/main/assets/engine_v2.html
+          test -f app/src/main/assets/raw_db1.js
+          test -f app/src/main/assets/home_approved.png
+          test -f gradle/wrapper/gradle-wrapper.jar
+      - name: Validate JavaScript regression tests
+        run: |
+          node --check app/src/main/assets/app.js
+          for f in test_stats.cjs test_official.cjs test_engine_bridge.cjs test_update.cjs test_r8_regression.cjs; do
+            test -f "$f" && node "$f"
+          done
+      - name: Require private signing secrets
+        env:
+          V35_KEYSTORE_B64: ${{ secrets.V35_KEYSTORE_B64 }}
+          V35_STORE_PASSWORD: ${{ secrets.V35_STORE_PASSWORD }}
+          V35_KEY_ALIAS: ${{ secrets.V35_KEY_ALIAS }}
+          V35_KEY_PASSWORD: ${{ secrets.V35_KEY_PASSWORD }}
+        run: |
+          test -n "$V35_KEYSTORE_B64" && test -n "$V35_STORE_PASSWORD" && test -n "$V35_KEY_ALIAS" && test -n "$V35_KEY_PASSWORD" || { echo 'Private signing secrets missing. Refusing to publish an un-upgradable APK.'; exit 1; }
+          printf %s "$V35_KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/v35-release.jks"
+          chmod 600 "$RUNNER_TEMP/v35-release.jks"
+          echo "V35_KEYSTORE_PATH=$RUNNER_TEMP/v35-release.jks" >> "$GITHUB_ENV"
+      - name: Assemble signed release APK
+        env:
+          V35_STORE_PASSWORD: ${{ secrets.V35_STORE_PASSWORD }}
+          V35_KEY_ALIAS: ${{ secrets.V35_KEY_ALIAS }}
+          V35_KEY_PASSWORD: ${{ secrets.V35_KEY_PASSWORD }}
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon --stacktrace :app:assembleRelease
+      - name: Verify signing and publish build artifact
+        run: |
+          APK=$(find app/build/outputs/apk/release -maxdepth 1 -name '*.apk' | head -n 1)
+          test -n "$APK" && test -s "$APK"
+          "${ANDROID_HOME}/build-tools/35.0.0/apksigner" verify --verbose "$APK"
+          sha256sum "$APK" > "$RUNNER_TEMP/V35_APK_SHA256.txt"
+          cp "$APK" "$RUNNER_TEMP/V35-independent-signed.apk"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: V35-independent-signed-APK
+          path: |
+            ${{ runner.temp }}/V35-independent-signed.apk
+            ${{ runner.temp }}/V35_APK_SHA256.txt
+          if-no-files-found: error
+          retention-days: 30
