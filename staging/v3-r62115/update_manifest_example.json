@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "app_id": "com.baekhak.dosa.v3",
+  "channel": "v35-master",
+  "update_available": false,
+  "version_code": null,
+  "version_name": null,
+  "apk_url": null,
+  "apk_sha256": null,
+  "notice_id": null,
+  "notice": "검증된 R6.21.15 APK 배포 전까지 비활성 유지"
+}
