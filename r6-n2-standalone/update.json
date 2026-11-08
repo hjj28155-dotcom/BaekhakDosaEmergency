@@ -1,9 +1,9 @@
 {
   "schema": 1,
   "package_name": "com.hanghae.fold8n2app",
-  "version_code": 621915,
-  "version_name": "6.21.15",
-  "apk_url": "",
-  "apk_sha256": "",
-  "release_notes": "R6-N2 신규 앱 V1. 현재 배포 가능한 후속 업데이트는 없습니다. 다음 버전은 앱 실행 시 팝업으로 안내합니다."
+  "version_code": 621916,
+  "version_name": "6.21.16",
+  "apk_url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/r6-n2-standalone/R6_N2_V2_621916.apk",
+  "apk_sha256": "d02c022308c161320fc1a12e59f25037a2d52157bcd2ba1541922dfb23b2f7c5",
+  "release_notes": "N2.00.02 업데이트: 기존 R6와 구별되는 N2 전용 아이콘, 분석 회차 입력 엔터키 오류 수정, N2 근거 부족(HOLD) 사유 안내 강화. 기존 N2 저장기록은 유지합니다. 근거 없는 조합은 생성하지 않습니다."
 }
