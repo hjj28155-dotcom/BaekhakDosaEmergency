@@ -1,0 +1,18 @@
+/* N2 6.21.28 approved score-management round controls.
+   Opt-in scope only: add n2-score-round-controls to the exact four-button
+   row after identifying the current APK DOM. No home/button recoloring. */
+.n2-score-round-controls {display:flex;align-items:stretch;gap:4px;width:100%;}
+.n2-score-round-controls > button,
+.n2-score-round-controls > [role="button"] {
+ min-height:58px;box-sizing:border-box;padding:13px 7px;display:inline-flex;
+ align-items:center;justify-content:center;line-height:1.25;white-space:normal;
+ text-align:center;touch-action:manipulation;flex:1 1 0;min-width:0;
+}
+.n2-score-round-controls > :last-child {flex-grow:1.17;}
+@media(max-width:410px){
+ .n2-score-round-controls{gap:3px;}
+ .n2-score-round-controls > button,
+ .n2-score-round-controls > [role="button"] {
+   min-height:60px;padding:14px 4px;font-size:clamp(11px,3vw,15px);
+ }
+}
