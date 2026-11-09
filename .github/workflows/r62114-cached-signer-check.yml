@@ -1,0 +1,43 @@
+name: R62114 candidate cached signer identity check
+on:
+  push:
+    branches: [research/r62114-signature-check-20261109]
+    paths: [.github/workflows/r62114-cached-signer-check.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compare-certificate-only:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Restore existing candidate key from default-branch Actions cache
+        id: candidate
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: hanghae-mini-stable-debug-keystore-v1
+      - name: Compare certificate fingerprint without exposing keys
+        shell: bash
+        env:
+          CACHE_HIT: ${{ steps.candidate.outputs.cache-hit }}
+        run: |
+          set -euo pipefail
+          if [ "$CACHE_HIT" != 'true' ]; then
+            echo 'RESULT=NO_CACHED_CANDIDATE'
+            exit 0
+          fi
+          file="$HOME/.android/debug.keystore"
+          if [ ! -f "$file" ]; then
+            echo 'RESULT=NO_CANDIDATE_KEYFILE'
+            exit 0
+          fi
+          expected='3FE57967C15F81EE39EA2B9B88DD96A7506C1B5B9032606ECBEA04BBDB15EE3C'
+          actual="$(keytool -list -v -keystore "$file" -storepass android -alias androiddebugkey 2>/dev/null | sed -n 's/^.*SHA256: //p' | head -1 | tr -d ': \r\n' | tr '[:lower:]' '[:upper:]')"
+          if [ -z "$actual" ]; then
+            echo 'RESULT=CANDIDATE_NOT_READABLE_WITH_DEFAULT_DEBUG_SETTINGS'
+          elif [ "$actual" = "$expected" ]; then
+            echo 'RESULT=MATCHES_R62114_CERTIFICATE_CANDIDATE'
+          else
+            echo 'RESULT=MISMATCHES_R62114_CERTIFICATE'
+          fi
+          # Candidate key is not emitted or uploaded, and the workflow never builds or publishes APKs.
