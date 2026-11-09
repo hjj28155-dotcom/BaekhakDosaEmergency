@@ -1,9 +1,9 @@
 {
   "schema": 1,
   "package_name": "com.hanghae.fold8n2app",
-  "version_code": 621927,
-  "version_name": "6.21.27",
-  "apk_url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/r6-n2-standalone/N2_Update_62127.apk",
-  "apk_sha256": "890a4cf0361ab109c6786042c01a069ae04aeda6fc1ca917d6af2f69f77ccef1",
-  "release_notes": "성적관리 결과표 스크롤 복구 및 이 회차 분석 완료 후 20조합 PNG·전체화면 오버레이 자동 표시. 승인된 홈화면·버튼·기존 저장기록은 변경하지 않습니다. R9 연구엔진은 포함되지 않았습니다. 기존 앱 삭제 없이 다운로드 후 사용자 직접 업데이트 설치하십시오. 실기기 동작 검증 전입니다."
+  "version_code": 621928,
+  "version_name": "6.21.28",
+  "apk_url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/r6-n2-standalone/N2_Update_62128.apk",
+  "apk_sha256": "1a6040b36fe67c981a93e321e5b469e4e9212c3809a8ae75cd66760d23351b4f",
+  "release_notes": "N2 6.21.28: 성적관리 회차 선택 버튼 확대, 20조합 PNG 결과 최상단 확대·스크롤, 분석 완료 즉시 오버레이 준비창 후 20조합 PNG 표시, 원본챗방 링크 입력·저장·열기, 1~100회 백업 복원 진입 버튼 추가(기존 JSON 백업 파일을 선택해야 기록 병합). 101~200회 기존 분석 엔진 유지. 홈화면·기존 기록 보존, R9 미포함. 기존 앱 삭제 없이 업데이트 다운로드 후 직접 설치하십시오. 실기기 검증 전."
 }
