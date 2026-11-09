@@ -4,7 +4,7 @@ export function normalizeChatUrl(value) {
   try {
     const u = new URL(value.trim());
     if (u.protocol !== 'https:' || !['chatgpt.com','www.chatgpt.com'].includes(u.hostname)) return null;
-    if (!/^\/(?:c|g\/[^/]+\/c|share)\/[A-Za-z0-9-]+\/?$/.test(u.pathname)) return null;
+    if (!/^\/(?:c|g\/[^\/]+\/c|share)\/[A-Za-z0-9-]+\/?$/.test(u.pathname)) return null;
     u.search=''; u.hash='';
     return u.toString();
   } catch { return null; }
