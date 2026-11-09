@@ -1,9 +1,9 @@
 {
   "schema": 1,
   "package_name": "com.hanghae.fold8n2app",
-  "version_code": 621916,
-  "version_name": "6.21.16",
-  "apk_url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/r6-n2-standalone/R6_N2_V2_621916.apk",
-  "apk_sha256": "d02c022308c161320fc1a12e59f25037a2d52157bcd2ba1541922dfb23b2f7c5",
-  "release_notes": "N2.00.02 업데이트: 기존 R6와 구별되는 N2 전용 아이콘, 분석 회차 입력 엔터키 오류 수정, N2 근거 부족(HOLD) 사유 안내 강화. 기존 N2 저장기록은 유지합니다. 근거 없는 조합은 생성하지 않습니다."
+  "version_code": 621927,
+  "version_name": "6.21.27",
+  "apk_url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/r6-n2-standalone/N2_Update_62127.apk",
+  "apk_sha256": "890a4cf0361ab109c6786042c01a069ae04aeda6fc1ca917d6af2f69f77ccef1",
+  "release_notes": "성적관리 결과표 스크롤 복구 및 이 회차 분석 완료 후 20조합 PNG·전체화면 오버레이 자동 표시. 승인된 홈화면·버튼·기존 저장기록은 변경하지 않습니다. R9 연구엔진은 포함되지 않았습니다. 기존 앱 삭제 없이 다운로드 후 사용자 직접 업데이트 설치하십시오. 실기기 동작 검증 전입니다."
 }
