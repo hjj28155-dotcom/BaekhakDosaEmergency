@@ -1,0 +1,11 @@
+{
+  "schema": "lotto645-update-v1",
+  "packageName": "com.hanghae.lotto645",
+  "versionCode": 44900,
+  "versionName": "4.49",
+  "apkUrl": null,
+  "notice": "업데이트 공지 연결 준비 중입니다. 배포 파일을 검증한 후 업데이트를 안내합니다.",
+  "noticeId": "20261109-setup",
+  "publishedAt": "2026-11-09T21:26:00+09:00",
+  "enabled": false
+}
