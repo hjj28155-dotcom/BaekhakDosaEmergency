@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 46900,
-  "versionName": "4.69",
-  "apkUrl": "https://drive.google.com/file/d/1jPfjWq_0YQmgEbP6RRMVrxt5vA85ijeK/view",
-  "notice": "⚓ 로또645 R4.69 긴급 저장 개선: 433회부터 분석 저장이 중단되는 현상에 대응하여 잠금·영수증·성적·공식당첨번호 원장의 저장 용량을 줄이는 무손실 압축 방식을 도입했습니다. 433회 분석 번호 생성은 정상 재현됐으며 기존 4방 20조합 엔진과 분석 기록은 변경하지 않았습니다. 432회 기존 백업을 반드시 별도 보관한 뒤 앱을 삭제하지 말고 덮어쓰기 설치하십시오. ★ 중요: R4.69에서 새 기록 저장 후에는 내부 원장이 압축 형식으로 바뀌므로 이전 R4.68로 다운그레이드하면 기록을 읽지 못할 수 있습니다. 다운그레이드 전 R4.69에서 JSON 백업을 내보내야 합니다. Android 실기기 433회 저장과 외부 Drive 다운로드 권한은 아직 확인되지 않았습니다.",
-  "noticeId": "R469-20261111-ROUND433-LOCALSTORAGE-LOSSLESS-COMPRESSION",
-  "publishedAt": "2026-11-11T07:37:00+09:00",
+  "versionCode": 47000,
+  "versionName": "4.70",
+  "apkUrl": "https://drive.google.com/file/d/10d3wZocUN9u4bNOOXywjW5B3PzP3KoYy/view",
+  "notice": "⚓ 로또645 R4.70 화면 위치 수정: 회차분석 후 축하·성적 안내가 끝나거나 '지금 20조합 보기'를 누르면 성적관리의 4방 20조합 목록 제목부터 펼쳐지도록 스크롤 기준을 수정했습니다. 기존에는 첫 번째 방 카드로 바로 이동해 목록 최상단 제목이 잘릴 수 있었습니다. 상단의 '◀ 이전'은 기존대로 성적관리 전체 상단으로 복귀합니다. R4.69의 433회 이후 압축 저장 개선, 4방 통계 예상수·PNG 비교, 기존 20조합 및 누적DB는 변경하지 않았습니다. 원본 백업을 별도 보관하고 기존 앱을 삭제하지 말고 덮어쓰기 설치하십시오. 실제 Android 휴대전화 동작 및 Google Drive 외부 다운로드 권한은 미검증입니다.",
+  "noticeId": "R470-20261111-SCORE-COMBOS-START-AT-DETAILS-TITLE",
+  "publishedAt": "2026-11-11T07:49:00+09:00",
   "enabled": true
 }
