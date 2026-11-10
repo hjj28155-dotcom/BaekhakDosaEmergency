@@ -37,3 +37,15 @@
 **위 체크 완료 전 운영 update.json 수정 금지.**
 
 다음 1순위: GitHub Actions에서 `N2 R6.21.34 signed APK release gate (read-only)` 실행 결과 및 첨부 로그를 확인한다. 이후 실기기 덮어쓰기 검증을 진행한다.
+
+
+## 2026-11-10 후속 실물 검증 시도 (추가 기록)
+- 로컬 curl 접속: `raw.githubusercontent.com` DNS 조회 실패. APK 바이트를 다운로드하지 못함.
+- GitHub fetch_file(binary, base64) 조회: 두 APK의 Git blob SHA는 조회되지만 반환 content 길이가 모두 0. 실제 APK 파일 해시/서명 검사는 **수행되지 않음**.
+  - R6.21.29 (main) Git blob: `05cc240deb7a5d40373736eb95019180fd06f191`
+  - R6.21.34 (pilot) Git blob: `b3e1e66425a4b765c371f4c8da4f2ceda504388c`
+- Actions run 목록은 연결 기능이 제한되어 성공 증거를 확보하지 못함. 빈 목록은 실패 또는 미실행을 증명하지 않음.
+- 공식 운영 JSON의 `version_name`은 6.21.29로 재확인.
+- 상기 Git blob SHA는 Git 객체 식별자이며 APK의 SHA-256, 서명 인증서 지문 또는 설치 호환성 증거가 아님.
+- 변경: 이 현황 문서 갱신만 수행. APK, 운영 update.json, 누적DB 미변경.
+- 다음 1순위: 실행된 Actions 작업의 실제 결과/로그를 확보하거나 APK 파일 바이트를 받아 apksigner + sha256sum으로 검사. 성공 후 실기기 136회차 분석·저장 검증.
