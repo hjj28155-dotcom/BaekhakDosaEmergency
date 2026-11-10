@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 47100,
-  "versionName": "4.71",
-  "apkUrl": "https://drive.google.com/file/d/1aqTnh5dz3VK26UT8fj7_EqoM5CDlQi5z/view",
-  "notice": "⚓ 로또645 R4.71 성적관리 화면 개선: 성적관리 제목 오른쪽(기존 ‘4방·20조합’ 표시 위치)에 ‘최종 분석 회차 · 제○○회’를 추가했습니다. 화면의 선택 회차가 아니라 실제 분석·채점 원장에서 확인된 과거분석 최고 회차를 표시합니다(440회까지 저장되어 있으면 제440회). 1249회 등 별도 연구 기록은 제외합니다. R4.70의 20조합 상단 펼침과 R4.69의 누적DB 압축 저장, 기존 4방 20조합·분석 엔진·원본 기록은 변경하지 않았습니다. 기존 앱을 삭제하지 말고 덮어쓰기 설치하십시오. 실제 Android 실기기 검증 및 Google Drive 외부 다운로드 권한은 미확인입니다.",
-  "noticeId": "R471-20261111-SCORE-HEADER-LATEST-ANALYZED-ROUND",
-  "publishedAt": "2026-11-11T07:56:00+09:00",
+  "versionCode": 47200,
+  "versionName": "4.72",
+  "apkUrl": "https://drive.google.com/file/d/1zYUyzlBWpK2bglVJLJ7u2-c9cSD0OSY-/view",
+  "notice": "⚓ 로또645 R4.72: 분석 완료 후 4개 방의 PNG형 예상수 비교 화면을 최상단부터 보이도록 수정했습니다. 추첨 전 분석은 결과 팝업이 없어도 황금빈도방 예상수 패널로 이동하며, 추첨 후에는 결과 안내 종료 시 같은 위치로 이동합니다. 성적관리 제목 오른쪽 표시는 현재 선택·진행 회차와 동기화했습니다. 기존 R4.69 압축 누적DB, 20조합, 통계 엔진, 저장 기록은 변경하지 않았습니다. 앱을 삭제하지 말고 덮어쓰기 설치하십시오. 실제 Android 실기기 검증 미완료. Google Drive 파일의 외부 공유 권한이 확인되지 않아 일반 설치자의 다운로드가 제한될 수 있습니다.",
+  "noticeId": "R472-20261111-AUTO-SCROLL-TO-FIRST-PNG-AND-CURRENT-ROUND",
+  "publishedAt": "2026-11-11T08:25:00+09:00",
   "enabled": true
 }
