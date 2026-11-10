@@ -21,6 +21,17 @@ jobs:
         with:
           ref: n2-r62134-pilot-20261110
           persist-credentials: false
+      - name: Checkout R6.21.29 official APK from main in separate directory
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: n2-official-source
+          persist-credentials: false
+      - name: Place official comparison APK in pilot worktree
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp n2-official-source/r6-n2-standalone/N2_Update_62129_UPDATE_BUTTON_FIXED.apk r6-n2-standalone/
       - name: Compare signed APKs and retain results
         shell: bash
         run: |
