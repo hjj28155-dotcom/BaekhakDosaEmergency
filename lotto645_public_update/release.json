@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 45700,
-  "versionName": "4.57",
-  "apkUrl": "https://drive.google.com/file/d/1sGUyfWsmcMeOTA-w02FVefHavw7qAX3z/view",
-  "notice": "⚓ 로또645 R4.57 업데이트: 앱을 열면 홈 회차분석 위에 '마지막 과거 분석 회차'와 '실구매 회차'를 구분해 표시합니다. 과거 분석은 저장시각이 가장 최신인 사후연구 잠금기록 기준입니다. 본 앱에는 구매 증빙 원장이 연결되지 않았으므로 실구매 회차는 '확인 기록 없음'으로 표시하며 과거 연구나 로컬 잠금을 실제 구매로 간주하지 않습니다. 이 기능은 읽기 전용이며 누적DB·기존 20조합·서명·중복 분석 차단 기능은 변경하지 않았습니다. 기존 앱을 삭제하지 말고 다운로드하여 덮어쓰기 설치하십시오. 통합DB 백업은 계속 보관하십시오.",
-  "noticeId": "R457-20261110-LAUNCH-ROUND-DISPLAY",
-  "publishedAt": "2026-11-10T19:15:00+09:00",
+  "versionCode": 45800,
+  "versionName": "4.58",
+  "apkUrl": "https://drive.google.com/file/d/1hJfxmNp3GvwqKwdRTpjiRTdi9VCWuSMm/view",
+  "notice": "⚓ 로또645 R4.58 업데이트: 성적관리에서 축하·낙첨 안내 멘트가 나온 다음, 별도 버튼을 누르지 않아도 안내창이 자동으로 닫히고 저장된 4방 20조합이 첫 번째 '황금빈도방'부터 화면 상단에 펼쳐집니다. Android 음성은 종료 콜백이 없어 축하 9초·낙첨 6초의 안내시간을 적용하며 브라우저 음성은 종료 신호에 맞춥니다. 이전 R4.57의 마지막 과거 분석 회차/실구매 구분 표시, 중복 분석 차단, 누적DB 및 최초 잠금은 그대로 유지합니다. 앱 삭제 없이 덮어쓰기 설치하십시오. 복구된 통합DB 백업은 반드시 보관하십시오.",
+  "noticeId": "R458-20261110-AUTO-EXPAND-COMBOS-AFTER-MESSAGE",
+  "publishedAt": "2026-11-10T20:05:00+09:00",
   "enabled": true
 }
