@@ -1,0 +1,44 @@
+name: Publish verified N2 621939 APK binary
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/n2-r62139-publish.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Reconstruct exact APK from release source branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin n2-r62139-publish-20261111
+          target=r6-n2-standalone/N2_R62139_CANDIDATE10_GAMES5_PNG_SIGNED.apk
+          for i in $(seq -w 0 15); do
+            git show "FETCH_HEAD:r6-n2-standalone/publish-621939/payload/part${i}.b64"
+          done | base64 --decode > "$target"
+          test "$(stat -c%s "$target")" -eq 2282523
+          printf '%s  %s\n' '38dff0c9b26d0f302242a9c082952c43ea11a43b7c8cb1b3646b5f115dda580c' "$target" | sha256sum --check
+          python3 - <<'PY'
+          import zipfile
+          p='r6-n2-standalone/N2_R62139_CANDIDATE10_GAMES5_PNG_SIGNED.apk'
+          with zipfile.ZipFile(p) as z:
+            assert z.testzip() is None
+          print('APK ZIP verified')
+          PY
+      - name: Commit release binary without altering live manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add r6-n2-standalone/N2_R62139_CANDIDATE10_GAMES5_PNG_SIGNED.apk
+          if ! git diff --cached --quiet; then
+            git commit -m 'release(n2): publish verified 621939 APK, preserve updater'
+            git push origin HEAD:main
+          fi
