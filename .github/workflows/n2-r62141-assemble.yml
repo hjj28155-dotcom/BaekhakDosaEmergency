@@ -1,0 +1,46 @@
+name: Assemble verified N2 R6.21.41 owner-signed APK
+on:
+  push:
+    branches: [n2-r62141-publish-20261111]
+    paths: ['.github/workflows/n2-r62141-assemble.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Reconstruct and verify exact signed APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir=r6-n2-standalone/publish-621941
+          apk="$dir/N2_R62141_4ROOM_INDEPENDENT_OWNER_SIGNED.apk"
+          count=$(find "$dir/payload" -type f -name 'part*.b64' | wc -l)
+          test "$count" -eq 16
+          cat "$dir"/payload/part*.b64 | base64 --decode > "$apk"
+          test "$(stat -c%s "$apk")" -eq 2290146
+          printf '%s  %s\n' '437576032e5783b0ea9659bd1fde9c4c05a79c4285a49eb3b53ab0d8973e122e' "$apk" | sha256sum --check
+          python3 - <<'PY'
+          import zipfile
+          p='r6-n2-standalone/publish-621941/N2_R62141_4ROOM_INDEPENDENT_OWNER_SIGNED.apk'
+          with zipfile.ZipFile(p) as z:
+            assert z.testzip() is None
+            assert 'AndroidManifest.xml' in z.namelist()
+            assert 'assets/index.html' in z.namelist()
+          print('APK ZIP CRC and expected entries PASS')
+          PY
+      - name: Commit verified APK to release branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add r6-n2-standalone/publish-621941/N2_R62141_4ROOM_INDEPENDENT_OWNER_SIGNED.apk
+          if ! git diff --cached --quiet; then
+            git commit -m 'release(n2): assemble and verify R6.21.41 exact APK'
+            git push
+          fi
