@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 45300,
-  "versionName": "4.53",
-  "apkUrl": "https://drive.google.com/file/d/1FzM5cVrm6J2DPvNyycBNqLhqEvSyWeTG/view",
-  "notice": "⚓ 로또645 R4.53 수정: 누적 DB의 구간별 기본 조회를 1~100회에서 1~300회로 바꿨습니다. 1~100 / 101~200 / 201~300 개별 조회는 유지합니다. 기존 기기 DB를 읽기만 하고 자동 복원·삭제·초기화하지 않습니다. 기존 설치 앱을 삭제하지 말고 덮어쓰기 업데이트하십시오. 1~300회 기록이 기기 자체에 없으면 기존 전체 DB 백업을 확인해야 합니다.",
-  "noticeId": "R453-20261110-DEFAULT-RANGE-1-300",
-  "publishedAt": "2026-11-10T17:00:00+09:00",
+  "versionCode": 45400,
+  "versionName": "4.54",
+  "apkUrl": "https://drive.google.com/file/d/1s7yXxu02hzunD9RyK7l2WxvOQyLy3Tkb/view",
+  "notice": "⚓ 로또645 R4.54 업데이트: 성적관리 화면을 열면 최상단의 회차 선택·바로 분석 저장 버튼부터 표시됩니다. 상세 성적 감사표는 아래로 이동했습니다. 공식 채점에서 5등 이상 적중 시 축하 문구·금빛 효과를 강화하고, 낙첨·미채점 화면은 명확히 구분했습니다. 기존 분석 엔진, 1~300회 누적DB, 최초 잠금은 유지합니다. 기존 앱을 삭제하거나 데이터를 지우지 말고 다운로드 후 덮어쓰기 설치하십시오.",
+  "noticeId": "R454-20261110-SCORES-TOP-CELEBRATION",
+  "publishedAt": "2026-11-10T17:56:00+09:00",
   "enabled": true
 }
