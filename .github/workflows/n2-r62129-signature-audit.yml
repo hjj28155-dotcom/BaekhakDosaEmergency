@@ -1,0 +1,44 @@
+name: N2 R6.21.29 APK signature audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/n2-r62129-signature-audit.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Check official N2 R6.21.29 APK on GitHub runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          FILE='r6-n2-standalone/N2_Update_62129_UPDATE_BUTTON_FIXED.apk'
+          EXPECTED_SHA='35d0ff12e1c7db0ef514676b3bd6f4d9e007ea7658420aa53e7d0dde1e730878'
+          EXPECTED_CERT='81d75da8b4e1c82fbe8af27a0f8512236f2b1c2cdef5d7d015f695fb98893d04'
+          echo '== File and SHA-256 =='
+          test -f "$FILE" || { echo 'FAIL: APK file missing'; exit 1; }
+          echo "$EXPECTED_SHA  $FILE" | sha256sum --check --status || { sha256sum "$FILE"; echo 'FAIL: SHA-256 mismatch'; exit 1; }
+          sha256sum "$FILE"
+          echo '== Android SDK tools =='
+          SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          SDK_BUILD="$(find "$SDK_ROOT/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n1)"
+          test -n "$SDK_BUILD" || { echo 'FAIL: Android SDK build-tools unavailable'; exit 1; }
+          echo '== APK signature =='
+          "$SDK_BUILD/apksigner" verify --verbose --print-certs "$FILE" | tee /tmp/n2-apksigner.txt
+          grep -Eiq 'Verified using v2 scheme \(APK Signature Scheme v2\): true' /tmp/n2-apksigner.txt || { echo 'FAIL: no valid v2 signature'; exit 1; }
+          CERT="$(sed -nE 's/^Signer #1 certificate SHA-256 digest: ([0-9a-fA-F:]+).*$/\1/p' /tmp/n2-apksigner.txt | tr -d ':' | tr '[:upper:]' '[:lower:]')"
+          test "$CERT" = "$EXPECTED_CERT" || { echo "FAIL: N2 certificate mismatch. Actual: $CERT"; exit 1; }
+          echo '== Package and version =='
+          "$SDK_BUILD/aapt" dump badging "$FILE" | tee /tmp/n2-badging.txt | head -n 8
+          grep -Eq "^package: name='com.hanghae.fold8n2app' versionCode='621929'" /tmp/n2-badging.txt || { echo 'FAIL: package or version mismatch'; exit 1; }
+          echo 'PASS: SHA-256, v2 signature, signer certificate, package and version.'
