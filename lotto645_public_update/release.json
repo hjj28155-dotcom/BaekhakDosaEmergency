@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 46800,
-  "versionName": "4.68",
-  "apkUrl": "https://drive.google.com/file/d/1EVksnvH2bj1Prf3EZnvqNpjnPDwQ2Xij/view",
-  "notice": "⚓ 로또645 R4.68 수정: 4개 방의 예상수가 동일하게 보이던 공통 통계참고수 표시 혼동을 바로잡았습니다. 방별 8~10개 최종 시험 생존수를 방마다 구분해 표시하고, 각 조합의 23개 조건 상세 설명에서 ‘예상수 포함’ 수치를 해당 방 전용 생존수를 기준으로 계산합니다. 4개 방은 장기빈도·최근추세·이월간격·균형교차 등 서로 다른 가중치를 그대로 사용하며, 통계상 겹치는 번호는 임의로 변경하지 않습니다. R4.67 ‘이전’ 버튼 상단 복귀 수정, PNG 당첨비교, 기존 20조합·누적DB도 유지합니다. 앱 삭제 없이 덮어쓰기 설치하십시오. 실제 휴대전화 동작과 외부 Google Drive 다운로드 권한은 미확인입니다.",
-  "noticeId": "R468-20261111-PER-ROOM-EXPECTED-VS-SHARED-REFERENCE-DISAMBIGUATION",
-  "publishedAt": "2026-11-11T00:52:00+09:00",
+  "versionCode": 46900,
+  "versionName": "4.69",
+  "apkUrl": "https://drive.google.com/file/d/1jPfjWq_0YQmgEbP6RRMVrxt5vA85ijeK/view",
+  "notice": "⚓ 로또645 R4.69 긴급 저장 개선: 433회부터 분석 저장이 중단되는 현상에 대응하여 잠금·영수증·성적·공식당첨번호 원장의 저장 용량을 줄이는 무손실 압축 방식을 도입했습니다. 433회 분석 번호 생성은 정상 재현됐으며 기존 4방 20조합 엔진과 분석 기록은 변경하지 않았습니다. 432회 기존 백업을 반드시 별도 보관한 뒤 앱을 삭제하지 말고 덮어쓰기 설치하십시오. ★ 중요: R4.69에서 새 기록 저장 후에는 내부 원장이 압축 형식으로 바뀌므로 이전 R4.68로 다운그레이드하면 기록을 읽지 못할 수 있습니다. 다운그레이드 전 R4.69에서 JSON 백업을 내보내야 합니다. Android 실기기 433회 저장과 외부 Drive 다운로드 권한은 아직 확인되지 않았습니다.",
+  "noticeId": "R469-20261111-ROUND433-LOCALSTORAGE-LOSSLESS-COMPRESSION",
+  "publishedAt": "2026-11-11T07:37:00+09:00",
   "enabled": true
 }
