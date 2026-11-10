@@ -42,3 +42,5 @@ jobs:
           "$SDK_BUILD/aapt" dump badging "$FILE" | tee /tmp/n2-badging.txt | head -n 8
           grep -Eq "^package: name='com.hanghae.fold8n2app' versionCode='621929'" /tmp/n2-badging.txt || { echo 'FAIL: package or version mismatch'; exit 1; }
           echo 'PASS: SHA-256, v2 signature, signer certificate, package and version.'
+
+# 2026-11-10: re-run read-only signature audit before considering N2 R6.21.34 public update.
