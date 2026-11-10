@@ -1,0 +1,47 @@
+name: Publish verified N2 621935 APK binary
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/n2-r62135-publish.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Assemble exact APK from isolated owner release branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin n2-r62135-publish-20261110
+          dir=r6-n2-standalone
+          target="$dir/N2_R62135_DB1_1250_1251_SIGNED.apk"
+          for i in $(seq -w 0 15); do
+            git show "FETCH_HEAD:r6-n2-standalone/publish-621935/payload/part${i}.b64"
+          done | base64 --decode > "$target"
+          test "$(stat -c%s "$target")" -eq 2280637
+          printf '%s  %s\n' '38d7d4a4e5d991526eb29dd86be56026abd37bd3d9dc4d4d686e67b67730e40d' "$target" | sha256sum --check
+          python3 - <<'PY'
+          import zipfile
+          p='r6-n2-standalone/N2_R62135_DB1_1250_1251_SIGNED.apk'
+          with zipfile.ZipFile(p) as f:
+            assert f.testzip() is None
+            assert 'assets/index.html' in f.namelist()
+            assert 'AndroidManifest.xml' in f.namelist()
+          print('PASS exact SHA-256, byte size and APK ZIP CRC')
+          PY
+      - name: Commit verified binary without modifying update channel
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add r6-n2-standalone/N2_R62135_DB1_1250_1251_SIGNED.apk
+          if ! git diff --cached --quiet; then
+            git commit -m 'release(n2): publish verified signed APK 621935 (manifest unchanged)'
+            git push origin HEAD:main
+          fi
