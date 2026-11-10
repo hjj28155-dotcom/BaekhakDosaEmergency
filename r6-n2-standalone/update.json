@@ -1,9 +1,0 @@
-{
-  "schema": 1,
-  "package_name": "com.hanghae.fold8n2app",
-  "version_code": 621929,
-  "version_name": "6.21.29",
-  "apk_url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/main/r6-n2-standalone/N2_Update_62129_UPDATE_BUTTON_FIXED.apk",
-  "apk_sha256": "35d0ff12e1c7db0ef514676b3bd6f4d9e007ea7658420aa53e7d0dde1e730878",
-  "release_notes": "N2 6.21.29: 기존 6.21.28 수정 기능 유지, 화면의 6.21.25 구형 버전 표시를 정정. 앱 시작 및 업데이트 확인 버튼 사용 시 N2 공식 서버 설정을 점검하고 서버 주소 미설정 또는 기존 R6 주소면 N2 전용 주소로 복구. 업데이트 확인 실패 시 오류 안내 및 재시도 제공. 기존 기록·분석엔진·패키지·서명 인증서 유지. 새 버전 다운로드 후 기존 앱 삭제 없이 직접 설치하십시오. 삼성 실기기 최종 검증 전."
-}

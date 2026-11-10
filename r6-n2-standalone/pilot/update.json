@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "package_name": "com.hanghae.fold8n2app",
+  "version_code": 621934,
+  "version_name": "6.21.34",
+  "apk_url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/n2-r62134-pilot-20261110/r6-n2-standalone/pilot/N2_R62134_OWNER_PILOT.apk",
+  "apk_sha256": "dae439ba238b55c4584ad0968f16843c0aaa29850015f177681f5ca2579fc121",
+  "release_notes": "N2 R6.21.34 소유자 1대 시험용: 136회차 이후 신규 분석 저장 보완, 누적DB 유지. 기존 앱 삭제 금지. 전체 사용자 정식 배포 전."
+}

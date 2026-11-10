@@ -1,0 +1,1 @@
+N2 R6.21.34 owner-only test channel. This branch is isolated from main; main/r6-n2-standalone/update.json remains unchanged. Test phone-only. APK is not production-approved. NEVER uninstall installed N2 or clear DB.
