@@ -1,0 +1,27 @@
+name: N2 R6.21.34 pilot APK compatibility audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - n2-r62134-pilot-20261110
+    paths:
+      - '.github/workflows/n2-r62134-pilot-compatibility.yml'
+      - 'r6-n2-standalone/pilot/verify-r62134-compatibility.sh'
+      - 'r6-n2-standalone/pilot/N2_R62134_OWNER_PILOT.apk'
+
+permissions:
+  contents: read
+
+jobs:
+  verify-n2-apks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout pilot branch without write credentials
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Audit old and pilot APK hashes, signatures and versions (read-only)
+        shell: bash
+        run: bash r6-n2-standalone/pilot/verify-r62134-compatibility.sh
