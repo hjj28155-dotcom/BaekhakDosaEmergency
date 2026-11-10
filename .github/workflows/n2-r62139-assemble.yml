@@ -1,0 +1,46 @@
+name: Assemble verified N2 6.21.39 APK
+on:
+  push:
+    branches: [n2-r62139-publish-20261111]
+    paths: ['.github/workflows/n2-r62139-assemble.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Reconstruct and verify signed APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir=r6-n2-standalone/publish-621939
+          target="$dir/N2_R62139_CANDIDATE10_GAMES5_PNG_SIGNED.apk"
+          count=$(find "$dir/payload" -name 'part*.b64' -type f | wc -l)
+          test "$count" -eq 16
+          cat "$dir"/payload/part*.b64 | base64 --decode > "$target"
+          test "$(stat -c%s "$target")" -eq 2282523
+          printf '%s  %s\n' '38dff0c9b26d0f302242a9c082952c43ea11a43b7c8cb1b3646b5f115dda580c' "$target" | sha256sum --check
+          python3 - <<'PY'
+          import zipfile
+          p='r6-n2-standalone/publish-621939/N2_R62139_CANDIDATE10_GAMES5_PNG_SIGNED.apk'
+          with zipfile.ZipFile(p) as f:
+            assert f.testzip() is None
+            assert 'assets/index.html' in f.namelist()
+            assert 'AndroidManifest.xml' in f.namelist()
+          print('ZIP integrity PASS')
+          PY
+      - name: Commit verified APK on isolated branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add r6-n2-standalone/publish-621939/N2_R62139_CANDIDATE10_GAMES5_PNG_SIGNED.apk
+          if ! git diff --cached --quiet; then
+            git commit -m 'release(n2): assemble SHA256-verified 621939 APK'
+            git push
+          fi
