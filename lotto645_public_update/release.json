@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 45400,
-  "versionName": "4.54",
-  "apkUrl": "https://drive.google.com/file/d/1s7yXxu02hzunD9RyK7l2WxvOQyLy3Tkb/view",
-  "notice": "⚓ 로또645 R4.54 업데이트: 성적관리 화면을 열면 최상단의 회차 선택·바로 분석 저장 버튼부터 표시됩니다. 상세 성적 감사표는 아래로 이동했습니다. 공식 채점에서 5등 이상 적중 시 축하 문구·금빛 효과를 강화하고, 낙첨·미채점 화면은 명확히 구분했습니다. 기존 분석 엔진, 1~300회 누적DB, 최초 잠금은 유지합니다. 기존 앱을 삭제하거나 데이터를 지우지 말고 다운로드 후 덮어쓰기 설치하십시오.",
-  "noticeId": "R454-20261110-SCORES-TOP-CELEBRATION",
-  "publishedAt": "2026-11-10T17:56:00+09:00",
+  "versionCode": 45500,
+  "versionName": "4.55",
+  "apkUrl": "https://drive.google.com/file/d/1kRpU9sCLkWll5iIXnAyQvTJSOhsA01Zj/view",
+  "notice": "⚓ 로또645 R4.55 화면 정리 업데이트: 성적관리 · 추첨후 채점 화면 최상단에 선택 회차 당첨번호와 공식 채점 결과·축하 안내를 배치했습니다. 기존 중복 '최근 당첨번호·당첨번호 재조회' 상자는 성적관리 화면에서 제거했습니다. 회차 선택·바로 분석 저장·4방 20조합 성적표는 그 아래 유지됩니다. 1~300회 누적DB, 기존 분석 엔진, 최초 잠금 및 소유자 서명은 변경하지 않았습니다. 과거 사후 재현 채점은 실제 구매 성적이 아닙니다. 기존 앱을 삭제하지 말고 다운로드하여 덮어쓰기 설치하십시오.",
+  "noticeId": "R455-20261110-APPROVED-SCORE-TOP-HERO",
+  "publishedAt": "2026-11-10T18:00:00+09:00",
   "enabled": true
 }
