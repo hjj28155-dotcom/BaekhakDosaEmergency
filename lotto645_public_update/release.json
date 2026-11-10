@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 46100,
-  "versionName": "4.61",
-  "apkUrl": "https://drive.google.com/file/d/1lgDo-DAs2DSSSGZjniQUM98QfXK3XM_0/view",
-  "notice": "⚓ 로또645 R4.61 회차 표시 긴급 수정: 홈 화면에 1250회가 고정 표시되는 초기 HTML 값을 제거했습니다. 기기에 저장된 과거분석 원장 또는 채점 원장에서 완료된 사후분석 최고 회차를 읽어 표시합니다(400회 기록이 있으면 제400회). 저장기록이 없으면 1250회로 돌아가지 않고 복원 확인 안내가 나옵니다. 사용자가 직접 선택한 회차는 유지합니다. 기존 R4.60의 성적관리 20조합 펼침 수정은 유지하며 엔진과 누적DB는 변경하지 않았습니다. 기존 앱을 삭제하지 말고 덮어쓰기 설치하십시오. 실제 휴대전화 동작 및 외부 Drive 다운로드 권한은 미검증입니다.",
-  "noticeId": "R461-20261110-FIX-HOME-1250-HARDCODE-FALLBACK",
-  "publishedAt": "2026-11-10T22:38:00+09:00",
+  "versionCode": 46200,
+  "versionName": "4.62",
+  "apkUrl": "https://drive.google.com/file/d/1-1R-CVkHp5wgzLEZ_99IXt8mwa3muHbz/view",
+  "notice": "⚓ 로또645 R4.62 업데이트: 각 분석방(황금빈도방·파동추세방·이월탐색방·균형교차방)에서 통계 예상수 후보 12개와 선정 가중치·근거 회차를 방별로 표시합니다. 각 방의 기존 5조합과 전체 20조합은 변경하지 않습니다. 저장 기록의 엔진/과거 자료가 맞지 않으면 후보를 임의 계산하지 않고 안내합니다. R4.61의 1250회 고정표시 수정과 R4.60의 스크롤 개선은 유지합니다. 기존 앱을 삭제하지 말고 덮어쓰기 설치하십시오. 예상수는 참고용 통계 순위로 당첨 확률 향상을 보장하지 않습니다. 실기기 검증 및 외부 Drive 다운로드 권한은 미확인입니다.",
+  "noticeId": "R462-20261110-ROOM-BY-ROOM-EXPECTED-CANDIDATES",
+  "publishedAt": "2026-11-10T23:49:00+09:00",
   "enabled": true
 }
