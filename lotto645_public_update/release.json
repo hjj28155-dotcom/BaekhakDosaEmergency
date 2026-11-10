@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 47200,
-  "versionName": "4.72",
-  "apkUrl": "https://drive.google.com/file/d/1zYUyzlBWpK2bglVJLJ7u2-c9cSD0OSY-/view",
-  "notice": "⚓ 로또645 R4.72: 분석 완료 후 4개 방의 PNG형 예상수 비교 화면을 최상단부터 보이도록 수정했습니다. 추첨 전 분석은 결과 팝업이 없어도 황금빈도방 예상수 패널로 이동하며, 추첨 후에는 결과 안내 종료 시 같은 위치로 이동합니다. 성적관리 제목 오른쪽 표시는 현재 선택·진행 회차와 동기화했습니다. 기존 R4.69 압축 누적DB, 20조합, 통계 엔진, 저장 기록은 변경하지 않았습니다. 앱을 삭제하지 말고 덮어쓰기 설치하십시오. 실제 Android 실기기 검증 미완료. Google Drive 파일의 외부 공유 권한이 확인되지 않아 일반 설치자의 다운로드가 제한될 수 있습니다.",
-  "noticeId": "R472-20261111-AUTO-SCROLL-TO-FIRST-PNG-AND-CURRENT-ROUND",
-  "publishedAt": "2026-11-11T08:25:00+09:00",
+  "versionCode": 47300,
+  "versionName": "4.73",
+  "apkUrl": "https://drive.google.com/file/d/1_ckHm1OyEmMPCMerT_0qKoPzCUu_RKQg/view",
+  "notice": "⚓ 로또645 R4.73 업데이트 표시 수정: 앱 업데이트·공지사항 화면에 이전 R4.68로 고정 표시되던 현재 버전 문구를 제거하고 실제 APK 버전코드에서 설치 버전을 계산하도록 수정했습니다. 업데이트 확인 결과에는 설치 버전과 원격 서버의 버전 및 버전코드를 각각 표시해 업데이트 감지 실패를 쉽게 구별할 수 있습니다. R4.72 PNG 예상수 상단 자동 펼침과 진행 회차 표시, R4.69 압축 저장, 4방 20조합 및 누적DB는 그대로 유지합니다. 기존 앱을 삭제하지 말고 덮어쓰기 설치하십시오. 실제 Android 실기기 설치/다운로드 및 원격 감지 실패 근본 원인 검증은 미완료이며 Google Drive 일반 사용자 다운로드 권한도 미설정입니다.",
+  "noticeId": "R473-20261111-UPDATE-REAL-LOCAL-VERSION-REMOTE-VERSION-DIAGNOSTIC",
+  "publishedAt": "2026-11-11T08:40:00+09:00",
   "enabled": true
 }
