@@ -6,6 +6,6 @@
   "apkUrl": "https://drive.google.com/file/d/1EVksnvH2bj1Prf3EZnvqNpjnPDwQ2Xij/view",
   "notice": "⚓ 로또645 R4.68 수정: 4개 방의 예상수가 동일하게 보이던 공통 통계참고수 표시 혼동을 바로잡았습니다. 방별 8~10개 최종 시험 생존수를 방마다 구분해 표시하고, 각 조합의 23개 조건 상세 설명에서 ‘예상수 포함’ 수치를 해당 방 전용 생존수를 기준으로 계산합니다. 4개 방은 장기빈도·최근추세·이월간격·균형교차 등 서로 다른 가중치를 그대로 사용하며, 통계상 겹치는 번호는 임의로 변경하지 않습니다. R4.67 ‘이전’ 버튼 상단 복귀 수정, PNG 당첨비교, 기존 20조합·누적DB도 유지합니다. 앱 삭제 없이 덮어쓰기 설치하십시오. 실제 휴대전화 동작과 외부 Google Drive 다운로드 권한은 미확인입니다.",
   "noticeId": "R468-20261111-PER-ROOM-EXPECTED-VS-SHARED-REFERENCE-DISAMBIGUATION",
-  "publishedAt": "2026-11-11T01:14:00+09:00",
+  "publishedAt": "2026-11-11T00:52:00+09:00",
   "enabled": true
 }
