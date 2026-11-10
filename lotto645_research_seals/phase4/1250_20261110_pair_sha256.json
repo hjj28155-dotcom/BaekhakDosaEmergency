@@ -1,0 +1,26 @@
+{
+  "A_tickets_sha256": "82a041f855a28e750f2c26a2a4b7b2bfbce6dd8c787c4d1ac58e49e92975ac3f",
+  "D_generation_algorithm": "PHASE4-D-20261110 deterministic independent permutations 45+45+30; no same-card duplicate; pair intersection<4; each number 2~3 occurrences",
+  "D_generation_attempt": 1,
+  "D_tickets_sha256": "b83c9a12c1a619dcc7c47ef4dcd1b763dc7d4b57698567afa27ffbadb19e0792",
+  "backup_sha256": "08a976340f186e3008319169880402d7605c049697789e50c8b08b8e3c1e3a3d",
+  "baseline_engine": "STAT_R4_2_WALKFORWARD_RESEARCH_20261107",
+  "baseline_mode": "LOCAL_UNVERIFIED",
+  "baseline_raw_rows_sha256": "72f7532ad298ac4f74cb04fb0451caed521c5af721664e8b97c447bde77c638b",
+  "created_from_backup_exportedAt": "2026-11-10T12:15:01.668Z",
+  "draw_date_kst": "2026-11-14",
+  "external_timestamp": {
+    "must_precede": "2026-11-14T20:35:00+09:00",
+    "status": "NOT_VERIFIED_UNTIL_REMOTE_GIT_COMMIT_READBACK"
+  },
+  "important": "Original baseline 1250 metadata hash differs from old commitment although original combination rows hash matches. Never replace old commitment.",
+  "integrity": "A and D are sealed together; a hash by itself does not prove predraw publication.",
+  "manifest_sha256_without_self": "250ee485c0e612e1262dffe72c392b62556138b2e9367dd2cc91ab2189279644",
+  "prediction_claim": "NONE",
+  "prior_existing_a_commitment_rows_sha256": "72f7532ad298ac4f74cb04fb0451caed521c5af721664e8b97c447bde77c638b",
+  "round": 1250,
+  "schema": "LOTTO645_PHASE4_PREDRAW_PAIR_V1",
+  "score_status": "NOT_DRAWN",
+  "tickets_file_sha256_canonical": "90e791673feceaee95287c5d03fdda0d1584c8ebf1df050f01bc2ef212b3bc41",
+  "training_through_round": 1249
+}
