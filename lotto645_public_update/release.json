@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 46600,
-  "versionName": "4.66",
-  "apkUrl": "https://drive.google.com/file/d/1ULITzhDcg74atZ3L7FHudfME7JtLBoy_/view",
-  "notice": "⚓ 로또645 R4.66 업데이트: 신서 낱말 해석을 제외하고 4개 방의 통계 기반 최종 시험 생존수 8~10개를 표시합니다. 각 방 1차 통계 후보 12개에서 점수 기준으로 압축한 생존수와 기존 5조합을 분리해 비교합니다. 성적관리에서 방별 번호공 화면·당첨번호 적중수·5조합 최고 적중수·PNG 비교 저장을 지원합니다. 401~500회 새 분석은 생존수 별도 로컬 기록을 남기고, 과거 회차를 사후 계산한 후보는 원본으로 취급하지 않습니다. 기존 20조합 생성 엔진, 누적DB, 기존 저장 조합은 변경하지 않았습니다. 기존 앱을 삭제하지 말고 덮어쓰기 설치하십시오. 실제 휴대전화 동작 및 외부 다운로드 권한은 미검증입니다.",
-  "noticeId": "R466-20261111-STAT-SURVIVORS-8TO10-ROOM-PNG",
-  "publishedAt": "2026-11-11T00:32:25+09:00",
+  "versionCode": 46700,
+  "versionName": "4.67",
+  "apkUrl": "https://drive.google.com/file/d/163YQRgZGJayhghGGj_eorWDWZ58_c2is/view",
+  "notice": "⚓ 로또645 R4.67 화면 이동 수정: 축하·성적 안내에서 ◀ 이전을 누르면 성적관리 화면 맨 위로 돌아가고, 성적관리 진입 및 회차 변경 시 4개 방 중간으로 자동 스크롤하지 않도록 수정했습니다. '지금 20조합 보기'를 선택하면 기존처럼 황금빈도방 첫 카드부터 표시합니다. 통계 생존수 8~10개·방별 PNG 비교·기존 4방 20조합·400회 누적DB는 그대로 유지합니다. 기존 앱을 삭제하지 말고 덮어쓰기 설치하십시오. 실제 휴대전화 화면 동작과 외부 Google Drive 다운로드 권한은 미검증입니다.",
+  "noticeId": "R467-20261111-SCORE-PREVIOUS-RETURN-TOP-NOT-MIDROOM",
+  "publishedAt": "2026-11-11T01:00:00+09:00",
   "enabled": true
 }
