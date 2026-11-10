@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 45200,
-  "versionName": "4.52",
-  "apkUrl": "https://drive.google.com/file/d/1ofR3M-uGwRsuQLoLtwiqg1TqxMgEtmWL/view",
-  "notice": "⚓ 로또645 R4.52 업데이트: 기존 R4.51 엔진·누적DB·잠금 기록을 유지하고 성적관리/누적DB 화면에 4개 이상·5개 이상·6개 적중, 방별 및 100회 구간별 읽기 전용 성적 감사를 추가했습니다. 5개·6개 적중 확률 개선이 입증된 엔진 변경은 아닙니다. 기존 앱을 삭제하거나 데이터 삭제하지 말고 업데이트 버튼을 눌러 다운로드 후 덮어쓰기 설치하십시오.",
-  "noticeId": "R452-20261110-READONLY-GRADE-AUDIT",
-  "publishedAt": "2026-11-10T16:48:00+09:00",
+  "versionCode": 45300,
+  "versionName": "4.53",
+  "apkUrl": "https://drive.google.com/file/d/1FzM5cVrm6J2DPvNyycBNqLhqEvSyWeTG/view",
+  "notice": "⚓ 로또645 R4.53 수정: 누적 DB의 구간별 기본 조회를 1~100회에서 1~300회로 바꿨습니다. 1~100 / 101~200 / 201~300 개별 조회는 유지합니다. 기존 기기 DB를 읽기만 하고 자동 복원·삭제·초기화하지 않습니다. 기존 설치 앱을 삭제하지 말고 덮어쓰기 업데이트하십시오. 1~300회 기록이 기기 자체에 없으면 기존 전체 DB 백업을 확인해야 합니다.",
+  "noticeId": "R453-20261110-DEFAULT-RANGE-1-300",
+  "publishedAt": "2026-11-10T17:00:00+09:00",
   "enabled": true
 }
