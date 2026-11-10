@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 47000,
-  "versionName": "4.70",
-  "apkUrl": "https://drive.google.com/file/d/10d3wZocUN9u4bNOOXywjW5B3PzP3KoYy/view",
-  "notice": "⚓ 로또645 R4.70 화면 위치 수정: 회차분석 후 축하·성적 안내가 끝나거나 '지금 20조합 보기'를 누르면 성적관리의 4방 20조합 목록 제목부터 펼쳐지도록 스크롤 기준을 수정했습니다. 기존에는 첫 번째 방 카드로 바로 이동해 목록 최상단 제목이 잘릴 수 있었습니다. 상단의 '◀ 이전'은 기존대로 성적관리 전체 상단으로 복귀합니다. R4.69의 433회 이후 압축 저장 개선, 4방 통계 예상수·PNG 비교, 기존 20조합 및 누적DB는 변경하지 않았습니다. 원본 백업을 별도 보관하고 기존 앱을 삭제하지 말고 덮어쓰기 설치하십시오. 실제 Android 휴대전화 동작 및 Google Drive 외부 다운로드 권한은 미검증입니다.",
-  "noticeId": "R470-20261111-SCORE-COMBOS-START-AT-DETAILS-TITLE",
-  "publishedAt": "2026-11-11T07:49:00+09:00",
+  "versionCode": 47100,
+  "versionName": "4.71",
+  "apkUrl": "https://drive.google.com/file/d/1aqTnh5dz3VK26UT8fj7_EqoM5CDlQi5z/view",
+  "notice": "⚓ 로또645 R4.71 성적관리 화면 개선: 성적관리 제목 오른쪽(기존 ‘4방·20조합’ 표시 위치)에 ‘최종 분석 회차 · 제○○회’를 추가했습니다. 화면의 선택 회차가 아니라 실제 분석·채점 원장에서 확인된 과거분석 최고 회차를 표시합니다(440회까지 저장되어 있으면 제440회). 1249회 등 별도 연구 기록은 제외합니다. R4.70의 20조합 상단 펼침과 R4.69의 누적DB 압축 저장, 기존 4방 20조합·분석 엔진·원본 기록은 변경하지 않았습니다. 기존 앱을 삭제하지 말고 덮어쓰기 설치하십시오. 실제 Android 실기기 검증 및 Google Drive 외부 다운로드 권한은 미확인입니다.",
+  "noticeId": "R471-20261111-SCORE-HEADER-LATEST-ANALYZED-ROUND",
+  "publishedAt": "2026-11-11T07:31:00+09:00",
   "enabled": true
 }
