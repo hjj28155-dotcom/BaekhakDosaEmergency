@@ -1,0 +1,43 @@
+name: Publish verified N2 R6.21.41 signed APK
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/n2-r62141-publish.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Verify and restore exact APK from release branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin n2-r62141-publish-20261111
+          target=r6-n2-standalone/N2_R62141_4ROOM_INDEPENDENT_OWNER_SIGNED.apk
+          for i in $(seq -w 0 15); do
+            git show "FETCH_HEAD:r6-n2-standalone/publish-621941/payload/part${i}.b64"
+          done | base64 --decode > "$target"
+          test "$(stat -c%s "$target")" -eq 2290146
+          printf '%s  %s\n' '437576032e5783b0ea9659bd1fde9c4c05a79c4285a49eb3b53ab0d8973e122e' "$target" | sha256sum --check
+          python3 - <<'PY'
+          import zipfile
+          p='r6-n2-standalone/N2_R62141_4ROOM_INDEPENDENT_OWNER_SIGNED.apk'
+          with zipfile.ZipFile(p) as z:
+            assert z.testzip() is None
+          PY
+      - name: Commit verified binary, do not touch update.json
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add r6-n2-standalone/N2_R62141_4ROOM_INDEPENDENT_OWNER_SIGNED.apk
+          if ! git diff --cached --quiet; then
+            git commit -m 'release(n2): add verified 621941 APK'
+            git push origin HEAD:main
+          fi
