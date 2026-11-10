@@ -23,5 +23,16 @@ jobs:
         with:
           persist-credentials: false
       - name: Audit old and pilot APK hashes, signatures and versions (read-only)
+        id: apk_audit
         shell: bash
-        run: bash r6-n2-standalone/pilot/verify-r62134-compatibility.sh
+        run: |
+          set -o pipefail
+          bash r6-n2-standalone/pilot/verify-r62134-compatibility.sh 2>&1 | tee n2-r62134-compatibility-audit.log
+      - name: Preserve audit log for review even when verification fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n2-r62134-compatibility-audit-${{ github.run_id }}
+          path: n2-r62134-compatibility-audit.log
+          if-no-files-found: warn
+          retention-days: 30
