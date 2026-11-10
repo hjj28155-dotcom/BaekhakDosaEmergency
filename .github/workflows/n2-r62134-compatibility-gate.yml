@@ -1,0 +1,36 @@
+name: N2 R6.21.34 signed APK release gate (read-only)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/n2-r62134-compatibility-gate.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  signed-apk-compatibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Read only pilot branch without changing release metadata
+        uses: actions/checkout@v4
+        with:
+          ref: n2-r62134-pilot-20261110
+          persist-credentials: false
+      - name: Compare signed APKs and retain results
+        shell: bash
+        run: |
+          set -o pipefail
+          bash r6-n2-standalone/pilot/verify-r62134-compatibility.sh 2>&1 | tee n2-r62134-compatibility-audit.log
+      - name: Upload verification log even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n2-r62134-main-gate-${{ github.run_id }}
+          path: n2-r62134-compatibility-audit.log
+          if-no-files-found: warn
+          retention-days: 30
