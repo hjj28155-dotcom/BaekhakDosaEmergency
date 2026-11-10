@@ -1,9 +1,9 @@
 {
   "schema": 1,
   "package_name": "com.hanghae.fold8n2app",
-  "version_code": 621935,
-  "version_name": "6.21.35",
-  "apk_url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/n2-r62135-publish-20261110/r6-n2-standalone/publish-621935/N2_R62135_DB1_1250_1251_SIGNED.apk",
-  "apk_sha256": "38d7d4a4e5d991526eb29dd86be56026abd37bd3d9dc4d4d686e67b67730e40d",
-  "release_notes": "⚓ N2 6.21.35: 백학신서 DB-1 제1250·1251회 원문 각 6문장을 원문은행에 추가하고 해당 회차 선택 및 원문 불러오기 기능을 확장했습니다. 기존 제1~1249회 원문, 6.21.34의 분석 저장 보완, 기존 화면과 기록 저장 구조는 유지합니다. 기존 N2 앱을 삭제하지 말고 먼저 기록을 백업한 다음 업데이트 버튼으로 APK를 다운로드하여 덮어쓰기 설치하십시오. 설치 중 앱 삭제·데이터 삭제를 요구하면 중단하십시오. 삼성 실기기 설치와 누적DB 보존 검증은 선장님 확인 예정입니다. 이 업데이트는 별도 R6(com.hanghae.fold8media)용이 아닙니다."
+  "version_code": 621939,
+  "version_name": "6.21.39",
+  "apk_url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/n2-r62139-publish-20261111/r6-n2-standalone/publish-621939/N2_R62139_CANDIDATE10_GAMES5_PNG_SIGNED.apk",
+  "apk_sha256": "38dff0c9b26d0f302242a9c082952c43ea11a43b7c8cb1b3646b5f115dda580c",
+  "release_notes": "⚓ N2 6.21.39: 1250·1251회차 분석 제한 수정. 각 방이 조합 전에 예상수 10개를 확정하고 그 안에서만 5조합을 생성합니다. 각 방 원본 예상수를 분석기록에 별도 저장하고 4방 화면·성적관리·PNG 최상단에 표시합니다. 과거 기록에 없는 원본 후보수는 임의 생성하지 않습니다. 기존 누적DB 및 백학신서 원문 보존. 기존 N2 앱 삭제 없이 업데이트 버튼으로 다운로드해 덮어쓰기 설치하십시오. 설치 중 삭제/데이터 초기화를 요구하면 중단하십시오. 실제 삼성폰 분석·저장·PNG 동작은 선장님 검증 전입니다. 별도 R6 앱에는 적용하지 마십시오."
 }
