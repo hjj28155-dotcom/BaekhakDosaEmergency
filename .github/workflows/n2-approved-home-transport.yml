@@ -1,0 +1,34 @@
+name: Prepare N2 R6.21.46 isolated home restoration reference
+on:
+  push:
+    branches: [n2-r62146-home-approved-build-20261111]
+    paths: ['.github/workflows/n2-approved-home-transport.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  reference:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify exact N2 current APK and package
+        run: |
+          set -euo pipefail
+          test -s r6-n2-standalone/publish-621946/N2_R62146_FINAL_OWNER_TEST.apk
+          file r6-n2-standalone/publish-621946/N2_R62146_FINAL_OWNER_TEST.apk
+          unzip -t r6-n2-standalone/publish-621946/N2_R62146_FINAL_OWNER_TEST.apk | tail -2
+          sha256sum r6-n2-standalone/publish-621946/N2_R62146_FINAL_OWNER_TEST.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: n2-r62146-unmodified-reference
+          path: r6-n2-standalone/publish-621946/N2_R62146_FINAL_OWNER_TEST.apk
+          retention-days: 1
+      - name: Record workflow id for retrieval in isolated branch
+        run: |
+          mkdir -p staging/n2-home
+          printf '%s\n' "$GITHUB_RUN_ID" > staging/n2-home/transport_run_id.txt
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add staging/n2-home/transport_run_id.txt
+          git commit -m 'chore(n2): store isolated artifact retrieval id' || true
+          git push
