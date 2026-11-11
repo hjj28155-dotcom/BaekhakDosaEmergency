@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "package_name": "com.baekhak.dosa.f6",
+  "channel": "v3-f6",
+  "update_available": false,
+  "version_code": null,
+  "version_name": null,
+  "apk_url": null,
+  "apk_sha256": null,
+  "notice_id": null,
+  "notice": "서명·기존 설치판 호환성 검증 전 안전 대기"
+}
