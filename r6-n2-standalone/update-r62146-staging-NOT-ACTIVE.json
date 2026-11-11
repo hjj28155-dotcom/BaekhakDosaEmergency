@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "channel": "owner-test-staging-not-active",
+  "package_name": "com.hanghae.fold8n2app",
+  "version_code": 621946,
+  "version_name": "6.21.46",
+  "apk_url": null,
+  "apk_sha256": "9206dba864861277df414e5b6fa44e478af68d6349b95c6ac8c731a78f4b3785",
+  "apk_size_bytes": 2387483,
+  "owner_drive_link": "https://drive.google.com/file/d/1DAovhurYkt0vmDIro8V32VY8eqxW9Y4O/view",
+  "release_notes": "홈화면: 수동 회차 입력, 이전·다음 이동, 전체방 프레젠테이션 및 종료 버튼. 기존 앱 삭제 금지. 소유자 시험용.",
+  "activation_condition": "Only update r6-n2-standalone/update.json after a public direct HTTPS APK URL, exact bytes SHA-256 match, and actual in-app download and install verification.",
+  "official_manifest_unchanged": true
+}
