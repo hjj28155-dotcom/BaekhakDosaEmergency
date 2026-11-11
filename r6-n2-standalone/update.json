@@ -1,9 +1,9 @@
 {
   "schema": 1,
   "package_name": "com.hanghae.fold8n2app",
-  "version_code": 621941,
-  "version_name": "6.21.41",
-  "apk_url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/n2-r62141-publish-20261111/r6-n2-standalone/publish-621941/N2_R62141_4ROOM_INDEPENDENT_OWNER_SIGNED.apk",
-  "apk_sha256": "437576032e5783b0ea9659bd1fde9c4c05a79c4285a49eb3b53ab0d8973e122e",
-  "release_notes": "⚓ N2 R6.21.41: 4방 예상수 중복 원인을 수정해 방별 선정 기준을 분리했습니다. 각 방 원본 예상수 10개를 선정·기록하고 그 번호 안에서 최종 5조합을 생성합니다. 1250·1251회차 분석 상한 수정, 원본 후보수·조합 PNG 표시, 화면 버전 표시 및 업데이트 서버 진단을 포함합니다. 기존 백학신서 원문, 분석 기록과 누적DB를 보존합니다. 기존 N2 앱을 삭제하지 말고 업데이트를 확인해 APK 다운로드 후 덮어쓰기 설치하십시오. Android가 앱 삭제 또는 데이터 삭제를 요구하면 중단하십시오. 실제 기기에서 팝업·다운로드·저장·PNG 검증은 아직 선장님 확인 전입니다. 별도 원본 R6 앱(com.hanghae.fold8media)용이 아닙니다."
+  "version_code": 621946,
+  "version_name": "6.21.46",
+  "apk_url": "https://raw.githubusercontent.com/hjj28155-dotcom/BaekhakDosaEmergency/n2-r62146-publish-20261111/r6-n2-standalone/publish-621946/N2_R62146_FINAL_OWNER_TEST.apk",
+  "apk_sha256": "9206dba864861277df414e5b6fa44e478af68d6349b95c6ac8c731a78f4b3785",
+  "release_notes": "⚓ N2 R6.21.46: 선장 승인 홈화면, 해양 배경, 낮은 메뉴 버튼, 종료 버튼, 직접 회차 입력, 이전·다음 회차, 전체방(4방·최대 20조합) 통합 프레젠테이션 및 음성 발표를 반영한 업데이트입니다. 새 버전 안내 후 업데이트 다운로드를 눌러 사용자가 APK 설치를 직접 승인하는 V1 방식입니다. 기존 N2 앱을 삭제하지 말고 덮어쓰기 업데이트 설치하십시오. 누적DB·연구 기록을 보존하며 Android가 앱 삭제 또는 데이터 삭제를 요구하면 중단하십시오. 실제 휴대전화에서 설치·종료·음성·데이터 유지 검증은 아직 완료되지 않았습니다."
 }
