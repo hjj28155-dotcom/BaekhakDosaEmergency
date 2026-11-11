@@ -24,11 +24,12 @@ window.V3Updater={
    if(!d||d.schema!==1||d.app_id!==APP_ID||d.channel!==CHANNEL)return;
    const n=versionCode(),newer=valid(d)&&n!==null&&d.version_code>n;
    const noticeId=typeof d.notice_id==="string"&&/^[\w.-]{1,96}$/.test(d.notice_id)?d.notice_id:null;
-   const key="v3_notice_seen_"+CHANNEL,seen=noticeId?localStorage.getItem(key):null;
+   const key="v3_notice_seen_"+CHANNEL;
+   let seen=null;
+   try{if(noticeId)seen=localStorage.getItem(key);}catch(_){}
    if(!newer&&(!noticeId||seen===noticeId))return;
-   downloading=newer?d:null;
-   if(noticeId)localStorage.setItem(key,noticeId);
    if(typeof window.modal!=="function"||typeof window.esc!=="function")return;
+   downloading=newer?d:null;
    const title=newer?"새 버전 안내":"항해사앱 공지사항";
    const msg=typeof d.notice==="string"?d.notice.slice(0,1000):"";
    const body='<div class="panel goldline"><h3>'+window.esc(title)+'</h3>'+
@@ -37,6 +38,8 @@ window.V3Updater={
     (newer?'<button class="b green" onclick="V3Updater.download()">업데이트 다운로드</button>':"")+
     '<button class="b" onclick="closeM()">닫기</button></div>';
    window.modal(title,body);
+   // A notice counts as seen only after the modal was successfully shown.
+   if(noticeId){try{localStorage.setItem(key,noticeId);}catch(_){}}
   }catch(_){/* network failures never block analysis */}finally{busy=false;}
  },
  download(){
