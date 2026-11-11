@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 47400,
-  "versionName": "4.74",
-  "apkUrl": "https://drive.google.com/file/d/1re6cpRrufXSVu4ZQjyPk6OEPWSluNkZG/view",
-  "notice": "⚓ 로또645 R4.74: 신규 회차 분석은 방별 통계 상위 12개 중 생존 예상수 8~10개를 먼저 선택하고 그 안에서만 방별 5조합을 생성하도록 연결했습니다. 조합 20개가 필터를 만족하지 못하면 예상수 밖 번호를 추가하지 않고 HOLD합니다. 기존 저장 회차의 조합·성적·누적DB는 변경하지 않습니다. 금주 회차를 홈 최상단에 표시하고 저장된 금주 조합이 있으면 버튼 한 번으로 성적관리의 해당 회차 20조합을 엽니다. 공식 자료 최신 1249회 기준 금주 분석은 1250회입니다. 브라우저 재현 검증: 401~500회 중 98회 정상, 444·465회 HOLD, 1250회 정상. 앱 서명 검증 완료, 실기기 검증 미완료. 현재 Google Drive 파일이 소유자 전용으로 확인되어 일반 설치자의 다운로드는 접근 제한될 수 있습니다. 기존 앱을 삭제하지 말고 덮어쓰기 설치하십시오.",
-  "noticeId": "R474-20261111-CANDIDATES-LINKED-5SETS-WEEKLY-BANNER",
-  "publishedAt": "2026-11-11T08:19:00+09:00",
+  "versionCode": 47500,
+  "versionName": "4.75",
+  "apkUrl": "https://drive.google.com/file/d/1Sg8zt_mjNoQ_pr8Iy8c17fsrSQcT3iun/view",
+  "notice": "⚓ R4.75: 앱 재실행 후 과거분석의 최종회차가 1249회로 잘못 표시되는 문제를 수정했습니다. 단순히 회차 번호가 높은 기록 대신 기기에 저장된 사후 과거분석 20조합 원장의 실제 마지막 저장 시각을 기준으로 표시합니다. 1000회가 최근 저장됐다면 1249회 참고연구 기록이 있어도 '마지막 저장 과거분석 · 제1000회'로 표시됩니다. 기록이 없을 경우 '저장 기록 없음'을 명시하고 저장 시각도 보여줍니다. 1250회 실구매 조합, 기존 잠금·누적DB·채점 기록, R4.74 예상수-5조합 연결 및 금주 단축 버튼은 그대로 보존합니다. 브라우저 재실행 모의시험, APK 서명 검사 통과. 실제 휴대전화 저장 상태 및 설치 검증 미완료. Google Drive 일반 링크 공유 권한이 없어 다운로드 제한이 있을 수 있습니다. 앱 삭제 없이 덮어쓰기 설치하십시오.",
+  "noticeId": "R475-20261111-LAST-SAVED-HISTORY-PERSISTENCE-DIAGNOSTIC",
+  "publishedAt": "2026-11-11T09:20:00+09:00",
   "enabled": true
 }
