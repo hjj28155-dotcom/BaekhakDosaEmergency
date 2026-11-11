@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 47300,
-  "versionName": "4.73",
-  "apkUrl": "https://drive.google.com/file/d/1_ckHm1OyEmMPCMerT_0qKoPzCUu_RKQg/view",
-  "notice": "⚓ 로또645 R4.73 업데이트 표시 수정: 앱 업데이트·공지사항 화면에 이전 R4.68로 고정 표시되던 현재 버전 문구를 제거하고 실제 APK 버전코드에서 설치 버전을 계산하도록 수정했습니다. 업데이트 확인 결과에는 설치 버전과 원격 서버의 버전 및 버전코드를 각각 표시해 업데이트 감지 실패를 쉽게 구별할 수 있습니다. R4.72 PNG 예상수 상단 자동 펼침과 진행 회차 표시, R4.69 압축 저장, 4방 20조합 및 누적DB는 그대로 유지합니다. 기존 앱을 삭제하지 말고 덮어쓰기 설치하십시오. 실제 Android 실기기 설치/다운로드 및 원격 감지 실패 근본 원인 검증은 미완료이며 Google Drive 일반 사용자 다운로드 권한도 미설정입니다.",
-  "noticeId": "R473-20261111-UPDATE-REAL-LOCAL-VERSION-REMOTE-VERSION-DIAGNOSTIC",
+  "versionCode": 47400,
+  "versionName": "4.74",
+  "apkUrl": "https://drive.google.com/file/d/1re6cpRrufXSVu4ZQjyPk6OEPWSluNkZG/view",
+  "notice": "⚓ 로또645 R4.74: 신규 회차 분석은 방별 통계 상위 12개 중 생존 예상수 8~10개를 먼저 선택하고 그 안에서만 방별 5조합을 생성하도록 연결했습니다. 조합 20개가 필터를 만족하지 못하면 예상수 밖 번호를 추가하지 않고 HOLD합니다. 기존 저장 회차의 조합·성적·누적DB는 변경하지 않습니다. 금주 회차를 홈 최상단에 표시하고 저장된 금주 조합이 있으면 버튼 한 번으로 성적관리의 해당 회차 20조합을 엽니다. 공식 자료 최신 1249회 기준 금주 분석은 1250회입니다. 브라우저 재현 검증: 401~500회 중 98회 정상, 444·465회 HOLD, 1250회 정상. 앱 서명 검증 완료, 실기기 검증 미완료. 현재 Google Drive 파일이 소유자 전용으로 확인되어 일반 설치자의 다운로드는 접근 제한될 수 있습니다. 기존 앱을 삭제하지 말고 덮어쓰기 설치하십시오.",
+  "noticeId": "R474-20261111-CANDIDATES-LINKED-5SETS-WEEKLY-BANNER",
   "publishedAt": "2026-11-11T08:19:00+09:00",
   "enabled": true
 }
