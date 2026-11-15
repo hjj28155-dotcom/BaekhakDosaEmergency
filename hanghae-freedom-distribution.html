@@ -34,7 +34,26 @@ small{display:block;color:#bfd9e5;line-height:1.6;margin-top:8px}
 footer{font-size:12px;text-align:center;color:#a8bfcb;line-height:1.8}
 </style>
 <script id="legacy-moveicon-download-route">
-(function(){try{if(new URLSearchParams(location.search).get("from")==="moveicon-v1079"){location.replace("./moveicon-download.html?from=moveicon-v1079");}}catch(e){}})();
+/* MOVEICON-LEGACY-RECOVERY-20261115
+   Recover from an older cached moveicon.html that still redirects here.
+   Do not redirect genuine Freedom visitors or external referrers. */
+(function(){
+  try {
+    var here=new URL(location.href);
+    if(here.searchParams.get("intent")==="freedom")return;
+    var legacy=here.searchParams.get("from")==="moveicon-v1079";
+    if(document.referrer){
+      var previous=new URL(document.referrer);
+      var historical=new URL("./moveicon.html",here.href);
+      legacy=legacy||(previous.origin===historical.origin&&previous.pathname===historical.pathname);
+    }
+    if(legacy){
+      var target=new URL("./moveicon-download.html",here.href);
+      target.searchParams.set("from","legacy-moveicon-recovery");
+      location.replace(target.href);
+    }
+  }catch(e){}
+})();
 </script>
 </head>
 <body>
