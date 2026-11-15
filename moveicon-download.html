@@ -15,9 +15,6 @@ p{font-size:15px;line-height:1.45;color:#d9e8f1;margin:9px 0}
 .note{margin-top:11px;padding:10px;background:#113825;border:1px solid #2f7c55;border-radius:12px;font-size:14px;line-height:1.55;text-align:left}
 .note summary{cursor:pointer;color:#d2f6e2;font-weight:800;font-size:15px;list-style:disclosure-closed}
 .note[open] summary{margin-bottom:10px}
-#freedom-install{margin-top:12px!important;border-color:#b99a50}
-#freedom-install h2{font-size:clamp(21px,5vw,24px)!important;margin:0 0 7px!important}
-#freedom-install .btn{margin-top:11px}
 #moveicon-release-extra{font-size:14px;line-height:1.45}
 @media(max-width:480px){.wrap{padding:10px 10px 12px}.card{padding:13px 12px}#moveicon-title{line-height:1.25}.btn{min-height:56px}}
 </style>
@@ -34,17 +31,12 @@ p{font-size:15px;line-height:1.45;color:#d9e8f1;margin:9px 0}
 <p><small>48.76 MB · 정식 OWNER 영구 서명 · 2026-11-15<br>기존 OWNER 앱은 삭제하지 말고 덮어쓰기 업데이트하세요.<br>645 앱은 휴대전화에 별도로 설치되어 있어야 합니다.<br>공개판과 OWNER는 패키지가 달라 서로 덮어쓸 수 없습니다.</small></p>
 </section><div class="card">
 <h1 id="moveicon-title">⚓ 이동아이콘 기존 공개판</h1>
-<p>이동아이콘을 먼저 설치해 사용하고, 화면 최상단 왼쪽 <b>‘🚢 항행의자유’</b> 버튼으로 항행의자유 설치를 안내합니다.</p>
+<p>기존 일반 공개판 사용자를 위한 독립적인 이동아이콘 설치 및 업데이트입니다.</p>
 <div class="note" id="moveicon-purpose" style="text-align:center;display:block;border-color:#e1b55c;background:#193b48">
-<strong style="font-size:18px;color:#ffe7a4">① 이동아이콘 다운로드 → ② 항행의자유 설치</strong><br>
+<strong style="font-size:18px;color:#ffe7a4">이동아이콘 설치 및 업데이트</strong><br>
 기존 앱을 삭제하지 마십시오. 이동아이콘 자체는 MP3·영상 등 기존 기능을 유지합니다.
 </div>
-<a id="moveicon-apk" class="btn" href="https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/v1.0.79/Hanghae_MoveIcon_v1.0.79.apk" target="_blank" rel="noopener">① ⬇ 이동아이콘 설치 APK 다운로드</a>
-<div id="moveicon-next-step" class="note" style="display:none;border-color:#e1b55c;background:#163a40;text-align:center" role="status" aria-live="polite">
-  <strong style="font-size:17px;color:#ffe39a">다음은 ② 항행의자유 설치입니다.</strong><br>
-  이동아이콘 설치를 완료한 뒤 아래 항행의자유 버튼을 누르세요. 중복 설치는 하지 마십시오.
-  <a id="moveicon-next-freedom" class="btn" href="./hanghae-freedom-distribution.html" style="background:#236d59">② 🚢 항행의자유 설치 안내 열기</a>
-</div>
+<a id="moveicon-apk" class="btn" href="https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/v1.0.79/Hanghae_MoveIcon_v1.0.79.apk" target="_blank" rel="noopener">⬇ 이동아이콘 기존 공개판 APK 다운로드</a>
 <details class="note">
 <summary>이동아이콘 기능 안내 펼쳐보기</summary>
 현재 공식 공개판의 기능 안내입니다. 승인된 신규 수정본의 배포 여부는 아래 공지를 확인하세요.<br>
@@ -54,10 +46,6 @@ p{font-size:15px;line-height:1.45;color:#d9e8f1;margin:9px 0}
 ④ MP3 창을 닫거나 재생을 시작하면 V3 화면이 뒤에 남지 않고 바로 돌아갑니다.<br>
 MP3·MP4는 자동검색이 아니라 <b>이동아이콘 내부 앱폴더 2개</b> 보관 방식 그대로입니다.
 </details>
-<section id="freedom-install" style="margin-top:12px;padding:12px;border:1px solid #b89b5a;border-radius:13px;background:#102d42">
-<h2 style="margin:0 0 6px;color:#ffe39a;font-size:20px">② 🚢 항행의자유 설치로 이어가기</h2>
-<p>이동아이콘을 설치한 뒤 사용자가 선택해 진행하는 단계입니다. 이미 설치된 항행의자유 앱은 삭제하지 마십시오.</p><a class="btn" id="moveicon-freedom-primary" href="./hanghae-freedom-distribution.html" style="margin-top:7px;background:#236d59">② 🚢 항행의자유 공식 설치·업데이트 화면 열기</a>
-</section>
 </div>
 </div>
 
@@ -108,10 +96,6 @@ MP3·MP4는 자동검색이 아니라 <b>이동아이콘 내부 앱폴더 2개</
   let data={versionName:"1.0.79",apkUrl:old,available:true};
   const status=document.getElementById("moveicon-release-status");
   const download=document.getElementById("moveicon-apk");
-  download.addEventListener("click",()=>{
-    const next=document.getElementById("moveicon-next-step");
-    if(next){ next.style.display="block"; next.scrollIntoView({behavior:"smooth",block:"nearest"}); }
-  });
   const dialog=document.getElementById("moveicon-update-modal");
   const dialogLink=document.getElementById("moveicon-update-download");
   function parts(v){return String(v||"").replace(/^v/i,"").split(/[.+\-]/).slice(0,3).map(n=>/^\d+$/.test(n)?Number(n):0)}
