@@ -1,0 +1,212 @@
+{
+  "run_id": "43707646272",
+  "checked_at": "2026-11-15T11:10:43.736159+00:00",
+  "expected_production_commit": "d32115f3be0feb27dc57f8d17d854ddf5619bcba",
+  "checks": [
+    {
+      "path": "moveicon.html",
+      "status": 200,
+      "sha256": "e3ab7f7260e999676547ccd60421b05387afe0230c8b6fe47c90dea3e8cf2563",
+      "owner_r10": false,
+      "legacy_download": true,
+      "freedom_redirect": false,
+      "recovery_marker": false,
+      "scroll": false,
+      "last_modified": "Sun, 15 Nov 2026 11:12:07 GMT"
+    },
+    {
+      "path": "moveicon.html?verify=20261115-r10",
+      "status": 200,
+      "sha256": "e3ab7f7260e999676547ccd60421b05387afe0230c8b6fe47c90dea3e8cf2563",
+      "owner_r10": false,
+      "legacy_download": true,
+      "freedom_redirect": false,
+      "recovery_marker": false,
+      "scroll": false,
+      "last_modified": "Sun, 15 Nov 2026 11:12:07 GMT"
+    },
+    {
+      "path": "moveicon-download.html",
+      "status": 200,
+      "sha256": "b08bd8a578d2c17eeb7f0de6932c725bd38ef2c01511e39b84c9f431abe5bda2",
+      "owner_r10": true,
+      "legacy_download": false,
+      "freedom_redirect": false,
+      "recovery_marker": false,
+      "scroll": false,
+      "last_modified": "Sun, 15 Nov 2026 11:12:07 GMT"
+    },
+    {
+      "path": "moveicon-download.html?from=legacy-moveicon-share",
+      "status": 200,
+      "sha256": "b08bd8a578d2c17eeb7f0de6932c725bd38ef2c01511e39b84c9f431abe5bda2",
+      "owner_r10": true,
+      "legacy_download": false,
+      "freedom_redirect": false,
+      "recovery_marker": false,
+      "scroll": false,
+      "last_modified": "Sun, 15 Nov 2026 11:12:07 GMT"
+    },
+    {
+      "path": "hanghae-freedom-distribution.html",
+      "status": 200,
+      "sha256": "c4874a552fb2ef1257ec117e3e24491bf8c8ffa2253f30712864b63c5c6f8f4f",
+      "owner_r10": false,
+      "legacy_download": false,
+      "freedom_redirect": false,
+      "recovery_marker": true,
+      "scroll": true,
+      "last_modified": "Sun, 15 Nov 2026 11:12:05 GMT"
+    },
+    {
+      "path": "index.html?v=40033-r12-installvideo-v18",
+      "status": 200,
+      "sha256": "724d06b7d39f51e21019e52f07b160b6ea55725ba833285ebc727292b29aaf02",
+      "owner_r10": false,
+      "legacy_download": false,
+      "freedom_redirect": false,
+      "recovery_marker": false,
+      "scroll": false,
+      "last_modified": "Sun, 15 Nov 2026 11:12:07 GMT"
+    },
+    {
+      "path": "hanghae-moveicon.html",
+      "status": 200,
+      "sha256": "46f1d3c94a59f1cd699b8db4f9693c7af3d3479ac2b689d3b544d9441b04f72c",
+      "owner_r10": false,
+      "legacy_download": false,
+      "freedom_redirect": false,
+      "recovery_marker": false,
+      "scroll": false,
+      "last_modified": "Sun, 15 Nov 2026 11:12:06 GMT"
+    }
+  ],
+  "browser_checks": [
+    {
+      "path": "moveicon.html",
+      "owner_r10": true,
+      "freedom_scroll": false,
+      "expected_owner": true,
+      "exit": 0,
+      "ok": true
+    },
+    {
+      "path": "moveicon.html?verify=20261115-r10",
+      "owner_r10": true,
+      "freedom_scroll": false,
+      "expected_owner": true,
+      "exit": 0,
+      "ok": true
+    },
+    {
+      "path": "index.html?v=40033-r12-installvideo-v18",
+      "owner_r10": true,
+      "freedom_scroll": false,
+      "expected_owner": true,
+      "exit": 0,
+      "ok": true
+    },
+    {
+      "path": "hanghae-moveicon.html",
+      "owner_r10": true,
+      "freedom_scroll": false,
+      "expected_owner": true,
+      "exit": 0,
+      "ok": true
+    },
+    {
+      "path": "hanghae-freedom-distribution.html?from=moveicon-v1079",
+      "owner_r10": true,
+      "freedom_scroll": false,
+      "expected_owner": true,
+      "exit": 0,
+      "ok": true
+    },
+    {
+      "path": "hanghae-freedom-distribution.html",
+      "owner_r10": false,
+      "freedom_scroll": true,
+      "expected_owner": false,
+      "exit": 0,
+      "ok": true
+    }
+  ],
+  "production_marker_present": true,
+  "pages_build": {
+    "url": "https://api.github.com/repos/hjj28155-dotcom/BaekhakDosaEmergency/pages/builds/1371608126",
+    "status": "built",
+    "error": {
+      "message": null
+    },
+    "pusher": {
+      "login": "hjj28155-dotcom",
+      "id": 324322599,
+      "node_id": "U_kgDOE1TFJw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/324322599?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/hjj28155-dotcom",
+      "html_url": "https://github.com/hjj28155-dotcom",
+      "followers_url": "https://api.github.com/users/hjj28155-dotcom/followers",
+      "following_url": "https://api.github.com/users/hjj28155-dotcom/following{/other_user}",
+      "gists_url": "https://api.github.com/users/hjj28155-dotcom/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/hjj28155-dotcom/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/hjj28155-dotcom/subscriptions",
+      "organizations_url": "https://api.github.com/users/hjj28155-dotcom/orgs",
+      "repos_url": "https://api.github.com/users/hjj28155-dotcom/repos",
+      "events_url": "https://api.github.com/users/hjj28155-dotcom/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/hjj28155-dotcom/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "commit": "d32115f3be0feb27dc57f8d17d854ddf5619bcba",
+    "duration": 153079,
+    "created_at": "2026-11-15T11:09:37Z",
+    "updated_at": "2026-11-15T11:12:10Z"
+  },
+  "recovery_script_tests": [
+    {
+      "name": "cached legacy moveicon referrer",
+      "expected": true,
+      "target": "https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/moveicon-download.html?from=legacy-moveicon-recovery",
+      "ok": true
+    },
+    {
+      "name": "cached legacy referrer with query",
+      "expected": true,
+      "target": "https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/moveicon-download.html?from=legacy-moveicon-recovery",
+      "ok": true
+    },
+    {
+      "name": "known legacy source query",
+      "expected": true,
+      "target": "https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/moveicon-download.html?from=legacy-moveicon-recovery",
+      "ok": true
+    },
+    {
+      "name": "ordinary Freedom visit",
+      "expected": false,
+      "target": null,
+      "ok": true
+    },
+    {
+      "name": "manual Freedom from official download",
+      "expected": false,
+      "target": null,
+      "ok": true
+    },
+    {
+      "name": "explicit Freedom choice",
+      "expected": false,
+      "target": null,
+      "ok": true
+    },
+    {
+      "name": "external lookalike referrer",
+      "expected": false,
+      "target": null,
+      "ok": true
+    }
+  ],
+  "completed_at": "2026-11-15T11:12:19.869827+00:00"
+}
