@@ -5,12 +5,12 @@
 <script id="legacy-moveicon-to-freedom">
 /* Official v1.0.79 MoveIcon opens index.html?v=40033-r12-installvideo-v18.
    Keep the general 5-app hub untouched; route ONLY that legacy deep link
-   to the dedicated Freedom installation/update seven-step page. */
+   to the current MoveIcon download page; retain the ordinary Freedom link. */
 (function(){
   try {
     const route=new URLSearchParams(window.location.search).get('v');
     if(route==='40033-r12-installvideo-v18'){
-      window.location.replace('./hanghae-freedom-distribution.html?from=moveicon-v1079');
+      window.location.replace('./moveicon-download.html?from=moveicon-v1079');
     }
   } catch(e) {}
 })();
@@ -30,7 +30,7 @@ ul{margin:8px 0;padding-left:20px}li{margin:4px 0}footer{font-size:12px;text-ali
 <body><main>
 <header><h1>⚓ 항행의자유 공식 연결실</h1><p>각 앱의 설치·업데이트 주소는 독립적으로 관리합니다.</p></header>
 <nav class="cards" aria-label="다섯 앱 별도 연결">
-<a class="card" id="homeMoveicon" href="./hanghae-moveicon.html" aria-label="최상단 왼쪽 이동아이콘 전용"><span class="emoji">⚓</span><strong>⑤ 이동아이콘</strong><small>최상단 왼쪽 · 전용 링크</small></a>
+<a class="card" id="homeMoveicon" href="./moveicon-download.html" aria-label="최상단 왼쪽 이동아이콘 전용"><span class="emoji">⚓</span><strong>⑤ 이동아이콘</strong><small>최상단 왼쪽 · 전용 링크</small></a>
 <a class="card" id="homeFreedom" href="./hanghae-freedom-distribution.html"><span class="emoji">🚢</span><strong>② 항행의자유 배포판</strong><small>7단계 안내 · 신규 APK 배포 별도</small></a>
 <a class="card" id="homeNavigator" href="./hanghae-navigator-app.html"><span class="emoji">🧭</span><strong>① 항해사앱</strong><small>V3 전담 · 전용 드라이브</small></a>
 <a class="card" id="homeV7" href="./hanghae-v7-controller.html"><span class="emoji">🛡️</span><strong>③ V7 통제관</strong><small>통제관 전담 · 7.9.0</small></a>
