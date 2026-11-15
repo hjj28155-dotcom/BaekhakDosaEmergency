@@ -1,0 +1,48 @@
+name: Audit live MoveIcon public routes
+on:
+  push:
+    branches: ['audit/moveicon-live-pages-20261115']
+    paths: ['.github/workflows/audit-moveicon-live.yml']
+permissions:
+  contents: write
+  pages: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspect live public HTTP and Pages deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import urllib.request, urllib.error, json, hashlib, os, datetime
+          base='https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/'
+          result={'checked_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'run_id':os.environ['GITHUB_RUN_ID'],'source_commit':os.environ['GITHUB_SHA'],'checks':[]}
+          for p in ['moveicon.html','moveicon.html?verify=20261115-r10','moveicon-download.html','moveicon-download.html?from=legacy-moveicon-share','hanghae-freedom-distribution.html','index.html?v=40033-r12-installvideo-v18']:
+              row={'path':p}
+              try:
+                  req=urllib.request.Request(base+p,headers={'User-Agent':'MoveIcon-Deployment-Audit/1.0','Cache-Control':'no-cache'})
+                  with urllib.request.urlopen(req,timeout=25) as r:
+                      raw=r.read(); body=raw.decode('utf-8','replace')
+                      row.update(status=r.status,final_url=r.url,sha256=hashlib.sha256(raw).hexdigest(),last_modified=r.headers.get('Last-Modified'),age=r.headers.get('Age'),etag=r.headers.get('ETag'),owner_r10='OWNER R10' in body,legacy_download='legacyMoveiconDownload' in body,freedom_redirect="location.replace('./hanghae-freedom-distribution.html')" in body,scroll='환영 두루마리' in body,download_route='./moveicon-download.html' in body)
+              except Exception as e: row['error']=str(e)
+              result['checks'].append(row)
+          for name in ['pages','pages/builds/latest']:
+              try:
+                  req=urllib.request.Request('https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']+'/'+name,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','User-Agent':'MoveIcon-Deployment-Audit'})
+                  with urllib.request.urlopen(req,timeout=20) as r: result[name]=json.load(r)
+              except Exception as e: result[name]={'error':str(e)}
+          open('/tmp/moveicon-live-report.json','w').write(json.dumps(result,ensure_ascii=False,indent=2))
+          print(json.dumps(result,ensure_ascii=False,indent=2))
+          PY
+      - name: Preserve diagnostic report on audit branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import os, json, base64, urllib.request
+          content=base64.b64encode(open('/tmp/moveicon-live-report.json','rb').read()).decode()
+          data=json.dumps({'message':'Record live MoveIcon deployment audit [skip ci]','content':content,'branch':os.environ['GITHUB_REF_NAME']}).encode()
+          req=urllib.request.Request('https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']+'/contents/audit/moveicon-live-report.json',data=data,method='PUT',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','User-Agent':'MoveIcon-Deployment-Audit','Content-Type':'application/json'})
+          with urllib.request.urlopen(req,timeout=25) as r: print('Report saved',r.status)
+          PY
