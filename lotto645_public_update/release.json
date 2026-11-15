@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 72900,
-  "versionName": "6.75 (R680J)",
-  "apkUrl": "https://drive.google.com/file/d/11ovqRLHrjBBo_9MpWxczPLRX9q0OT8JP/view",
-  "notice": "⚓ 항행의자유 LOTTO645 R680J 업데이트입니다. 여성 앵커 영상의 장면 사이 표시 유지, 조합 번호 읽기와 화면 강조 연동, 당첨번호 순차 공개, 일정한 세로 방송 화면, 자연스러운 장면 전환 및 마지막 성적표 연결을 개선했습니다. 분석 엔진과 기존 원장·기기별 조합은 그대로 유지됩니다. 각 기기의 통합 원장 백업을 저장한 후 기존 앱을 삭제하지 말고 업데이트 설치하십시오. 다운로드 권한이 없으면 소유자에게 요청하십시오.",
-  "noticeId": "R680J-20261116-BROADCAST-CONTINUITY-72900",
-  "publishedAt": "2026-11-16T04:43:00+09:00",
+  "versionCode": 73100,
+  "versionName": "6.75 (R680L)",
+  "apkUrl": "https://drive.google.com/file/d/1R1tjq9ckhgE_YhA0PzboTDqtPDXc9JJc/view",
+  "notice": "⚓ 항행의자유 LOTTO645 R680L 업데이트입니다. 하단 중복 조합표를 제거하고 앵커의 말하는 모습과 대기 표정 전환, 발표판 사이 부드러운 연결, 음성 조각의 연결 및 멘트 간격을 개선했습니다. 기존 분석 엔진·조합·누적기록은 그대로 유지됩니다. 각 기기의 통합 원장을 백업한 후 기존 앱을 삭제하지 말고 업데이트 설치하십시오. 다운로드 권한이 없으면 소유자에게 요청하십시오.",
+  "noticeId": "R680L-20261116-BROADCAST-REFINEMENT-73100",
+  "publishedAt": "2026-11-16T04:58:00+09:00",
   "enabled": true
 }
