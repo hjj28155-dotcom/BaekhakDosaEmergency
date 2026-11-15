@@ -1,0 +1,20 @@
+{
+  "checked_at": "2026-11-15T14:30:26.519320+00:00",
+  "checks": {
+    "page_http": 200,
+    "manifest_http": 200,
+    "legacy_http": 200,
+    "page_r12": true,
+    "manifest_r12": true,
+    "manifest_checksum_matches": true,
+    "drive_same_id": true,
+    "legacy_redirect_to_download": true,
+    "public_stable_preserved": true,
+    "both_downloads_hidden_when_current": true,
+    "page_last_modified": "Sun, 15 Nov 2026 14:32:47 GMT",
+    "manifest_last_modified": "Sun, 15 Nov 2026 14:32:47 GMT",
+    "fallback": "https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/moveicon-owner-r12-v1.1.11/MoveIcon_OWNER_R12_1.1.11_SIGNED.apk"
+  },
+  "pass": true,
+  "completed_at": "2026-11-15T14:32:58.391532+00:00"
+}
