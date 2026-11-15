@@ -1,0 +1,88 @@
+name: Publish MoveIcon OWNER R11 and switch official download
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/publish-moveicon-owner-r11.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reconstruct exact signed R11 from public R10 and verified transfer
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/owner-r11
+          curl -fL --retry 3 'https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/moveicon-owner-r10-v1.1.9/MoveIcon_OWNER_R10_1.1.9_SIGNED.apk' -o /tmp/owner-r11/r10.apk
+          echo '2c7fc0d5ef601587730589e1931e10db54f9e427ce6e7a398c7d9ebc2b335ba7  /tmp/owner-r11/r10.apk' | sha256sum -c -
+          python3 - <<'PY'
+          import pathlib,json,hashlib,zlib,base64,zipfile
+          root=pathlib.Path('release-transfer/moveicon-owner-r11')
+          m=json.loads((root/'MANIFEST.json').read_text())
+          a=pathlib.Path('/tmp/owner-r11/r10.apk').read_bytes()
+          assert hashlib.sha256(a).hexdigest()==m['base_sha256']
+          zipped=b''.join(base64.b64decode((root/p).read_text().strip()) for p in m['parts'])
+          assert hashlib.sha256(zipped).hexdigest()==m['packed_sha256']
+          lit=zlib.decompress(zipped)
+          b=bytearray()
+          for op,off,n in m['ops']:
+              b.extend(lit[off:off+n] if op=='literal' else a[off:off+n])
+          assert len(b)==m['bytes']==48763042
+          assert hashlib.sha256(b).hexdigest()==m['sha256']=='bbf1b9ea152d929cfc78bdde5a71d0dc207ead04465fc61e8331e071e1a739f9'
+          dst=pathlib.Path('/tmp/owner-r11/MoveIcon_OWNER_R11_1.1.10_SIGNED.apk')
+          dst.write_bytes(b)
+          with zipfile.ZipFile(dst) as z:
+              assert z.testzip() is None
+          print('VERIFIED signed R11 APK byte-for-byte:',len(b))
+          PY
+      - name: Publish R11 direct download to GitHub Releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG=moveicon-owner-r11-v1.1.10
+          FILE=/tmp/owner-r11/MoveIcon_OWNER_R11_1.1.10_SIGNED.apk
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$FILE" --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$TAG" "$FILE" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'MoveIcon OWNER R11 1.1.10' --notes 'Permanent owner-signed APK. Fixed bottom update / hide / exit. Package com.navigator.freedom.moveicon.owner; version code 1100011. Public stable v1.0.79 is separate and unchanged. Device testing pending.' --latest=false
+          fi
+      - name: Verify public direct APK download checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL='https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/moveicon-owner-r11-v1.1.10/MoveIcon_OWNER_R11_1.1.10_SIGNED.apk'
+          curl -fL --retry 6 --retry-delay 3 "$URL" -o /tmp/owner-r11/public-recheck.apk
+          echo 'bbf1b9ea152d929cfc78bdde5a71d0dc207ead04465fc61e8331e071e1a739f9  /tmp/owner-r11/public-recheck.apk' | sha256sum -c -
+      - name: Update existing official webpage only after verification
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git fetch origin main
+          git checkout -B main origin/main
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('moveicon-download.html')
+          s=p.read_text()
+          if s.count('id="moveicon-owner-apk"')!=1 or not 'moveicon-owner-r10-v1.1.9/MoveIcon_OWNER_R10_1.1.9_SIGNED.apk' in s:
+              if 'moveicon-owner-r11-v1.1.10/MoveIcon_OWNER_R11_1.1.10_SIGNED.apk' in s:
+                  print('Official R11 is already current')
+                  raise SystemExit(0)
+              raise SystemExit('Unexpected newer page: no overwrite')
+          old='https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/moveicon-owner-r10-v1.1.9/MoveIcon_OWNER_R10_1.1.9_SIGNED.apk'
+          new='https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/moveicon-owner-r11-v1.1.10/MoveIcon_OWNER_R11_1.1.10_SIGNED.apk'
+          s=s.replace(old,new).replace('id="moveicon-owner-r10"','id="moveicon-owner-r11"').replace('⚓ 이동아이콘 OWNER R10','⚓ 이동아이콘 OWNER R11').replace('최신 OWNER 1.1.9','최신 OWNER 1.1.10').replace('download="MoveIcon_OWNER_R10_1.1.9_SIGNED.apk"','download="MoveIcon_OWNER_R11_1.1.10_SIGNED.apk"').replace('⬇ OWNER R10 다운로드 및 설치','⬇ OWNER R11 다운로드 및 설치')
+          s=s.replace('프리미엄 MP3·MP4 플레이어 및 저장폴더 유지. 기존 추가 앱과 저장 자료 보존.','프리미엄 MP3·MP4 플레이어 및 저장폴더 유지. 기존 추가 앱과 저장 자료 보존. 업데이트·숨김·종료 버튼 하단 고정.')
+          p.write_text(s)
+          PY
+          git add moveicon-download.html
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Publish verified OWNER R11 direct APK on existing MoveIcon link'
+          git push origin HEAD:main
