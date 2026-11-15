@@ -1,0 +1,53 @@
+name: Audit live OWNER R12 update page and manifest
+on:
+  push:
+    branches: ['audit/moveicon-live-pages-20261115']
+    paths: ['.github/workflows/audit-owner-r12-live.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+  pages: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify actual public pages and owner version check
+        run: |
+          python3 - <<'PY'
+          import urllib.request,json,time,datetime,pathlib,hashlib
+          base='https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/'
+          expected='cdf437358e72a049a12f046a7b8fa459641479898e6d74e6e28ea79d14f87ce2'
+          report={'checked_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'checks':{}}
+          def get(path):
+              sep='&' if '?' in path else '?'
+              req=urllib.request.Request(base+path+sep+'audit='+str(time.time_ns()),headers={'Cache-Control':'no-cache','User-Agent':'MoveIcon-Release-Audit/1.0'})
+              with urllib.request.urlopen(req,timeout=20) as r:return r.status,r.read().decode('utf-8'),dict(r.headers)
+          for n in range(18):
+              try:
+                  a,p,ph=get('moveicon-download.html')
+                  b,m,mh=get('moveicon-owner-release.json')
+                  j=json.loads(m)
+                  if a==b==200 and 'id="moveicon-owner-r12"' in p and j.get('versionCode')==1100012 and j.get('sha256')==expected:break
+              except Exception as e:report['last_error']=str(e)
+              time.sleep(10)
+          try:
+              a,p,ph=get('moveicon-download.html')
+              b,m,mh=get('moveicon-owner-release.json')
+              j=json.loads(m)
+              c,l,lh=get('moveicon.html')
+              report['checks']={'page_http':a,'manifest_http':b,'legacy_http':c,'page_r12':'id="moveicon-owner-r12"' in p,'manifest_r12':j.get('versionCode')==1100012 and j.get('versionName')=='1.1.11-OWNER','manifest_checksum_matches':j.get('sha256')==expected,'drive_same_id':'1e_kSWQ0PopAMdkJLr51bQkQM9M-phaaq' in p and '1e_kSWQ0PopAMdkJLr51bQkQM9M-phaaq' in j.get('apkUrl',''),'legacy_redirect_to_download':'./moveicon-download.html' in l,'public_stable_preserved':'Hanghae_MoveIcon_v1.0.79.apk' in p,'both_downloads_hidden_when_current':'showDownload(false)' in p and 'fallback.style.display=show?' in p,'page_last_modified':ph.get('Last-Modified'),'manifest_last_modified':mh.get('Last-Modified'),'fallback':j.get('fallbackUrl')}
+              report['pass']=all(report['checks'][x] for x in ['page_r12','manifest_r12','manifest_checksum_matches','drive_same_id','legacy_redirect_to_download','public_stable_preserved','both_downloads_hidden_when_current'])
+          except Exception as e:report['pass']=False;report['error']=str(e)
+          report['completed_at']=datetime.datetime.now(datetime.timezone.utc).isoformat()
+          dst=pathlib.Path('audit/moveicon-owner-r12-live-report.json');dst.parent.mkdir(exist_ok=True);dst.write_text(json.dumps(report,indent=2)+'\n')
+          print(json.dumps(report,indent=2))
+          PY
+      - name: Preserve public audit report
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add audit/moveicon-owner-r12-live-report.json
+          git commit -m 'Record live R12 deployment verification [skip ci]'
+          git push origin HEAD:audit/moveicon-live-pages-20261115
