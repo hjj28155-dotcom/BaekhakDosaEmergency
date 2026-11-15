@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 72600,
-  "versionName": "6.75 (R680G)",
-  "apkUrl": "https://drive.google.com/file/d/115MtOp0VXO93pdEMBe0vkvl3pswqd7Mj/view",
-  "notice": "⚓ 항행의자유 LOTTO645 R680G 업데이트입니다. 이제 홈 방송시작과 일반 P2 분석에서 기기별 독립 원장을 기본 사용합니다. 기존 분석 원장과 최초 구매 기록은 별도 보존됩니다. 두 휴대폰에서 제1회 방송을 비교하십시오. 기존 앱을 삭제하지 말고 업데이트 설치하십시오. 다운로드 권한이 없으면 소유자에게 요청하십시오.",
-  "noticeId": "R680G-20261116-DEVICE-DEFAULT-72600",
-  "publishedAt": "2026-11-16T03:18:00+09:00",
+  "versionCode": 72700,
+  "versionName": "6.75 (R680H)",
+  "apkUrl": "https://drive.google.com/file/d/15NOeAxfR4A3eSvbjTqfqEmwrEou_VnIP/view",
+  "notice": "⚓ 항행의자유 LOTTO645 R680H 업데이트입니다. 구간별 누적과 100회 성적 감사표를 기기별 독립 원장에 연결했습니다. 기존 P2 및 최초 채점 원장은 별도 조회할 수 있습니다. 기존 앱을 삭제하지 말고 업데이트 설치하십시오. 기존 분석 기록은 유지됩니다. 다운로드 권한이 없으면 소유자에게 요청하십시오.",
+  "noticeId": "R680H-20261116-RANGE-CUMULATIVE-72700",
+  "publishedAt": "2026-11-16T03:28:00+09:00",
   "enabled": true
 }
