@@ -2,13 +2,13 @@
   "channel": "owner",
   "available": true,
   "package": "com.navigator.freedom.moveicon.owner",
-  "versionName": "1.1.11-OWNER",
-  "versionCode": 1100012,
-  "release": "R12",
-  "apkUrl": "https://drive.usercontent.google.com/download?id=1e_kSWQ0PopAMdkJLr51bQkQM9M-phaaq&export=download&confirm=t",
-  "sha256": "cdf437358e72a049a12f046a7b8fa459641479898e6d74e6e28ea79d14f87ce2",
-  "sizeBytes": 48763042,
+  "versionName": "1.1.12-OWNER",
+  "versionCode": 1100013,
+  "release": "R13",
+  "apkUrl": "https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/moveicon-owner-r13-v1.1.12/MoveIcon_OWNER_R13_1.1.12_645_FINAL_SIGNED.apk",
+  "sha256": "b85756a5911047d204e0b0e9b2b9bf2e538d6595e32d416fa29f666512fd164b",
+  "sizeBytes": 148787966,
   "ownerCertificateSha256": "2716bfb38ed089c8a039d73be92db5000ddaf85b70f0e5d8689bd537da303b3e",
   "deviceTested": false,
-  "fallbackUrl": "https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/moveicon-owner-r12-v1.1.11/MoveIcon_OWNER_R12_1.1.11_SIGNED.apk"
+  "fallbackUrl": "https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/moveicon-owner-r13-v1.1.12/MoveIcon_OWNER_R13_1.1.12_645_FINAL_SIGNED.apk"
 }
