@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 72200,
-  "versionName": "6.75 (R680C)",
-  "apkUrl": "https://drive.google.com/file/d/1vQdtxyYXpOjJ0nH1LzxpOxk_hYEEOwkr/view",
-  "notice": "⚓ 항행의자유 LOTTO645 R680C입니다. 누적 성적 안내와 마지막 인사가 진행되는 동안 성적 화면을 유지합니다. 방송 종료 후 이번 회차 및 누적 성적과 20조합 상세 성적표가 자동 표시됩니다. 상세 성적표 바로 보기도 추가했습니다. 기존 여성 앵커 음성, P2 엔진, 분석 원장 및 기록은 그대로 보존했습니다. 기존 앱을 삭제하지 말고 업데이트 설치하십시오. 다운로드 권한이 없으면 소유자에게 요청하십시오.",
-  "noticeId": "R680C-20261116-FINAL-SCORE-72200",
-  "publishedAt": "2026-11-16T02:00:00+09:00",
+  "versionCode": 72500,
+  "versionName": "6.75 (R680F)",
+  "apkUrl": "https://drive.google.com/file/d/11E_ohP-rNpRhyWJVlr4wRy1VM0VawisQ/view",
+  "notice": "⚓ 항행의자유 LOTTO645 R680F 업데이트입니다. 기기별 독립 조합 생성과 방송 멘트를 개선했습니다. 기존 분석기록은 유지되며, P2 독립 10수 분석실의 '기기별 독립 연구로 전환'에서 별도 제1회 연구를 시작할 수 있습니다. 기존 앱을 삭제하지 말고 업데이트 설치하십시오. 다운로드 권한이 없으면 소유자에게 요청하십시오.",
+  "noticeId": "R680F-20261116-DEVICE-NARRATION-72500",
+  "publishedAt": "2026-11-16T03:00:00+09:00",
   "enabled": true
 }
