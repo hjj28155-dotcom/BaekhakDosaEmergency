@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 72700,
-  "versionName": "6.75 (R680H)",
-  "apkUrl": "https://drive.google.com/file/d/15NOeAxfR4A3eSvbjTqfqEmwrEou_VnIP/view",
-  "notice": "⚓ 항행의자유 LOTTO645 R680H 업데이트입니다. 구간별 누적과 100회 성적 감사표를 기기별 독립 원장에 연결했습니다. 기존 P2 및 최초 채점 원장은 별도 조회할 수 있습니다. 기존 앱을 삭제하지 말고 업데이트 설치하십시오. 기존 분석 기록은 유지됩니다. 다운로드 권한이 없으면 소유자에게 요청하십시오.",
-  "noticeId": "R680H-20261116-RANGE-CUMULATIVE-72700",
-  "publishedAt": "2026-11-16T03:28:00+09:00",
+  "versionCode": 72800,
+  "versionName": "6.75 (R680I)",
+  "apkUrl": "https://drive.google.com/file/d/1toVpe0adX1B0ChbfnuDqPekWRW16Fle8/view",
+  "notice": "⚓ 항행의자유 LOTTO645 R680I 업데이트입니다. 기존 분석기록과 기기별 기록을 연속 이력으로 표시합니다. 동일 회차는 기기별 기록을 우선 집계하며 기존 원본은 보관함에 남습니다. 홈에서 이어서 분석하고 누적DB에서 통합 조회할 수 있습니다. 업데이트 전에 각 기기의 통합 원장 백업을 별도 저장한 후 기존 앱을 삭제하지 말고 업데이트 설치하십시오.",
+  "noticeId": "R680I-20261116-CONTINUOUS-HISTORY-72800",
+  "publishedAt": "2026-11-16T03:56:03+09:00",
   "enabled": true
 }
