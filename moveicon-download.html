@@ -27,8 +27,15 @@ p{font-size:15px;line-height:1.45;color:#d9e8f1;margin:9px 0}
 <p style="color:#ffe39a;font-weight:800">최신 OWNER 1.1.10 · 645 앱 통합판</p>
 <p>고정 아이콘: 645 앱 · MP3 · AM · FM · 실시간 TV</p>
 <p>프리미엄 MP3·MP4 플레이어 및 저장폴더 유지. 기존 추가 앱과 저장 자료 보존. 업데이트·숨김·종료 버튼 하단 고정.</p>
-<a id="moveicon-owner-apk" class="btn" href="https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/moveicon-owner-r11-v1.1.10/MoveIcon_OWNER_R11_1.1.10_SIGNED.apk" download="MoveIcon_OWNER_R11_1.1.10_SIGNED.apk" style="background:#236d59">⬇ OWNER R11 다운로드 및 설치</a>
-<p><small>다운로드 완료 후 APK 열기 → 설치 또는 업데이트를 누르세요.<br>48.76 MB · 정식 OWNER 영구 서명 · 2026-11-15<br>기존 OWNER 앱은 삭제하지 말고 덮어쓰기 업데이트하세요.<br>645 앱은 휴대전화에 별도로 설치되어 있어야 합니다.<br>공개판과 OWNER는 패키지가 달라 서로 덮어쓸 수 없습니다.</small></p>
+<div class="note" id="owner-version-check" data-latest="1.1.10" style="text-align:center">
+<strong style="color:#ffe39a">최종 배포 버전: OWNER R11 · 1.1.10</strong>
+<p id="owner-version-status" role="status" aria-live="polite">현재 설치 버전은 웹페이지에서 자동으로 확인할 수 없습니다. 기존 OWNER 앱 업데이트 화면의 버전을 입력하면 비교합니다.</p>
+<label for="owner-installed-version" style="display:block;margin-bottom:6px">현재 설치된 OWNER 버전</label>
+<input id="owner-installed-version" type="text" inputmode="decimal" placeholder="예: 1.1.10" autocomplete="off" style="width:100%;border:1px solid #648398;border-radius:8px;padding:12px;font-size:16px">
+<button type="button" id="owner-check-version" style="width:100%;margin-top:8px;padding:12px;border-radius:8px;border:1px solid #648398;background:#145d72;color:white;font-size:16px;font-weight:800">현재 버전과 비교</button>
+</div>
+<a id="moveicon-owner-apk" class="btn" href="https://drive.usercontent.google.com/download?id=1e_kSWQ0PopAMdkJLr51bQkQM9M-phaaq&amp;export=download&amp;confirm=t" download="MoveIcon_OWNER_R11_1.1.10_SIGNED.apk" style="background:#236d59">⬇ OWNER R11 다운로드 및 설치</a>
+<p><small>구글 드라이브에서 APK를 다운로드한 뒤 설치 또는 업데이트를 누르세요. Google 드라이브의 파일 검사 안내가 뜨면 내용을 확인하고 다운로드를 계속하세요.<br>48.76 MB · 정식 OWNER 영구 서명 · 2026-11-15<br>기존 OWNER 앱은 삭제하지 말고 덮어쓰기 업데이트하세요.<br>645 앱은 휴대전화에 별도로 설치되어 있어야 합니다.<br>공개판과 OWNER는 패키지가 달라 서로 덮어쓸 수 없습니다.</small></p>
 </section><div class="card">
 <h1 id="moveicon-title">⚓ 이동아이콘 기존 공개판</h1>
 <p>기존 일반 공개판 사용자를 위한 독립적인 이동아이콘 설치 및 업데이트입니다.</p>
@@ -145,6 +152,29 @@ MP3·MP4는 자동검색이 아니라 <b>이동아이콘 내부 앱폴더 2개</
   }
   checkBtn.addEventListener("click",()=>fetchStable(true));
   fetchStable(false);
+})();
+</script>
+<script id="owner-version-script">
+(function(){
+  "use strict";
+  const panel=document.getElementById("owner-version-check");
+  const input=document.getElementById("owner-installed-version");
+  const status=document.getElementById("owner-version-status");
+  const download=document.getElementById("moveicon-owner-apk");
+  const latest=panel.dataset.latest;
+  function parse(v){const m=String(v||"").trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-OWNER)?$/i);return m?m.slice(1).map(Number):null}
+  function compare(a,b){for(let i=0;i<3;i++){if(a[i]!==b[i])return a[i]>b[i]?1:-1}return 0}
+  function check(){
+    const installed=parse(input.value),release=parse(latest);
+    if(!installed||!release){status.textContent="현재 OWNER 버전을 정확하게 입력해 주세요. 예: "+latest;download.style.display="block";return}
+    const order=compare(installed,release);
+    if(order>=0){status.textContent="현재 설치 버전: "+installed.join(".")+" · "+(order===0?"최신 버전입니다.":"배포 버전보다 최신입니다.")+" 추가 다운로드가 필요 없습니다.";download.style.display="none"}
+    else{status.textContent="현재 설치 버전: "+installed.join(".")+" · 새 OWNER 업데이트가 있습니다. 기존 앱을 삭제하지 말고 업데이트하세요.";download.style.display="block"}
+  }
+  document.getElementById("owner-check-version").addEventListener("click",check);
+  input.addEventListener("keydown",function(e){if(e.key==="Enter")check()});
+  const query=new URLSearchParams(location.search).get("ownerInstalled");
+  if(query){input.value=query;check()}
 })();
 </script>
 </body>
