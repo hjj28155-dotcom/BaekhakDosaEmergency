@@ -1,0 +1,97 @@
+name: Connect verified OWNER R11 Drive update
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/publish-moveicon-owner-r11-drive.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  connect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify anonymous Google Drive APK bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/r11-drive
+          EXPECT='bbf1b9ea152d929cfc78bdde5a71d0dc207ead04465fc61e8331e071e1a739f9'
+          ID=1e_kSWQ0PopAMdkJLr51bQkQM9M-phaaq
+          URL="https://drive.usercontent.google.com/download?id=$ID&export=download&confirm=t"
+          if curl -fL --retry 2 --connect-timeout 20 "$URL" -o /tmp/r11-drive/verified.apk && echo "$EXPECT  /tmp/r11-drive/verified.apk" | sha256sum -c -; then
+            printf '%s' "$URL" > /tmp/r11-drive/url.txt
+          else
+            python3 -m pip install --quiet gdown
+            gdown "https://drive.google.com/uc?id=$ID" -O /tmp/r11-drive/verified.apk
+            echo "$EXPECT  /tmp/r11-drive/verified.apk" | sha256sum -c -
+            printf '%s' "https://drive.google.com/uc?export=download&id=$ID" > /tmp/r11-drive/url.txt
+          fi
+          test "$(stat -c%s /tmp/r11-drive/verified.apk)" = 48763042
+          python3 - <<'PY'
+          import zipfile
+          with zipfile.ZipFile('/tmp/r11-drive/verified.apk') as z: assert z.testzip() is None
+          PY
+      - name: Connect verified Drive file and display installed versus latest OWNER version
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git fetch origin main
+          git checkout -B main origin/main
+          python3 - <<'PY'
+          from pathlib import Path
+          import html,json,re
+          p=Path('moveicon-download.html');s=p.read_text()
+          old='https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/moveicon-owner-r11-v1.1.10/MoveIcon_OWNER_R11_1.1.10_SIGNED.apk'
+          new=Path('/tmp/r11-drive/url.txt').read_text().strip()
+          assert 'id="moveicon-owner-r11"' in s and s.count('id="moveicon-owner-apk"')==1
+          assert old in s or html.escape(new,quote=True) in s
+          s=s.replace(old,html.escape(new,quote=True))
+          s=s.replace('다운로드 완료 후 APK 열기 → 설치 또는 업데이트를 누르세요.','구글 드라이브에서 APK를 다운로드한 뒤 설치 또는 업데이트를 누르세요. Google 드라이브의 파일 검사 안내가 뜨면 내용을 확인하고 다운로드를 계속하세요.')
+          if 'id="owner-version-check"' not in s:
+              marker='<a id="moveicon-owner-apk"'
+              panel='''<div class="note" id="owner-version-check" data-latest="1.1.10" style="text-align:center">
+          <strong style="color:#ffe39a">최종 배포 버전: OWNER R11 · 1.1.10</strong>
+          <p id="owner-version-status" role="status" aria-live="polite">현재 설치 버전은 웹페이지에서 자동으로 확인할 수 없습니다. 기존 OWNER 앱 업데이트 화면의 버전을 입력하면 비교합니다.</p>
+          <label for="owner-installed-version" style="display:block;margin-bottom:6px">현재 설치된 OWNER 버전</label>
+          <input id="owner-installed-version" type="text" inputmode="decimal" placeholder="예: 1.1.10" autocomplete="off" style="width:100%;border:1px solid #648398;border-radius:8px;padding:12px;font-size:16px">
+          <button type="button" id="owner-check-version" style="width:100%;margin-top:8px;padding:12px;border-radius:8px;border:1px solid #648398;background:#145d72;color:white;font-size:16px;font-weight:800">현재 버전과 비교</button>
+          </div>
+          '''
+              s=s.replace(marker,panel+marker,1)
+              script='''<script id="owner-version-script">
+          (function(){
+            "use strict";
+            const panel=document.getElementById("owner-version-check");
+            const input=document.getElementById("owner-installed-version");
+            const status=document.getElementById("owner-version-status");
+            const download=document.getElementById("moveicon-owner-apk");
+            const latest=panel.dataset.latest;
+            function parse(v){const m=String(v||"").trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-OWNER)?$/i);return m?m.slice(1).map(Number):null}
+            function compare(a,b){for(let i=0;i<3;i++){if(a[i]!==b[i])return a[i]>b[i]?1:-1}return 0}
+            function check(){
+              const installed=parse(input.value),release=parse(latest);
+              if(!installed||!release){status.textContent="현재 OWNER 버전을 정확하게 입력해 주세요. 예: "+latest;download.style.display="block";return}
+              const order=compare(installed,release);
+              if(order>=0){status.textContent="현재 설치 버전: "+installed.join(".")+" · "+(order===0?"최신 버전입니다.":"배포 버전보다 최신입니다.")+" 추가 다운로드가 필요 없습니다.";download.style.display="none"}
+              else{status.textContent="현재 설치 버전: "+installed.join(".")+" · 새 OWNER 업데이트가 있습니다. 기존 앱을 삭제하지 말고 업데이트하세요.";download.style.display="block"}
+            }
+            document.getElementById("owner-check-version").addEventListener("click",check);
+            input.addEventListener("keydown",function(e){if(e.key==="Enter")check()});
+            const query=new URLSearchParams(location.search).get("ownerInstalled");
+            if(query){input.value=query;check()}
+          })();
+          </script>'''
+              s=s.replace('</body>',script+'\n</body>',1)
+          assert 'Hanghae_MoveIcon_v1.0.79.apk' in s and 'hanghae-freedom-distribution.html' not in s
+          p.write_text(s)
+          manifest={'channel':'owner','available':True,'package':'com.navigator.freedom.moveicon.owner','versionName':'1.1.10-OWNER','versionCode':1100011,'release':'R11','apkUrl':new,'sha256':'bbf1b9ea152d929cfc78bdde5a71d0dc207ead04465fc61e8331e071e1a739f9','sizeBytes':48763042,'ownerCertificateSha256':'2716bfb38ed089c8a039d73be92db5000ddaf85b70f0e5d8689bd537da303b3e','deviceTested':False}
+          Path('moveicon-owner-release.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
+          PY
+          git add moveicon-download.html moveicon-owner-release.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Connect verified Drive OWNER R11 and show current/latest version comparison'
+          git push origin HEAD:main
