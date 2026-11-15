@@ -1,0 +1,57 @@
+name: Publish verified MoveIcon OWNER R10 direct APK
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/publish-moveicon-owner-r10-direct.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch public APK and verify exact approved bytes
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet gdown
+          mkdir -p /tmp/moveicon-release
+          gdown 'https://drive.google.com/uc?id=1e_kSWQ0PopAMdkJLr51bQkQM9M-phaaq' -O /tmp/moveicon-release/MoveIcon_OWNER_R10_1.1.9_SIGNED.apk
+          echo '2c7fc0d5ef601587730589e1931e10db54f9e427ce6e7a398c7d9ebc2b335ba7  /tmp/moveicon-release/MoveIcon_OWNER_R10_1.1.9_SIGNED.apk' | sha256sum -c -
+          test "$(stat -c%s /tmp/moveicon-release/MoveIcon_OWNER_R10_1.1.9_SIGNED.apk)" = 48763042
+      - name: Publish signed APK only and test anonymous download
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG=moveicon-owner-r10-v1.1.9
+          APK=/tmp/moveicon-release/MoveIcon_OWNER_R10_1.1.9_SIGNED.apk
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$APK" --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$TAG" "$APK" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'MoveIcon OWNER R10 1.1.9' --notes 'Verified permanent OWNER signed APK. Existing public stable package remains separate. Only installation APK is published.' --latest=false
+          fi
+          curl --fail --location --retry 3 'https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/moveicon-owner-r10-v1.1.9/MoveIcon_OWNER_R10_1.1.9_SIGNED.apk' -o /tmp/moveicon-release/recheck.apk
+          echo '2c7fc0d5ef601587730589e1931e10db54f9e427ce6e7a398c7d9ebc2b335ba7  /tmp/moveicon-release/recheck.apk' | sha256sum -c -
+      - name: Switch official page only after anonymous APK verification
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git fetch origin main
+          git checkout -B main origin/main
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('moveicon-download.html')
+          s=p.read_text()
+          old='href="https://drive.google.com/file/d/1e_kSWQ0PopAMdkJLr51bQkQM9M-phaaq/view?usp=drivesdk" target="_blank" rel="noopener"'
+          new='href="https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/moveicon-owner-r10-v1.1.9/MoveIcon_OWNER_R10_1.1.9_SIGNED.apk" download="MoveIcon_OWNER_R10_1.1.9_SIGNED.apk"'
+          if 'id="moveicon-owner-r10"' not in s or s.count(old)!=1: raise SystemExit('R10 link no longer current; preserve newer page')
+          s=s.replace(old,new).replace('⬇ OWNER R10 최신 APK 다운로드','⬇ OWNER R10 다운로드 및 설치')
+          s=s.replace('48.76 MB · 정식 OWNER 영구 서명','다운로드 완료 후 APK 열기 → 설치 또는 업데이트를 누르세요.<br>48.76 MB · 정식 OWNER 영구 서명')
+          p.write_text(s)
+          PY
+          git add moveicon-download.html
+          git commit -m 'Connect verified OWNER R10 public direct APK download'
+          git push origin HEAD:main
