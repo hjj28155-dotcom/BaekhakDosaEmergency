@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 47800,
-  "versionName": "4.78",
-  "apkUrl": "https://drive.google.com/file/d/148Nc47e4KfV_lDa3aujRopNtaBuEZyNL/view",
-  "notice": "⚓ 로또645 R4.78: 회차별 음성 프레젠테이션의 4개 분석방 각 슬라이드 상단에 저장된 당첨번호 6개와 보너스번호를 표시하고, 방별 예상수 및 실제 5조합에서 일치하는 번호를 색으로 강조합니다. 각 조합 옆에 당첨 등급과 적중 개수를 함께 표시하며 추첨 전/당첨자료가 없는 회차는 결과 미확인으로 표시합니다. 전 단계 R4.77의 모든 화면에 접근 가능한 프레젠테이션 바로가기 및 분석방 예상수 원장 구분 기능도 포함합니다. 기존 조합, 누적DB, 과거분석 기록은 보존합니다. 브라우저 4개 방 및 추첨 전 회차 표시 시험과 APK 소유자 서명 통과, 실제 Android 실기기 검증 미완료. 음성 재생 장애는 아직 별도 미해결입니다. Google Drive 파일은 소유자 전용이어서 일반 다운로드가 제한될 수 있습니다. 기존 앱 삭제 없이 덮어쓰기 설치하십시오.",
-  "noticeId": "R478-20261111-ROOM-SLIDE-WINNING-NUMBERS-AND-HIGHLIGHTS",
-  "publishedAt": "2026-11-11T09:20:00+09:00",
+  "versionCode": 72000,
+  "versionName": "6.75 (R680A)",
+  "apkUrl": "https://drive.google.com/file/d/1_UMeXPB5vg4ZMtxrSh-YBlkxB_0B9OWk/view",
+  "notice": "⚓ 항행의자유 LOTTO645 최신 수정판 R680A입니다. 기존 P2 분석 엔진과 네 분석방, 누적 성적 및 원장을 유지합니다. 홈 화면 업데이트 버튼 및 자동 알림, 당첨번호·성적 발표, 기존 여성 앵커 목소리와 제3회 성적 멘트를 보완했습니다. 기존 앱을 삭제하지 않고 업데이트 설치하십시오. APK는 현재 소유자 및 다운로드 권한을 받은 사용자만 접근할 수 있습니다. 권한이 없으면 소유자에게 요청하십시오.",
+  "noticeId": "R680A-20261116-UPDATE-72000",
+  "publishedAt": "2026-11-16T01:30:00+09:00",
   "enabled": true
 }
