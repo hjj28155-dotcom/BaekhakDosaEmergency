@@ -1,0 +1,66 @@
+name: Publish verified OWNER R12 direct fallback
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/publish-moveicon-owner-r12-direct.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch shared Drive R12 and verify exact approved APK
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet gdown
+          mkdir -p /tmp/owner-r12
+          gdown 'https://drive.google.com/uc?id=1e_kSWQ0PopAMdkJLr51bQkQM9M-phaaq' -O /tmp/owner-r12/MoveIcon_OWNER_R12_1.1.11_SIGNED.apk
+          echo 'cdf437358e72a049a12f046a7b8fa459641479898e6d74e6e28ea79d14f87ce2  /tmp/owner-r12/MoveIcon_OWNER_R12_1.1.11_SIGNED.apk' | sha256sum -c -
+          test "$(stat -c%s /tmp/owner-r12/MoveIcon_OWNER_R12_1.1.11_SIGNED.apk)" = 48763042
+      - name: Publish verified R12 APK and anonymously recheck it
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG=moveicon-owner-r12-v1.1.11
+          APK=/tmp/owner-r12/MoveIcon_OWNER_R12_1.1.11_SIGNED.apk
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$APK" --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$TAG" "$APK" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'MoveIcon OWNER R12 1.1.11' --notes 'Verified permanent OWNER signed APK. Installed version display and automatic release comparison. Device testing pending. Stable v1.0.79 remains separate.' --latest=false
+          fi
+          curl --fail --location --retry 5 --retry-delay 3 'https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/moveicon-owner-r12-v1.1.11/MoveIcon_OWNER_R12_1.1.11_SIGNED.apk' -o /tmp/owner-r12/recheck.apk
+          echo 'cdf437358e72a049a12f046a7b8fa459641479898e6d74e6e28ea79d14f87ce2  /tmp/owner-r12/recheck.apk' | sha256sum -c -
+      - name: Add verified R12 direct fallback without changing Drive primary
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git fetch origin main
+          git checkout -B main origin/main
+          python3 - <<'PY'
+          import json,re
+          from pathlib import Path
+          p=Path('moveicon-download.html')
+          m=Path('moveicon-owner-release.json')
+          j=json.loads(m.read_text())
+          if j.get('versionCode')!=1100012 or j.get('sha256')!='cdf437358e72a049a12f046a7b8fa459641479898e6d74e6e28ea79d14f87ce2':
+              raise SystemExit('A newer release is current; preserve it')
+          s=p.read_text()
+          if 'id="moveicon-owner-r12"' not in s: raise SystemExit('Unexpected page')
+          url='https://github.com/hjj28155-dotcom/BaekhakDosaEmergency/releases/download/moveicon-owner-r12-v1.1.11/MoveIcon_OWNER_R12_1.1.11_SIGNED.apk'
+          pat=r'<div id="owner-download-fallback"[\s\S]*?</div>'
+          new='<div id="owner-download-fallback" class="note" style="text-align:center"><strong>드라이브 다운로드 오류가 발생할 경우</strong><br><a id="moveicon-owner-fallback" class="btn" href="'+url+'" download="MoveIcon_OWNER_R12_1.1.11_SIGNED.apk" style="background:#17639a">⬇ 동일 R12 APK 직접 다운로드 (대체)</a><small>드라이브와 SHA-256이 동일한 정식 서명 파일입니다. 기존 앱을 삭제하지 마세요.</small></div>'
+          s,n=re.subn(pat,lambda _:new,s)
+          if n!=1: raise SystemExit('Fallback section missing or duplicated')
+          p.write_text(s)
+          j['fallbackUrl']=url
+          m.write_text(json.dumps(j,indent=2)+'\n')
+          PY
+          git add moveicon-download.html moveicon-owner-release.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Add verified OWNER R12 GitHub fallback; keep Drive primary'
+          git push origin HEAD:main
