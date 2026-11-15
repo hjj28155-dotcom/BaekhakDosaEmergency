@@ -1,0 +1,67 @@
+name: Publish verified MoveIcon OWNER R13 645 FINAL
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/publish-moveicon-owner-r13.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: moveicon-owner-production
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Recover exact previously verified signed R13 from four Drive parts
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet gdown
+          mkdir -p /tmp/r13
+          cd /tmp/r13
+          gdown 'https://drive.google.com/uc?id=1H0ppo9UZGG_r0-ANpiMYkzm_4TCrdjqX' -O p01
+          gdown 'https://drive.google.com/uc?id=1hI-eNQ2qrz6cxG1HyxrjiZtCssg4FW1P' -O p02
+          gdown 'https://drive.google.com/uc?id=1mqy1Qy-u28JR_4CWkiL4_XPHIzPZ6zjv' -O p03
+          gdown 'https://drive.google.com/uc?id=12QaIgnlnJCVQmgD6t8jTwTnc1leUjHS3' -O p04
+          sha256sum -c <<'EOF'
+          9d2b2d77c63194b016da46a175c511cc656185b2d998ec4205fdae1b0def42ad  p01
+          5f2648ee45bc578632f5c3f02ee2cc3b1d909633e21b9c3731c7d98c1adfd3a0  p02
+          3861a83b5f218a94c3eb2ae09e767db811cdf8adac4f959d34d53bbf6a02ec19  p03
+          2faabf54e1dd8f940d581072f4ee023c076b9efbfd3e75446cf34c725500de60  p04
+          EOF
+          cat p01 p02 p03 p04 > MoveIcon_OWNER_R13_1.1.12_645_FINAL_SIGNED.apk
+          echo 'b85756a5911047d204e0b0e9b2b9bf2e538d6595e32d416fa29f666512fd164b  MoveIcon_OWNER_R13_1.1.12_645_FINAL_SIGNED.apk' | sha256sum -c -
+          test "$(stat -c%s MoveIcon_OWNER_R13_1.1.12_645_FINAL_SIGNED.apk)" = 148787966
+          python3 -c "import zipfile; z=zipfile.ZipFile('MoveIcon_OWNER_R13_1.1.12_645_FINAL_SIGNED.apk'); assert z.testzip() is None"
+      - name: Publish immutable APK and verify anonymous direct download
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG=moveicon-owner-r13-v1.1.12-645-final
+          APK=/tmp/r13/MoveIcon_OWNER_R13_1.1.12_645_FINAL_SIGNED.apk
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$TAG" "$APK" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'MoveIcon OWNER R13 1.1.12 645 FINAL' --notes 'Exact permanent-OWNER signed APK; embedded LOTTO645 R678 (71700). Android device test pending. Existing OWNER app must be updated in place. General public channel unchanged.' --latest=false
+          fi
+          URL="https://github.com/$GITHUB_REPOSITORY/releases/download/$TAG/$(basename "$APK")"
+          curl --fail --location --retry 5 --retry-delay 3 "$URL" -o /tmp/r13/recheck.apk
+          echo 'b85756a5911047d204e0b0e9b2b9bf2e538d6595e32d416fa29f666512fd164b  /tmp/r13/recheck.apk' | sha256sum -c -
+          test "$(stat -c%s /tmp/r13/recheck.apk)" = 148787966
+      - name: Advance OWNER version and download page together only after verified release
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git fetch origin main
+          git checkout -B main origin/main
+          python3 scripts/publish_moveicon_owner_r13.py
+          git add moveicon-owner-release.json moveicon-download.html
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish verified OWNER R13 1.1.12; preserve R12 release and public channel'
+            git push origin HEAD:main
+          fi
