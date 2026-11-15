@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 72000,
-  "versionName": "6.75 (R680A)",
-  "apkUrl": "https://drive.google.com/file/d/1_UMeXPB5vg4ZMtxrSh-YBlkxB_0B9OWk/view",
-  "notice": "⚓ 항행의자유 LOTTO645 최신 수정판 R680A입니다. 기존 P2 분석 엔진과 네 분석방, 누적 성적 및 원장을 유지합니다. 홈 화면 업데이트 버튼 및 자동 알림, 당첨번호·성적 발표, 기존 여성 앵커 목소리와 제3회 성적 멘트를 보완했습니다. 기존 앱을 삭제하지 않고 업데이트 설치하십시오. APK는 현재 소유자 및 다운로드 권한을 받은 사용자만 접근할 수 있습니다. 권한이 없으면 소유자에게 요청하십시오.",
-  "noticeId": "R680A-20261116-UPDATE-72000",
-  "publishedAt": "2026-11-16T01:30:00+09:00",
+  "versionCode": 72100,
+  "versionName": "6.75 (R680B)",
+  "apkUrl": "https://drive.google.com/file/d/1eHytNWjPK25qCNh9KCMl6FVYLkgcVh2i/view",
+  "notice": "⚓ 항행의자유 LOTTO645 R680B 새 버전입니다. 앱 실행 및 홈 화면 복귀 시 업데이트 확인을 개선하고 서버 연결 실패·응답 지연 시 보조 확인 경로를 추가했습니다. 기존 P2 분석 엔진, 방송국의 여성 앵커 음성, 분석 조합, 누적 성적과 원장은 그대로 유지합니다. 기존 앱을 삭제하지 말고 업데이트 설치하십시오. 다운로드 권한이 없으면 소유자에게 요청하십시오.",
+  "noticeId": "R680B-20261116-UPDATE-72100",
+  "publishedAt": "2026-11-16T01:49:00+09:00",
   "enabled": true
 }
