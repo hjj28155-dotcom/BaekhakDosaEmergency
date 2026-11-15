@@ -1,4 +1,4 @@
-name: Audit live MoveIcon public routes
+name: Audit live MoveIcon legacy recovery and browser navigation
 on:
   push:
     branches: ['audit/moveicon-live-pages-20261115']
@@ -9,40 +9,78 @@ permissions:
 jobs:
   audit:
     runs-on: ubuntu-latest
+    timeout-minutes: 8
     steps:
-      - name: Inspect live public HTTP and Pages deployment
+      - name: Inspect deployed source and real browser navigation
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           python3 - <<'PY'
-          import urllib.request, urllib.error, json, hashlib, os, datetime
+          import urllib.request, json, hashlib, os, datetime, re, subprocess, shutil, time, tempfile
           base='https://hjj28155-dotcom.github.io/BaekhakDosaEmergency/'
-          result={'checked_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'run_id':os.environ['GITHUB_RUN_ID'],'source_commit':os.environ['GITHUB_SHA'],'checks':[]}
-          for p in ['moveicon.html','moveicon.html?verify=20261115-r10','moveicon-download.html','moveicon-download.html?from=legacy-moveicon-share','hanghae-freedom-distribution.html','index.html?v=40033-r12-installvideo-v18']:
-              row={'path':p}
+          expected='MOVEICON-LEGACY-RECOVERY-20261115'
+          result={'run_id':os.environ['GITHUB_RUN_ID'],'checked_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'expected_production_commit':'d32115f3be0feb27dc57f8d17d854ddf5619bcba','checks':[],'browser_checks':[]}
+          def get(path):
+              req=urllib.request.Request(base+path,headers={'User-Agent':'MoveIcon-Deployment-Audit/2.0','Cache-Control':'no-cache'})
+              with urllib.request.urlopen(req,timeout=20) as r:
+                  raw=r.read()
+                  return raw.decode('utf-8','replace'),r.status,dict(r.headers.items())
+          def api(path):
+              req=urllib.request.Request('https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']+'/'+path,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','User-Agent':'MoveIcon-Deployment-Audit'})
+              with urllib.request.urlopen(req,timeout=20) as r: return json.load(r)
+          for attempt in range(18):
               try:
-                  req=urllib.request.Request(base+p,headers={'User-Agent':'MoveIcon-Deployment-Audit/1.0','Cache-Control':'no-cache'})
-                  with urllib.request.urlopen(req,timeout=25) as r:
-                      raw=r.read(); body=raw.decode('utf-8','replace')
-                      row.update(status=r.status,final_url=r.url,sha256=hashlib.sha256(raw).hexdigest(),last_modified=r.headers.get('Last-Modified'),age=r.headers.get('Age'),etag=r.headers.get('ETag'),owner_r10='OWNER R10' in body,legacy_download='legacyMoveiconDownload' in body,freedom_redirect="location.replace('./hanghae-freedom-distribution.html')" in body,scroll='환영 두루마리' in body,download_route='./moveicon-download.html' in body)
-              except Exception as e: row['error']=str(e)
-              result['checks'].append(row)
-          for name in ['pages','pages/builds/latest']:
+                  body,status,headers=get('hanghae-freedom-distribution.html?audit=recovery-20261115')
+                  if expected in body: break
+              except Exception as e: print(str(e))
+              if attempt<17: time.sleep(10)
+          result['production_marker_present']=expected in body if 'body' in locals() else False
+          for path in ['moveicon.html','moveicon.html?verify=20261115-r10','moveicon-download.html','moveicon-download.html?from=legacy-moveicon-share','hanghae-freedom-distribution.html','index.html?v=40033-r12-installvideo-v18','hanghae-moveicon.html']:
               try:
-                  req=urllib.request.Request('https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']+'/'+name,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','User-Agent':'MoveIcon-Deployment-Audit'})
-                  with urllib.request.urlopen(req,timeout=20) as r: result[name]=json.load(r)
-              except Exception as e: result[name]={'error':str(e)}
-          open('/tmp/moveicon-live-report.json','w').write(json.dumps(result,ensure_ascii=False,indent=2))
+                  body,status,headers=get(path)
+                  result['checks'].append({'path':path,'status':status,'sha256':hashlib.sha256(body.encode()).hexdigest(),'owner_r10': 'id="moveicon-owner-r10"' in body,'legacy_download':'legacyMoveiconDownload' in body,'freedom_redirect':"location.replace('./hanghae-freedom-distribution.html')" in body,'recovery_marker':expected in body,'scroll':'환영 두루마리' in body,'last_modified':headers.get('Last-Modified')})
+              except Exception as e: result['checks'].append({'path':path,'error':str(e)})
+          try:
+              result['pages_build']=api('pages/builds/latest')
+          except Exception as e: result['pages_build']={'error':str(e)}
+          try:
+              body,_,_=get('hanghae-freedom-distribution.html?audit=legacy-script')
+              script=re.search(r'<script id="legacy-moveicon-download-route">([\s\S]*?)</script>',body).group(1)
+              tests=[
+                  ('cached legacy moveicon referrer','',base+'moveicon.html',True),
+                  ('cached legacy referrer with query','',base+'moveicon.html?old=1',True),
+                  ('known legacy source query','?from=moveicon-v1079','',True),
+                  ('ordinary Freedom visit','','',False),
+                  ('manual Freedom from official download','',base+'moveicon-download.html',False),
+                  ('explicit Freedom choice','?intent=freedom',base+'moveicon.html',False),
+                  ('external lookalike referrer','','https://other.example/BaekhakDosaEmergency/moveicon.html',False)]
+              runner='const vm=require("vm"); const fs=require("fs"); const x=JSON.parse(fs.readFileSync(0,"utf8")); const out=x.tests.map(([name,query,referrer,expected])=>{let target=null;const location={href:x.base+"hanghae-freedom-distribution.html"+query,replace:v=>target=v};vm.runInNewContext(x.script,{URL,URLSearchParams,location,document:{referrer}});const ok=expected?target===x.base+"moveicon-download.html?from=legacy-moveicon-recovery":target===null;return {name,expected,target,ok};});console.log(JSON.stringify(out));'
+              p=subprocess.run(['node','-e',runner],input=json.dumps({'script':script,'tests':tests,'base':base}),text=True,capture_output=True,check=True)
+              result['recovery_script_tests']=json.loads(p.stdout)
+          except Exception as e: result['recovery_script_error']=str(e)
+          chrome=shutil.which('google-chrome') or shutil.which('chromium') or shutil.which('chromium-browser')
+          if chrome:
+              for path,expect_owner in [('moveicon.html',True),('moveicon.html?verify=20261115-r10',True),('index.html?v=40033-r12-installvideo-v18',True),('hanghae-moveicon.html',True),('hanghae-freedom-distribution.html?from=moveicon-v1079',True),('hanghae-freedom-distribution.html',False)]:
+                  try:
+                      with tempfile.TemporaryDirectory() as profile:
+                          p=subprocess.run([chrome,'--headless','--no-sandbox','--disable-dev-shm-usage','--disable-gpu','--no-first-run','--user-data-dir='+profile,'--virtual-time-budget=3000','--dump-dom',base+path],capture_output=True,text=True,timeout=25)
+                      owner='id="moveicon-owner-r10"' in p.stdout
+                      scroll='id="step1"' in p.stdout and '환영 두루마리' in p.stdout
+                      result['browser_checks'].append({'path':path,'owner_r10':owner,'freedom_scroll':scroll,'expected_owner':expect_owner,'exit':p.returncode,'ok':p.returncode==0 and (owner and not scroll if expect_owner else scroll)})
+                  except Exception as e: result['browser_checks'].append({'path':path,'error':str(e),'ok':False})
+          else: result['browser_error']='Chrome not installed'
+          result['completed_at']=datetime.datetime.now(datetime.timezone.utc).isoformat()
+          open('/tmp/moveicon-recovery-report.json','w').write(json.dumps(result,ensure_ascii=False,indent=2))
           print(json.dumps(result,ensure_ascii=False,indent=2))
           PY
-      - name: Preserve diagnostic report on audit branch
+      - name: Preserve recovery audit results
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           python3 - <<'PY'
           import os, json, base64, urllib.request
-          content=base64.b64encode(open('/tmp/moveicon-live-report.json','rb').read()).decode()
-          data=json.dumps({'message':'Record live MoveIcon deployment audit [skip ci]','content':content,'branch':os.environ['GITHUB_REF_NAME']}).encode()
-          req=urllib.request.Request('https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']+'/contents/audit/moveicon-live-report.json',data=data,method='PUT',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','User-Agent':'MoveIcon-Deployment-Audit','Content-Type':'application/json'})
+          content=base64.b64encode(open('/tmp/moveicon-recovery-report.json','rb').read()).decode()
+          data=json.dumps({'message':'Record live MoveIcon browser and recovery audit [skip ci]','content':content,'branch':os.environ['GITHUB_REF_NAME']}).encode()
+          req=urllib.request.Request('https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']+'/contents/audit/moveicon-live-recovery-report.json',data=data,method='PUT',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','User-Agent':'MoveIcon-Deployment-Audit','Content-Type':'application/json'})
           with urllib.request.urlopen(req,timeout=25) as r: print('Report saved',r.status)
           PY
