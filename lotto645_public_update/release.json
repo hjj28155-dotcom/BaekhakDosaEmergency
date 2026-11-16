@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 73100,
-  "versionName": "6.75 (R680L)",
-  "apkUrl": "https://drive.google.com/file/d/1R1tjq9ckhgE_YhA0PzboTDqtPDXc9JJc/view",
-  "notice": "⚓ 항행의자유 LOTTO645 R680L 업데이트입니다. 하단 중복 조합표를 제거하고 앵커의 말하는 모습과 대기 표정 전환, 발표판 사이 부드러운 연결, 음성 조각의 연결 및 멘트 간격을 개선했습니다. 기존 분석 엔진·조합·누적기록은 그대로 유지됩니다. 각 기기의 통합 원장을 백업한 후 기존 앱을 삭제하지 말고 업데이트 설치하십시오. 다운로드 권한이 없으면 소유자에게 요청하십시오.",
-  "noticeId": "R680L-20261116-BROADCAST-REFINEMENT-73100",
-  "publishedAt": "2026-11-16T04:58:00+09:00",
+  "versionCode": 73500,
+  "versionName": "6.75 (R680Q)",
+  "apkUrl": "https://drive.google.com/file/d/1K-LttaPgJfB_-BXGkSwcr6XaIPthxE2E/view",
+  "notice": "⚓ 항행의자유 LOTTO645 R680Q 오션뷰 방송국 업데이트입니다. 승인된 오션뷰 전망대, 실제 발화 앵커 오프닝, R10형 대형 조합 발표판, 방송 종료 후 상세 성적표 연결을 개선했습니다. 기존 P2 엔진과 기기별 독립 조합·누적기록은 유지됩니다. 각 기기의 통합 원장을 백업한 후 기존 앱을 삭제하지 말고 업데이트 설치하십시오. 다운로드 권한이 없으면 소유자에게 요청하십시오.",
+  "noticeId": "R680Q-20261116-OCEAN-BROADCAST-73500",
+  "publishedAt": "2026-11-16T11:40:00+09:00",
   "enabled": true
 }
