@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 75000,
-  "versionName": "6.75 (R681F)",
-  "apkUrl": "https://drive.google.com/file/d/1HYmYcQvJusWhCgoNB17Qm3FgR-0wUtcn/view",
-  "notice": "⚓ 항행의자유 LOTTO645 R681F(75000) 방송 최종 성적 인사 중복 수정판입니다. 최종 종합 성적 화면에서 오프닝 인사와 시작용 음성을 제외하고, 당첨일 때는 축하·낙첨일 때는 위로 안내로 각각 마무리하도록 조정했습니다. 4개 분석방의 기존 5조합 성적 발표는 유지하며 감사 인사는 최종 방송 끝에서 한 번만 출력되도록 코드 시험했습니다. P2 엔진과 누적 원장은 수정하지 않았습니다. 업데이트 전에 앱 내 전체 원장 백업을 저장하고 기존 앱을 삭제하지 말고 설치하십시오. 선장폰 실제 음성 재생 검증은 완료되지 않았습니다.",
-  "noticeId": "R681F-20261117-FINAL-GREETING-FIX-75000",
-  "publishedAt": "2026-11-17T16:55:00+09:00",
+  "versionCode": 75100,
+  "versionName": "6.75 (R681F 성적발표 중복방지)",
+  "apkUrl": "https://drive.google.com/file/d/1o3cjCtYoGZfYwNFyTT8plZJBrRjPhY58/view",
+  "notice": "⚓ 항행의자유 LOTTO645 R681F 성적발표 중복방지 업데이트(75100)입니다. 마지막 종합 성적 음성이 끝나면 같은 성적표가 무음으로 다시 나타나는 자동 상세 성적표 전환을 제거했습니다. 상세 성적표는 화면 버튼으로 직접 열 수 있습니다. 기존 R681F 방송 음성·4개 분석방·P2 엔진·누적 원장은 보존했습니다. 업데이트 전에 앱 내 전체 원장을 백업하고 기존 앱을 삭제하지 말고 덮어쓰기 설치하십시오. 실제 선장폰 설치 및 스피커 청취는 아직 확인되지 않았습니다.",
+  "noticeId": "R681F-20261117-FINAL-SCORE-ONCE-75100",
+  "publishedAt": "2026-11-17T18:00:00+09:00",
   "enabled": true
 }
