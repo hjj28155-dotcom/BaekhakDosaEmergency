@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 75200,
-  "versionName": "6.75 (R681F 낙첨 멘트 수정)",
+  "versionCode": 75300,
+  "versionName": "6.75 (R681F P3 엔진 연구기능 추가)",
   "apkUrl": "https://drive.google.com/file/d/1QgxHy_hLYVjCL99qV7fgBkW5nPMxMgjQ/view",
-  "notice": "⚓ 선장 최종승인 LOTTO645 R681F 낙첨 멘트 수정판(75200)입니다. 낙첨 결과 뒤 어색하게 이어지던 추가 응원 멘트를 제외하고 결과 안내와 감사 인사를 자연스럽게 연결했습니다. 최종 감사 인사는 한 번만 나오도록 유지하며 당첨 축하 멘트·기존 P2 엔진·누적 원장·방송국 자산은 보존했습니다. 앱 내 누적 원장을 먼저 백업하고 기존 앱을 삭제하지 말고 업데이트 설치하십시오.",
-  "noticeId": "R681F-20261117-LOSS-NARRATION-APPROVED-75200",
-  "publishedAt": "2026-11-17T18:21:00+09:00",
+  "notice": "⚓ LOTTO645 75300 업데이트: 신규 P3 연구 엔진과 P2 비교 기능을 추가했습니다. 기존 P2 기본 운영 엔진과 방송·누적 DB는 유지합니다. P3 성적 향상은 아직 독립적으로 입증되지 않았습니다. 기존 앱을 삭제하지 말고 누적 DB를 먼저 백업한 후 업데이트 설치하십시오.",
+  "noticeId": "R681F-20261118-P3-RESEARCH-75300",
+  "publishedAt": "2026-11-18T21:30:00+09:00",
   "enabled": true
 }
