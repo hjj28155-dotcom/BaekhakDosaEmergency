@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 75300,
-  "versionName": "6.75 (R681F P3 엔진 연구기능 추가)",
+  "versionCode": 75301,
+  "versionName": "6.75 (R681F 업데이트 안내 반복 오류 수정)",
   "apkUrl": "https://drive.google.com/file/d/1QgxHy_hLYVjCL99qV7fgBkW5nPMxMgjQ/view",
-  "notice": "⚓ LOTTO645 75300 업데이트: 신규 P3 연구 엔진과 P2 비교 기능을 추가했습니다. 기존 P2 기본 운영 엔진과 방송·누적 DB는 유지합니다. P3 성적 향상은 아직 독립적으로 입증되지 않았습니다. 기존 앱을 삭제하지 말고 누적 DB를 먼저 백업한 후 업데이트 설치하십시오.",
-  "noticeId": "R681F-20261118-P3-RESEARCH-75300",
-  "publishedAt": "2026-11-18T21:30:00+09:00",
+  "notice": "⚓ LOTTO645 75301 안정화 업데이트: 이전 75300의 업데이트 알림이 반복되는 버전 판정 오류를 수정했습니다. 기존 P2 운영 엔진, P3 연구 기능, 잠금·영수증·누적 DB는 변경하지 않았습니다. 기존 앱을 삭제하지 말고 원장을 백업한 후 덮어쓰기 업데이트하십시오. 당첨확률 향상판이 아닙니다.",
+  "noticeId": "R681F-20261119-UPDATE-POPUP-FIX-75301",
+  "publishedAt": "2026-11-19T12:36:00+09:00",
   "enabled": true
 }
