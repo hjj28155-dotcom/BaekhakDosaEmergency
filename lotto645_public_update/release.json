@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 75301,
-  "versionName": "6.75 (R681F 업데이트 안내 반복 오류 수정)",
+  "versionCode": 75304,
+  "versionName": "6.75 (R681F 축하·낙첨 음성 정상화)",
   "apkUrl": "https://drive.google.com/file/d/1QgxHy_hLYVjCL99qV7fgBkW5nPMxMgjQ/view",
-  "notice": "⚓ LOTTO645 75301 안정화 업데이트: 이전 75300의 업데이트 알림이 반복되는 버전 판정 오류를 수정했습니다. 기존 P2 운영 엔진, P3 연구 기능, 잠금·영수증·누적 DB는 변경하지 않았습니다. 기존 앱을 삭제하지 말고 원장을 백업한 후 덮어쓰기 업데이트하십시오. 당첨확률 향상판이 아닙니다.",
-  "noticeId": "R681F-20261119-UPDATE-POPUP-FIX-75301",
-  "publishedAt": "2026-11-19T12:36:00+09:00",
+  "notice": "⚓ LOTTO645 75304 정식 업데이트: 축하 및 낙첨 팝업의 음성 멘트를 화면 문구와 일치시키고 안드로이드 음성합성 연결을 수정했습니다. 선장님 휴대전화에서 정상 동작 확인 후 배포합니다. 기존 엔진·구매기록·누적 DB를 보존하고 앱 삭제 없이 덮어쓰기 설치하십시오. 당첨확률 향상판은 아닙니다.",
+  "noticeId": "R681F-20261119-VOICE-POPUP-FIX-75304",
+  "publishedAt": "2026-11-19T18:55:45+09:00",
   "enabled": true
 }
