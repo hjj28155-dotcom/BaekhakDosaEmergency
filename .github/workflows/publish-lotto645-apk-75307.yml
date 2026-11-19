@@ -1,0 +1,28 @@
+name: Publish LOTTO645 75307 direct-download APK
+
+on:
+  push:
+    paths:
+      - '.github/workflows/publish-lotto645-apk-75307.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Install Google Drive downloader
+        run: python -m pip install --quiet gdown==5.2.0
+      - name: Retrieve existing verified public APK
+        run: |
+          gdown --id 1QgxHy_hLYVjCL99qV7fgBkW5nPMxMgjQ -O LOTTO645_75307.apk
+          echo 'edfa5a29ba2cca116d2c150c4debf100818c93351bc16f381db95c01208f6119  LOTTO645_75307.apk' | sha256sum --check
+      - name: Publish release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view v75307 >/dev/null 2>&1 || gh release create v75307 --repo ${{ github.repository }} --title "LOTTO645 75307 정식 배포" --notes "방송 직행 · 업데이트 안내 유지 · 방송 전 홈 버튼 숨김 · 방송 종료 후 홈 표시. 기존 DB 보존. SHA256 edfa5a29ba2cca116d2c150c4debf100818c93351bc16f381db95c01208f6119"
+          gh release upload v75307 LOTTO645_75307.apk --clobber --repo ${{ github.repository }}
