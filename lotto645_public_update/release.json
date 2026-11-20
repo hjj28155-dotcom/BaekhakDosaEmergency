@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 75309,
-  "versionName": "6.75 (R16.0 1~1250회 휴대전화 재분석 추가)",
-  "apkUrl": "https://drive.google.com/file/d/1v9_9GWijVvUJHLpBX4w9X2PPrnr4LFBE/view",
-  "notice": "⚓ LOTTO645 75309 업데이트: 기존 75307을 유지한 채 R16.0 1~1250회 사후 재분석 화면이 추가되었습니다. 홈의 과거회차 분석을 누르면 R16.0 조합 20장 조회와 1,249회 전체 재채점을 실행할 수 있습니다(951회 원장 누락). 기존 P2 방송 엔진과 누적 DB는 삭제·변경하지 않습니다. 기존 앱을 삭제하지 말고 원장 백업 후 덮어쓰기 업데이트하십시오. 이는 미래 당첨확률 향상 증명이 아니며 실제 단말 동작은 아직 확인 중입니다.",
-  "noticeId": "R16-20261120-75309-RETROSPECTIVE-REANALYSIS",
-  "publishedAt": "2026-11-20T22:22:35+09:00",
+  "versionCode": 75310,
+  "versionName": "6.75 (R16.0 기존 분석·성적·누적DB 활성 전환, 기존 홈 유지)",
+  "apkUrl": "https://drive.google.com/file/d/1p-qwSstvqfd7i7JidDHnlfCWdzAGk2c9/view",
+  "notice": "⚓ 로또645 75310 수정 업데이트: 기존 홈화면 유지, 추가된 R16.0 별도 버튼 제거. 기존 과거회차 분석·성적관리·누적DB·과거 분석 방송이 R16.0 1~1250회 연구 조합을 활성 자료로 사용합니다(951회 원장 누락). 기기 내 P2/실구매/1251회 확정 조합은 삭제하거나 변경하지 않습니다. 앱 내부 원장 백업 후 기존 앱 위에 덮어쓰기 업데이트하십시오. 실기기 기능은 아직 검증되지 않았으며 미래 당첨률 향상 증명이 아닙니다.",
+  "noticeId": "R16-20261120-75310-NATIVE-HISTORY-REPLACEMENT",
+  "publishedAt": "2026-11-20T23:54:00+09:00",
   "enabled": true
 }
