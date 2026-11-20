@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 75307,
-  "versionName": "6.75 (R681F 방송 직행·방송 전 홈버튼 숨김·방송 후 홈 복귀)",
-  "apkUrl": "https://drive.google.com/file/d/1QgxHy_hLYVjCL99qV7fgBkW5nPMxMgjQ/view",
-  "notice": "⚓ LOTTO645 75307 정식 업데이트: 앱 실행 시 업데이트 안내를 먼저 표시하고 저장된 회차 방송 화면으로 바로 진입합니다. 방송 전에는 홈화면 버튼을 숨기고 방송 종료 후 홈화면과 버튼을 표시합니다. 75305 엔진 분석 기록·PC 비교 기능을 포함하며 기존 엔진·누적 DB는 보존합니다. 앱을 삭제하지 않고 덮어쓰기 업데이트하십시오. 당첨확률 향상판이 아닙니다.",
-  "noticeId": "R681F-20261119-BROADCAST-STARTUP-75307",
-  "publishedAt": "2026-11-19T21:43:10+09:00",
+  "versionCode": 75309,
+  "versionName": "6.75 (R16.0 1~1250회 휴대전화 재분석 추가)",
+  "apkUrl": "https://drive.google.com/file/d/1v9_9GWijVvUJHLpBX4w9X2PPrnr4LFBE/view",
+  "notice": "⚓ LOTTO645 75309 업데이트: 기존 75307을 유지한 채 R16.0 1~1250회 사후 재분석 화면이 추가되었습니다. 홈의 과거회차 분석을 누르면 R16.0 조합 20장 조회와 1,249회 전체 재채점을 실행할 수 있습니다(951회 원장 누락). 기존 P2 방송 엔진과 누적 DB는 삭제·변경하지 않습니다. 기존 앱을 삭제하지 말고 원장 백업 후 덮어쓰기 업데이트하십시오. 이는 미래 당첨확률 향상 증명이 아니며 실제 단말 동작은 아직 확인 중입니다.",
+  "noticeId": "R16-20261120-75309-RETROSPECTIVE-REANALYSIS",
+  "publishedAt": "2026-11-20T22:22:35+09:00",
   "enabled": true
 }
