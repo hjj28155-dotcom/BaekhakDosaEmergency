@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 75310,
-  "versionName": "6.75 (R16.0 기존 분석·성적·누적DB 활성 전환, 기존 홈 유지)",
-  "apkUrl": "https://drive.google.com/file/d/1p-qwSstvqfd7i7JidDHnlfCWdzAGk2c9/view",
-  "notice": "⚓ 로또645 75310 수정 업데이트: 기존 홈화면 유지, 추가된 R16.0 별도 버튼 제거. 기존 과거회차 분석·성적관리·누적DB·과거 분석 방송이 R16.0 1~1250회 연구 조합을 활성 자료로 사용합니다(951회 원장 누락). 기기 내 P2/실구매/1251회 확정 조합은 삭제하거나 변경하지 않습니다. 앱 내부 원장 백업 후 기존 앱 위에 덮어쓰기 업데이트하십시오. 실기기 기능은 아직 검증되지 않았으며 미래 당첨률 향상 증명이 아닙니다.",
-  "noticeId": "R16-20261120-75310-NATIVE-HISTORY-REPLACEMENT",
-  "publishedAt": "2026-11-20T23:54:00+09:00",
+  "versionCode": 75311,
+  "versionName": "6.75 (R16.0 P2 참고 후보 10·12수 화면 복구)",
+  "apkUrl": "https://drive.google.com/file/d/1em8Ds0bGJBkOcyzuqlCD-MZrZAEPLWo0/view",
+  "notice": "⚓ 로또645 75311 후보수 표시 복구: 75310에서 표시되지 않던 방별 기존 P2 기준 후보 10수·12수를 1~1250회(951회 원장 누락)의 과거 분석 화면과 전체방 PNG에 연결했습니다. R16.0은 방별 1~4조합에 P2 상위10수를 사용하고 5번째 조합은 전체45수에서 번호균형 보충하므로, 후보10·12수는 P2 기준 참고자료입니다. 기존 홈·R16 20조합·성적관리·누적DB·1251회 확정 조합·실구매 자료는 변경하지 않습니다. 원장 백업 후 기존 앱을 삭제하지 말고 덮어쓰기 업데이트하십시오. 실제 단말 최종 확인은 필요합니다.",
+  "noticeId": "R16-20261121-75311-P2-CANDIDATES-RESTORED",
+  "publishedAt": "2026-11-21T03:15:00+09:00",
   "enabled": true
 }
