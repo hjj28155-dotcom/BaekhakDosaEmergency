@@ -1,0 +1,12 @@
+{
+  "schema": "lotto645-update-v1",
+  "packageName": "com.hanghae.lotto645",
+  "versionCode": 75321,
+  "versionName": "6.75.321 (4방 공동후보12수 V2 시험후보)",
+  "apkUrl": "https://drive.google.com/file/d/1IQB-DRKatjBXu3nuv-WWDKv7CewWg0oS/view",
+  "notice": "검증용 후보판: 기존 설치자 DB 보존 및 안드로이드 덮어쓰기 실기기 검사 전. 전체 배포 금지.",
+  "noticeId": "LOTTO645-75321-STAGING-20261122",
+  "enabled": false,
+  "validationStatus": "STATIC_TEST_ONLY",
+  "productionRelease": false
+}
