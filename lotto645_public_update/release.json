@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 75341,
-  "versionName": "6.75 (75341 · 14수 B형 공동검증 업데이트)",
+  "versionCode": 75342,
+  "versionName": "6.75 (75342 · 구형 시작화면 숨김 · 승인 홈 바로 실행)",
   "apkUrl": "https://drive.google.com/file/d/1em8Ds0bGJBkOcyzuqlCD-MZrZAEPLWo0/view",
-  "notice": "⚓ 로또645 75341 공동검증 업데이트 (전체 기기 다운로드 권한 복구). 기존 설치자는 앱에서 업데이트 안내를 열고 설치하십시오. 새로운 B14 14수·4개 독립 분석방·각 5조합 총 20조합으로 기기별 번호를 비교합니다. 설치 전 누적 DB와 기존 확정·구매 조합을 백업하고 기존 앱을 삭제하지 마십시오. 선장폰 및 여러 실기기의 덮어쓰기·DB 보존 검증은 아직 진행 전이며 이상이 있으면 설치를 중단하십시오.",
-  "noticeId": "LOTTO645-20261123-75341-B14-ALL-DEVICE-PUBLIC-DOWNLOAD-FIX",
-  "publishedAt": "2026-11-23T14:30:00+09:00",
+  "notice": "⚓ 로또645 V75342 시작 화면 수정. 앱 실행 시 '업데이트·원문 채팅방·기본메뉴' 구형 3버튼 화면을 표시하지 않고 기존 승인 로또645 홈을 바로 표시합니다. B14 다중기기 엔진, 4개 독립 분석방, 누적 DB·구매/확정 기록, 업데이트 기능은 그대로 유지합니다. 기존 앱을 삭제하지 말고 DB 백업 후 덮어쓰기 업데이트하십시오. 실기기 화면 동작·DB 보존은 아직 확인 전입니다.",
+  "noticeId": "LOTTO645-20261123-75342-HOME-LAUNCH-APPROVED",
+  "publishedAt": "2026-11-23T14:42:00+09:00",
   "enabled": true
 }
