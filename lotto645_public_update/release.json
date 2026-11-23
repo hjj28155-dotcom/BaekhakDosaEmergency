@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 75354,
-  "versionName": "6.75 (V75354 · 업데이트 반복 팝업 수정)",
+  "versionCode": 75355,
+  "versionName": "6.75 (V75355 · 50·51회 기기별 B14 후보 조회경로 수정)",
   "apkUrl": "https://drive.google.com/file/d/1em8Ds0bGJBkOcyzuqlCD-MZrZAEPLWo0/view",
-  "notice": "⚓ 로또645 V75354: V75353을 설치한 뒤에도 업데이트 팝업이 계속 표시되는 버전 인식 오류를 수정했습니다. APK 내부 업데이트 검사 버전과 서버 버전을 75354로 일치시켰습니다. V75353의 기기별 후보 14수 독립 선정 엔진·분석 원장·성적관리·누적DB·방송 기능은 변경하지 않았습니다. 기존 앱 삭제 없이 덮어쓰기 업데이트하고 설치 후 앱을 다시 실행하여 확인하십시오. 업데이트 전 DB 백업을 권장합니다.",
-  "noticeId": "LOTTO645-20261123-75354-UPDATE-LOOP-HOTFIX",
-  "publishedAt": "2026-11-23T22:27:20+09:00",
+  "notice": "⚓ 로또645 V75355: 50·51회차에서 기존 공통 P2/R16 후보와 기기별 B14 후보가 혼동되지 않도록 회차별 후보 조회 경로를 보강했습니다. 각 기기의 B14 후보 14수와 고유 시드 식별자를 직접 확인하여 비교할 수 있습니다. 기존 원장·구매·확정 기록은 삭제하지 않았습니다. 기기별 후보 차이의 실기기 검증 중입니다. 설치 전 DB 백업, 기존 앱 삭제 없이 덮어쓰기 업데이트하십시오.",
+  "noticeId": "LOTTO645-20261123-75355-B14-CANDIDATE-VIEW-ROUND50-51",
+  "publishedAt": "2026-11-23T23:01:13+09:00",
   "enabled": true
 }
