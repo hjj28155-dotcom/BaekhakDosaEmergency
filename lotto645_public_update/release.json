@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 75355,
-  "versionName": "6.75 (V75355 · 50·51회 기기별 B14 후보 조회경로 수정)",
+  "versionCode": 75356,
+  "versionName": "6.75 (V75356 · 기기별 B14 후보 버튼 홈 가로배치 복구)",
   "apkUrl": "https://drive.google.com/file/d/1em8Ds0bGJBkOcyzuqlCD-MZrZAEPLWo0/view",
-  "notice": "⚓ 로또645 V75355: 50·51회차에서 기존 공통 P2/R16 후보와 기기별 B14 후보가 혼동되지 않도록 회차별 후보 조회 경로를 보강했습니다. 각 기기의 B14 후보 14수와 고유 시드 식별자를 직접 확인하여 비교할 수 있습니다. 기존 원장·구매·확정 기록은 삭제하지 않았습니다. 기기별 후보 차이의 실기기 검증 중입니다. 설치 전 DB 백업, 기존 앱 삭제 없이 덮어쓰기 업데이트하십시오.",
-  "noticeId": "LOTTO645-20261123-75355-B14-CANDIDATE-VIEW-ROUND50-51",
-  "publishedAt": "2026-11-23T23:01:13+09:00",
+  "notice": "⚓ 로또645 V75356: V75355에서 새 ‘이 기기 독립 B14 후보 14수’ 버튼이 홈화면 왼쪽에 세로로 길게 표시되던 배치 오류를 수정했습니다. 홈 격자 밖의 전체 가로 너비 버튼으로 변경했고, V75355의 기기별 B14 후보 조회 기능과 기존 후보·분석·성적·누적DB 및 방송 코드, DB는 유지했습니다. 휴대폰 실기기 화면 검증 중입니다. 기존 앱 삭제 없이 덮어쓰기 업데이트하고 설치 전 DB 백업을 권장합니다.",
+  "noticeId": "LOTTO645-20261123-75356-HOME-B14-CANDIDATE-BUTTON-LAYOUT",
+  "publishedAt": "2026-11-23T23:10:30+09:00",
   "enabled": true
 }
