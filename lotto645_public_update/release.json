@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 75313,
-  "versionName": "6.75 (R16.0 최종 분석 회차 영구 저장·재실행 복원)",
-  "apkUrl": "https://drive.google.com/file/d/1em8Ds0bGJBkOcyzuqlCD-MZrZAEPLWo0/view",
-  "notice": "⚓ 로또645 75313 업데이트: 앱 종료 후 다시 실행해도 R16.0 최종 분석 완료 회차 제1250회(1,249회·24,980조합, 951회 원장 누락)를 기기 저장소에서 복원합니다. 이미 완료된 과거 분석은 재실행 대신 저장된 최종 회차의 성적을 조회하도록 수정했습니다. 기존 후보 10·12수, R16 조합, P2·구매 원장·1251회 확정 조합은 보존합니다. 기존 앱을 삭제하지 말고 DB 백업 후 덮어쓰기 설치하십시오. 실제 선장폰 종료·재실행 검증은 별도로 필요합니다.",
-  "noticeId": "R16-20261121-75313-LAST-COMPLETED-PERSISTENT",
-  "publishedAt": "2026-11-21T10:25:00+09:00",
+  "versionCode": 75341,
+  "versionName": "6.75 (75341 · 14수 B형 공동검증 업데이트)",
+  "apkUrl": "https://drive.google.com/file/d/1W_zRrwfAGpoGByNukLoIPShgKIv0Lc2m/view",
+  "notice": "⚓ 로또645 75341 전체 기기 공동검증 업데이트: 네 독립 분석방·후보 14수·방별 5조합(최대 20조합) B형을 적용했습니다. 각 휴대폰의 조합과 회차별 4수·5수 이상 적중 및 낙첨 성적을 비교합니다. 기존 누적 DB·구매/확정 기록·1252회 사전등록 조합은 삭제하거나 재설정하지 마십시오. 설치 전 DB를 백업하고 기존 앱 삭제 없이 덮어쓰기 설치하십시오. 실기기 설치·DB 보존은 아직 검증되지 않았습니다. 다운로드가 제한될 경우 Google Drive 공유 권한을 확인하십시오.",
+  "noticeId": "LOTTO645-20261123-75341-B14-ALL-DEVICE-RESEARCH",
+  "publishedAt": "2026-11-23T14:16:27+09:00",
   "enabled": true
 }
