@@ -1,11 +1,11 @@
 {
   "schema": "lotto645-update-v1",
   "packageName": "com.hanghae.lotto645",
-  "versionCode": 75342,
-  "versionName": "6.75 (75342 · 구형 시작화면 숨김 · 승인 홈 바로 실행)",
+  "versionCode": 75343,
+  "versionName": "6.75 (75343 · 업데이트 팝업 자동확인 복구)",
   "apkUrl": "https://drive.google.com/file/d/1em8Ds0bGJBkOcyzuqlCD-MZrZAEPLWo0/view",
-  "notice": "⚓ 로또645 V75342 시작 화면 수정. 앱 실행 시 '업데이트·원문 채팅방·기본메뉴' 구형 3버튼 화면을 표시하지 않고 기존 승인 로또645 홈을 바로 표시합니다. B14 다중기기 엔진, 4개 독립 분석방, 누적 DB·구매/확정 기록, 업데이트 기능은 그대로 유지합니다. 기존 앱을 삭제하지 말고 DB 백업 후 덮어쓰기 업데이트하십시오. 실기기 화면 동작·DB 보존은 아직 확인 전입니다.",
-  "noticeId": "LOTTO645-20261123-75342-HOME-LAUNCH-APPROVED",
-  "publishedAt": "2026-11-23T14:42:00+09:00",
+  "notice": "⚓ 로또645 V75343 업데이트 팝업 복구. 앱의 승인 홈은 그대로 사용하면서 빠져 있던 업데이트 자동 확인 프로그램 연결을 복구하고 실제 설치 버전코드(75343)를 동기화했습니다. 새 버전이 있으면 시작 시 팝업을 표시하며 같은 버전이면 표시하지 않습니다. V75342 및 이전 일부 설치본은 팝업 연결이 없어 이 버전으로 한 번 직접 덮어쓰기 설치해야 합니다. 기존 앱을 삭제하지 말고 누적 DB를 백업하십시오. 분석 엔진·구매/확정기록·DB 처리 코드 불변. 실기기 UI·DB 보존은 아직 확인 전입니다.",
+  "noticeId": "LOTTO645-20261123-75343-UPDATE-POPUP-LOADER-RESTORED",
+  "publishedAt": "2026-11-23T15:00:10+09:00",
   "enabled": true
 }
